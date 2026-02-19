@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
+import { useSupabaseClient, useSession } from "@/src/lib/auth/session-context";
 import MissionShell from "../../../BasePlate";
 import { CloudCogIcon, FolderCog, HelpCircle, PaintBucket, Vote } from "lucide-react";
 import { AiForMarsProjectWithID, StarterAiForMars } from "@/src/components/projects/Auto/AI4Mars";

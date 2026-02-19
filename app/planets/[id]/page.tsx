@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useCallback, useState, useMemo } from "react";
-import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
+import { useSession, useSupabaseClient } from "@/src/lib/auth/session-context";
 import { PostCardSingleWithGenerator } from "@/src/components/social/posts/PostWithGen";
 import Image from "next/image";
 import { Button } from "@/src/components/ui/button";

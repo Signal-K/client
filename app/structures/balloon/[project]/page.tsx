@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter, useParams } from 'next/navigation';
-import { useSession } from '@supabase/auth-helpers-react';
+import { useSession } from '@/src/lib/auth/session-context';
 import Home from '@/app/page';
 import GameNavbar from '@/src/components/layout/Tes';
 import AI4M from '@/src/components/deployment/missions/structures/Astronomers/SatellitePhotos/AI4M/AIForMars';

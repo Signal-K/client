@@ -1,19 +1,19 @@
 "use client";
 
-import { useSession } from "@supabase/auth-helpers-react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import EnhancedAuthPage from "@/src/components/profile/auth/EnhancedAuth";
+import { useAuthUser } from "@/src/hooks/useAuthUser";
 
 const Register = () => {
-    const session = useSession();
+    const { user } = useAuthUser();
     const router = useRouter();
 
     useEffect(() => {
-        if (session) {
+        if (user) {
             router.push('/');
         }
-    }, [session, router]);
+    }, [user, router]);
 
     return <EnhancedAuthPage />;
 };

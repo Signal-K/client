@@ -5,7 +5,7 @@ import { Badge } from "@/src/components/ui/badge"
 import { Telescope, Sun, Target, Info, ArrowLeft, Sparkles } from "lucide-react"
 import { Button } from "@/src/components/ui/button"
 import React, { useEffect, useState } from "react"
-import { useSupabaseClient } from "@supabase/auth-helpers-react"
+import { useSupabaseClient } from "@/src/lib/auth/session-context"
 
 export default function TypeSelection({
   onChooseType,

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { ChevronUp, ChevronDown, Satellite } from 'lucide-react';
-import { useSupabaseClient, useSession } from '@supabase/auth-helpers-react';
+import { useSupabaseClient, useSession } from '@/src/lib/auth/session-context';
 import { useRouter } from 'next/navigation';
 import { DatabaseAnomaly } from '../Telescope/TelescopeUtils';
 import { PlanetGeneratorMinimal } from '@/src/components/discovery/data-sources/Astronomers/PlanetHunters/PlanetGenerator';
@@ -235,14 +235,17 @@ const SatelliteSpiderScan: React.FC<SatelliteSpiderScanProps> = ({ anomalies }) 
     
     setIsRecalling(true);
     try {
-      const { error } = await supabase
-        .from('linked_anomalies')
-        .delete()
-        .eq('author', session.user.id)
-        .eq('automaton', 'WeatherSatellite');
+      const response = await fetch("/api/gameplay/linked-anomalies", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          automaton: "WeatherSatellite",
+        }),
+      });
+      const payload = await response.json().catch(() => ({}));
 
-      if (error) {
-        console.error('Error recalling satellite:', error);
+      if (!response.ok) {
+        console.error('Error recalling satellite:', payload?.error);
         alert('Failed to recall satellite. Please try again.');
       } else {
         // Redirect to home or satellite viewport after successful recall

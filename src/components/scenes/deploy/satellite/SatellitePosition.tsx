@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
+import { useSupabaseClient, useSession } from "@/src/lib/auth/session-context";
 import Section from "@/src/components/sections/Section";
 import WeatherSatelliteMissionType from "./WeatherSatelliteMissionType";
 import SatelliteProgressBar from "./SatelliteProgressBar";
@@ -304,22 +304,23 @@ export default function SatellitePosition({ satellites, flashingIndicator }: Sat
     
     setIsUnlocking(true);
     try {
-      const { error } = await supabase
-        .from("linked_anomalies")
-        .update({ 
-          unlocked: true
-        })
-        .eq("id", selectedSatellite.linkedAnomalyId)
-        .eq("author", session.user.id);
+      const response = await fetch("/api/gameplay/linked-anomalies", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: selectedSatellite.linkedAnomalyId,
+          unlocked: true,
+        }),
+      });
+      const result = await response.json().catch(() => ({}));
 
-      if (error) {
-        // Handle case where unlocked column doesn't exist
-        if (error.message?.includes('unlocked')) {
+      if (!response.ok) {
+        if (String(result?.error || "").includes("unlocked")) {
           console.warn('Cannot unlock: unlocked column missing in database');
           alert('Unlock feature requires database update. Please contact support.');
           return;
         }
-        throw error;
+        throw new Error(result?.error || "Failed to unlock anomaly");
       }
 
       // Update the satellite state
@@ -456,15 +457,24 @@ const handleSatelliteMouseEnter = async (satellite: Satellite) => {
       
       // Also update in database
       if (session?.user?.id && positions[0].linkedAnomalyId) {
-        supabase
-          .from("linked_anomalies")
-          .update({ unlocked: true })
-          .eq("id", positions[0].linkedAnomalyId)
-          .eq("author", session.user.id)
-          .then(({ error }) => {
-            if (error && !error.message?.includes('unlocked')) {
-              console.error("Error auto-unlocking anomaly:", error);
+        fetch("/api/gameplay/linked-anomalies", {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            id: positions[0].linkedAnomalyId,
+            unlocked: true,
+          }),
+        })
+          .then(async (res) => {
+            if (!res.ok) {
+              const payload = await res.json().catch(() => ({}));
+              if (!String(payload?.error || "").includes("unlocked")) {
+                console.error("Error auto-unlocking anomaly:", payload?.error);
+              }
             }
+          })
+          .catch((error) => {
+            console.error("Error auto-unlocking anomaly:", error);
           });
       }
     }

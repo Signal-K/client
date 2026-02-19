@@ -5,8 +5,8 @@ import { RoverBackground } from "@/src/components/classification/telescope/rover
 import MainHeader from "@/src/components/layout/Header/MainHeader";
 import UseDarkMode from "@/src/shared/hooks/useDarkMode";
 import { usePageData } from "@/hooks/usePageData";
-import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { TelescopeBackground } from "@/src/components/classification/telescope/telescope-background";
+import { useAuthUser } from "@/src/hooks/useAuthUser";
 
 const PLANETS = ["Mars"];
 
@@ -15,9 +15,8 @@ export default function DeployRoverPage() {
   const [waypoints, setWaypoints] = useState<{ x: number; y: number }[]>([]);
   const mapRef = useRef<HTMLDivElement>(null);
 
-  // Supabase session and client
-  const supabase = useSupabaseClient();
-  const session = useSession();
+  // Supabase session
+  const { user } = useAuthUser();
 
   // Most recent planet classification and anomaly
   const [planetClassification, setPlanetClassification] = useState<any>(null);
@@ -31,71 +30,33 @@ export default function DeployRoverPage() {
   });
 
   useEffect(() => {
-    async function fetchPlanetClassification() {
-      if (!session) return;
-      const { data: classifications, error } = await supabase
-        .from("classifications")
-        .select("*, anomaly:anomalies(*)")
-        .eq("classificationtype", "planet")
-        .eq("author", session.user.id)
-        .order("created_at", { ascending: false })
-        .limit(1);
-      if (classifications && classifications.length > 0) {
-        setPlanetClassification(classifications[0]);
-        setPlanetAnomaly(classifications[0].anomaly);
-      };
-    };
+    async function loadRoverSetup() {
+      if (!user) return;
+      const response = await fetch("/api/gameplay/deploy/rover/setup", { cache: "no-store" });
+      const payload = await response.json().catch(() => null);
+      if (!response.ok) {
+        return;
+      }
 
-    async function fetchClassificationCount() {
-      if (!session) return;
-      const { count, error } = await supabase
-        .from("classifications")
-        .select("id", { count: "exact" })
-        .eq("author", session.user.id);
+      setPlanetClassification(payload?.planetClassification ?? null);
+      setPlanetAnomaly(payload?.planetAnomaly ?? null);
+      setUserClassificationCount(payload?.userClassificationCount ?? 0);
+      setIsFastDeployEnabled(Boolean(payload?.isFastDeployEnabled));
+      setRoverUpgrades(
+        payload?.roverUpgrades ?? {
+          roverwaypoints: false,
+          findMinerals: false,
+        }
+      );
+      setMaxWaypoints(payload?.maxWaypoints ?? 4);
 
-      const classificationCount = count || 0;
-      setUserClassificationCount(classificationCount);
-      setIsFastDeployEnabled(classificationCount < 4);
-    }
-
-    async function fetchRoverUpgrades() {
-      if (!session) return;
-      const { data: upgrades, error } = await supabase
-        .from("researched")
-        .select("tech_type")
-        .eq("user_id", session.user.id)
-        .in("tech_type", ["roverwaypoints", "findMinerals"]);
-
-      const hasRoverWaypoints = upgrades?.some((u: any) => u.tech_type === "roverwaypoints") ?? false;
-      const hasFindMinerals = upgrades?.some((u: any) => u.tech_type === "findMinerals") ?? false;
-
-      setRoverUpgrades({
-        roverwaypoints: hasRoverWaypoints,
-        findMinerals: hasFindMinerals,
-      });
-
-      setMaxWaypoints(hasRoverWaypoints ? 6 : 4);
-    };
-
-    fetchPlanetClassification();
-    fetchClassificationCount();
-    fetchRoverUpgrades();
-  }, [session, supabase]);
-
-  useEffect(() => {
-    async function checkExistingRoverDeployment() {
-      if (!session) return;
-      const { data: existingDeployments, error } = await supabase
-        .from("linked_anomalies")
-        .select("*")
-        .eq("author", session.user.id)
-        .eq("automaton", "Rover");
-      if (existingDeployments && existingDeployments.length > 0) {
+      if (payload?.hasExistingRoverDeployment) {
         window.location.href = "/game?view=rover";
       }
     }
-    checkExistingRoverDeployment();
-  }, [session, supabase]);
+
+    loadRoverSetup();
+  }, [user]);
 
   const {
     linkedAnomalies,
@@ -130,109 +91,26 @@ export default function DeployRoverPage() {
   };
 
   const handleDeployRover = async () => {
-    if (!session) {
+    if (!user) {
       return;
     };
 
     setDeployMessage("");
-
-    // 1. Check for recent deployment
-    const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
-    const { data: recentDeployments, error: recentError } = await supabase
-      .from("linked_anomalies")
-      .select("*")
-      .eq("author", session.user.id)
-      .eq("automaton", "Rover")
-      .gte("date", sevenDaysAgo);
-
-    if (recentDeployments && recentDeployments.length > 0) {
-      setDeployMessage("Rover deployment has already occurred this week");
-      return;
-    };
-
-    // 2. Get classified anomalies by user
-    const { data: classified, error: classifiedError } = await supabase
-      .from("classifications")
-      .select("anomaly")
-      .eq("classificationtype", "automaton-aiForMars")
-      .eq("author", session.user.id);
-
-    const classifiedIds = ( classified || []).map((c: any) => c.anomaly);
-
-    // 3. Get all anomalies for automaton-aiForMars
-    const { data: allAnomalies, error: anomaliesError } = await supabase
-      .from("anomalies")
-      .select("id")
-      .eq("anomalySet", "automaton-aiForMars");
-    let unclassified = (allAnomalies || []).filter((a: any) => !classifiedIds.includes(a.id));
-    const requiredAnomalies = waypoints.length;
-    if (unclassified.length < requiredAnomalies) {
-      unclassified = allAnomalies || [];
-    };
-
-    const selectedAnomalies = unclassified.slice(0, requiredAnomalies);
-
-    // 4. Add to `linked_anomalies`
-    const deploymentDate = isFastDeployEnabled
-      ? new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
-      : new Date().toISOString();
-
-    for (const anomaly of selectedAnomalies) {
-      await supabase
-        .from("linked_anomalies")
-        .insert({
-          author: session.user.id,
-          anomaly_id: anomaly.id,
-          automaton: "Rover",
-          date: deploymentDate,
-          unlocked: true,
-        });
-    };
-
-    // 5. Determine mineral deposit waypoints if user has researched `findMinerals`
-    const mineralWaypointIndices: number[] = [];
-    if (roverUpgrades.findMinerals && waypoints.length > 0) {
-    // Mark every 4th waypoint as a mineral deposit location
-    for (let i = 0; i < waypoints.length; i++) {
-      if ((i + 1) % 4 === 0) {
-        mineralWaypointIndices.push(i);
-      }
-    }
-    // If no waypoints qualify (less than 4), mark the last one
-    if (mineralWaypointIndices.length === 0 && waypoints.length > 0) {
-      mineralWaypointIndices.push(waypoints.length - 1);
-    }
-  };
-    // 6. Create route with mineral deposit markers
-  const waypointsWithMinerals = waypoints.map((wp, index) => ({
-    ...wp,
-    hasMineralDeposit: mineralWaypointIndices.includes(index),
-    anomalyId: selectedAnomalies[index]?.id || null,
-  }));
-
-  const routeConfig = {
-    anomalies: selectedAnomalies.map((a: any) => a.id),
-    waypoints: waypointsWithMinerals,
-    mineralWaypoints: mineralWaypointIndices,
-  };
-  
-  const routeTimestamp = isFastDeployEnabled 
-    ? new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString() // 1 day prior for fast deploy
-    : new Date().toISOString(); // Current time for normal deploy
-    
-  await supabase
-    .from("routes")
-    .insert({
-      author: session.user.id,
-      routeConfiguration: routeConfig,
-      location: selectedAnomalies[0]?.id || null,
-      timestamp: routeTimestamp,
+    const response = await fetch("/api/gameplay/deploy/rover", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ waypoints }),
     });
+    const payload = await response.json().catch(() => null);
+    if (!response.ok) {
+      setDeployMessage(payload?.error || "Failed to deploy rover");
+      return;
+    }
 
-  setDeployMessage("Rover deployed successfully!");
-  setTimeout(() => {
-    window.location.href = "/game?view=rover";
-  }, 2000);
+    setDeployMessage("Rover deployed successfully!");
+    setTimeout(() => {
+      window.location.href = "/game?view=rover";
+    }, 2000);
   };
 
   // Draw lines between waypoints

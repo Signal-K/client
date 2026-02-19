@@ -3,7 +3,6 @@
 import { AvatarGenerator } from "@/src/components/profile/setup/Avatar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/src/components/ui/card";
 import { Button } from "@/src/components/ui/button";
-import { useSupabaseClient } from "@supabase/auth-helpers-react";
 
 interface CommentCardProps {
   id: number;
@@ -37,23 +36,23 @@ export function CommentCard({
   isSurveyor, 
   configuration 
 }: CommentCardProps) {
-  const supabase = useSupabaseClient();
-
   const handleConfirmComment = async () => {
     if (!configuration) return;
 
     try {
-      const updatedConfig = {
-        ...classificationConfig,
-        ...configuration,
-      };
-
-      const { error } = await supabase
-        .from("classifications")
-        .update({ classificationConfiguration: updatedConfig })
-        .eq("id", classificationId);
-
-      if (error) throw error;
+      const response = await fetch("/api/gameplay/classifications/configuration", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          classificationId,
+          action: "merge",
+          patch: configuration,
+        }),
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        throw new Error(result?.error || "Failed to confirm comment");
+      }
     } catch (error) {
       console.error("Error confirming comment:", error);
     };

@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useEffect, useState } from "react"
-import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react"
+import { useSession, useSupabaseClient } from "@/src/lib/auth/session-context"
 import {
   Select,
   SelectContent,

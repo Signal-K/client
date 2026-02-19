@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
+import { useSupabaseClient, useSession } from "@/src/lib/auth/session-context";
 import { Card } from "@/src/components/ui/card";
 import {
   Dialog,
@@ -125,36 +125,17 @@ export default function ActivityHeader({
   const handleSendSatellite = async (planetId: number, planetName: string) => {
     if (!session) return;
 
-    const userId = session.user.id;
-
     try {
-      // Get random cloud anomaly
-      const { data: cloudAnomalies, error } = await supabase
-        .from("anomalies")
-        .select("id")
-        .eq("anomalytype", "cloud");
-
-      if (error || !cloudAnomalies || cloudAnomalies.length === 0) return;
-
-      const randomIndex = Math.floor(Math.random() * cloudAnomalies.length);
-      const selectedAnomaly = cloudAnomalies[randomIndex];
-
-      const insertPayload = [
-        {
-          author: userId,
-          anomaly_id: selectedAnomaly.id,
-          classification_id: planetId,
-          automaton: "WeatherSatellite",
-        },
-        {
-          author: userId,
-          anomaly_id: selectedAnomaly.id,
-          classification_id: planetId,
-          automaton: "WeatherSatellite",
-        },
-      ];
-
-      await supabase.from("linked_anomalies").insert(insertPayload);
+      const response = await fetch("/api/gameplay/deploy/satellite/quick", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ planetClassificationId: planetId }),
+      });
+      const payload = await response.json().catch(() => null);
+      if (!response.ok) {
+        console.error("Error deploying satellite:", payload?.error || response.statusText);
+        return;
+      }
 
       // Show success message and animation
       setDeploymentMessage(`🛰️ Satellite successfully deployed to ${planetName}!`);

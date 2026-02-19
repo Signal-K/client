@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { useParams, useRouter } from "next/navigation"
-import { useSessionContext } from "@supabase/auth-helpers-react"
+import { useSessionContext } from "@/src/lib/auth/session-context"
 
 // Mission imports
 import PlanetHuntersSteps from "@/src/components/deployment/missions/structures/Astronomers/PlanetHunters/PlanetHunters"

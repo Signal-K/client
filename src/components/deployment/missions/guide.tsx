@@ -3,7 +3,7 @@ import { Button } from "@/src/components/ui/button";
 import { Card, CardContent } from "@/src/components/ui/card";
 import { CloudDrizzleIcon, LightbulbIcon, Telescope, ArrowUpIcon, ArrowDownIcon } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
+import { useSupabaseClient, useSession } from "@/src/lib/auth/session-context";
 import JournalPage from "@/src/components/deployment/missions/structures/Stardust/Journal";
 import MilestoneCard from "@/src/components/deployment/missions/structures/Milestones/MilestoneCard";
 

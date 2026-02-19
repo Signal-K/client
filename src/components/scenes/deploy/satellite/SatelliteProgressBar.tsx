@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { useState, useMemo } from "react";
-import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
+import { useSession, useSupabaseClient } from "@/src/lib/auth/session-context";
 import { useRouter } from "next/navigation";
 import PlanetMission from "./PlanetMission";
 import WeatherMission from "./WeatherMission";
@@ -611,51 +611,51 @@ export default function SatelliteProgressBar(props: SatelliteProgressBarProps) {
       type: planetType,
     });
 
-    // Create a new classification in the database
-    const { data, error } = await supabase
-      .from("classifications")
-      .insert([
-        {
-          author: session?.user?.id,
-          classificationtype: "planet",
-          anomaly: classification?.anomaly,
-          classificationConfiguration: {
-            planet_mass: planetMass,
-            planet_radius: planetRadius,
-            planet_density: planetDensity,
-            planet_temp: planetTemp,
-            planet_type: planetType,
-            orbital_period: orbitalPeriod,
-            transit_depth: transitDepth,
-            stellar_temp: stellarTemp,
-            stellar_radius: stellarRadius,
-            stellar_mass: stellarMass,
-            source_classification_id: linkedAnomalyClassificationId, // Reference to the original lightcurve classification
-          },
-          content: `Discovered ${planetType} with radius ${planetRadius.toFixed(2)} Earth radii and mass ${planetMass.toFixed(2)} Earth masses`,
+    const classificationResponse = await fetch("/api/gameplay/classifications", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        classificationtype: "planet",
+        anomaly: classification?.anomaly,
+        classificationConfiguration: {
+          planet_mass: planetMass,
+          planet_radius: planetRadius,
+          planet_density: planetDensity,
+          planet_temp: planetTemp,
+          planet_type: planetType,
+          orbital_period: orbitalPeriod,
+          transit_depth: transitDepth,
+          stellar_temp: stellarTemp,
+          stellar_radius: stellarRadius,
+          stellar_mass: stellarMass,
+          source_classification_id: linkedAnomalyClassificationId,
         },
-      ])
-      .select();
+        content: `Discovered ${planetType} with radius ${planetRadius.toFixed(2)} Earth radii and mass ${planetMass.toFixed(2)} Earth masses`,
+      }),
+    });
 
-    if (error) {
-      console.error("Error creating classification:", error);
+    if (!classificationResponse.ok) {
+      const payload = await classificationResponse.json().catch(() => ({}));
+      console.error("Error creating classification:", payload?.error);
       alert("Failed to save your findings. Please try again.");
     } else {
-      console.log("Classification created:", data);
-      if (data && data[0]) {
-        setNewClassificationId(data[0].id);
+      const data = await classificationResponse.json();
+      if (data?.id) {
+        setNewClassificationId(data.id);
         setShowSuccessModal(true);
         
         // Delete ALL linked_anomalies rows for WeatherSatellite missions by this user
         if (session?.user?.id) {
-          const { error: deleteError } = await supabase
-            .from("linked_anomalies")
-            .delete()
-            .eq("author", session.user.id)
-            .eq("automaton", "WeatherSatellite");
-          
-          if (deleteError) {
-            console.error("Error deleting linked_anomalies rows:", deleteError);
+          const deleteResponse = await fetch("/api/gameplay/linked-anomalies", {
+            method: "DELETE",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              automaton: "WeatherSatellite",
+            }),
+          });
+          if (!deleteResponse.ok) {
+            const payload = await deleteResponse.json().catch(() => ({}));
+            console.error("Error deleting linked_anomalies rows:", payload?.error);
           } else {
             console.log("Successfully deleted all WeatherSatellite linked_anomalies rows for user");
           }
@@ -663,7 +663,7 @@ export default function SatelliteProgressBar(props: SatelliteProgressBarProps) {
         
         // Redirect after 3 seconds
         setTimeout(() => {
-          router.push(`/next/${data[0].id}`);
+          router.push(`/next/${data.id}`);
         }, 3000);
       }
     }

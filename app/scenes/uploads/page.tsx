@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from "react";
-import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
+import { useSupabaseClient, useSession } from "@/src/lib/auth/session-context";
 import Navbar from "@/src/components/layout/Navbar";
 import Link from "next/link";
 

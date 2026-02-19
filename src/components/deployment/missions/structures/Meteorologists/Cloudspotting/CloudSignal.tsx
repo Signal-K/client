@@ -5,7 +5,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card } from "@/src/components/ui/card"
 import { Textarea } from "@/src/components/ui/textarea"
 import { Plus, Trash2, Copy, ClipboardPasteIcon as Paste } from 'lucide-react'
-import { useSupabaseClient } from '@supabase/auth-helpers-react'
 
 type CloudShape = 'arch' | 'loop' | 'wisp'
 type Cloud = {
@@ -107,8 +106,6 @@ const getCloudColor = (altitude: number, shape: CloudShape) => {
 };
 
 export default function CloudSignal({ classificationConfig, classificationId }: CloudSignalProps) {
-  const supabase = useSupabaseClient();
-
   // From sb
   const initialClouds = classificationConfig?.cloudData || [];
   const [exporting, setExporting] = useState<boolean>(false);
@@ -155,27 +152,19 @@ export default function CloudSignal({ classificationConfig, classificationId }: 
     setExporting(true);
   
     try {
-      const { data, error } = await supabase
-        .from("classifications")
-        .select("classificationConfiguration")
-        .eq("id", classificationId)
-        .single();
-  
-      if (error) throw error;
-  
-      const currentConfig = data?.classificationConfiguration || {};
-      const newCloudConfig = {
-        cloudData: clouds, // Use clouds as the new cloud configuration
-      };
-  
-      const updatedConfig = { ...currentConfig, ...newCloudConfig };
-  
-      const { error: updateError } = await supabase
-        .from("classifications")
-        .update({ classificationConfiguration: updatedConfig })
-        .eq("id", classificationId);
-  
-      if (updateError) throw updateError;
+      const response = await fetch("/api/gameplay/classifications/configuration", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          classificationId: Number(classificationId),
+          action: "merge",
+          patch: { cloudData: clouds },
+        }),
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        throw new Error(result?.error || "Failed to export cloud configuration");
+      }
   
       alert("Cloud configuration exported successfully!");
     } catch (err) {

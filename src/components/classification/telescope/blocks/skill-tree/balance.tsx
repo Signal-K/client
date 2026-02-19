@@ -3,7 +3,7 @@
 import { Badge } from "@/src/components/ui/badge"
 import { Sparkles } from "lucide-react"
 import { useEffect, useState, forwardRef, useImperativeHandle } from "react"
-import { useSupabaseClient } from "@supabase/auth-helpers-react"
+import { useSupabaseClient } from "@/src/lib/auth/session-context"
 
 interface StardustBalanceProps {
   userId: string

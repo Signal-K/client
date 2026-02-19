@@ -6,7 +6,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/src/comp
 import { Button } from "@/src/components/ui/button";
 import { ThumbsUp, MessageSquare, FeatherIcon, PencilLineIcon, EyeIcon, EyeOffIcon } from "lucide-react";
 import { Badge } from "@/src/components/ui/badge";
-import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
+import { useSession, useSupabaseClient } from "@/src/lib/auth/session-context";
 import { CommentCard } from "../comments/CommentSingle";
 
 import CloudSignal from "@/src/components/deployment/missions/structures/Meteorologists/Cloudspotting/CloudSignal";
@@ -100,18 +100,22 @@ export function PostCardSingleWithGenerator({
     if (!session) return;
 
     try {
-      const { error } = await supabase
-        .from("votes")
-        .insert([
-          {
-            user_id: session.user.id,
-            classification_id: classificationId,
-            anomaly_id: anomalyId,
-          },
-        ]);
+      const response = await fetch("/api/gameplay/social/votes", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          classificationId,
+          anomalyId,
+          voteType: "up",
+        }),
+      });
+      const result = await response.json().catch(() => ({}));
 
-      if (error) {
-        console.error('Error inserting vote: ', error);
+      if (!response.ok) {
+        console.error("Error inserting vote:", result?.error);
+        return;
+      }
+      if (result?.alreadyVoted) {
         return;
       }
 
@@ -319,17 +323,16 @@ export function PostCardSingleWithGeneratorEditMode({
     if (!newComment.trim()) return;
 
     try {
-      const { error } = await supabase
-        .from("comments")
-        .insert([
-          {
-            content: newComment,
-            classification_id: classificationId,
-            author: session?.user?.id,
-          },
-        ]);
-
-      if (error) throw error;
+      const response = await fetch("/api/gameplay/social/comments", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          content: newComment,
+          classificationId,
+        }),
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(result?.error || "Failed to add comment");
 
       setNewComment("");
       fetchComments();

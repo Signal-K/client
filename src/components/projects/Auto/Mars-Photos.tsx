@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
+import { useSession, useSupabaseClient } from "@/src/lib/auth/session-context";
 import { useActivePlanet } from "@/src/core/context/ActivePlanet";
 import ClassificationForm from "../(classifications)/PostForm";
 import { MapPin } from "lucide-react";
@@ -69,15 +69,20 @@ export const RooverFromAppeears: React.FC = () => {
                     created_at: new Date(),
                 }));
     
-                const { data, error } = await supabase
-                    .from("anomalies")
-                    .insert(anomalies)
-                    .select("id, avatar_url");
-    
-                if (error) {
-                    console.error("Error inserting anomalies: ", error.message);
-                    throw error;
-                };
+                const response = await fetch("/api/gameplay/anomalies", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        anomalies,
+                    }),
+                });
+                const data = await response.json().catch(() => []);
+                if (!response.ok) {
+                    console.error("Error inserting anomalies: ", (data as any)?.error);
+                    throw new Error((data as any)?.error || "Failed to insert anomalies");
+                }
     
                 setImagesCollected(true);
                 alert("Images collected successfully!");
@@ -104,14 +109,20 @@ export const RooverFromAppeears: React.FC = () => {
                     },
                 }));
 
-                const { data, error } = await supabase
-                    .from("mineralDeposits")
-                    .insert(deposits);
-
-                if (error) {
-                    console.error("Error inserting mineral deposits: ", error.message);
-                    throw error;
-                };
+                const response = await fetch("/api/gameplay/mineral-deposits/bulk", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        deposits,
+                    }),
+                });
+                const payload = await response.json().catch(() => ({}));
+                if (!response.ok) {
+                    console.error("Error inserting mineral deposits: ", payload?.error);
+                    throw new Error(payload?.error || "Failed to insert mineral deposits");
+                }
 
                 alert("Mining settlement established successfully!");
             } catch (error) {
@@ -237,15 +248,20 @@ export const RoverPhoto: React.FC = () => {
                     created_at: new Date(),
                 };
 
-                const { data, error } = await supabase
-                    .from("anomalies")
-                    .insert([anomaly])
-                    .select("id, avatar_url");
-
-                if (error) {
-                    console.error("Error inserting anomaly:", error.message);
-                    throw error;
-                };
+                const response = await fetch("/api/gameplay/anomalies", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        anomaly,
+                    }),
+                });
+                const data = await response.json().catch(() => []);
+                if (!response.ok) {
+                    console.error("Error inserting anomaly:", (data as any)?.error);
+                    throw new Error((data as any)?.error || "Failed to insert anomaly");
+                }
 
                 setImagesCollected(true);
                 setRovers(data);

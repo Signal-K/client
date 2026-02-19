@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
+import { useSupabaseClient, useSession } from "@/src/lib/auth/session-context";
 import { useRouter } from "next/navigation";
 import { SimplePostSingle } from "@/src/components/social/posts/SimplePostSingle";
 
@@ -126,44 +126,30 @@ const PlanetTypeCommentForm = ({ classificationId }: PlanetTypeCommentFormProps)
   }, [supabase, classificationIdNum]);
 
   const handleSelectPreferredComment = async (classificationId: number, commentId: number) => {
-    const selectedComment = comments.find((comment) => comment.id === commentId);
-    if (!selectedComment) return;
-
-    const classificationToUpdate = classifications.find(
-      (classification) => classification.id === classificationId
-    );
+    const classificationToUpdate = classifications.find((classification) => classification.id === classificationId);
     if (!classificationToUpdate || classificationToUpdate.author !== session?.user?.id) return;
 
-    const planetType = selectedComment.configuration?.planetType;
-    if (!planetType) return;
-
-    const updatedClassificationConfig = {
-      ...classificationToUpdate.classificationConfiguration,
-      classificationOptions: {
-        ...classificationToUpdate.classificationConfiguration.classificationOptions,
-        planetType: [
-          ...(classificationToUpdate.classificationConfiguration.classificationOptions["planetType"] || []),
-          planetType,
-        ],
-      },
-    };
-
     try {
-      const { error } = await supabase
-        .from("classifications")
-        .update({ classificationConfiguration: updatedClassificationConfig })
-        .eq("id", classificationId);
+      const response = await fetch("/api/gameplay/planet/comments/preferred", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          classificationId,
+          commentId,
+        }),
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        throw new Error(result?.error || "Failed to mark comment as preferred");
+      }
 
-      if (error) throw error;
-
-      const updatedConfig = { ...selectedComment.configuration, preferred: true };
-
-      const { error: commentError } = await supabase
-        .from("comments")
-        .update({ configuration: updatedConfig })
-        .eq("id", commentId);
-
-      if (commentError) throw commentError;
+      setComments((prev) =>
+        prev.map((comment) =>
+          comment.id === commentId
+            ? { ...comment, configuration: { ...(comment.configuration || {}), preferred: true } }
+            : comment
+        )
+      );
     } catch (err) {
       console.error("Error updating preferred comment:", err);
     }
@@ -180,18 +166,19 @@ const PlanetTypeCommentForm = ({ classificationId }: PlanetTypeCommentFormProps)
     }
 
     try {
-      const { error } = await supabase.from("comments").insert([
-        {
+      const response = await fetch("/api/gameplay/social/comments", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
           content: commentInput,
-          classification_id: classificationId,
-          author: session?.user?.id,
+          classificationId,
           configuration: { planetType },
-        },
-      ]);
-
-      if (error) {
-        console.error("Supabase error:", error);
-        throw error;
+        }),
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        console.error("API error:", result?.error);
+        throw new Error(result?.error || "Failed to add comment");
       }
 
       setCommentInputs((prev) => ({ ...prev, [classificationId]: "" }));

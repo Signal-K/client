@@ -1,6 +1,6 @@
 "use client"
 
-import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react"
+import { useSupabaseClient, useSession } from "@/src/lib/auth/session-context"
 import Section from "@/src/components/sections/Section"
 import React, { useState } from "react"
 import { Inbox, Bell, Wrench, MessageSquare } from "lucide-react"

@@ -8,7 +8,7 @@ import { Button } from "@/src/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/src/components/ui/card";
 import { Textarea } from "@/src/components/ui/textarea";
 import { ThumbsUp, MessageSquare, Share2 } from "lucide-react";
-import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
+import { useSession, useSupabaseClient } from "@/src/lib/auth/session-context";
 import html2canvas from "html2canvas";
 import { CommentCard } from "../comments/CommentSingle";
 import { SurveyorComments } from "./Surveyor/SurveyorPostCard";
@@ -92,16 +92,21 @@ export function PostCardSingle({
     if (!session?.user?.id) return;
 
     try {
-      const { error } = await supabase.from("votes").insert([
-        {
-          user_id: session.user.id,
-          classification_id: classificationId,
-          anomaly_id: anomalyId,
-        },
-      ]);
-
-      if (error) {
-        console.error("Error inserting vote: ", error);
+      const response = await fetch("/api/gameplay/social/votes", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          classificationId,
+          anomalyId,
+          voteType: "up",
+        }),
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        console.error("Error inserting vote:", result?.error || "Unknown vote error");
+        return;
+      }
+      if (result?.alreadyVoted) {
         return;
       }
 
@@ -117,17 +122,18 @@ export function PostCardSingle({
     if (!newComment.trim()) return;
 
     try {
-      const { error } = await supabase
-        .from("comments")
-        .insert([
-          {
-            content: newComment,
-            classification_id: classificationId,
-            author: session?.user?.id,
-          },
-        ]);
-
-      if (error) throw error;
+      const response = await fetch("/api/gameplay/social/comments", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          content: newComment,
+          classificationId,
+        }),
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        throw new Error(result?.error || "Failed to add comment");
+      }
 
       setNewComment("");
       fetchComments();

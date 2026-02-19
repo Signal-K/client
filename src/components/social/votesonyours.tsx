@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react"
+import { useSupabaseClient, useSession } from "@/src/lib/auth/session-context"
 import { AvatarGenerator } from "@/src/components/profile/setup/Avatar"
 import { ThumbsUp, MessageCircle } from "lucide-react"
 

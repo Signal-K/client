@@ -2,7 +2,7 @@
 
 import React, { act, useEffect, useState } from "react";
 import Home from "@/app/page";
-import { useSession } from "@supabase/auth-helpers-react";
+import { useSession } from "@/src/lib/auth/session-context";
 import { useRouter } from "next/navigation";
 import { BuildingIcon, CloudCogIcon, MicroscopeIcon } from "lucide-react";
 import ChatGPTImageClassifier from "@/src/components/classification/tools/image-classifier";

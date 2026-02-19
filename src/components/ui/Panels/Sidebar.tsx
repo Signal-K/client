@@ -2,7 +2,7 @@
 import TotalPoints from "@/src/components/deployment/missions/structures/Stardust/Total";
 
 import type React from "react"
-import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
+import { useSession, useSupabaseClient } from "@/src/lib/auth/session-context";
 import { useState, useEffect } from "react"
 import { Button } from "@/src/components/ui/button"
 import { Card, CardContent } from "@/src/components/ui/card"

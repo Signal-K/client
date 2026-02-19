@@ -3,8 +3,8 @@
 import { Suspense, useState, useEffect, useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import dynamic from "next/dynamic";
-import { useSession, useSessionContext } from "@supabase/auth-helpers-react";
 import { usePostHog } from "posthog-js/react";
+import { useAuthUser } from "@/src/hooks/useAuthUser";
 
 // Dynamic heavy components
 const TelescopeBackground = dynamic(
@@ -111,8 +111,7 @@ const POSTHOG_SURVEY_SHOWN_KEY = "posthog_survey_g5zk5h_shown_v1";
 
 // Create a separate component for the search params logic
 function GamePageContent() {
-  const session = useSession();
-  const { isLoading: isAuthLoading } = useSessionContext();
+  const { user, isLoading: isAuthLoading } = useAuthUser();
   const posthog = usePostHog();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -146,10 +145,10 @@ function GamePageContent() {
 
   // Show preferences modal on first visit or new device
   useEffect(() => {
-    if (!preferencesLoading && needsPreferencesPrompt && session) {
+    if (!preferencesLoading && needsPreferencesPrompt && user) {
       setShowPreferencesModal(true);
     }
-  }, [preferencesLoading, needsPreferencesPrompt, session]);
+  }, [preferencesLoading, needsPreferencesPrompt, user]);
 
         // Determine which structures to show based on preferences
         const shouldShowStructure = (structureType: "telescope" | "satellite" | "rover" | "solar") => {
@@ -269,18 +268,18 @@ function GamePageContent() {
 
         // Track page view
         useEffect(() => {
-          if (session?.user) {
+          if (user) {
             posthog?.capture("game_page_viewed", {
-              user_id: session.user.id,
+              user_id: user.id,
               classification_count: classifications.length,
               discovery_count: linkedAnomalies.length,
             });
           }
-        }, [session, posthog, classifications.length, linkedAnomalies.length]);
+        }, [user, posthog, classifications.length, linkedAnomalies.length]);
 
         // Show the PostHog survey once, after meaningful engagement in gameplay.
         useEffect(() => {
-          if (!session?.user || !posthog || activeView !== "base") {
+          if (!user || !posthog || activeView !== "base") {
             return;
           }
 
@@ -323,7 +322,7 @@ function GamePageContent() {
 
           return () => window.clearTimeout(timeout);
         }, [
-          session?.user,
+          user,
           posthog,
           activeView,
           showNpsModal,
@@ -336,10 +335,10 @@ function GamePageContent() {
 
         // Redirect unauthenticated users
         useEffect(() => {
-          if (!isAuthLoading && !session) {
+          if (!isAuthLoading && !user) {
             router.push("/");
           }
-        }, [isAuthLoading, session, router]);
+        }, [isAuthLoading, user, router]);
 
         // Handle view navigation
         const handleViewChange = (view: ViewMode) => {
@@ -371,7 +370,7 @@ function GamePageContent() {
         const needsProfileSetup = !profile?.username || !profile?.full_name;
 
         // Loading state
-        if (!session) {
+        if (!user) {
           return (
             <div className="min-h-screen w-full flex items-center justify-center text-sm text-muted-foreground">
               Redirecting…
@@ -437,8 +436,8 @@ function GamePageContent() {
               </main>
 
               {/* NPS Popup */}
-              {showNpsModal && session && (
-                <NPSPopup userId={session.user.id} isOpen={true} onClose={handleCloseNps} />
+              {showNpsModal && user && (
+                <NPSPopup userId={user.id} isOpen={true} onClose={handleCloseNps} />
               )}
 
               <PWAPrompt />
@@ -655,8 +654,8 @@ function GamePageContent() {
               </Dialog>
 
               {/* NPS Popup */}
-              {showNpsModal && session && (
-                <NPSPopup userId={session.user.id} isOpen={true} onClose={handleCloseNps} />
+              {showNpsModal && user && (
+                <NPSPopup userId={user.id} isOpen={true} onClose={handleCloseNps} />
               )}
 
               {/* Project Preferences Modal */}

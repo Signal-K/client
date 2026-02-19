@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from "react";
-import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
+import { useSession, useSupabaseClient } from "@/src/lib/auth/session-context";
 import { useRouter } from "next/navigation";
 import PostCard from "@/src/components/social/posts/TestPostCard";
 
@@ -69,25 +69,21 @@ export default function VotePlanetClassifications({ classificationId }: VotePlan
 
   const handleVote = async (classificationId: number, currentConfig: any) => {
     try {
-      
-      const currentVotes = currentConfig?.votes || 0;
-
-      const updatedConfig = {
-        ...currentConfig,
-        votes: currentVotes + 1,
-      };
-
-      
-
-      const { error } = await supabase
-        .from("classifications")
-        .update({ classificationConfiguration: updatedConfig })
-        .eq("id", classificationId);
-      if (error) {
-        console.error("PHVote: Error updating classificationConfiguration:", error);
+      const response = await fetch("/api/gameplay/classifications/configuration", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          classificationId,
+          action: "increment_vote",
+        }),
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        console.error("PHVote: Error updating classificationConfiguration:", result?.error);
       } else {
+        const updatedVotes = result?.classificationConfiguration?.votes ?? (currentConfig?.votes || 0) + 1;
         setClassification((prev: any) =>
-          prev ? { ...prev, votes: updatedConfig.votes } : prev
+          prev ? { ...prev, votes: updatedVotes } : prev
         );
         
         // Show success popup

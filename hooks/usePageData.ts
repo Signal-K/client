@@ -25,7 +25,7 @@ export function useGroupedClassifications(classifications: Classification[]) {
   return withAnnotations;
 }
 import { useEffect, useState } from "react";
-import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
+import { useSession, useSupabaseClient } from "@/src/lib/auth/session-context";
 import { subDays } from "date-fns";
 
 const CACHE_KEY = 'pageDataCache';

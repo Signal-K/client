@@ -4,7 +4,6 @@ import React, { useState } from "react";
 import { Button } from "@/src/components/ui/button";
 import { Input } from "@/src/components/ui/input";
 import { Textarea } from "@/src/components/ui/textarea";
-import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useRouter } from "next/navigation";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/src/components/ui/select";
 
@@ -13,8 +12,6 @@ interface Props {
 };
 
 export default function SurveyorCalculator({ classificationId }: Props) {
-  const supabase = useSupabaseClient();
-  const session = useSession();
   const router = useRouter();
 
   const [calculatorInputs, setCalculatorInputs] = useState({
@@ -32,16 +29,17 @@ export default function SurveyorCalculator({ classificationId }: Props) {
     if (!newComment.trim() && !calculatedValueComment.trim()) return;
 
     try {
-      const { error } = await supabase.from("comments").insert([
-        {
+      const response = await fetch("/api/gameplay/surveyor/comments", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          classificationId,
           content: `Calculated Value: ${calculatedValueComment}\nGeneral Comment: ${newComment}`,
-          classification_id: classificationId,
-          author: session?.user?.id,
-          configuration: { generalComment: newComment }, // Include the general comment here
-        },
-      ]);
-
-      if (error) throw error;
+          configuration: { generalComment: newComment },
+        }),
+      });
+      const payload = await response.json().catch(() => null);
+      if (!response.ok) throw new Error(payload?.error || "Failed to add comment");
 
       setNewComment("");
       setCalculatedValueComment("");
@@ -146,21 +144,20 @@ export default function SurveyorCalculator({ classificationId }: Props) {
     }
 
     try {
-      const { error } = await supabase
-        .from("comments")
-        .insert([
-          {
-            content: `${densityInput1}\n\n${densityInput2}`,
-            classification_id: classificationId,
-            author: session?.user?.id,
-            configuration: { density: `${densityInput2}`, generalComment: newComment }, // Include general comment in config
-            surveyor: "TRUE",
-            value: densityInput2,
-            category: "Density",
-          },
-        ]);
-
-      if (error) throw error;
+      const response = await fetch("/api/gameplay/surveyor/comments", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          classificationId,
+          content: `${densityInput1}\n\n${densityInput2}`,
+          configuration: { density: `${densityInput2}`, generalComment: newComment },
+          surveyor: "TRUE",
+          value: densityInput2,
+          category: "Density",
+        }),
+      });
+      const payload = await response.json().catch(() => null);
+      if (!response.ok) throw new Error(payload?.error || "Failed to add density comment");
 
       
       setCalculatorInputs({ input1: "", input2: "", input3: "" });
@@ -191,21 +188,20 @@ export default function SurveyorCalculator({ classificationId }: Props) {
     }
 
     try {
-      const { error } = await supabase
-        .from("comments")
-        .insert([
-          {
-            content: `${temperatureInput1}\n\n${temperatureInput2}`,
-            classification_id: classificationId,
-            author: session?.user?.id,
-            configuration: { temperature: `${temperatureInput2}`, generalComment: newComment }, // Include general comment in config
-            surveyor: "TRUE",
-            value: temperatureInput2,
-            category: 'Temperature'
-          },
-        ]);
-
-      if (error) throw error;
+      const response = await fetch("/api/gameplay/surveyor/comments", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          classificationId,
+          content: `${temperatureInput1}\n\n${temperatureInput2}`,
+          configuration: { temperature: `${temperatureInput2}`, generalComment: newComment },
+          surveyor: "TRUE",
+          value: temperatureInput2,
+          category: "Temperature",
+        }),
+      });
+      const payload = await response.json().catch(() => null);
+      if (!response.ok) throw new Error(payload?.error || "Failed to add temperature comment");
 
       
       setCalculatorInputs({ input1: "", input2: "", input3: "" });
@@ -236,21 +232,20 @@ export default function SurveyorCalculator({ classificationId }: Props) {
     }
 
     try {
-      const { error } = await supabase
-        .from("comments")
-        .insert([
-          {
-            content: `${periodInput1}\n\n${periodInput2}`,
-            classification_id: classificationId,
-            author: session?.user?.id,
-            configuration: { period: `${periodInput2}`, generalComment: newComment }, // Include general comment in config
-            surveyor: "TRUE",
-            value: periodInput2,
-            category: 'Period'
-          },
-        ]);
-
-      if (error) throw error;
+      const response = await fetch("/api/gameplay/surveyor/comments", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          classificationId,
+          content: `${periodInput1}\n\n${periodInput2}`,
+          configuration: { period: `${periodInput2}`, generalComment: newComment },
+          surveyor: "TRUE",
+          value: periodInput2,
+          category: "Period",
+        }),
+      });
+      const payload = await response.json().catch(() => null);
+      if (!response.ok) throw new Error(payload?.error || "Failed to add period comment");
 
       console.log('CalculatorSurveyor: Period comment submitted successfully, showing popup...');
       setCalculatorInputs({ input1: "", input2: "", input3: "" });
@@ -282,25 +277,20 @@ export default function SurveyorCalculator({ classificationId }: Props) {
     };
 
     try {
-      const { error } = await supabase
-        .from("comments")
-        .insert([
-          {
-            content: `${newComment}`,
-            classification_id: classificationId,
-            author: session?.user.id,
-            configuration: {
-              radius: `${radiusInput2}`
-            },
-            surveyor: "TRUE",
-            value: radiusInput2,
-            category: "Radius"
-          },
-        ]);
-
-      if (error) {
-        throw error;
-      };
+      const response = await fetch("/api/gameplay/surveyor/comments", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          classificationId,
+          content: `${newComment}`,
+          configuration: { radius: `${radiusInput2}` },
+          surveyor: "TRUE",
+          value: radiusInput2,
+          category: "Radius",
+        }),
+      });
+      const payload = await response.json().catch(() => null);
+      if (!response.ok) throw new Error(payload?.error || "Failed to add radius comment");
 
       console.log('CalculatorSurveyor: Radius comment submitted successfully, showing popup...');
       setCalculatorInputs({

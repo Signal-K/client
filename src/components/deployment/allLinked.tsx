@@ -1,51 +1,26 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react"
 import { Telescope, Satellite, Compass, Sparkles } from "lucide-react"
 import Link from "next/link"
 import type { LinkedAnomaly } from "@/hooks/usePageData"
 import { getAnomalyColor } from "@/src/components/ui/helpers/classification-icons"
 
 export default function AwaitingObjects() {
-    const supabase = useSupabaseClient()
-    const session = useSession()
     const [linkedAnomalies, setLinkedAnomalies] = useState<LinkedAnomaly[]>([])
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
-        if (!session?.user?.id) return
-
         const fetchLinkedAnomalies = async () => {
             try {
-                const { data, error } = await supabase
-                    .from("linked_anomalies")
-                    .select(`
-                                                id,
-                                                anomaly_id,
-                                                date,
-                                                automaton,
-                                                unlocked,
-                                                anomaly:anomaly_id(
-                                                        id,
-                                                        content,
-                                                        anomalytype,
-                                                        anomalySet
-                                                )
-                                        `)
-                    .eq("author", session.user.id)
-                    .eq("unlocked", false)
-                    .order("date", { ascending: false })
-
-                if (error) {
-                    console.error("Error fetching linked anomalies:", error)
-                } else {
-                    const transformedData = (data ?? []).map((item) => ({
-                        ...item,
-                        anomaly: Array.isArray(item.anomaly) ? item.anomaly[0] : item.anomaly,
-                    })) as unknown as LinkedAnomaly[]
-                    setLinkedAnomalies(transformedData)
+                const response = await fetch("/api/gameplay/deploy/awaiting", { cache: "no-store" })
+                const payload = await response.json().catch(() => null)
+                if (!response.ok) {
+                    console.error("Error fetching linked anomalies:", payload?.error || response.statusText)
+                    setLinkedAnomalies([])
+                    return
                 }
+                setLinkedAnomalies((payload?.linkedAnomalies || []) as LinkedAnomaly[])
             } catch (err) {
                 console.error("Error in fetchLinkedAnomalies:", err)
             } finally {
@@ -54,7 +29,7 @@ export default function AwaitingObjects() {
         }
 
         fetchLinkedAnomalies()
-    }, [session, supabase])
+    }, [])
 
     if (loading) {
         return (

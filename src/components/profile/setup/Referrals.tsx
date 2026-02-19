@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { Button } from "@/src/components/ui/button";
-import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
+import { getReferralPanelDataAction } from "./actions";
 
 interface ReferredUser {
   id: string;
@@ -11,9 +11,6 @@ interface ReferredUser {
 }
 
 export default function ReferralCodePanel() {
-  const supabase = useSupabaseClient();
-  const session = useSession();
-
   const [referralCode, setReferralCode] = useState<string | null>(null);
   const [referredUsers, setReferredUsers] = useState<ReferredUser[]>([]);
   const [loading, setLoading] = useState(false);
@@ -21,85 +18,22 @@ export default function ReferralCodePanel() {
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
-    if (!session) return;
-
     const fetchReferralData = async () => {
       setLoading(true);
       setError(null);
 
       try {
-        // 1. Get the referral code from profiles table for current user
-        const { data: profileData, error: profileError } = await supabase
-          .from("profiles")
-          .select("referral_code")
-          .eq("id", session.user.id)
-          .maybeSingle();
-
-        if (profileError) {
-          console.error("Error fetching referral code:", profileError);
-          setError("Failed to load your referral code.");
-          setLoading(false);
-          return;
-        }
-
-        if (!profileData?.referral_code) {
-          setError("No referral code found for your account.");
-          setLoading(false);
-          return;
-        }
-
-        const userReferralCode = profileData.referral_code;
-        setReferralCode(userReferralCode);
-
-        // 2. Get all referrals where referral_code matches current user's referral code
-        const { data: referralsData, error: referralsError } = await supabase
-          .from("referrals")
-          .select("referree_id")
-          .eq("referral_code", userReferralCode);
-
-        if (referralsError) {
-          console.error("Error fetching referrals:", referralsError);
-          setError("Failed to load referred users.");
-          setLoading(false);
-          return;
-        }
-
-        const referredUserIds = referralsData?.map((r) => r.referree_id) || [];
-
-        if (referredUserIds.length === 0) {
+        const result = await getReferralPanelDataAction();
+        if (!result.ok) {
+          setError(result.error || "Failed to load referral data.");
           setReferredUsers([]);
+          setReferralCode(null);
           setLoading(false);
           return;
         }
 
-        // 3. Fetch profiles of all referred users
-        const { data: usersData, error: usersError } = await supabase
-          .from("profiles")
-          .select("id, username")
-          .in("id", referredUserIds);
-
-        if (usersError) {
-          console.error("Error fetching referred user profiles:", usersError);
-          setError("Failed to load referred users' profiles.");
-          setReferredUsers([]);
-        } else {
-          // Optional: Merge in emails from auth.users
-          const { data: authUsers, error: authError } = await supabase
-            .from("users")
-            .select("id, email")
-            .in("id", referredUserIds);
-
-          if (authError) {
-            console.warn("Could not fetch emails from auth.users:", authError);
-          }
-
-          const merged = usersData.map((user) => ({
-            ...user,
-            email: authUsers?.find((u) => u.id === user.id)?.email ?? null,
-          }));
-
-          setReferredUsers(merged);
-        }
+        setReferralCode(result.data.referralCode);
+        setReferredUsers(result.data.referredUsers as ReferredUser[]);
       } catch (err) {
         console.error("Unexpected error:", err);
         setError("An unexpected error occurred.");
@@ -109,7 +43,7 @@ export default function ReferralCodePanel() {
     };
 
     fetchReferralData();
-  }, [session, supabase]);
+  }, []);
 
   const handleCopy = () => {
     if (!referralCode) return;

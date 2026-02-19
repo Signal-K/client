@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useSupabaseClient } from "@supabase/auth-helpers-react";
+import { useSupabaseClient } from "@/src/lib/auth/session-context";
 import Image from "next/image";
 import { Info } from "lucide-react";
 

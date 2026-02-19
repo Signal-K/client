@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useSupabaseClient } from "@supabase/auth-helpers-react";
+import { useSupabaseClient } from "@/src/lib/auth/session-context";
 import MainHeader from "@/src/components/layout/Header/MainHeader";
 import { Card, CardContent, CardHeader, CardTitle } from "@/src/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/src/components/ui/tabs";

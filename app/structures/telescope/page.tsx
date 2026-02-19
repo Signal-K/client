@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import Home from "@/app/page";
 import GameNavbar from "@/src/components/layout/Tes";
 import { Dialog, DialogContent } from "@/src/components/ui/dialog";
-import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
+import { useSession, useSupabaseClient } from "@/src/lib/auth/session-context";
 import TelescopeViewport from "@/src/components/classification/telescope/telescope-viewport";
 import { useState, useEffect } from "react";
 import Landing from "@/app/apt/page";

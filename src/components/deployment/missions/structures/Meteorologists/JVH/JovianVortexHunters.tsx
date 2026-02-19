@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
+import { useSupabaseClient, useSession } from "@/src/lib/auth/session-context";
 import MissionShell from "../../BasePlate";
 import { LidarJVHSatelliteWithId } from "@/src/components/projects/Lidar/JovianVortexHunter";
 import { CloudCogIcon, CloudHail, HelpCircle, ShovelIcon } from "lucide-react";

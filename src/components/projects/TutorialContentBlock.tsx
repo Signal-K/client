@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
+import { useSession, useSupabaseClient } from '@/src/lib/auth/session-context';
 import Image from 'next/image';
 import { Button } from '@/src/components/ui/button';
 import { Card, CardContent } from '@/src/components/ui/card';

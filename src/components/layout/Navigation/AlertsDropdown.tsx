@@ -4,9 +4,9 @@ import { Button } from '@/src/components/ui/button';
 import { Badge } from '@/src/components/ui/badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@/src/components/ui/dropdown-menu';
 import Link from 'next/link';
-import { useSupabaseClient, useSession } from '@supabase/auth-helpers-react';
 import { formatDistanceToNow, startOfDay, addDays, subDays } from 'date-fns';
 import Cookies from 'js-cookie';
+import { useAuthUser } from '@/src/hooks/useAuthUser';
 
 interface LinkedAnomaly {
   id: string;
@@ -56,111 +56,31 @@ const playRandomSound = () => {
   audio.play().catch((err) => console.error("Failed to play sound:", err));
 };
 
-async function generateAlerts(supabase: any, session: any): Promise<AlertItem[]> {
-  if (!session?.user) return [];
-
-  const userId = session.user.id;
-  const weekAgo = subDays(new Date(), 7);
-  const alerts: AlertItem[] = [];
+async function generateAlerts(userId: string | null | undefined): Promise<AlertItem[]> {
+  if (!userId) return [];
 
   try {
-    const { data: linkedAnomalies, error: linkedError } = await supabase
-      .from('linked_anomalies')
-      .select(`
-        id,
-        date,
-        anomaly:anomalies(
-          id,
-          anomalytype,
-          content,
-          classification_status
-        )
-      `)
-      .eq('author', userId)
-      .gte('date', weekAgo.toISOString())
-      .order('date', { ascending: false });
-
-    if (linkedError) {
-      console.error('Error fetching linked anomalies:', linkedError);
+    const response = await fetch("/api/gameplay/alerts", { cache: "no-store" });
+    const payload = await response.json().catch(() => null);
+    if (!response.ok) {
       return [];
     }
+    const fetchedAlerts: AlertItem[] = payload?.alerts || [];
 
-    // Get existing classifications for these anomalies
-    const linkedAnomalyIds = linkedAnomalies?.map((la: { anomaly: { id: any; }; }) => la.anomaly.id) || [];
-    
-    const { data: existingClassifications } = await supabase
-      .from("classifications")
-      .select('anomaly')
-      .eq('author', userId)
-      .in('anomaly', linkedAnomalyIds);
-
-    const classifiedAnomalyIds = new Set(existingClassifications?.map((c: { anomaly: any; }) => c.anomaly) || []);
-
-    // Get dismissed alerts
     const currentWeek = new Date().toISOString().split('T')[0];
     const cookieKey = getCookieKey(userId, currentWeek);
     const dismissedIds = JSON.parse(Cookies.get(cookieKey) || "[]");
+    const visibleAlerts = fetchedAlerts.filter((alert) => !dismissedIds.includes(alert.id));
 
-    // Filter unclassified anomalies that haven't been dismissed
-    const unclassifiedAnomalies = linkedAnomalies?.filter((la: { anomaly: { id: unknown; }; id: any; }) => 
-      !classifiedAnomalyIds.has(la.anomaly.id) && 
-      !dismissedIds.includes(`anomaly-${la.id}`)
-    ) || [];
-
-    // Add anomaly alerts
-    for (const linkedAnomaly of unclassifiedAnomalies) {
-      const anomalyType = linkedAnomaly.anomaly.anomalytype || 'unknown object';
-      alerts.push({
-        id: `anomaly-${linkedAnomaly.id}`,
-        type: 'anomaly',
-        // message: `New ${anomalyType} discovered, classify it for bonus stardust`,
-        message: `New anomaly discovered, classify it for bonus stardust`,
-        anomalyId: linkedAnomaly.anomaly.id,
-        anomaly: { anomalytype: anomalyType },  // attach anomalytype for routing
-      });
-    }
-
-    // Get upcoming events
-    const { data: upcomingEvents, error: eventsError } = await supabase
-      .from('events')
-      .select(`
-        id,
-        type,
-        time,
-        completed,
-        location:anomalies(id, content),
-        classification_location:classifications(id)
-      `)
-      .eq('classifications.author', userId)
-      .eq('completed', false)
-      .gte('time', new Date().toISOString())
-      .order('time', { ascending: true })
-      .limit(5);
-
-    if (!eventsError && upcomingEvents) {
-      for (const event of upcomingEvents) {
-        if (!dismissedIds.includes(`event-${event.id}`)) {
-          alerts.push({
-            id: `event-${event.id}`,
-            type: 'event',
-            message: `Upcoming ${event.type} event on planet ${event.location?.content || 'Unknown'}`,
-            eventId: event.id,
-            classificationId: event.classification_location?.id
-          });
-        }
-      }
-    }
-
-    // If no alerts, show completion message
-    if (alerts.length === 0) {
-      alerts.push({
+    if (visibleAlerts.length === 0) {
+      return [{
         id: 'completion',
         type: 'completion',
         message: "No primary objects left to classify. Great work!"
-      });
+      }];
     }
 
-    return alerts;
+    return visibleAlerts;
   } catch (error) {
     console.error('Error generating alerts:', error);
     return [{
@@ -172,8 +92,7 @@ async function generateAlerts(supabase: any, session: any): Promise<AlertItem[]>
 }
 
 export default function ResponsiveAlerts() {
-  const supabase = useSupabaseClient();
-  const session = useSession();
+  const { user } = useAuthUser();
 
   const [alerts, setAlerts] = useState<AlertItem[]>([]);
   const [currentAlertIndex, setCurrentAlertIndex] = useState(0);
@@ -183,14 +102,14 @@ export default function ResponsiveAlerts() {
 
   useEffect(() => {
     const fetchAlerts = async () => {
-      const alertItems = await generateAlerts(supabase, session);
+      const alertItems = await generateAlerts(user?.id);
       setAlerts(alertItems);
       setHasNewAlert(alertItems.length > 0 && alertItems[0].type !== 'completion');
       setNewNotificationsCount(alertItems.filter(a => a.type !== 'completion').length);
     };
 
     fetchAlerts();
-  }, [session, supabase]);
+  }, [user?.id]);
 
   useEffect(() => {
     const calculateTimeRemaining = () => {
@@ -206,13 +125,13 @@ export default function ResponsiveAlerts() {
   }, []);
 
   const dismissCurrentAlert = () => {
-    if (!session?.user || alerts.length === 0) return;
+    if (!user || alerts.length === 0) return;
 
     const currentAlert = alerts[currentAlertIndex];
     if (currentAlert.type === 'completion') return;
 
     const currentWeek = new Date().toISOString().split('T')[0];
-    const cookieKey = getCookieKey(session.user.id, currentWeek);
+    const cookieKey = getCookieKey(user.id, currentWeek);
     const dismissedIds: string[] = JSON.parse(Cookies.get(cookieKey) || "[]");
     const updated = [...new Set([...dismissedIds, currentAlert.id])];
     Cookies.set(cookieKey, JSON.stringify(updated), { expires: 7 });
@@ -224,7 +143,7 @@ export default function ResponsiveAlerts() {
       setCurrentAlertIndex(nextIndex);
       setNewNotificationsCount(Math.max(0, newNotificationsCount - 1));
     } else {
-      generateAlerts(supabase, session).then(alertItems => {
+      generateAlerts(user.id).then(alertItems => {
         setAlerts(alertItems);
         setCurrentAlertIndex(0);
         setHasNewAlert(false);

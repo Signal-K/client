@@ -1,6 +1,6 @@
 'use client'
 
-import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react"
+import { useSupabaseClient, useSession } from "@/src/lib/auth/session-context"
 import { useState, useEffect } from "react"
 
 interface PushSubscription {
@@ -240,18 +240,21 @@ export default function NotificationSubscribeButton() {
                 return;
             }
 
-            // Insert subscription directly into Supabase
-            const { error } = await supabase
-                .from("push_subscriptions")
-                .insert({
-                    profile_id: session.user.id,
+            const response = await fetch("/api/gameplay/notifications/subscribe", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
                     endpoint: subscription.endpoint,
                     auth: authKey,
                     p256dh: p256dhKey,
-                });
+                }),
+            });
+            const payload = await response.json().catch(() => ({}));
 
-            if (error) {
-                console.error('Error saving subscription:', error);
+            if (!response.ok) {
+                console.error('Error saving subscription:', payload?.error);
                 alert('Failed to save subscription. Please try again.');
                 return;
             }
@@ -283,15 +286,13 @@ export default function NotificationSubscribeButton() {
         setIsRejecting(true);
 
         try {
-            // Save rejection to database
-            const { error } = await supabase
-                .from("notification_rejections")
-                .insert({
-                    profile_id: session.user.id,
-                });
+            const response = await fetch("/api/gameplay/notifications/reject", {
+                method: "POST",
+            });
+            const payload = await response.json().catch(() => ({}));
 
-            if (error) {
-                console.error('Error saving notification rejection:', error);
+            if (!response.ok) {
+                console.error('Error saving notification rejection:', payload?.error);
                 alert('Failed to save preference. Please try again.');
                 return;
             }

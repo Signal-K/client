@@ -1,12 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import { Button } from "@/src/components/ui/button";
 import { Input } from "@/src/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/src/components/ui/card";
 import { Alert, AlertDescription } from "@/src/components/ui/alert";
 import { Mail, Shield, UserPlus, Loader2 } from "lucide-react";
+import { useAuthUser } from "@/src/hooks/useAuthUser";
 
 interface ConvertAnonymousAccountProps {
   onSuccess?: () => void;
@@ -14,8 +14,7 @@ interface ConvertAnonymousAccountProps {
 }
 
 export default function ConvertAnonymousAccount({ onSuccess, onCancel }: ConvertAnonymousAccountProps) {
-  const supabase = useSupabaseClient();
-  const session = useSession();
+  const { supabase, user } = useAuthUser();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -23,7 +22,7 @@ export default function ConvertAnonymousAccount({ onSuccess, onCancel }: Convert
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
-  const isAnonymousUser = session?.user?.is_anonymous;
+  const isAnonymousUser = Boolean((user as any)?.is_anonymous);
 
   const handleEmailConversion = async (e: React.FormEvent) => {
     e.preventDefault();

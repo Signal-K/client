@@ -14,7 +14,7 @@ import SettingsPanel from "./SettingsPanel";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/src/components/ui/dialog";
 import { Button } from "@/src/components/ui/button";
 import { Textarea } from "@/src/components/ui/textarea";
-import { useSupabaseClient } from "@supabase/auth-helpers-react";
+import { useSupabaseClient } from "@/src/lib/auth/session-context";
 
 interface PlanetGeneratorProps {
   classificationId: string;
@@ -144,24 +144,15 @@ export default function PlanetGenerator({
   const handleExport = async () => {
     const idAsNumber = Number.parseInt(classificationId);
     if (isNaN(idAsNumber)) return;
-
-    const { data, error: fetchError } = await supabase
-      .from("classifications")
-      .select("classificationConfiguration")
-      .eq("id", idAsNumber)
-      .single();
-
-    if (fetchError || !data) return;
-
-    const updatedConfig = {
-      ...data.classificationConfiguration,
-      planetConfiguration: planetConfig,
-    }; 
-
-    await supabase
-      .from("classifications")
-      .update({ classificationConfiguration: updatedConfig })
-      .eq("id", idAsNumber);
+    await fetch("/api/gameplay/classifications/configuration", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        classificationId: idAsNumber,
+        action: "merge",
+        patch: { planetConfiguration: planetConfig },
+      }),
+    });
   };
 
   useEffect(() => {

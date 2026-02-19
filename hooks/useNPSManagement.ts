@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
+import { useSession, useSupabaseClient } from "@/src/lib/auth/session-context";
 
 export function useNPSManagement() {
   const supabase = useSupabaseClient();

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
+import { useSupabaseClient, useSession } from "@/src/lib/auth/session-context";
 import { Button } from "@/src/components/ui/button";
 import { Canvas } from "@react-three/fiber";
 import { Suspense } from "react";
@@ -100,16 +100,13 @@ export default function SolarHealth() {
   // Handle participate
   async function handleParticipate() {
     setParticipating(true);
-    for (const anomaly of sunspotAnomalies) {
-      await supabase.from("linked_anomalies").insert({
-        author: session?.user.id,
-        anomaly_id: anomaly.id,
-        automaton: automatonType,
-        unlocked: false,
-        date: now.toISOString(),
-      });
-    }
+    const response = await fetch("/api/gameplay/deploy/solar", { method: "POST" });
+    const payload = await response.json().catch(() => null);
     setParticipating(false);
+    if (!response.ok) {
+      console.error("Error joining solar mission:", payload?.error || response.statusText);
+      return;
+    }
     // Refresh
     const weekStart = getWeekStart(now).toISOString();
     const { data: linked } = await supabase

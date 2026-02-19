@@ -6,16 +6,12 @@ import { SkillIcons } from "./skill-node"
 import { SkillTreeExpandedPanelOverlay } from "@/src/components/ui/panel-overlay"
 import { isSkillUnlockable } from "@/src/components/research/skill-utils"
 import type { SkillCategory, Skill, SkillStatus } from "@/types/Reseearch/skill-tree"
-import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react"
 
 interface SkillTreeSectionProps {
     isFullTree?: boolean;
 };
 
 export function SkillTreeSection({ isFullTree = false }: SkillTreeSectionProps) {
-    const supabase = useSupabaseClient();
-    const session = useSession();
-
   const [unlockedSkills, setUnlockedSkills] = useState<string[]>([])
   const [classifiedPlanets, setClassifiedPlanets] = useState(0)
   const [discoveredAsteroids, setDiscoveredAsteroids] = useState(0)
@@ -102,14 +98,13 @@ export function SkillTreeSection({ isFullTree = false }: SkillTreeSectionProps) 
   const fetchData = useCallback(async () => {
     setLoading(true)
     try {
-      // Get user session
-      const {
-        data: { session },
-        error: sessionError,
-      } = await supabase.auth.getSession()
-      if (sessionError) throw sessionError
+      const response = await fetch("/api/gameplay/research/summary")
+      const payload = await response.json()
+      if (!response.ok) {
+        throw new Error(payload?.error || "Failed to fetch skill tree data")
+      }
 
-      const currentUserId = session?.user?.id ?? null
+      const currentUserId = payload?.userId ?? null
       setUserId(currentUserId)
 
       if (!currentUserId) {
@@ -118,17 +113,10 @@ export function SkillTreeSection({ isFullTree = false }: SkillTreeSectionProps) 
         return
       }
 
-      // Fetch unlocked skills
-      const { data: researchedData, error: researchedError } = await supabase
-        .from("researched")
-        .select("tech_type")
-        .eq("user_id", currentUserId)
-
-      if (researchedError) throw researchedError
-
-      const fetchedUnlockedSkillIds = researchedData
+      const researchedTechTypes: string[] = payload?.researchedTechTypes || []
+      const fetchedUnlockedSkillIds = researchedTechTypes
         .map((row) => {
-          const foundSkill = skillTreeData[0].skills.find((s) => s.id === row.tech_type || s.name === row.tech_type)
+          const foundSkill = skillTreeData[0].skills.find((s) => s.id === row || s.name === row)
           return foundSkill ? foundSkill.id : null
         })
         .filter(Boolean) as string[]
@@ -139,42 +127,8 @@ export function SkillTreeSection({ isFullTree = false }: SkillTreeSectionProps) 
       }
 
       setUnlockedSkills(fetchedUnlockedSkillIds)
-
-      // Debug: Log user ID
-
-      // Debug: Check what classifications exist for this user
-      const { data: userClassifications, error: debugError } = await supabase
-        .from("classifications")
-        .select("id, classificationtype, author")
-        .eq("author", currentUserId)
-        .limit(10)
-
-      if (!debugError && userClassifications) {
-      }
-
-      // Fetch classified planets
-      const { count: planetCount, error: planetError } = await supabase
-        .from("classifications")
-        .select("id", { count: "exact" })
-        .eq("author", currentUserId)
-        .eq("classificationtype", "planet") 
-
-      if (planetError) {
-        throw planetError
-      }
-      setClassifiedPlanets(planetCount || 0)
-
-      // Fetch discovered asteroids (using 'telescope-minorPlanet' as per schema)
-      const { count: asteroidCount, error: asteroidError } = await supabase
-        .from("classifications")
-        .select("id", { count: "exact" })
-        .eq("author", currentUserId)
-        .eq("classificationtype", "telescope-minorPlanet")
-
-      if (asteroidError) {
-        throw asteroidError
-      }
-      setDiscoveredAsteroids(asteroidCount || 0)
+      setClassifiedPlanets(payload?.skillTree?.classifiedPlanets || 0)
+      setDiscoveredAsteroids(payload?.skillTree?.discoveredAsteroids || 0)
     } catch (error) {
       console.error("Error fetching skill tree data:", error)
       // Optionally show an error message to the user
@@ -212,11 +166,16 @@ export function SkillTreeSection({ isFullTree = false }: SkillTreeSectionProps) 
     if (skillToUnlock.status === "available") {
       setLoading(true)
       try {
-        const { error } = await supabase.from("researched").insert({ tech_type: skillToUnlock.id, user_id: userId })
-
-        if (error) {
-          console.error("ERROR: Supabase insert failed:", error.message, error.details, error.hint)
-          throw error // Re-throw to ensure the catch block is hit
+        const response = await fetch("/api/gameplay/research/unlock", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ techType: skillToUnlock.id }),
+        })
+        if (!response.ok) {
+          const payload = await response.json().catch(() => ({}))
+          throw new Error(payload?.error || "Failed to unlock skill")
         }
 
         setUnlockedSkills((prev) => [...prev, skillId])

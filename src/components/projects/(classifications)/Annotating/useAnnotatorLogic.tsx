@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
+import { useSession, useSupabaseClient } from "@/src/lib/auth/session-context";
 import { useRouter } from "next/navigation";
 import { determineMineralType } from "@/src/utils/mineralAnalysis";
 import { useActivePlanet } from "@/src/core/context/ActivePlanet";
@@ -180,43 +180,36 @@ export function useAnnotatorLogic({
         classificationParent: parentClassificationId ?? null,
       };
 
-      const { data: classificationData, error: classificationError } =
-        await supabase
-          .from("classifications")
-          .insert({
-            author: session.user.id,
-            content,
-            media: [
-              [],
-              ...finalUploads,
-              ...(otherAssets || []).map((url) => [
-                "http://...",
-                "generated-id",
-              ]),
-              ...(Array.isArray(assetMentioned)
-                ? assetMentioned
-                : [assetMentioned]
-              ).map((id) => id && [id, "id"]),
-            ].filter(
-              (item): item is [string, string] =>
-                Array.isArray(item) && item.length === 2
-            ),
-            anomaly: anomalyId,
-            classificationParent: classificationParent,
-            classificationtype: anomalyType,
-            classificationConfiguration,
-          })
-          .select()
-          .single();
+      const classificationResponse = await fetch("/api/gameplay/classifications", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          content,
+          media: [
+            [],
+            ...finalUploads,
+            ...(otherAssets || []).map((url) => ["http://...", "generated-id"]),
+            ...(Array.isArray(assetMentioned) ? assetMentioned : [assetMentioned]).map((id) => id && [id, "id"]),
+          ].filter(
+            (item): item is [string, string] =>
+              Array.isArray(item) && item.length === 2
+          ),
+          anomaly: anomalyId,
+          classificationParent: classificationParent,
+          classificationtype: anomalyType,
+          classificationConfiguration,
+        }),
+      });
 
-      if (classificationError) {
-        console.error(
-          "Error creating classification: ",
-          classificationError.message
-        );
+      if (!classificationResponse.ok) {
+        const payload = await classificationResponse.json().catch(() => ({}));
+        console.error("Error creating classification: ", payload?.error);
         alert("Failed to create classification. Please try again");
         return;
       }
+      const classificationData = await classificationResponse.json();
 
       // Create mineral deposit if this waypoint has one
       if (classificationData && hasMineralDeposit && anomalyId) {
@@ -237,26 +230,26 @@ export function useAnnotatorLogic({
 
           // creating mineral deposit with computed config
 
-          // Create mineral deposit record
-          const { data: mineralData, error: mineralError } = await supabase
-            .from("mineralDeposits")
-            .insert({
+          const mineralResponse = await fetch("/api/gameplay/mineral-deposits", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
               anomaly: parseInt(anomalyId),
-              owner: session.user.id,
+              discovery: classificationData.id,
               mineralconfiguration: mineralConfig,
               location: "Mars",
-              discovery: classificationData.id,
               roverName: "Rover 1",
               created_at: new Date().toISOString(),
-            })
-            .select()
-            .single();
-
-          if (mineralError) {
-            console.error("Error creating mineral deposit:", mineralError);
+            }),
+          });
+          if (!mineralResponse.ok) {
+            const payload = await mineralResponse.json().catch(() => ({}));
+            console.error("Error creating mineral deposit:", payload?.error);
           } else {
+            const mineralData = await mineralResponse.json();
             setMineralDepositId(mineralData.id);
-            // mineral deposit created successfully
           }
         } catch (err) {
           console.error("Error in mineral deposit creation:", err);
@@ -505,40 +498,36 @@ export function useAnnotatorLogic({
     };
 
     try {
-      const { data: classificationData, error: classificationError } =
-        await supabase
-          .from("classifications")
-          .insert({
-            author: session.user.id,
-            content,
-            media: [
-              [],
-              ...uploads,
-              ...(otherAssets || []).map((url) => ["http://...", "generated-id"]),
-              ...(Array.isArray(assetMentioned)
-                ? assetMentioned
-                : [assetMentioned]
-              ).map((id) => id && [id, "id"]),
-            ].filter(
-              (item): item is [string, string] =>
-                Array.isArray(item) && item.length === 2
-            ),
-            anomaly: anomalyId,
-            classificationParent: classificationParent,
-            classificationtype: anomalyType,
-            classificationConfiguration,
-          })
-          .select()
-          .single();
+      const classificationResponse = await fetch("/api/gameplay/classifications", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          content,
+          media: [
+            [],
+            ...uploads,
+            ...(otherAssets || []).map((url) => ["http://...", "generated-id"]),
+            ...(Array.isArray(assetMentioned) ? assetMentioned : [assetMentioned]).map((id) => id && [id, "id"]),
+          ].filter(
+            (item): item is [string, string] =>
+              Array.isArray(item) && item.length === 2
+          ),
+          anomaly: anomalyId,
+          classificationParent: classificationParent,
+          classificationtype: anomalyType,
+          classificationConfiguration,
+        }),
+      });
 
-      if (classificationError) {
-        console.error(
-          "Error creating classification: ",
-          classificationError.message
-        );
+      if (!classificationResponse.ok) {
+        const payload = await classificationResponse.json().catch(() => ({}));
+        console.error("Error creating classification: ", payload?.error);
         alert("Failed to create classification. Please try again");
         return;
       }
+      const classificationData = await classificationResponse.json();
 
       console.log("Classification created successfully: ", classificationData);
 
@@ -556,23 +545,26 @@ export function useAnnotatorLogic({
           categories,
         });
 
-        const { data: mineralData, error: mineralError } = await supabase
-          .from("mineralDeposits")
-          .insert({
+        const mineralResponse = await fetch("/api/gameplay/mineral-deposits", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
             anomaly: anomalyId ? parseInt(anomalyId) : null,
-            owner: session.user.id,
+            discovery: classificationData.id,
             mineralConfiguration: mineralConfig,
             location: "Mars",
-            discovery: classificationData.id,
             roverName: "Rover 1",
             created_at: new Date().toISOString(),
-          })
-          .select()
-          .single();
+          }),
+        });
 
-        if (mineralError) {
-          console.error("Error creating mineral deposit:", mineralError);
+        if (!mineralResponse.ok) {
+          const payload = await mineralResponse.json().catch(() => ({}));
+          console.error("Error creating mineral deposit:", payload?.error);
         } else {
+          const mineralData = await mineralResponse.json();
           setMineralDepositId(mineralData.id);
         }
       }

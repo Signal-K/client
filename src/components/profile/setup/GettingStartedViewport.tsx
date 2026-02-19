@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/src/components/ui/button";
 import Section from "@/src/components/sections/Section";
@@ -27,8 +26,6 @@ export default function GettingStartedViewport({
   classificationsCount,
   classificationTypes = []
 }: GettingStartedViewportProps) {
-  const session = useSession();
-  const supabase = useSupabaseClient();
   const router = useRouter();
   const { isDark } = UseDarkMode();
   
@@ -46,48 +43,26 @@ export default function GettingStartedViewport({
   const shouldShow = progress.totalClassifications < 4 && progress.classificationTypes.length < 2;
 
   useEffect(() => {
-    if (!session || !shouldShow) return;
+    if (!shouldShow) return;
 
     const fetchProgressData = async () => {
       try {
-        const { data: classifications, error } = await supabase
-          .from('classifications')
-          .select('classificationtype')
-          .eq('author', session.user.id);
-
-        if (error) throw error;
-
-        const types = Array.from(new Set(classifications?.map(c => c.classificationtype).filter(Boolean))) as string[];
-        
-        // Count tools used based on classification types
-        const toolCounts = types.reduce((acc, type) => {
-          // Telescope: planet, telescope-minorPlanet, sunspot, active-asteroid
-          if (['planet', 'telescope-minorPlanet', 'sunspot', 'active-asteroid'].includes(type)) {
-            acc.telescope++;
-          }
-          // Satellite: balloon-marsCloudShapes, cloud, lidar-jovianVortexHunter, satellite-planetFour
-          else if (['balloon-marsCloudShapes', 'cloud', 'lidar-jovianVortexHunter', 'satellite-planetFour'].includes(type)) {
-            acc.satellite++;
-          }
-          // Rover: automaton-aiForMars
-          else if (['automaton-aiForMars'].includes(type)) {
-            acc.rover++;
-          }
-          return acc;
-        }, { telescope: 0, satellite: 0, rover: 0 });
-
-        setProgress({
-          totalClassifications: classifications?.length || 0,
-          classificationTypes: types,
-          toolsUsed: toolCounts
+        const response = await fetch("/api/gameplay/profile/getting-started", {
+          method: "GET",
         });
+        const payload = await response.json();
+        if (!response.ok) {
+          throw new Error(payload?.error || "Failed to fetch progress data");
+        }
+
+        setProgress(payload);
       } catch (error) {
         console.error('Error fetching progress data:', error);
       }
     };
 
     fetchProgressData();
-  }, [session, supabase, shouldShow]);
+  }, [shouldShow]);
 
   if (!shouldShow) {
     return null;

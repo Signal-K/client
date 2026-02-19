@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import { useParams, useRouter } from "next/navigation"
 import { ExtractionScene } from "@/src/components/deployment/extraction/ex-scene"
-import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react"
+import { useAuthUser } from "@/src/hooks/useAuthUser"
 import MainHeader from "@/src/components/layout/Header/MainHeader"
 import UseDarkMode from "@/src/shared/hooks/useDarkMode"
 import { usePageData } from "@/hooks/usePageData"
@@ -11,8 +11,7 @@ import { usePageData } from "@/hooks/usePageData"
 export default function ExtractionPage() {
   const params = useParams()
   const router = useRouter()
-  const supabase = useSupabaseClient()
-  const session = useSession()
+  const { user } = useAuthUser()
   const { isDark, toggleDarkMode } = UseDarkMode()
   const { activityFeed, otherClassifications } = usePageData()
 
@@ -26,22 +25,14 @@ export default function ExtractionPage() {
       if (!params.id) return
 
       try {
-        const { data, error } = await supabase.from("mineralDeposits").select("*").eq("id", params.id).single()
-
-        if (error) throw error
-
-        if (!data) {
-          setError("Mineral deposit not found")
+        const response = await fetch(`/api/gameplay/extraction/${params.id}`, { cache: "no-store" })
+        const payload = await response.json().catch(() => null)
+        if (!response.ok) {
+          setError(payload?.error || "Failed to load mineral deposit")
           return
         }
 
-        // Check if user owns this deposit
-        if (session?.user?.id && data.owner !== session.user.id) {
-          setError("You don't have permission to extract this deposit")
-          return
-        }
-
-        setDeposit(data)
+        setDeposit(payload?.deposit || null)
       } catch (err) {
         console.error("Error fetching deposit:", err)
         setError("Failed to load mineral deposit")
@@ -51,44 +42,22 @@ export default function ExtractionPage() {
     }
 
     fetchDeposit()
-  }, [params.id, supabase, session])
+  }, [params.id, user])
 
   const handleExtractionComplete = async (extractedQuantity: number, purity: number) => {
-    if (!session?.user?.id || !deposit) return
+    if (!user?.id || !deposit) return
 
     try {
-      // Add to user mineral inventory (extracted but unprocessed resources)
-      const { error: inventoryError } = await supabase.from("user_mineral_inventory").insert({
-        user_id: session.user.id,
-        mineral_deposit_id: deposit.id,
-        mineral_type: deposit.mineralconfiguration.type,
-        quantity: extractedQuantity,
-        purity: purity,
-        extracted_at: new Date().toISOString(),
-      })
-
-      if (inventoryError) {
-        console.error("Error adding to mineral inventory:", inventoryError)
-        // Show error to user but don't block navigation
-        alert("Failed to save to inventory. Please try again.")
+      const response = await fetch(`/api/gameplay/extraction/${deposit.id}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ extractedQuantity, purity }),
+      });
+      const payload = await response.json().catch(() => null);
+      if (!response.ok) {
+        console.error("Error adding to mineral inventory:", payload?.error || response.statusText);
+        alert("Failed to save to inventory. Please try again.");
         return
-      }
-
-      // Drain the deposit quantity to 0 in mineralDeposits table
-      const updatedConfig = {
-        ...deposit.mineralconfiguration,
-        amount: 0,
-        quantity: 0,
-      }
-
-      const { error: updateError } = await supabase
-        .from("mineralDeposits")
-        .update({ mineralconfiguration: updatedConfig })
-        .eq("id", deposit.id)
-
-      if (updateError) {
-        console.error("Error updating deposit quantity:", updateError)
-        // Continue anyway since the extraction was recorded
       }
 
       // Successfully extracted - navigate back after delay

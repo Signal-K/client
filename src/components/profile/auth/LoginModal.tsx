@@ -2,7 +2,6 @@
 
 import { ReactNode } from "react";
 import { Auth } from "@supabase/auth-ui-react";
-import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import Image from "next/image";
 import Link from "next/link";
 import { MicroscopeIcon, CodeIcon, FilesIcon } from "lucide-react";
@@ -11,6 +10,7 @@ import { createStyles } from 'antd-style';
 import { rgba } from 'polished';
 import { Card, CardContent } from "@/src/components/ui/card";
 import { Separator } from "@/src/components/ui/separator";
+import { getSupabaseBrowserClient } from "@/lib/supabase/browser";
 
 interface AuthPageProps {
   children: ReactNode;
@@ -59,7 +59,7 @@ const Navbar = () => {
 };
 
 function SupabaseAuthWrapper({ children }: { children: ReactNode }) {
-  const supabase = useSupabaseClient();
+  const supabase = getSupabaseBrowserClient();
 
     const { styles } = useStyles();
 
@@ -149,7 +149,7 @@ function AuthPage({ children }: AuthPageProps) {
 }
 
 export default function LoginPage() {
-  const supabase = useSupabaseClient();
+  const supabase = getSupabaseBrowserClient();
 
   return (
     <AuthPage>

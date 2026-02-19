@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
+import { useSession, useSupabaseClient } from "@/src/lib/auth/session-context";
 import { useRouter } from "next/navigation";
 import ImboxViewport from "@/src/components/classification/viewport/imbox";
 import PlanetCompletionWidget from "@/src/components/discovery/planets/PlanetCompletionWidget";

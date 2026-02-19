@@ -2,42 +2,31 @@
 
 import { useRouter } from "next/navigation"
 import DeployTelescopeViewport from "@/src/components/scenes/deploy/TelescopeViewportRange"
-import { useSession, useSessionContext, useSupabaseClient } from "@supabase/auth-helpers-react"
 import { useEffect, useState } from "react"
 import UseDarkMode from "@/src/shared/hooks/useDarkMode"
 import GameNavbar from "@/src/components/layout/Tes"
+import { useAuthUser } from "@/src/hooks/useAuthUser"
 
 export default function NewDeployPage() {
   const router = useRouter()
-  const session = useSession()
-  const { isLoading: isAuthLoading } = useSessionContext()
-  const supabase = useSupabaseClient()
+  const { user, isLoading: isAuthLoading } = useAuthUser()
   const { isDark } = UseDarkMode()
   const [profileChecked, setProfileChecked] = useState(false)
 
   useEffect(() => {
     if (isAuthLoading) return;
 
-    if (!session?.user?.id) {
+    if (!user?.id) {
       router.replace('/auth');
       return;
     }
 
     const ensureProfile = async () => {
       try {
-        const { data } = await supabase
-          .from("profiles")
-          .select("id")
-          .eq("id", session.user!.id)
-          .single();
-
-        if (!data) {
-          const { error: insertError } = await supabase
-            .from("profiles")
-            .insert({ id: session.user!.id });
-          if (insertError) {
-            console.error("Error creating profile:", insertError.message);
-          }
+        const response = await fetch("/api/gameplay/profile/ensure", { method: "POST" });
+        const payload = await response.json().catch(() => null);
+        if (!response.ok) {
+          console.error("Error creating profile:", payload?.error || response.statusText);
         }
       } catch (error) {
         console.error("ensureProfile failed", error);
@@ -47,7 +36,7 @@ export default function NewDeployPage() {
     };
 
     ensureProfile();
-  }, [isAuthLoading, router, session, supabase]);
+  }, [isAuthLoading, router, user]);
 
   if (!profileChecked) {
     return (

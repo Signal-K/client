@@ -3,7 +3,6 @@
 import { ReactNode, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Auth } from "@supabase/auth-ui-react";
-import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import Image from "next/image";
 import Link from "next/link";
 import { MicroscopeIcon, CodeIcon, FilesIcon, UserX, Mail, ArrowRight } from "lucide-react";
@@ -13,6 +12,7 @@ import { Card, CardContent } from "@/src/components/ui/card";
 import { Separator } from "@/src/components/ui/separator";
 import { Button } from "@/src/components/ui/button";
 import { Alert, AlertDescription } from "@/src/components/ui/alert";
+import { getSupabaseBrowserClient } from "@/lib/supabase/browser";
 
 interface AuthPageProps {
   children: ReactNode;
@@ -38,7 +38,7 @@ const useStyles = createStyles(({ css, token }) => {
 });
 
 function SupabaseAuthWrapper({ children }: { children: ReactNode }) {
-  const supabase = useSupabaseClient();
+  const supabase = getSupabaseBrowserClient();
   const [showAnonymousSignIn, setShowAnonymousSignIn] = useState(false);
   const [isLoadingAnonymous, setIsLoadingAnonymous] = useState(false);
   const [anonymousError, setAnonymousError] = useState<string | null>(null);

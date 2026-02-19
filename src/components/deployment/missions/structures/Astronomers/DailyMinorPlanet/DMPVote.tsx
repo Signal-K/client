@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { PostCardSingle } from "@/src/components/social/posts/PostSingle";
-import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
+import { useSession, useSupabaseClient } from "@/src/lib/auth/session-context";
 
 interface Classification {
     id: number;
@@ -50,7 +50,7 @@ export default function VoteDMPClassifications() {
                 } 
                 else if (media && typeof media === "object" && media.uploadUrl) {
                     images.push(media.uploadUrl);
-                }''
+                }
 
                 const votes = classification.classificationConfiguration?.votes || 0;
 
@@ -63,7 +63,7 @@ export default function VoteDMPClassifications() {
             setError("Failed to load classifications.");
         } finally {
             setLoading(false);
-        }''
+        }
     };
 
     useEffect(() => {
@@ -72,25 +72,24 @@ export default function VoteDMPClassifications() {
 
     const handleVote = async (classificationId: number, currentConfig: any) => {
         try {
-            const currentVotes = currentConfig?.votes || 0;
+            const response = await fetch("/api/gameplay/classifications/configuration", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    classificationId,
+                    action: "increment_vote",
+                }),
+            });
+            const result = await response.json().catch(() => ({}));
 
-            const updatedConfig = {
-                ...currentConfig,
-                votes: currentVotes + 1,
-            };
-
-            const { error } = await supabase
-                .from("classifications")
-                .update({ classificationConfiguration: updatedConfig })
-                .eq("id", classificationId);
-
-            if (error) {
-                console.error("Error updating classificationConfiguration:", error);
+            if (!response.ok) {
+                console.error("Error updating classificationConfiguration:", result?.error);
             } else {
+                const updatedVotes = result?.classificationConfiguration?.votes ?? (currentConfig?.votes || 0) + 1;
                 setClassifications((prevClassifications) =>
                     prevClassifications.map((classification) =>
                         classification.id === classificationId
-                            ? { ...classification, votes: updatedConfig.votes }
+                            ? { ...classification, votes: updatedVotes }
                             : classification
                     )
                 );

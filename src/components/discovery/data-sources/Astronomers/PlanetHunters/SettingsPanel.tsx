@@ -9,7 +9,6 @@ import { Download, Upload, Save } from "lucide-react"
 import BasicSettings from "./Settings/BasicSettings";
 import TerrainSettings from "./Settings/TerrainSettings";
 import ColorSettings from "./Settings/ColourSettings";
-import { useSupabaseClient } from "@supabase/auth-helpers-react";
 
 interface SettingsPanelProps {
   planetConfig: PlanetConfig
@@ -18,8 +17,6 @@ interface SettingsPanelProps {
 }
 
 export default function SettingsPanel({ planetConfig, onChange, classificationId }: SettingsPanelProps) {
-  const supabase = useSupabaseClient();
-
   const [importText, setImportText] = useState("")
   const [importError, setImportError] = useState("")
   const [showExport, setShowExport] = useState(false)
@@ -44,31 +41,18 @@ export default function SettingsPanel({ planetConfig, onChange, classificationId
     setSaveStatus("saving")
 
     try {
-      // First, fetch the existing classification configuration
-      const { data: existingData, error: fetchError } = await supabase
-        .from("classifications")
-        .select("classificationConfiguration")
-        .eq("id", classificationId)
-        .single()
-
-      if (fetchError) {
-        throw fetchError
-      }
-
-      // Merge the planet configuration with existing configuration
-      const updatedConfig = {
-        ...existingData.classificationConfiguration,
-        planetConfiguration: planetConfig,
-      }
-
-      // Update the classification with the merged configuration
-      const { error: updateError } = await supabase
-        .from("classifications")
-        .update({ classificationConfiguration: updatedConfig })
-        .eq("id", classificationId)
-
-      if (updateError) {
-        throw updateError
+      const response = await fetch("/api/gameplay/classifications/configuration", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          classificationId,
+          action: "merge",
+          patch: { planetConfiguration: planetConfig },
+        }),
+      })
+      const result = await response.json().catch(() => ({}))
+      if (!response.ok) {
+        throw new Error(result?.error || "Failed to save configuration")
       }
 
       setSaveStatus("saved")

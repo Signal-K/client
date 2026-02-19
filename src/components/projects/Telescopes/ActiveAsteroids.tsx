@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from "react";
-import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
+import { useSession, useSupabaseClient } from "@/src/lib/auth/session-context";
 import ClassificationForm from "../(classifications)/PostForm";
 import { Button } from "@/src/components/ui/button";
 import ImageAnnotator from "../(classifications)/Annotating/Annotator";

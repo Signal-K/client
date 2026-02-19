@@ -10,7 +10,7 @@ import MySettlementsLocations from "@/src/components/classification/UserLocation
 import NPSPopup from "@/src/components/ui/helpers/nps-popup";
 // import TelescopeViewport from "@/telescope-viewport";
 import { TelescopeBackground } from "@/src/components/classification/telescope/telescope-background";
-import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
+import { useSession, useSupabaseClient } from "@/src/lib/auth/session-context";
 import { useEffect, useState } from "react";
 // import { PlanetGenerator } from "starsailors-planet-generator";
 

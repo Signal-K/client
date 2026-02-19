@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useEffect, useState } from "react";
-import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
+import { useSupabaseClient, useSession } from "@/src/lib/auth/session-context";
 import { useRouter } from "next/navigation";
 import ClassificationForm from "../(classifications)/PostForm";
 import { Button } from "../../ui/button";
@@ -197,21 +197,22 @@ export const SuperWASPTutorial: React.FC<TelescopeProps> = ({ anomalyId }) => {
         timestamp: new Date().toISOString()
       };
 
-      // Insert classification into database
-      const { data, error } = await supabase
-        .from('classifications')
-        .insert({
-          author: session.user.id,
+      const response = await fetch("/api/gameplay/classifications", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
           anomaly: parseInt(anomalyId),
-          classificationtype: 'superwasp-variable',
-          classificationConfiguration: classificationConfiguration,
-          content: comments.trim() || null
-        })
-        .select()
-        .single();
+          classificationtype: "superwasp-variable",
+          classificationConfiguration,
+          content: comments.trim() || null,
+        }),
+      });
+      const data = await response.json().catch(() => ({}));
 
-      if (error) {
-        console.error("Error saving classification:", error);
+      if (!response.ok) {
+        console.error("Error saving classification:", data?.error);
         alert("Error saving classification. Please try again.");
         return;
       }

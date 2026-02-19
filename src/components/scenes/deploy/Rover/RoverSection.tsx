@@ -3,7 +3,7 @@
 import Section from "@/src/components/sections/Section";
 import TutorialWrapper, { ROVER_INTRO_STEPS } from "@/src/components/onboarding/TutorialWrapper";
 import { Anomaly } from "@/types/Structures/telescope";
-import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
+import { useSession, useSupabaseClient } from "@/src/lib/auth/session-context";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/src/components/ui/button";
@@ -364,35 +364,12 @@ export default function RoverViewportSection() {
          
         setIsReturningHome(true);
         try {
-            // Delete all linked_anomalies for this user's rover
-            const { error: linkedError } = await supabase
-                .from('linked_anomalies')
-                .delete()
-                .eq('author', session.user.id)
-                .eq('automaton', 'Rover');
-
-            if (linkedError) {
-                console.error('Error deleting linked anomalies:', linkedError);
-                alert('Failed to clear rover mission data. Please try again.');
-                return;
-            }
-
-            // Delete all routes for this user for this week
-            const now = new Date();
-            const utcDay = now.getUTCDay(); // 0=Sun, 6=Sat
-            const daysToLastSaturday = utcDay === 6 ? 0 : (utcDay + 1) % 7;
-            const cutoff = new Date(now);
-            cutoff.setUTCDate(now.getUTCDate() - daysToLastSaturday);
-            cutoff.setUTCHours(14, 1, 0, 0);
-
-            const { error: routeError } = await supabase
-                .from('routes')
-                .delete()
-                .eq('author', session.user.id)
-                .gte('timestamp', cutoff.toISOString());
-
-            if (routeError) {
-                console.error('Error deleting routes:', routeError);
+            const response = await fetch("/api/gameplay/deploy/rover/return", {
+                method: "POST",
+            });
+            const payload = await response.json().catch(() => ({}));
+            if (!response.ok) {
+                console.error("Error returning rover home:", payload?.error);
                 alert('Failed to clear route data. Please try again.');
                 return;
             }

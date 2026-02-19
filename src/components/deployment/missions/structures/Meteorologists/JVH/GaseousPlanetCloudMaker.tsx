@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { PostCardSingleWithGenerator } from "@/src/components/social/posts/PostWithGen";
-import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
+import { useSession, useSupabaseClient } from "@/src/lib/auth/session-context";
 
 type Classification = {
   id: string;

@@ -3,7 +3,6 @@
 import { Button } from "@/src/components/ui/button"
 import { ArrowLeft } from "lucide-react"
 import { useState, useEffect } from "react"
-import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react"
 import { SkillNode } from "./skill-node"
 import { SkillDetails } from "./skill-details"
 import { SkillLegend } from "./skill-legend"
@@ -122,8 +121,6 @@ const SKILLS: Skill[] = [
 ]
 
 export function SkillTreeView({ onBack }: SkillTreeViewProps) {
-  const session = useSession()
-  const supabase = useSupabaseClient()
   const [selectedSkill, setSelectedSkill] = useState<Skill | null>(null)
   const [userProgress, setUserProgress] = useState<UserProgress>({
     unlockedSkills: ["planet-hunting"],
@@ -131,12 +128,11 @@ export function SkillTreeView({ onBack }: SkillTreeViewProps) {
     classifications: {},
   })
   const [loading, setLoading] = useState(true)
-
-  const userId = session?.user?.id || "4d9a57e6-ea3c-4836-aa18-1c3ee7f6f725"
+  const [userId, setUserId] = useState<string>("")
 
   useEffect(() => {
     fetchUserProgress()
-  }, [userId])
+  }, [])
 
   const fetchUserProgress = async () => {
     setLoading(true)
@@ -144,34 +140,25 @@ export function SkillTreeView({ onBack }: SkillTreeViewProps) {
       // Debug: Log user ID
       console.log("Skill Tree View - Current user ID:", userId)
 
-      // Fetch user classifications
-      const { data: classifications } = await supabase
-        .from("classifications")
-        .select("classificationtype")
-        .eq("author", userId)
+      const response = await fetch("/api/gameplay/research/summary")
+      const payload = await response.json()
+      if (!response.ok) {
+        throw new Error(payload?.error || "Failed to fetch user progress")
+      }
+      setUserId(payload?.userId || "")
 
-      // Debug: Log all classifications found
-      console.log("Skill Tree View - User's classifications:", classifications)
-
-      // Count classifications by type
-      const classificationCounts: Record<string, number> = {}
-      classifications?.forEach((c) => {
-        const type = c.classificationtype || "unknown"
-        classificationCounts[type] = (classificationCounts[type] || 0) + 1
-      })
+      const classificationCounts: Record<string, number> = {
+        planet: payload?.counts?.planet || 0,
+        "telescope-minorPlanet": payload?.counts?.asteroid || 0,
+        cloud: payload?.counts?.cloud || 0,
+      }
 
       console.log("Skill Tree View - Classification counts:", classificationCounts)
 
-      // Fetch unlocked skills from researched table
-      const { data: researchedData, error: researchedError } = await supabase
-        .from("researched")
-        .select("tech_type")
-        .eq("user_id", userId)
-
-      if (researchedError) throw researchedError
+      const researchedData = (payload?.researchedTechTypes || []).map((tech: string) => ({ tech_type: tech }))
 
       const unlockedSkillIds = researchedData
-        ?.map((row) => {
+        ?.map((row: { tech_type: string }) => {
           const foundSkill = SKILLS.find((s) => s.id === row.tech_type || s.name === row.tech_type)
           return foundSkill ? foundSkill.id : null
         })
@@ -232,11 +219,17 @@ export function SkillTreeView({ onBack }: SkillTreeViewProps) {
     }
 
     try {
-      // Add skill to researched table
-      await supabase.from("researched").insert({
-        tech_type: skill.id,
-        user_id: userId,
+      const response = await fetch("/api/gameplay/research/unlock", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ techType: skill.id }),
       })
+      if (!response.ok) {
+        const payload = await response.json().catch(() => ({}))
+        throw new Error(payload?.error || "Failed to unlock skill")
+      }
 
       // Deduct stardust cost (you might want to implement this in your points system)
       // For now, we'll just update the local state

@@ -1,6 +1,6 @@
 "use client";
 
-import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
+import { useSession, useSupabaseClient } from "@/src/lib/auth/session-context";
 import { useEffect, useState } from "react";
 import LoginPage from "@/src/components/profile/auth/LoginModal";
 import { useRouter} from "next/navigation";

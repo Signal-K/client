@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, Suspense, useMemo } from "react";
-import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
+import { useSupabaseClient, useSession } from "@/src/lib/auth/session-context";
 import { useRouter } from "next/navigation";
 import { usePostHog } from 'posthog-js/react';
 import { Canvas } from "@react-three/fiber";
@@ -105,10 +105,12 @@ function SunspotClassifier({ onBack, weekStart }: SunspotClassifierProps) {
 
       
 
-      const { data, error } = await supabase
-        .from("classifications")
-        .insert({
-          author: session.user.id,
+      const response = await fetch("/api/gameplay/classifications", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
           anomaly: anomaly.id,
           classificationtype: "sunspot",
           content: `Count: ${sunspotCount}. Shape: ${shapeDescription || 'Not described'}`,
@@ -122,12 +124,13 @@ function SunspotClassifier({ onBack, weekStart }: SunspotClassifierProps) {
             observationDate: observationDate.toISOString(),
             annotations
           }
-        })
-        .select();
+        }),
+      });
+      const payload = await response.json().catch(() => ({}));
 
-      if (error) {
-        console.error("Supabase error:", error);
-        throw error;
+      if (!response.ok) {
+        console.error("Classification API error:", payload?.error);
+        throw new Error(payload?.error || "Failed to submit classification");
       }
 
       
@@ -413,17 +416,17 @@ export default function SolarTab({ onExpandedChange }: SolarTabProps = {}) {
 
         // If no event exists for this week, create one
         if (!event) {
-          const { data: newEvent, error: createError } = await supabase
-            .from("solar_events")
-            .insert({
-              week_start: weekStart.toISOString().split('T')[0],
-              week_end: weekEnd.toISOString().split('T')[0],
-              was_defended: false
-            })
-            .select()
-            .single();
-
-          if (createError) throw createError;
+          const ensureResponse = await fetch("/api/gameplay/solar", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              action: "ensure_event",
+              weekStart: weekStart.toISOString().split("T")[0],
+              weekEnd: weekEnd.toISOString().split("T")[0],
+            }),
+          });
+          const newEvent = await ensureResponse.json().catch(() => ({}));
+          if (!ensureResponse.ok) throw new Error(newEvent?.error || "Failed to create solar event");
           event = newEvent;
         }
 
@@ -481,10 +484,14 @@ export default function SolarTab({ onExpandedChange }: SolarTabProps = {}) {
 
         // Update was_defended if threshold met
         if (percentComplete >= 100 && !event.was_defended) {
-          await supabase
-            .from("solar_events")
-            .update({ was_defended: true })
-            .eq("id", event.id);
+          await fetch("/api/gameplay/solar", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              action: "mark_defended",
+              eventId: event.id,
+            }),
+          });
         }
 
       } catch (error: any) {
@@ -533,15 +540,17 @@ export default function SolarTab({ onExpandedChange }: SolarTabProps = {}) {
     setProbeAnimation(true);
     
     try {
-      const { error } = await supabase
-        .from("defensive_probes")
-        .insert({
-          event_id: currentEvent.id,
-          user_id: session.user.id,
-          count: 1
-        });
-
-      if (error) throw error;
+      const probeResponse = await fetch("/api/gameplay/solar", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "launch_probe",
+          eventId: currentEvent.id,
+          count: 1,
+        }),
+      });
+      const probePayload = await probeResponse.json().catch(() => ({}));
+      if (!probeResponse.ok) throw new Error(probePayload?.error || "Failed to launch probe");
 
       // Refresh progress
       setCommunityProgress(prev => ({

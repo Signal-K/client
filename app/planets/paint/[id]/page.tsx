@@ -5,7 +5,7 @@ import { useParams, useRouter } from "next/navigation"
 import PlanetViewer from "@/src/components/discovery/data-sources/Astronomers/PlanetHunters/planetViewer"
 import { type PlanetConfig, defaultPlanetConfig } from "@/src/components/discovery/planets/planet-config"
 import SettingsPanel from "@/src/components/discovery/data-sources/Astronomers/PlanetHunters/SettingsPanel"
-import { useSupabaseClient } from "@supabase/auth-helpers-react"
+import { useSupabaseClient } from "@/src/lib/auth/session-context"
 import { Button } from "@/src/components/ui/button"
 import GameNavbar from "@/src/components/layout/Tes"
 

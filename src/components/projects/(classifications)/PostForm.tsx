@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
+import { useSupabaseClient, useSession } from "@/src/lib/auth/session-context";
 import { useActivePlanet } from "@/src/core/context/ActivePlanet";
 
 import {
@@ -258,24 +258,22 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({
         },
       };
 
-      // Create the mineral deposit entry
-      const { data: mineralDeposit, error: mineralError } = await supabase
-        .from("mineralDeposits")
-        .insert({
+      const response = await fetch("/api/gameplay/mineral-deposits", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
           anomaly: anomalyId,
-          owner: userId,
+          discovery: classificationId,
           mineralconfiguration: mineralConfiguration,
           location: `Mars - Waypoint ${anomalyIndex + 1}`,
-          discovery: classificationId,
-          roverName: "Mars Rover Alpha", // You can make this dynamic if needed
-        })
-        .select()
-        .single();
-
-      if (mineralError) {
-        console.error("Error creating mineral deposit:", mineralError);
-      } else {
-        // mineral deposit created successfully
+          roverName: "Mars Rover Alpha",
+        }),
+      });
+      if (!response.ok) {
+        const payload = await response.json().catch(() => ({}));
+        console.error("Error creating mineral deposit:", payload?.error);
       }
     } catch (error) {
       console.error("Unexpected error in mineral deposit creation:", error);
@@ -379,47 +377,57 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({
       };
 
       if (inventoryItemId) {
-        const { error: updateError } = await supabase
-          .from("inventory")
-          .update({ configuration: currentConfig })
-          .eq("id", inventoryItemId);
+        const inventoryResponse = await fetch("/api/gameplay/inventory/use", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            inventoryId: inventoryItemId,
+            decrementBy: 1,
+          }),
+        });
+        if (!inventoryResponse.ok) {
+          const payload = await inventoryResponse.json().catch(() => ({}));
+          throw new Error(payload?.error || "Failed to update inventory uses");
+        }
+      }
 
-        if (updateError) {
-          throw updateError;
-        };
-      };
+      const classificationResponse = await fetch("/api/gameplay/classifications", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          content,
+          media: [uploads, assetMentioned],
+          anomaly: anomalyId,
+          classificationtype: anomalyType,
+          classificationConfiguration,
+        }),
+      });
 
-      const { data: classificationData, error: classificationError } =
-        await supabase
-          .from("classifications")
-          .insert({
-            author: session?.user?.id,
-            content,
-            media: [uploads, assetMentioned],
-            anomaly: anomalyId,
-            classificationtype: anomalyType,
-            classificationConfiguration,
-          })
-          .select()
-          .single();
-
-      if (classificationError) {
-        console.error(
-          "Error creating classification: ",
-          classificationError.message
-        );
+      if (!classificationResponse.ok) {
+        const payload = await classificationResponse.json().catch(() => ({}));
+        console.error("Error creating classification: ", payload?.error);
         alert("Failed to create classification. Please try again.");
         return;
       } else {
+        const classificationData = await classificationResponse.json();
         // On successful classification, delete linked_anomalies entries
-        const { error: deleteError } = await supabase
-          .from("linked_anomalies")
-          .delete()
-          .eq("author", session?.user.id)
-          .eq("anomaly_id", anomalyId);
+        const deleteResponse = await fetch("/api/gameplay/linked-anomalies", {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            anomalyId,
+          }),
+        });
 
-        if (deleteError) {
-          console.error("Error deleting linked anomalies:", deleteError.message);
+        if (!deleteResponse.ok) {
+          const payload = await deleteResponse.json().catch(() => ({}));
+          console.error("Error deleting linked anomalies:", payload?.error);
         }
 
         // Check if this classification is for a waypoint with a mineral deposit
@@ -442,23 +450,19 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({
 
       // await handleMissionComplete();
 
-      const { data: profileData, error: profileError } = await supabase
-        .from("profiles")
-        .select("classificationPoints")
-        .eq("id", session?.user?.id)
-        .single();
-
-      if (profileError) throw profileError;
-
-      const newClassificationPoints =
-        (profileData?.classificationPoints || 0) + 1;
-
-      const { error: updatePointsError } = await supabase
-        .from("profiles")
-        .update({ classificationPoints: newClassificationPoints })
-        .eq("id", session?.user?.id);
-
-      if (updatePointsError) throw updatePointsError;
+      const pointsResponse = await fetch("/api/gameplay/profile/classification-points", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          amount: 1,
+        }),
+      });
+      if (!pointsResponse.ok) {
+        const payload = await pointsResponse.json().catch(() => ({}));
+        throw new Error(payload?.error || "Failed to update classification points");
+      }
     } catch (error: any) {
       console.error("Unexpected error:", error);
     };

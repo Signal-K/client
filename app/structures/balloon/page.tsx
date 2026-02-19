@@ -1,7 +1,7 @@
 'use client'
 
 import Home from "@/app/page";
-import { useSession } from "@supabase/auth-helpers-react";
+import { useSession } from "@/src/lib/auth/session-context";
 import {
   BuildingIcon,
   CameraOffIcon,

@@ -1,20 +1,20 @@
 "use client";
 
 import Landing from "./apt/page";
-import { useSessionContext } from "@supabase/auth-helpers-react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import { useAuthUser } from "@/src/hooks/useAuthUser";
 
 // Root page: show landing for logged-out users.
 export default function HomePage() {
-  const { session, isLoading } = useSessionContext();
+  const { user, isLoading } = useAuthUser();
   const router = useRouter();
 
   useEffect(() => {
-    if (!isLoading && session) {
+    if (!isLoading && user) {
       router.replace('/game');
     }
-  }, [isLoading, session, router]);
+  }, [isLoading, user, router]);
 
   return <Landing />;
 }

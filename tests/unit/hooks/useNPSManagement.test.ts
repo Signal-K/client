@@ -1,9 +1,9 @@
 import { renderHook } from "@testing-library/react"
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest"
 import { useNPSManagement } from "@/hooks/useNPSManagement"
-import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react"
+import { useSession, useSupabaseClient } from "@/src/lib/auth/session-context"
 
-vi.mock("@supabase/auth-helpers-react", () => ({
+vi.mock("@/src/lib/auth/session-context", () => ({
   useSession: vi.fn(),
   useSupabaseClient: vi.fn(),
 }))

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
+import { useSupabaseClient, useSession } from "@/src/lib/auth/session-context";
 import { useRouter } from "next/navigation";
 import { useActivePlanet } from "@/src/core/context/ActivePlanet";
 import ClassificationForm from "../(classifications)/PostForm";
@@ -256,21 +256,22 @@ export const DiskDetectorTutorial: React.FC<TelescopeProps> = ({
         timestamp: new Date().toISOString()
       };
 
-      // Insert classification into database
-      const { data, error } = await supabase
-        .from('classifications')
-        .insert({
-          author: session.user.id,
+      const response = await fetch("/api/gameplay/classifications", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
           anomaly: parseInt(anomalyId),
-          classificationtype: 'diskDetective',
-          classificationConfiguration: classificationConfiguration,
-          content: comments.trim() || null
-        })
-        .select()
-        .single();
+          classificationtype: "diskDetective",
+          classificationConfiguration,
+          content: comments.trim() || null,
+        }),
+      });
+      const data = await response.json().catch(() => ({}));
 
-      if (error) {
-        console.error("Error saving classification:", error);
+      if (!response.ok) {
+        console.error("Error saving classification:", data?.error);
         alert("Error saving classification. Please try again.");
         return;
       }

@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useEffect, useState } from "react"
-import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react"
+import { useSession, useSupabaseClient } from "@/src/lib/auth/session-context"
 import { useRouter } from "next/navigation"
 import type { Anomaly, Star } from "@/types/Structures/telescope"
 import { DatabaseAnomaly } from "../Telescope/TelescopeUtils"
@@ -623,166 +623,39 @@ export default function DeploySatelliteViewport() {
     }, 1000);
   };
 
-    const handleDeploy = async () => {
-    // handleDeploy invoked
+  const handleDeploy = async () => {
     setDeploying(true);
-    
+
     try {
       if (!session?.user?.id) {
-        // no user session
         return;
       }
-      const userId = session.user.id;
-      // user id obtained
-      
-      // Check if user has fast deploy enabled (no classifications made)
-      const { count: userClassificationCount } = await supabase
-        .from('classifications')
-        .select('id', { count: 'exact', head: true })
-        .eq('author', userId);
-
-      const isFastDeployEnabled = (userClassificationCount || 0) === 0;
-      // fast deploy setting determined
-      
-      // Set deployment date - one day prior for fast deploy, current time otherwise
-      const now = new Date();
-      const deploymentDate = isFastDeployEnabled 
-        ? new Date(now.getTime() - 24 * 60 * 60 * 1000) // 1 day ago
-        : now;
-      const deploymentDateISO = deploymentDate.toISOString();
-      
-      // deployment date determined
-      
-      // Check for satellite upgrade
-      let anomalyCount = 4; // Default count
-      const { data: researched } = await supabase
-        .from("researched")
-        .select("tech_type")
-        .eq("user_id", userId)
-        .eq("tech_type", "satellitecount");
-      
-      if (researched && researched.length > 0) {
-        anomalyCount = 6; // Increased count with upgrade
-        // satellite upgrade detected
-      }
-
-      let rows = [];
       const planet = planetAnomalies[focusedPlanetIdx];
-      // planet and deployment parameters prepared
       if (!planet) {
-        // no planet selected
         return;
       }
-    if (investigationMode === 'planets') {
-      // Find classification for this user/planet
-      const { data: classifications } = await supabase
-        .from('classifications')
-        .select('id')
-        .eq('author', userId)
-        .eq('anomaly', planet.id)
-        .eq('classificationtype', 'planet');
-      const classificationId = classifications && classifications[0]?.id;
-      rows.push({
-        author: userId,
-        anomaly_id: planet.id,
-        classification_id: classificationId || null,
-        date: deploymentDateISO,
-        automaton: 'WeatherSatellite',
-        unlocked: false,
-        unlock_time: null,
+
+      const response = await fetch("/api/gameplay/deploy/satellite", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          investigationMode,
+          planetId: planet.id,
+        }),
       });
-    } else if (investigationMode === 'weather') {
-      // Find classification for this user/planet
-      const { data: classifications } = await supabase
-        .from('classifications')
-        .select('id')
-        .eq('author', userId)
-        .eq('anomaly', planet.id)
-        .eq('classificationtype', 'planet');
-      const classificationId = classifications && classifications[0]?.id;
-      
-      let anomalySets: string[] = [];
-      if (userCloudClassifications >= 2) {
-        anomalySets = ["lidar-jovianVortexHunter", "cloudspottingOnMars", "balloon-marsCloudShapes"];
-      } else {
-        anomalySets = ["cloudspottingOnMars"];
-      }
+      const payload = await response.json().catch(() => null);
 
-      // Fetch cloud anomalies from ANYWHERE in the correct sets (upgraded count)
-      const { data: allClouds, error: cloudErr } = await supabase
-        .from('anomalies')
-        .select('id')
-        .in('anomalySet', anomalySets);
-
-      if (cloudErr) {
-        alert('Failed to fetch cloud anomalies: ' + cloudErr.message);
+      if (!response.ok) {
+        console.error("Deployment failed:", payload?.error || response.statusText);
+        alert(`Deployment failed: ${payload?.error || "Unknown error"}`);
         return;
       }
-      const shuffledClouds = (allClouds || []).sort(() => 0.5 - Math.random());
-      shuffledClouds.slice(0, anomalyCount).forEach((cloud) => {
-        rows.push({
-          author: userId,
-          anomaly_id: cloud.id,
-          classification_id: classificationId || null,
-          date: deploymentDateISO,
-          automaton: 'WeatherSatellite',
-          unlocked: false,
-          unlock_time: null,
-        });
+
+      setShowConfirmation(true);
+      setDeploymentResult({
+        anomalies: (payload?.anomalyIds || []).map((id: number) => String(id)),
+        sectorName: payload?.sectorName || planet.content || `TIC ${planet.id}`,
       });
-    } else if (investigationMode === 'p-4') {
-      // Find classification for this user/planet
-      const { data: classifications } = await supabase
-        .from('classifications')
-        .select('id')
-        .eq('author', userId)
-        .eq('anomaly', planet.id)
-        .eq('classificationtype', 'planet');
-      const classificationId = classifications && classifications[0]?.id;
-
-      // Fetch wind survey anomalies (upgraded count)
-      const { data: windAnomalies, error: windErr } = await supabase
-        .from('anomalies')
-        .select('id')
-        .eq('anomalySet', 'satellite-planetFour');
-
-      if (windErr) {
-        alert('Failed to fetch wind survey anomalies: ' + windErr.message);
-        return;
-      };
-
-      const shuffledAnomalies = (windAnomalies || []).sort(() => 0.5 - Math.random());
-      shuffledAnomalies.slice(0, anomalyCount).forEach((anomaly) => {
-        rows.push({
-          author: userId,
-          anomaly_id: anomaly.id,
-          classification_id: classificationId || null,
-          date: deploymentDateISO,
-          automaton: 'WeatherSatellite',
-          unlocked: false,
-          unlock_time: null,
-        });
-      });
-    }
-    // rows to insert prepared
-    if (rows.length > 0) {
-      // attempting to insert rows into linked_anomalies
-      const { error, data } = await supabase.from('linked_anomalies').insert(rows);
-      // insert result processed
-      if (!error) {
-        // deployment successful
-        setShowConfirmation(true);
-        setDeploymentResult({
-          anomalies: rows.map(r => String(r.anomaly_id)),
-          sectorName: planet.content || `TIC ${planet.id}`,
-        });
-      } else {
-        console.error("Deployment failed:", error);
-        alert('Deployment failed: ' + error.message);
-      }
-    } else {
-      // no rows to insert
-    }
     } catch (error) {
       console.error("Error in handleDeploy:", error);
       alert("An error occurred during deployment. Please try again.");

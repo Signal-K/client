@@ -2,7 +2,7 @@
 
 import type React from "react"
 import { useState, useEffect, useRef } from "react"
-import { useSession } from "@supabase/auth-helpers-react"
+import { useSession } from "@/src/lib/auth/session-context"
 import type { Anomaly, Star } from "@/types/Structures/telescope"
 import { generateSectorName, generateStars, filterAnomaliesBySector } from "@/src/components/classification/telescope/utils/sector-utils"
 import { useDatabaseOperations } from "./blocks/viewport/db-ops"

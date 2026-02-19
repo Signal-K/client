@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import MainHeader from "@/src/components/layout/Header/MainHeader";
 import UseDarkMode from "@/src/shared/hooks/useDarkMode";
 import { usePageData } from "@/hooks/usePageData";
-import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
+import { useSession, useSupabaseClient } from "@/src/lib/auth/session-context";
 import { useRouter } from "next/navigation";
 import ActivityHeaderSection from "@/src/components/social/activity/ActivityHeaderSection";
 import { Button } from "@/src/components/ui/button";

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from "react";
-import { useSupabaseClient } from "@supabase/auth-helpers-react";
+import { useSupabaseClient } from "@/src/lib/auth/session-context";
 import PostCard from "@/src/components/social/posts/TestPostCard";
 import GameNavbar from "@/src/components/layout/Tes";
 import StructuresOnPlanet from "@/src/components/deployment/structures/Structures";

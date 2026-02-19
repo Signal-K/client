@@ -1,7 +1,7 @@
 // /Users/scroobz/Navigation/client/src/components/deployment/missions/structures/Stardust/Total.tsx
 
 import { useEffect, useState, forwardRef, useImperativeHandle } from "react";
-import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
+import { useSupabaseClient, useSession } from "@/src/lib/auth/session-context";
 
 /**
  * ------------------------------------------------------------

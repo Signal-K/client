@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
-import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react"
 import { Bell, ChevronDown, HammerIcon, LogOut, Settings, Star, Trophy, User, X, Zap, Sparkles } from "lucide-react"
 import { formatDistanceToNow, startOfDay, addDays } from "date-fns"
 import { Avatar, AvatarGenerator } from "../profile/setup/Avatar";
@@ -31,6 +30,7 @@ import { useRouter } from "next/navigation"
 import ResponsiveAlerts from "./Navigation/AlertsDropdown"
 import ProjectPreferencesModal from "@/src/components/onboarding/ProjectPreferencesModal"
 import { useUserPreferences, ProjectType } from "@/src/hooks/useUserPreferences"
+import { useAuthUser } from "@/src/hooks/useAuthUser"
 
 // Sample data - replace with actual data in your implementation
 const techTree = [
@@ -41,8 +41,7 @@ const techTree = [
 ];
 
 export default function GameNavbar() {
-  const supabase = useSupabaseClient();
-  const session = useSession();
+  const { supabase, user } = useAuthUser();
 
   const router = useRouter();
 
@@ -102,28 +101,23 @@ export default function GameNavbar() {
   const [referralCode, setReferralCode] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!session) {
+    if (!user) {
       setReferralCode(null);
       return;
     }
 
     const fetchReferralCode = async () => {
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("referral_code")
-        .eq("id", session.user.id)
-        .single();
-
-      if (error) {
-        console.error("Error fetching referral code:", error);
+      const response = await fetch("/api/gameplay/profile/code", { cache: "no-store" });
+      const payload = await response.json().catch(() => null);
+      if (!response.ok) {
         setReferralCode(null);
       } else {
-        setReferralCode(data?.referral_code ?? null);
+        setReferralCode(payload?.referralCode ?? null);
       }
     };
 
     fetchReferralCode();
-  }, [session, supabase]);
+  }, [user]);
 
   // Fetch milestones
   useEffect(() => {
@@ -265,7 +259,7 @@ export default function GameNavbar() {
                                     className="flex items-center justify-center w-6 h-6 rounded-full overflow-hidden bg-[#5FCBC3]/60 hover:bg-[#5FCBC3]/80 transition"
                                   >
                     {/* <Avatar /> */}
-                    <AvatarGenerator author={session?.user.id ?? ""} />
+                    <AvatarGenerator author={user?.id ?? ""} />
                     </div>
                 </div>
                 <ChevronDown className="h-3 w-3 text-white/70" />

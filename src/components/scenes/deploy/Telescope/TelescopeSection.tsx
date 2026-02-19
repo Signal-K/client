@@ -8,15 +8,11 @@ import { ClassificationDetailDialog } from "@/src/components/classification/view
 import { TelescopeViewportState } from "@/src/components/classification/telescope/telescope-viewport";
 import Section from "@/src/components/sections/Section";
 import { Anomaly } from "@/types/Structures/telescope";
-import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 
 export default function TelescopeViewportSection() {
   const router = useRouter();
-
-  const supabase = useSupabaseClient();
-  const session = useSession();
 
   const [hasTelescopeDeployed, setHasTelescopeDeployed] =
     useState<boolean>(false);
@@ -35,20 +31,22 @@ export default function TelescopeViewportSection() {
   // Check for linked_anomalies of relevant type
   useEffect(() => {
     async function fetchLinkedAnomaliesAndClassifications() {
-      if (!session?.user?.id) return;
-      // Fetch linked anomalies for this user
-      const { data: linked, error: linkedError } = await supabase
-        .from("linked_anomalies")
-        .select("*, anomaly:anomalies(*)")
-        .eq("author", session.user.id)
-        .in("automaton", ["Telescope", "TelescopePlanet"]); // TelescopeSolar
-      
-      setHasTelescopeDeployed((linked && linked.length > 0) || false);
+      const response = await fetch("/api/gameplay/telescope/viewport", { cache: "no-store" });
+      const payload = await response.json().catch(() => null);
+      if (!response.ok) {
+        setHasTelescopeDeployed(false);
+        setLinkedAnomalies([]);
+        setClassifications([]);
+        return;
+      }
+
+      const linked = payload?.anomalies || [];
+      setHasTelescopeDeployed(linked.length > 0);
       
         // Map to anomaly shape
       const mapped = (linked || []).map((row: any) => ({
-        id: `db-${row.anomaly_id}`,
-        ...row.anomaly,
+        id: `db-${row.id}`,
+        ...row,
         x: Math.random() * 80 + 10,
         y: Math.random() * 80 + 10,
         size: 1,
@@ -60,18 +58,10 @@ export default function TelescopeViewportSection() {
         pulseSpeed: 1.5,
       }));
       setLinkedAnomalies(mapped);
-      // Fetch classifications for this user and others
-      const anomalyIds = mapped.map((a) =>
-        typeof a.id === "string" ? a.id.replace("db-", "") : a.id
-      );
-      const { data: classData, error: classError } = await supabase
-        .from("classifications")
-        .select("*")
-        .in("anomaly", anomalyIds);
-      setClassifications(classData || []);
+      setClassifications(payload?.allClassifications || []);
     }
     fetchLinkedAnomaliesAndClassifications();
-  }, [session, supabase]);
+  }, []);
 
   // Deploy handler (stub)
   const handleDeployTelescope = async () => {

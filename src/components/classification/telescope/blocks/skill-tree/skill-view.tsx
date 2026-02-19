@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react"
+import { useSession, useSupabaseClient } from "@/src/lib/auth/session-context"
 import { Button } from "@/src/components/ui/button"
 import { ArrowLeft } from "lucide-react"
 import { SkillNode } from "./skill-node"
@@ -209,15 +209,23 @@ export function SkillTreeView({ onBack }: SkillTreeViewProps) {
     }
 
     try {
-      await supabase.from("user_skills").insert({
-        user_id: userId,
-        skill_id: skill.id,
-        unlocked_at: new Date().toISOString(),
+      const response = await fetch("/api/gameplay/skills/unlock", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          skillId: skill.id,
+        }),
       })
+      const result = await response.json().catch(() => ({}))
+      if (!response.ok) {
+        throw new Error(result?.error || "Failed to unlock skill")
+      }
 
       setUserProgress((prev) => ({
         ...prev,
-        unlockedSkills: [...prev.unlockedSkills, skill.id],
+        unlockedSkills: prev.unlockedSkills.includes(skill.id)
+          ? prev.unlockedSkills
+          : [...prev.unlockedSkills, skill.id],
         stardustBalance: prev.stardustBalance - skill.cost,
       }))
     } catch (error) {

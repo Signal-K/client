@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { PostCardSingle } from "@/src/components/social/posts/PostSingle";
-import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
+import { useSession, useSupabaseClient } from "@/src/lib/auth/session-context";
 
 interface Classification {
     id: number;
@@ -73,25 +73,24 @@ export default function VoteJVH() {
 
     const handleVote = async (classificationId: number, currentConfig: any) => {
         try {
-          const currentVotes = currentConfig?.votes || 0;
-    
-          const updatedConfig = {
-            ...currentConfig,
-            votes: currentVotes + 1,
-          };
-    
-          const { error } = await supabase
-            .from("classifications")
-            .update({ classificationConfiguration: updatedConfig })
-            .eq("id", classificationId);
-    
-          if (error) {
-            console.error("Error updating classificationConfiguration:", error);
+          const response = await fetch("/api/gameplay/classifications/configuration", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              classificationId,
+              action: "increment_vote",
+            }),
+          });
+          const result = await response.json().catch(() => ({}));
+
+          if (!response.ok) {
+            console.error("Error updating classificationConfiguration:", result?.error);
           } else {
+            const updatedVotes = result?.classificationConfiguration?.votes ?? (currentConfig?.votes || 0) + 1;
             setClassifications((prevClassifications) =>
               prevClassifications.map((classification) =>
                 classification.id === classificationId
-                  ? { ...classification, votes: updatedConfig.votes }
+                  ? { ...classification, votes: updatedVotes }
                   : classification
               )
             );

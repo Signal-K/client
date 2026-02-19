@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useSession } from "@supabase/auth-helpers-react";
+import { useSession } from "@/src/lib/auth/session-context";
 import { usePageData } from "@/hooks/usePageData";
 import { useUserPreferences } from "@/src/hooks/useUserPreferences";
 import ProjectPreferencesModal from "@/src/components/onboarding/ProjectPreferencesModal";
