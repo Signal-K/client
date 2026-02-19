@@ -132,8 +132,9 @@ export default defineConfig({
         video: process.env.CI ? true : false,
         screenshotOnRunFailure: true,
         defaultCommandTimeout: 10000,
-        requestTimeout: 10000,
-        responseTimeout: 10000,
+        // Next.js dev-mode cold compiles can exceed 10s in CI.
+        requestTimeout: 60000,
+        responseTimeout: 60000,
         pageLoadTimeout: 120000,
         // Docker-specific settings
         chromeWebSecurity: false,
