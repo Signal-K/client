@@ -13,9 +13,31 @@ export NEXT_PUBLIC_SUPABASE_URL="${NEXT_PUBLIC_SUPABASE_URL:-http://127.0.0.1:54
 export NEXT_PUBLIC_SUPABASE_ANON_KEY="${NEXT_PUBLIC_SUPABASE_ANON_KEY:-}"
 export SUPABASE_SERVICE_ROLE_KEY="${SUPABASE_SERVICE_ROLE_KEY:-}"
 
+# Derive keys from local Supabase when not provided explicitly.
 if [[ -z "${NEXT_PUBLIC_SUPABASE_ANON_KEY}" || -z "${SUPABASE_SERVICE_ROLE_KEY}" ]]; then
-  echo "Missing required env vars: NEXT_PUBLIC_SUPABASE_ANON_KEY and SUPABASE_SERVICE_ROLE_KEY"
-  echo "Set them in your shell (or .env.local) before running test:suite:local."
+  STATUS_ENV="$(supabase status -o env 2>/dev/null || true)"
+  if [[ -n "${STATUS_ENV}" ]]; then
+    LOCAL_PUBLISHABLE="$(printf '%s\n' "${STATUS_ENV}" | sed -n 's/^ANON_KEY=//p' | tail -n1 | sed 's/^"//; s/"$//')"
+    LOCAL_SECRET="$(printf '%s\n' "${STATUS_ENV}" | sed -n 's/^SERVICE_ROLE_KEY=//p' | tail -n1 | sed 's/^"//; s/"$//')"
+    if [[ -z "${LOCAL_PUBLISHABLE}" ]]; then
+      LOCAL_PUBLISHABLE="$(printf '%s\n' "${STATUS_ENV}" | sed -n 's/^PUBLISHABLE_KEY=//p' | tail -n1 | sed 's/^"//; s/"$//')"
+    fi
+    if [[ -z "${LOCAL_SECRET}" ]]; then
+      LOCAL_SECRET="$(printf '%s\n' "${STATUS_ENV}" | sed -n 's/^SECRET_KEY=//p' | tail -n1 | sed 's/^"//; s/"$//')"
+    fi
+  fi
+  if [[ -z "${LOCAL_PUBLISHABLE}" || -z "${LOCAL_SECRET}" ]]; then
+    STATUS_TEXT="$(supabase status)"
+    LOCAL_PUBLISHABLE="$(printf '%s\n' "${STATUS_TEXT}" | sed -n 's/^| Publishable | \(.*\) |$/\1/p' | tail -n1)"
+    LOCAL_SECRET="$(printf '%s\n' "${STATUS_TEXT}" | sed -n 's/^| Secret      | \(.*\) |$/\1/p' | tail -n1)"
+  fi
+
+  export NEXT_PUBLIC_SUPABASE_ANON_KEY="${NEXT_PUBLIC_SUPABASE_ANON_KEY:-$LOCAL_PUBLISHABLE}"
+  export SUPABASE_SERVICE_ROLE_KEY="${SUPABASE_SERVICE_ROLE_KEY:-$LOCAL_SECRET}"
+fi
+
+if [[ -z "${NEXT_PUBLIC_SUPABASE_ANON_KEY}" || -z "${SUPABASE_SERVICE_ROLE_KEY}" ]]; then
+  echo "Missing Supabase keys. Could not derive NEXT_PUBLIC_SUPABASE_ANON_KEY/SUPABASE_SERVICE_ROLE_KEY from local Supabase."
   exit 1
 fi
 

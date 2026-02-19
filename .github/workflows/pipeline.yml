@@ -44,10 +44,6 @@ jobs:
     env:
       NODE_ENV: test
       SKIP_USER_CREATION_TESTS: "true"
-      SUPABASE_URL: ${{ vars.SUPABASE_URL }}
-      NEXT_PUBLIC_SUPABASE_URL: ${{ vars.NEXT_PUBLIC_SUPABASE_URL }}
-      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ vars.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
-      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
 
     steps:
       - name: Checkout
@@ -72,16 +68,41 @@ jobs:
 
       - name: Normalize local test env defaults
         run: |
-          echo "SUPABASE_URL=${SUPABASE_URL:-http://127.0.0.1:54321}" >> "$GITHUB_ENV"
-          echo "NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL:-http://127.0.0.1:54321}" >> "$GITHUB_ENV"
-          if [ -z "${NEXT_PUBLIC_SUPABASE_ANON_KEY}" ]; then
-            echo "Missing NEXT_PUBLIC_SUPABASE_ANON_KEY (GitHub variable)." >&2
+          SUPABASE_URL="${SUPABASE_URL:-${{ vars.SUPABASE_URL }}}"
+          NEXT_PUBLIC_SUPABASE_URL="${NEXT_PUBLIC_SUPABASE_URL:-${{ vars.NEXT_PUBLIC_SUPABASE_URL }}}"
+          NEXT_PUBLIC_SUPABASE_ANON_KEY="${NEXT_PUBLIC_SUPABASE_ANON_KEY:-${{ vars.NEXT_PUBLIC_SUPABASE_ANON_KEY }}}"
+          SUPABASE_SERVICE_ROLE_KEY="${SUPABASE_SERVICE_ROLE_KEY:-${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}}"
+
+          SUPABASE_URL="${SUPABASE_URL:-http://127.0.0.1:54321}"
+          NEXT_PUBLIC_SUPABASE_URL="${NEXT_PUBLIC_SUPABASE_URL:-http://127.0.0.1:54321}"
+
+          STATUS_ENV="$(supabase status -o env 2>/dev/null || true)"
+          if [ -n "${STATUS_ENV}" ]; then
+            LOCAL_PUBLISHABLE="$(printf '%s\n' "${STATUS_ENV}" | sed -n 's/^ANON_KEY=//p' | tail -n1 | sed 's/^"//; s/"$//')"
+            LOCAL_SECRET="$(printf '%s\n' "${STATUS_ENV}" | sed -n 's/^SERVICE_ROLE_KEY=//p' | tail -n1 | sed 's/^"//; s/"$//')"
+            if [ -z "${LOCAL_PUBLISHABLE}" ]; then
+              LOCAL_PUBLISHABLE="$(printf '%s\n' "${STATUS_ENV}" | sed -n 's/^PUBLISHABLE_KEY=//p' | tail -n1 | sed 's/^"//; s/"$//')"
+            fi
+            if [ -z "${LOCAL_SECRET}" ]; then
+              LOCAL_SECRET="$(printf '%s\n' "${STATUS_ENV}" | sed -n 's/^SECRET_KEY=//p' | tail -n1 | sed 's/^"//; s/"$//')"
+            fi
+          fi
+          if [ -z "${LOCAL_PUBLISHABLE}" ] || [ -z "${LOCAL_SECRET}" ]; then
+            STATUS_TEXT="$(supabase status)"
+            LOCAL_PUBLISHABLE="$(printf '%s\n' "${STATUS_TEXT}" | sed -n 's/^| Publishable | \(.*\) |$/\1/p' | tail -n1)"
+            LOCAL_SECRET="$(printf '%s\n' "${STATUS_TEXT}" | sed -n 's/^| Secret      | \(.*\) |$/\1/p' | tail -n1)"
+          fi
+
+          NEXT_PUBLIC_SUPABASE_ANON_KEY="${NEXT_PUBLIC_SUPABASE_ANON_KEY:-$LOCAL_PUBLISHABLE}"
+          SUPABASE_SERVICE_ROLE_KEY="${SUPABASE_SERVICE_ROLE_KEY:-$LOCAL_SECRET}"
+
+          if [ -z "${NEXT_PUBLIC_SUPABASE_ANON_KEY}" ] || [ -z "${SUPABASE_SERVICE_ROLE_KEY}" ]; then
+            echo "Unable to resolve local Supabase auth keys from supabase status." >&2
             exit 1
           fi
-          if [ -z "${SUPABASE_SERVICE_ROLE_KEY}" ]; then
-            echo "Missing SUPABASE_SERVICE_ROLE_KEY (GitHub secret)." >&2
-            exit 1
-          fi
+
+          echo "SUPABASE_URL=${SUPABASE_URL}" >> "$GITHUB_ENV"
+          echo "NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}" >> "$GITHUB_ENV"
           echo "NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY}" >> "$GITHUB_ENV"
           echo "SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}" >> "$GITHUB_ENV"
 
