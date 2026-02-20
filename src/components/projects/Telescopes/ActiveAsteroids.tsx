@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from "react";
-import { useSession, useSupabaseClient } from "@/src/lib/auth/session-context";
+import { useSession } from "@/src/lib/auth/session-context";
 import ClassificationForm from "../(classifications)/PostForm";
 import { Button } from "@/src/components/ui/button";
 import ImageAnnotator from "../(classifications)/Annotating/AnnotatorView";
@@ -25,7 +25,6 @@ type Anomaly = {
 };
 
 export function ActiveAsteroidWithId() {
-    const supabase = useSupabaseClient();
     const session = useSession();
 
     const [anomaly, setAnomaly] = useState<Anomaly | null>(null);
@@ -42,20 +41,12 @@ export function ActiveAsteroidWithId() {
             };
 
             try {
-                const {
-                    data: anomalyData,
-                    error: anomalyError,
-                } = await supabase
-                    .from('anomalies')
-                    .select("*")
-                    .eq("author", session.user.id)
-                    .eq("anomalySet", "telescope-active-asteroids")
-                    .limit(1)
-                    .maybeSingle();
-
-                if (anomalyError) {
-                    throw anomalyError;
-                };
+                const res = await fetch(
+                  `/api/gameplay/anomalies?author=${encodeURIComponent(session.user.id)}&anomalySet=telescope-active-asteroids&limit=1`
+                );
+                const payload = await res.json();
+                if (!res.ok) throw new Error(payload?.error || "Failed to load anomaly");
+                const anomalyData = payload?.anomalies?.[0];
 
                 if (anomalyData) {
                     setAnomaly(anomalyData);
@@ -74,7 +65,7 @@ export function ActiveAsteroidWithId() {
         }
 
         fetchAnomaly();
-    }, [session, supabase]);
+    }, [session]);
 
     if (loading) {
         return <div>Loading...</div>;
@@ -124,7 +115,6 @@ export function ActiveAsteroidWithId() {
 
 // New component specifically for active asteroids with specific ID
 export function ActiveAsteroidClassifyWithId({ anomalyId }: { anomalyId: string }) {
-    const supabase = useSupabaseClient();
     const session = useSession();
 
     const [anomaly, setAnomaly] = useState<Anomaly | null>(null);
@@ -144,17 +134,12 @@ export function ActiveAsteroidClassifyWithId({ anomalyId }: { anomalyId: string 
             try {
                 console.log("Fetching active asteroid anomaly with ID:", anomalyId);
                 
-                const { data: anomalyData, error: anomalyError } = await supabase
-                    .from('anomalies')
-                    .select("*")
-                    .eq("id", anomalyId)
-                    .eq("anomalySet", "active-asteroids")
-                    .maybeSingle();
-
-                if (anomalyError) {
-                    console.error("Database error:", anomalyError);
-                    throw anomalyError;
-                }
+                const res = await fetch(
+                  `/api/gameplay/anomalies?id=${encodeURIComponent(anomalyId)}&anomalySet=active-asteroids&limit=1`
+                );
+                const payload = await res.json();
+                if (!res.ok) throw new Error(payload?.error || "Failed to load anomaly");
+                const anomalyData = payload?.anomalies?.[0];
 
                 console.log("Query returned:", anomalyData);
 
@@ -174,7 +159,7 @@ export function ActiveAsteroidClassifyWithId({ anomalyId }: { anomalyId: string 
         }
 
         fetchAnomaly();
-    }, [anomalyId, session, supabase]);
+    }, [anomalyId, session]);
 
     if (loading) {
         return (

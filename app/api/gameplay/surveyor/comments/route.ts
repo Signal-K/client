@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 
-import { getRouteSupabaseWithUser } from "@/lib/server/supabaseRoute";
+import { prisma } from "@/lib/server/prisma";
+import { getRouteUser } from "@/lib/server/supabaseRoute";
 
 export const dynamic = "force-dynamic";
 
@@ -15,7 +16,7 @@ type SurveyorCommentBody = {
 };
 
 export async function POST(request: NextRequest) {
-  const { supabase, user, authError } = await getRouteSupabaseWithUser();
+  const { user, authError } = await getRouteUser();
   if (authError || !user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
@@ -47,10 +48,25 @@ export async function POST(request: NextRequest) {
     insertPayload.value = body.value;
   }
 
-  const { error } = await supabase.from("comments").insert([insertPayload]);
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
-  }
+  const configurationJson = insertPayload.configuration
+    ? JSON.stringify(insertPayload.configuration as Record<string, unknown>)
+    : null;
+  const surveyor = (insertPayload.surveyor as string | undefined) ?? null;
+  const category = (insertPayload.category as string | undefined) ?? null;
+  const value = (insertPayload.value as string | undefined) ?? null;
+
+  await prisma.$executeRaw`
+    INSERT INTO comments (content, classification_id, author, configuration, surveyor, category, value)
+    VALUES (
+      ${insertPayload.content as string},
+      ${insertPayload.classification_id as number},
+      ${insertPayload.author as string},
+      ${configurationJson}::jsonb,
+      ${surveyor},
+      ${category},
+      ${value}
+    )
+  `;
 
   revalidatePath(`/planets/${classificationId}`);
   revalidatePath(`/posts/surveyor/${classificationId}`);

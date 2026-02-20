@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from "react"; 
-import { useSession, useSupabaseClient } from "@/src/lib/auth/session-context";
+import { useSession } from "@/src/lib/auth/session-context";
 import ImageAnnotator from "../(classifications)/Annotating/AnnotatorView";
 import { Button } from "@/src/components/ui/button";
 import TutorialContentBlock, { createTutorialSlides } from "../TutorialContentBlock";
@@ -21,7 +21,7 @@ interface Props {
 export function StarterJovianVortexHunter({
     anomalyid
 }: Props) {
-    const supabase = useSupabaseClient();
+    const session = useSession();
     const imageUrl = `${supabaseUrl}/storage/v1/object/public/telescope/lidar-jovianVortexHunter/${anomalyid}.png`;
     const [showTutorial, setShowTutorial] = useState(false);
 
@@ -144,8 +144,7 @@ export function StarterJovianVortexHunter({
                             initialImageUrl={imageUrl}
                             annotationType="JVH"
                             onClassificationComplete={async () => {
-                                const session = await supabase.auth.getSession();
-                                if (!session.data.session) return;
+                                if (!session?.user?.id) return;
 
                                 try {
                                     const { 
@@ -153,21 +152,18 @@ export function StarterJovianVortexHunter({
                                         selectJovianMineral 
                                     } = await import("@/src/utils/mineralDepositCreation");
 
-                                    const { data: recentClassification } = await supabase
-                                        .from("classifications")
-                                        .select("id")
-                                        .eq("author", session.data.session.user.id)
-                                        .eq("anomaly", parseInt(anomalyid.toString()))
-                                        .eq("classificationtype", "lidar-jovianVortexHunter")
-                                        .order("created_at", { ascending: false })
-                                        .limit(1)
-                                        .single();
+                                    const recentRes = await fetch(
+                                      `/api/gameplay/classifications?author=${encodeURIComponent(session.user.id)}&anomaly=${parseInt(anomalyid.toString())}&classificationtype=lidar-jovianVortexHunter&orderBy=created_at&ascending=false&limit=1`
+                                    );
+                                    const recentPayload = await recentRes.json().catch(() => ({}));
+                                    const recentClassification = recentRes.ok
+                                      ? recentPayload?.classifications?.[0]
+                                      : null;
 
                                     if (recentClassification) {
                                         const mineralConfig = selectJovianMineral();
                                         const depositCreated = await attemptMineralDepositCreation({
-                                            supabase,
-                                            userId: session.data.session.user.id,
+                                            userId: session.user.id,
                                             anomalyId: parseInt(anomalyid.toString()),
                                             classificationId: recentClassification.id,
                                             mineralConfig,
@@ -191,7 +187,6 @@ export function StarterJovianVortexHunter({
 };
 
 export function LidarJVHSatelliteWithId() {
-    const supabase = useSupabaseClient();
     const session = useSession();
 
     const [anomaly, setAnomaly] = useState<Anomaly | null>(null);
@@ -209,15 +204,12 @@ export function LidarJVHSatelliteWithId() {
         }
 
         try {
-            const { data: anomalyData, error: anomalyError } = await supabase
-                .from('anomalies')
-                .select('*')
-                .eq('author', session.user.id)
-                .eq('anomalySet', 'lidar-jovianVortexHunter')
-                .limit(1)
-                .maybeSingle();
-
-            if (anomalyError) throw anomalyError;
+            const anomalyRes = await fetch(
+              `/api/gameplay/anomalies?author=${encodeURIComponent(session.user.id)}&anomalySet=lidar-jovianVortexHunter&limit=1`
+            );
+            const anomalyPayload = await anomalyRes.json().catch(() => ({}));
+            if (!anomalyRes.ok) throw new Error(anomalyPayload?.error || "Failed to load anomaly");
+            const anomalyData = anomalyPayload?.anomalies?.[0];
 
             if (anomalyData) {
                 setAnomaly(anomalyData);
@@ -236,7 +228,7 @@ export function LidarJVHSatelliteWithId() {
 
     useEffect(() => {
         fetchAnomaly();
-    }, [session, supabase]);
+    }, [session]);
 
     if (loading) {
         return <div>Loading...</div>;
@@ -278,20 +270,17 @@ export function LidarJVHSatelliteWithId() {
                                     selectJovianMineral 
                                 } = await import("@/src/utils/mineralDepositCreation");
 
-                                const { data: recentClassification } = await supabase
-                                    .from("classifications")
-                                    .select("id")
-                                    .eq("author", session.user.id)
-                                    .eq("anomaly", parseInt(anomaly.id.toString()))
-                                    .eq("classificationtype", "lidar-jovianVortexHunter")
-                                    .order("created_at", { ascending: false })
-                                    .limit(1)
-                                    .single();
+                                const recentRes = await fetch(
+                                  `/api/gameplay/classifications?author=${encodeURIComponent(session.user.id)}&anomaly=${parseInt(anomaly.id.toString())}&classificationtype=lidar-jovianVortexHunter&orderBy=created_at&ascending=false&limit=1`
+                                );
+                                const recentPayload = await recentRes.json().catch(() => ({}));
+                                const recentClassification = recentRes.ok
+                                  ? recentPayload?.classifications?.[0]
+                                  : null;
 
                                 if (recentClassification) {
                                     const mineralConfig = selectJovianMineral();
                                     const depositCreated = await attemptMineralDepositCreation({
-                                        supabase,
                                         userId: session.user.id,
                                         anomalyId: parseInt(anomaly.id.toString()),
                                         classificationId: recentClassification.id,

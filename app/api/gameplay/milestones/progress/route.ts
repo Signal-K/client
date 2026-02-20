@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
-import { getRouteSupabaseWithUser } from "@/lib/server/supabaseRoute";
+import { prisma } from "@/lib/server/prisma";
+import { getRouteUser } from "@/lib/server/supabaseRoute";
 import {
   ALL_MINERAL_TYPES,
   ALL_RESEARCH_UPGRADES,
@@ -23,31 +24,26 @@ const VALID_TYPES: ClassificationType[] = [
 ];
 
 export async function GET() {
-  const { supabase, user, authError } = await getRouteSupabaseWithUser();
+  const { user, authError } = await getRouteUser();
   if (authError || !user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   const userId = user.id;
 
-  const [{ data: researchData, error: researchError }, { data: classificationData, error: classificationsError }, { data: mineralsData, error: mineralsError }] =
-    await Promise.all([
-      supabase.from("researched").select("tech_type").eq("user_id", userId),
-      supabase.from("classifications").select("classificationtype").eq("author", userId),
-      supabase.from("mineralDeposits").select("mineralconfiguration").eq("owner", userId),
-    ]);
+  const [researchData, classificationData, mineralsData] = await Promise.all([
+    prisma.$queryRaw<Array<{ tech_type: string }>>`
+      SELECT tech_type FROM researched WHERE user_id = ${userId}
+    `,
+    prisma.$queryRaw<Array<{ classificationtype: string }>>`
+      SELECT classificationtype FROM classifications WHERE author = ${userId}
+    `,
+    prisma.$queryRaw<Array<{ mineralconfiguration: Record<string, unknown> | null }>>`
+      SELECT mineralconfiguration FROM "mineralDeposits" WHERE owner = ${userId}
+    `,
+  ]);
 
-  if (researchError || classificationsError || mineralsError) {
-    return NextResponse.json(
-      {
-        error:
-          researchError?.message || classificationsError?.message || mineralsError?.message || "Failed to load milestones",
-      },
-      { status: 500 }
-    );
-  }
-
-  const unlockedUpgrades = new Set((researchData || []).map((r: any) => r.tech_type));
+  const unlockedUpgrades = new Set((researchData || []).map((r) => r.tech_type));
   const allUpgrades = {
     type: "all-upgrades" as const,
     total: ALL_RESEARCH_UPGRADES.length,
@@ -60,7 +56,7 @@ export async function GET() {
   };
 
   const classificationCounts: Record<string, number> = {};
-  (classificationData || []).forEach((row: any) => {
+  (classificationData || []).forEach((row) => {
     const type = row.classificationtype;
     if (VALID_TYPES.includes(type as ClassificationType)) {
       classificationCounts[type] = (classificationCounts[type] || 0) + 1;
@@ -85,7 +81,7 @@ export async function GET() {
   };
 
   const extractedTypes = new Set<string>();
-  (mineralsData || []).forEach((deposit: any) => {
+  (mineralsData || []).forEach((deposit) => {
     const config = deposit.mineralconfiguration;
     if (!config) return;
     const type = config.type || config.mineralType;
@@ -116,4 +112,3 @@ export async function GET() {
     resourceExtraction,
   });
 }
-

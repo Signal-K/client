@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useSupabaseClient, useSession } from "@/src/lib/auth/session-context";
+import { useSession } from "@/src/lib/auth/session-context";
 import { useRouter } from "next/navigation";
 import { SimplePostSingle } from "@/src/components/social/posts/SimplePostSingle";
 
@@ -28,7 +28,6 @@ interface PlanetTypeCommentFormProps {
 }
 
 const PlanetTypeCommentForm = ({ classificationId }: PlanetTypeCommentFormProps) => {
-  const supabase = useSupabaseClient();
   const session = useSession();
   const router = useRouter();
 
@@ -41,23 +40,24 @@ const PlanetTypeCommentForm = ({ classificationId }: PlanetTypeCommentFormProps)
   const classificationIdNum = classificationId ? Number(classificationId) : undefined;
 
   useEffect(() => {
-    const fetchClassifications = async () => {
+    const fetchData = async () => {
       try {
-        let query = supabase.from("classifications").select("*");
-
+        const params = new URLSearchParams();
         if (classificationIdNum) {
-          query = query.eq("id", classificationIdNum);
-        } else {
-          query = query.eq("classificationtype", "planet");
+          params.set("classificationId", String(classificationIdNum));
         }
 
-        const { data, error } = await query;
+        const response = await fetch(`/api/gameplay/planet-type?${params.toString()}`, {
+          cache: "no-store",
+        });
+        const result = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(result?.error || "Failed to fetch planet-type data");
 
-        if (error) throw new Error("Error fetching classifications: " + error.message);
+        const data = Array.isArray(result.classifications) ? result.classifications : [];
 
-        const processedData = (data || []).map((classification) => {
+        const processedData = (data || []).map((classification: any) => {
           const media = classification.media;
-          let images: string[] = [];
+          const images: string[] = [];
 
           if (Array.isArray(media)) {
             media.forEach((item) => {
@@ -81,49 +81,17 @@ const PlanetTypeCommentForm = ({ classificationId }: PlanetTypeCommentFormProps)
         });
 
         setClassifications(processedData);
+        setComments(Array.isArray(result.comments) ? result.comments : []);
       } catch (err) {
         console.error(err);
+      } finally {
+        setLoading(false);
       }
     };
 
-    const fetchComments = async () => {
-      try {
-        let query = supabase
-          .from("comments")
-          .select(`
-            id,
-            content,
-            configuration,
-            classification_id,
-            author (
-              id,
-              full_name,
-              avatar_url
-            )
-          `);
-
-        if (classificationIdNum) {
-          query = query.eq("classification_id", classificationIdNum);
-        }
-
-        const { data, error } = await query;
-
-        if (error) throw new Error("Error fetching comments: " + error.message);
-
-        setComments(data || []);
-      } catch (err) {
-        console.error(err);
-      }
-    };
-
-    const fetchData = async () => {
-      setLoading(true);
-      await Promise.all([fetchClassifications(), fetchComments()]);
-      setLoading(false);
-    };
-
+    setLoading(true);
     fetchData();
-  }, [supabase, classificationIdNum]);
+  }, [classificationIdNum]);
 
   const handleSelectPreferredComment = async (classificationId: number, commentId: number) => {
     const classificationToUpdate = classifications.find((classification) => classification.id === classificationId);

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { useSession, useSupabaseClient } from "@/src/lib/auth/session-context";
+import { useSession } from "@/src/lib/auth/session-context";
 import { useActivePlanet } from "@/src/core/context/ActivePlanet";
 import ClassificationForm from "../(classifications)/PostForm";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/src/components/ui/card";
@@ -22,7 +22,6 @@ interface Anomaly {
 export function StarterPlanetFour({
     anomalyid
 }: Props) {
-    const supabase = useSupabaseClient();
     const session = useSession();
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const imageUrl = `${supabaseUrl}/storage/v1/object/public/telescope/satellite-planetFour/${anomalyid}.jpeg`;
@@ -39,20 +38,9 @@ export function StarterPlanetFour({
             }
 
             try {
-                const { data, error } = await supabase
-                    .from('classifications')
-                    .select('id')
-                    .eq('author', session.user.id)
-                    .eq('classificationtype', 'satellite-planetFour')
-                    .limit(1);
-
-                if (error) {
-                    console.error('Error checking classification history:', error);
-                } else {
-                    // If user has classifications, skip tutorial and show classification interface
-                    const hasClassified = data && data.length > 0;
-                    setShowClassification(hasClassified);
-                }
+                const res = await fetch("/api/gameplay/classifications/exists?classificationtype=satellite-planetFour");
+                const payload = await res.json();
+                setShowClassification(Boolean(res.ok && payload?.exists));
             } catch (error) {
                 console.error('Error in tutorial status check:', error);
             } finally {
@@ -61,7 +49,7 @@ export function StarterPlanetFour({
         };
 
         checkIfReturningUser();
-    }, [session, supabase]);
+    }, [session]);
 
     // Tutorial slides for Planet Four
     const tutorialSlides = createTutorialSlides([
@@ -175,15 +163,13 @@ export function StarterPlanetFour({
                                             selectPlanetFourMineral 
                                         } = await import("@/src/utils/mineralDepositCreation");
 
-                                        const { data: recentClassification } = await supabase
-                                            .from("classifications")
-                                            .select("id, classificationConfiguration")
-                                            .eq("author", session.user.id)
-                                            .eq("anomaly", parseInt(anomalyid.toString()))
-                                            .eq("classificationtype", "satellite-planetFour")
-                                            .order("created_at", { ascending: false })
-                                            .limit(1)
-                                            .single();
+                                        const recentRes = await fetch(
+                                          `/api/gameplay/classifications?author=${encodeURIComponent(session.user.id)}&anomaly=${parseInt(anomalyid.toString())}&classificationtype=satellite-planetFour&orderBy=created_at&ascending=false&limit=1`
+                                        );
+                                        const recentPayload = await recentRes.json();
+                                        const recentClassification = recentRes.ok
+                                          ? recentPayload?.classifications?.[0]
+                                          : null;
 
                                         if (recentClassification) {
                                             // Extract annotations from classification config if available
@@ -199,12 +185,11 @@ export function StarterPlanetFour({
 
                                             const mineralConfig = selectPlanetFourMineral(annotations);
                                             const depositCreated = await attemptMineralDepositCreation({
-                                                supabase,
-                                                userId: session.user.id,
-                                                anomalyId: parseInt(anomalyid.toString()),
-                                                classificationId: recentClassification.id,
-                                                mineralConfig,
-                                                location: `Surface feature at anomaly ${anomalyid}`
+                                              userId: session.user.id,
+                                              anomalyId: parseInt(anomalyid.toString()),
+                                              classificationId: recentClassification.id,
+                                              mineralConfig,
+                                              location: `Surface feature at anomaly ${anomalyid}`,
                                             });
 
                                             if (depositCreated) {
@@ -226,7 +211,6 @@ export function StarterPlanetFour({
 };
 
 export function PlanetFourProject() {
-    const supabase = useSupabaseClient();
     const session = useSession();
 
     const [anomaly, setAnomaly] = useState<Anomaly | null>(null);
@@ -244,17 +228,14 @@ export function PlanetFourProject() {
             }
 
             try {
-                const { data: anomalyData, error: anomalyError } = await supabase
-                    .from("anomalies")
-                    .select("*")
-                    .eq("author", session.user.id)
-                    .eq("anomalySet", "satellite-planetFour")
-                    .limit(1)
-                    .maybeSingle();
-
-                if (anomalyError) {
-                    throw anomalyError;
+                const anomalyRes = await fetch(
+                  `/api/gameplay/anomalies?author=${encodeURIComponent(session.user.id)}&anomalySet=satellite-planetFour&limit=1`
+                );
+                const anomalyPayload = await anomalyRes.json();
+                if (!anomalyRes.ok) {
+                  throw new Error(anomalyPayload?.error || "Failed to load anomaly");
                 }
+                const anomalyData = anomalyPayload?.anomalies?.[0];
 
                 if (anomalyData) {
                     setAnomaly(anomalyData);
@@ -273,28 +254,23 @@ export function PlanetFourProject() {
         }
 
         fetchAnomaly();
-    }, [session, supabase]);
+    }, [session]);
 
     useEffect(() => {
         async function checkMineralResearch() {
             if (!session) return;
 
             try {
-                const { data } = await supabase
-                    .from("inventory")
-                    .select("id")
-                    .eq("owner", session.user.id)
-                    .eq("item", 3103)
-                    .maybeSingle();
-
-                setHasMineralResearch(!!data);
+                const inventoryRes = await fetch("/api/gameplay/inventory/mine?item=3103&limit=1");
+                const inventoryPayload = await inventoryRes.json();
+                setHasMineralResearch(Boolean(inventoryRes.ok && inventoryPayload?.inventory?.length));
             } catch (error) {
                 console.error("Error checking mineral research:", error);
             }
         }
 
         checkMineralResearch();
-    }, [session, supabase]);
+    }, [session]);
 
     if (loading) {
         return <div>Loading...</div>;
@@ -344,15 +320,13 @@ export function PlanetFourProject() {
                                         selectPlanetFourMineral 
                                     } = await import("@/src/utils/mineralDepositCreation");
 
-                                    const { data: recentClassification } = await supabase
-                                        .from("classifications")
-                                        .select("id, classificationConfiguration")
-                                        .eq("author", session.user.id)
-                                        .eq("anomaly", parseInt(anomaly.id.toString()))
-                                        .eq("classificationtype", "satellite-planetFour")
-                                        .order("created_at", { ascending: false })
-                                        .limit(1)
-                                        .single();
+                                    const recentRes = await fetch(
+                                      `/api/gameplay/classifications?author=${encodeURIComponent(session.user.id)}&anomaly=${parseInt(anomaly.id.toString())}&classificationtype=satellite-planetFour&orderBy=created_at&ascending=false&limit=1`
+                                    );
+                                    const recentPayload = await recentRes.json();
+                                    const recentClassification = recentRes.ok
+                                      ? recentPayload?.classifications?.[0]
+                                      : null;
 
                                     if (recentClassification) {
                                         let annotations;
@@ -367,12 +341,11 @@ export function PlanetFourProject() {
 
                                         const mineralConfig = selectPlanetFourMineral(annotations);
                                         const depositCreated = await attemptMineralDepositCreation({
-                                            supabase,
-                                            userId: session.user.id,
-                                            anomalyId: parseInt(anomaly.id.toString()),
-                                            classificationId: recentClassification.id,
-                                            mineralConfig,
-                                            location: `Surface feature at anomaly ${anomaly.id}`
+                                          userId: session.user.id,
+                                          anomalyId: parseInt(anomaly.id.toString()),
+                                          classificationId: recentClassification.id,
+                                          mineralConfig,
+                                          location: `Surface feature at anomaly ${anomaly.id}`,
                                         });
 
                                         if (depositCreated) {

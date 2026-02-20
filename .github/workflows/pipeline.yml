@@ -61,14 +61,17 @@ jobs:
           yarn install --frozen-lockfile
 
       - name: Setup Supabase CLI
+        if: github.event_name != 'push' || github.ref_name == 'main'
         uses: supabase/setup-cli@v1
         with:
           version: latest
 
       - name: Start local Supabase
+        if: github.event_name != 'push' || github.ref_name == 'main'
         run: supabase start
 
       - name: Normalize local test env defaults
+        if: github.event_name != 'push' || github.ref_name == 'main'
         run: |
           SUPABASE_URL="${SUPABASE_URL:-${{ vars.SUPABASE_URL }}}"
           NEXT_PUBLIC_SUPABASE_URL="${NEXT_PUBLIC_SUPABASE_URL:-${{ vars.NEXT_PUBLIC_SUPABASE_URL }}}"
@@ -112,7 +115,7 @@ jobs:
         run: yarn test:unit
 
       - name: Run Cypress smoke (minimal)
-        if: github.event_name == 'push'
+        if: github.event_name == 'push' && github.ref_name == 'main'
         run: env -u ELECTRON_RUN_AS_NODE yarn start-server-and-test "yarn dev" http://localhost:3000 "yarn test:e2e:smoke:minimal"
 
       - name: Run Cypress smoke (full for PR to main)
@@ -121,7 +124,11 @@ jobs:
         run: env -u ELECTRON_RUN_AS_NODE yarn start-server-and-test "yarn dev" http://localhost:3000 "yarn test:e2e:smoke:full"
 
       - name: Upload Cypress artifacts
-        if: always()
+        if: >
+          always() && (
+            (github.event_name == 'push' && github.ref_name == 'main') ||
+            (github.event_name == 'pull_request' && github.base_ref == 'main')
+          )
         uses: actions/upload-artifact@v4
         with:
           name: cypress-artifacts

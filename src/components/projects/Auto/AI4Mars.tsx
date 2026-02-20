@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useSession, useSupabaseClient } from "@/src/lib/auth/session-context";
+import { useSession } from "@/src/lib/auth/session-context";
 import { useActivePlanet } from "@/src/core/context/ActivePlanet";
 import ClassificationForm from "../(classifications)/PostForm";
 import ImageAnnotator from "../(classifications)/Annotating/AnnotatorView";
@@ -34,7 +34,6 @@ interface SelectedAnomProps {
 }; 
 
 export function AiForMarsProjectWithID({ anomalyid }: { anomalyid?: number }) {
-    const supabase = useSupabaseClient();
     const [anomaly, setAnomaly] = useState<AnomalyRecord | null>(null);
     const [imageUrl, setImageUrl] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
@@ -46,13 +45,10 @@ export function AiForMarsProjectWithID({ anomalyid }: { anomalyid?: number }) {
                 return;
             }
             try {
-                const { data, error } = await supabase
-                    .from("anomalies")
-                    .select("*")
-                    .eq("id", anomalyid)
-                    .single();
-
-                if (error) throw error;
+                const res = await fetch(`/api/gameplay/anomalies?id=${encodeURIComponent(String(anomalyid))}&limit=1`);
+                const payload = await res.json();
+                if (!res.ok || !payload?.anomalies?.[0]) throw new Error(payload?.error || "Anomaly not found");
+                const data = payload.anomalies[0];
                 setAnomaly(data);
                 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
                 // images for this project are stored in the "automaton-aiForMars" bucket
@@ -65,7 +61,7 @@ export function AiForMarsProjectWithID({ anomalyid }: { anomalyid?: number }) {
             }
         }
         fetchAnomaly();
-    }, [anomalyid, supabase]);
+    }, [anomalyid]);
 
     if (loading) return <p>Loading...</p>;
     if (!anomaly || !imageUrl) {

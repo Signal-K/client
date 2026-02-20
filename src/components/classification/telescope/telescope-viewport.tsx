@@ -314,7 +314,7 @@ const TelescopeViewport: React.FC = () => {
       viewportState.currentSector.x, 
       viewportState.currentSector.y
     )
-    let projectItems = projectId ? sectorItems.filter((item) => item.project === projectId) : sectorItems
+    const projectItems = projectId ? sectorItems.filter((item) => item.project === projectId) : sectorItems
     
     if (projectItems.length === 0 && viewportState.anomalies.length > 0) {
       const allItems = projectId ? viewportState.anomalies.filter((item) => item.project === projectId) : viewportState.anomalies

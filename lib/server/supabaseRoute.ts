@@ -13,3 +13,8 @@ export async function getRouteSupabaseWithUser() {
     authError: error,
   };
 }
+
+export async function getRouteUser() {
+  const { user, authError } = await getRouteSupabaseWithUser();
+  return { user, authError };
+}

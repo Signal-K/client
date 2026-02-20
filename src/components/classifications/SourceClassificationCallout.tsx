@@ -1,8 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useSupabaseClient } from "@/src/lib/auth/session-context";
-import Image from "next/image";
 import { Info } from "lucide-react";
 
 interface SourceClassificationCalloutProps {
@@ -10,7 +8,6 @@ interface SourceClassificationCalloutProps {
 }
 
 export function SourceClassificationCallout({ classificationConfiguration }: SourceClassificationCalloutProps) {
-  const supabase = useSupabaseClient();
   const [sourceClassification, setSourceClassification] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
@@ -24,16 +21,14 @@ export function SourceClassificationCallout({ classificationConfiguration }: Sou
       }
 
       try {
-        const { data, error } = await supabase
-          .from("classifications")
-          .select("id, content, author, media, created_at, classificationtype")
-          .eq("id", sourceId)
-          .single();
-
-        if (error) {
-          console.error("Error fetching source classification:", error);
+        const response = await fetch(`/api/gameplay/classifications/${sourceId}`, {
+          cache: "no-store",
+        });
+        const payload = await response.json().catch(() => null);
+        if (!response.ok || !payload?.classification) {
+          console.error("Error fetching source classification:", payload?.error || response.statusText);
         } else {
-          setSourceClassification(data);
+          setSourceClassification(payload.classification);
         }
       } catch (err) {
         console.error("Exception fetching source classification:", err);
@@ -43,7 +38,7 @@ export function SourceClassificationCallout({ classificationConfiguration }: Sou
     }
 
     fetchSourceClassification();
-  }, [classificationConfiguration, supabase]);
+  }, [classificationConfiguration]);
 
   if (loading || !sourceClassification) return null;
 

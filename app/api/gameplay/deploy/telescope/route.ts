@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 
-import { getRouteSupabaseWithUser } from "@/lib/server/supabaseRoute";
+import { prisma } from "@/lib/server/prisma";
+import { getRouteUser } from "@/lib/server/supabaseRoute";
 
 export const dynamic = "force-dynamic";
 
@@ -31,7 +32,7 @@ function computeSetsToFetch(
 }
 
 export async function GET(request: NextRequest) {
-  const { supabase, user, authError } = await getRouteSupabaseWithUser();
+  const { user, authError } = await getRouteUser();
   if (authError || !user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
@@ -48,30 +49,24 @@ export async function GET(request: NextRequest) {
     let includeNgts = false;
 
     if (deploymentType === "planetary") {
-      const [{ count: minorPlanetCount, error: countError }, { data: ngtsData, error: ngtsError }] =
-        await Promise.all([
-          supabase
-            .from("classifications")
-            .select("id", { count: "exact", head: true })
-            .eq("author", user.id)
-            .eq("classificationtype", "telescope-minorPlanet"),
-          supabase
-            .from("researched")
-            .select("tech_type")
-            .eq("user_id", user.id)
-            .eq("tech_type", "ngtsAccess")
-            .limit(1),
-        ]);
+      const [minorPlanetRows, ngtsData] = await Promise.all([
+        prisma.$queryRaw<Array<{ count: bigint }>>`
+          SELECT COUNT(*)::bigint AS count
+          FROM classifications
+          WHERE author = ${user.id}
+            AND classificationtype = 'telescope-minorPlanet'
+        `,
+        prisma.$queryRaw<Array<{ tech_type: string }>>`
+          SELECT tech_type
+          FROM researched
+          WHERE user_id = ${user.id}
+            AND tech_type = 'ngtsAccess'
+          LIMIT 1
+        `,
+      ]);
 
-      if (countError || ngtsError) {
-        return NextResponse.json(
-          { error: countError?.message || ngtsError?.message || "Failed to load unlocks" },
-          { status: 500 }
-        );
-      }
-
-      includeActiveAsteroids = (minorPlanetCount || 0) >= 2;
-      includeNgts = (ngtsData || []).length > 0;
+      includeActiveAsteroids = Number(minorPlanetRows[0]?.count ?? 0) >= 2;
+      includeNgts = ngtsData.length > 0;
     }
 
     const setsToFetch = computeSetsToFetch(deploymentType, {
@@ -79,12 +74,13 @@ export async function GET(request: NextRequest) {
       includeNgts,
     });
 
-    const { data, error } = await supabase.from("anomalies").select("*").in("anomalySet", setsToFetch);
-    if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
-    }
+    const data = await prisma.$queryRaw<Array<Record<string, unknown>>>`
+      SELECT *
+      FROM anomalies
+      WHERE "anomalySet" = ANY(${setsToFetch}::text[])
+    `;
 
-    return NextResponse.json({ anomalies: data || [] });
+    return NextResponse.json({ anomalies: data });
   }
 
   if (action === "status") {
@@ -92,42 +88,33 @@ export async function GET(request: NextRequest) {
     oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
 
     const [linkedRes, commentsRes, votesRes] = await Promise.all([
-      supabase
-        .from("linked_anomalies")
-        .select("id")
-        .eq("automaton", "Telescope")
-        .eq("author", user.id)
-        .gte("date", oneWeekAgo.toISOString()),
-      supabase
-        .from("comments")
-        .select("id, classification:classifications(author)")
-        .eq("author", user.id)
-        .gte("created_at", oneWeekAgo.toISOString()),
-      supabase
-        .from("votes")
-        .select("id, classification:classifications(author)")
-        .eq("user_id", user.id)
-        .eq("vote_type", "up")
-        .gte("created_at", oneWeekAgo.toISOString()),
+      prisma.$queryRaw<Array<{ id: number }>>`
+        SELECT id
+        FROM linked_anomalies
+        WHERE automaton = 'Telescope'
+          AND author = ${user.id}
+          AND date >= ${oneWeekAgo.toISOString()}
+      `,
+      prisma.$queryRaw<Array<{ id: number; classification_author: string | null }>>`
+        SELECT c.id, cls.author AS classification_author
+        FROM comments c
+        LEFT JOIN classifications cls ON cls.id = c.classification_id
+        WHERE c.author = ${user.id}
+          AND c.created_at >= ${oneWeekAgo.toISOString()}
+      `,
+      prisma.$queryRaw<Array<{ id: number; classification_author: string | null }>>`
+        SELECT v.id, cls.author AS classification_author
+        FROM votes v
+        LEFT JOIN classifications cls ON cls.id = v.classification_id
+        WHERE v.user_id = ${user.id}
+          AND v.vote_type = 'up'
+          AND v.created_at >= ${oneWeekAgo.toISOString()}
+      `,
     ]);
 
-    if (linkedRes.error || commentsRes.error || votesRes.error) {
-      return NextResponse.json(
-        {
-          error:
-            linkedRes.error?.message || commentsRes.error?.message || votesRes.error?.message || "Failed to load deployment status",
-        },
-        { status: 500 }
-      );
-    }
-
-    const linkedCount = linkedRes.data?.length || 0;
-    const validComments = (commentsRes.data || []).filter(
-      (c: any) => c.classification?.author && c.classification.author !== user.id
-    );
-    const validVotes = (votesRes.data || []).filter(
-      (v: any) => v.classification?.author && v.classification.author !== user.id
-    );
+    const linkedCount = linkedRes.length;
+    const validComments = commentsRes.filter((c) => c.classification_author && c.classification_author !== user.id);
+    const validVotes = votesRes.filter((v) => v.classification_author && v.classification_author !== user.id);
 
     const additionalDeploys = Math.floor(validVotes.length / 3) + validComments.length;
     const userCanRedeploy = linkedCount + additionalDeploys > linkedCount;
@@ -152,35 +139,27 @@ export async function GET(request: NextRequest) {
   if (action === "skill-progress") {
     const start = new Date("2000-01-01").toISOString();
 
-    const [telescopeRes, weatherRes] = await Promise.all([
-      supabase
-        .from("classifications")
-        .select("id", { count: "exact", head: true })
-        .eq("author", user.id)
-        .in("classificationtype", ["planet", "telescope-minorPlanet"])
-        .gte("created_at", start),
-      supabase
-        .from("classifications")
-        .select("id", { count: "exact", head: true })
-        .eq("author", user.id)
-        .in("classificationtype", ["cloud", "lidar-jovianVortexHunter"])
-        .gte("created_at", start),
+    const [telescopeRows, weatherRows] = await Promise.all([
+      prisma.$queryRaw<Array<{ count: bigint }>>`
+        SELECT COUNT(*)::bigint AS count
+        FROM classifications
+        WHERE author = ${user.id}
+          AND classificationtype IN ('planet', 'telescope-minorPlanet')
+          AND created_at >= ${start}
+      `,
+      prisma.$queryRaw<Array<{ count: bigint }>>`
+        SELECT COUNT(*)::bigint AS count
+        FROM classifications
+        WHERE author = ${user.id}
+          AND classificationtype IN ('cloud', 'lidar-jovianVortexHunter')
+          AND created_at >= ${start}
+      `,
     ]);
-
-    if (telescopeRes.error || weatherRes.error) {
-      return NextResponse.json(
-        {
-          error:
-            telescopeRes.error?.message || weatherRes.error?.message || "Failed to load skill progress",
-        },
-        { status: 500 }
-      );
-    }
 
     return NextResponse.json({
       skillProgress: {
-        telescope: telescopeRes.count || 0,
-        weather: weatherRes.count || 0,
+        telescope: Number(telescopeRows[0]?.count ?? 0),
+        weather: Number(weatherRows[0]?.count ?? 0),
       },
     });
   }
@@ -189,7 +168,7 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  const { supabase, user, authError } = await getRouteSupabaseWithUser();
+  const { user, authError } = await getRouteUser();
   if (authError || !user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
@@ -208,15 +187,12 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "No anomalies selected" }, { status: 400 });
   }
 
-  const { data: upgradeRows, error: upgradeError } = await supabase
-    .from("researched")
-    .select("tech_type")
-    .eq("user_id", user.id)
-    .eq("tech_type", "probereceptors");
-
-  if (upgradeError) {
-    return NextResponse.json({ error: upgradeError.message }, { status: 500 });
-  }
+  const upgradeRows = await prisma.$queryRaw<Array<{ tech_type: string }>>`
+    SELECT tech_type
+    FROM researched
+    WHERE user_id = ${user.id}
+      AND tech_type = 'probereceptors'
+  `;
 
   const maxAnomalies = (upgradeRows || []).length > 0 ? 6 : 4;
   const uniqueIds = Array.from(new Set(anomalyIds)).slice(0, maxAnomalies);
@@ -228,10 +204,12 @@ export async function POST(request: NextRequest) {
     automaton: "Telescope",
   }));
 
-  const { error } = await supabase.from("linked_anomalies").insert(rows);
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
-  }
+  await prisma.$executeRaw`
+    INSERT INTO linked_anomalies (author, anomaly_id, classification_id, automaton)
+    SELECT x.author, x.anomaly_id, x.classification_id, x.automaton
+    FROM jsonb_to_recordset(${JSON.stringify(rows)}::jsonb)
+      AS x(author text, anomaly_id int, classification_id int, automaton text)
+  `;
 
   revalidatePath("/activity/deploy");
   revalidatePath("/structures/telescope");

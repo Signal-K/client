@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 
-import { getRouteSupabaseWithUser } from "@/lib/server/supabaseRoute";
+import { prisma } from "@/lib/server/prisma";
+import { getRouteUser } from "@/lib/server/supabaseRoute";
 
 export const dynamic = "force-dynamic";
 
@@ -13,7 +14,7 @@ function getWeekStart(date: Date) {
 }
 
 export async function POST() {
-  const { supabase, user, authError } = await getRouteSupabaseWithUser();
+  const { user, authError } = await getRouteUser();
   if (authError || !user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
@@ -22,29 +23,27 @@ export async function POST() {
   const weekStart = getWeekStart(now).toISOString();
   const automatonType = "TelescopeSolar";
 
-  const [{ data: anomalies, error: anomalyError }, { data: existing, error: existingError }] = await Promise.all([
-    supabase.from("anomalies").select("id").eq("anomalySet", "sunspot"),
-    supabase
-      .from("linked_anomalies")
-      .select("id")
-      .eq("author", user.id)
-      .eq("automaton", automatonType)
-      .gte("date", weekStart)
-      .limit(1),
+  const [anomalies, existing] = await Promise.all([
+    prisma.$queryRaw<Array<{ id: number }>>`
+      SELECT id
+      FROM anomalies
+      WHERE "anomalySet" = 'sunspot'
+    `,
+    prisma.$queryRaw<Array<{ id: number }>>`
+      SELECT id
+      FROM linked_anomalies
+      WHERE author = ${user.id}
+        AND automaton = ${automatonType}
+        AND date >= ${weekStart}
+      LIMIT 1
+    `,
   ]);
-
-  if (anomalyError || existingError) {
-    return NextResponse.json(
-      { error: anomalyError?.message || existingError?.message || "Failed to join solar mission" },
-      { status: 500 }
-    );
-  }
 
   if ((existing || []).length > 0) {
     return NextResponse.json({ success: true, inserted: 0 });
   }
 
-  const rows = (anomalies || []).map((anomaly: any) => ({
+  const rows = anomalies.map((anomaly) => ({
     author: user.id,
     anomaly_id: anomaly.id,
     automaton: automatonType,
@@ -56,10 +55,12 @@ export async function POST() {
     return NextResponse.json({ error: "No sunspot anomalies available" }, { status: 400 });
   }
 
-  const { error } = await supabase.from("linked_anomalies").insert(rows);
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
-  }
+  await prisma.$executeRaw`
+    INSERT INTO linked_anomalies (author, anomaly_id, automaton, unlocked, date)
+    SELECT x.author, x.anomaly_id, x.automaton, x.unlocked, x.date::timestamptz
+    FROM jsonb_to_recordset(${JSON.stringify(rows)}::jsonb)
+      AS x(author text, anomaly_id int, automaton text, unlocked boolean, date text)
+  `;
 
   revalidatePath("/viewports/solar");
   revalidatePath("/game");

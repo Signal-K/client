@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 
-import { getRouteSupabaseWithUser } from "@/lib/server/supabaseRoute";
+import { prisma } from "@/lib/server/prisma";
+import { getRouteUser } from "@/lib/server/supabaseRoute";
 
 export const dynamic = "force-dynamic";
 
@@ -10,7 +11,7 @@ type Body = {
 };
 
 export async function POST(request: NextRequest) {
-  const { supabase, user, authError } = await getRouteSupabaseWithUser();
+  const { user, authError } = await getRouteUser();
   if (authError || !user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
@@ -22,13 +23,14 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Invalid planet classification id" }, { status: 400 });
   }
 
-  const { data: cloudAnomalies, error: cloudError } = await supabase
-    .from("anomalies")
-    .select("id")
-    .eq("anomalytype", "cloud");
+  const cloudAnomalies = await prisma.$queryRaw<Array<{ id: number }>>`
+    SELECT id
+    FROM anomalies
+    WHERE anomalytype = 'cloud'
+  `;
 
-  if (cloudError || !cloudAnomalies || cloudAnomalies.length === 0) {
-    return NextResponse.json({ error: cloudError?.message || "No cloud anomalies available" }, { status: 500 });
+  if (cloudAnomalies.length === 0) {
+    return NextResponse.json({ error: "No cloud anomalies available" }, { status: 500 });
   }
 
   const randomIndex = Math.floor(Math.random() * cloudAnomalies.length);
@@ -49,10 +51,12 @@ export async function POST(request: NextRequest) {
     },
   ];
 
-  const { error } = await supabase.from("linked_anomalies").insert(insertPayload);
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
-  }
+  await prisma.$executeRaw`
+    INSERT INTO linked_anomalies (author, anomaly_id, classification_id, automaton)
+    SELECT x.author, x.anomaly_id, x.classification_id, x.automaton
+    FROM jsonb_to_recordset(${JSON.stringify(insertPayload)}::jsonb)
+      AS x(author text, anomaly_id int, classification_id int, automaton text)
+  `;
 
   revalidatePath("/activity/deploy");
   revalidatePath("/game");

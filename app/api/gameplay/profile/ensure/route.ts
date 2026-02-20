@@ -1,25 +1,24 @@
 import { NextResponse } from "next/server";
 
-import { getRouteSupabaseWithUser } from "@/lib/server/supabaseRoute";
+import { prisma } from "@/lib/server/prisma";
+import { getRouteUser } from "@/lib/server/supabaseRoute";
 
 export const dynamic = "force-dynamic";
 
 export async function POST() {
-  const { supabase, user, authError } = await getRouteSupabaseWithUser();
+  const { user, authError } = await getRouteUser();
   if (authError || !user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { data, error } = await supabase.from("profiles").select("id").eq("id", user.id).maybeSingle();
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
-  }
+  const existing = await prisma.$queryRaw<Array<{ id: string }>>`
+    SELECT id FROM profiles WHERE id = ${user.id} LIMIT 1
+  `;
 
-  if (!data) {
-    const { error: insertError } = await supabase.from("profiles").insert({ id: user.id });
-    if (insertError) {
-      return NextResponse.json({ error: insertError.message }, { status: 500 });
-    }
+  if (existing.length === 0) {
+    await prisma.$executeRaw`
+      INSERT INTO profiles (id) VALUES (${user.id})
+    `;
   }
 
   return NextResponse.json({ success: true });

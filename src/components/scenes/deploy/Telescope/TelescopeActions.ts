@@ -29,14 +29,18 @@ export async function checkDeployment(
   setAlreadyDeployed: (b: boolean) => void,
   setDeploymentMessage: (m: string | null) => void
 ) {
-  const response = await fetch("/api/gameplay/deploy/telescope?action=status", { cache: "no-store" });
-  const payload = await response.json().catch(() => null);
-  if (!response.ok) {
-    console.error("Error fetching deployment status:", payload?.error || response.statusText);
-    return;
+  try {
+    const response = await fetch("/api/gameplay/deploy/telescope?action=status", { cache: "no-store" });
+    const payload = await response.json().catch(() => null);
+    if (!response.ok) {
+      console.error("Error fetching deployment status:", payload?.error || response.statusText);
+      return;
+    }
+    setAlreadyDeployed(Boolean(payload?.alreadyDeployed));
+    setDeploymentMessage(payload?.deploymentMessage ?? null);
+  } catch (err) {
+    console.error("Unexpected error checking deployment status:", err);
   }
-  setAlreadyDeployed(Boolean(payload?.alreadyDeployed));
-  setDeploymentMessage(payload?.deploymentMessage ?? null);
 }
 
 export function loadSector(x: number, y: number, tessAnomalies: DatabaseAnomaly[], setStars: (s: Star[]) => void, setSectorAnomalies: (a: Anomaly[]) => void, generateAnomalyFromDB: (db: DatabaseAnomaly, sx: number, sy: number) => Anomaly) {

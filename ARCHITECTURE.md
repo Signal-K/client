@@ -25,7 +25,7 @@ Contains essential application infrastructure that is used across the entire app
   - `UserAnomalies.tsx` - User anomalies state
   - `UserProfile.tsx` - User profile state
 
-- **`database/`** - Database layer with Drizzle ORM
+- **`database/`** - Database layer with Prisma ORM
   - `index.ts` - Database connection and client setup
   - `schema.ts` - Database schema definitions
   - `examples.ts` - Example queries and usage patterns

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 
+import { prisma } from "@/lib/server/prisma";
 import { getRouteSupabaseWithUser } from "@/lib/server/supabaseRoute";
 
 export const dynamic = "force-dynamic";
@@ -67,10 +68,17 @@ export async function POST(request: NextRequest) {
     uploadPayload.location = location;
   }
 
-  const { error: uploadEntryError } = await supabase.from("uploads").insert(uploadPayload);
-  if (uploadEntryError) {
-    return NextResponse.json({ error: uploadEntryError.message }, { status: 500 });
-  }
+  await prisma.$executeRaw`
+    INSERT INTO uploads (author, file_url, content, source, configuration, location)
+    VALUES (
+      ${uploadPayload.author as string},
+      ${uploadPayload.file_url as string},
+      ${uploadPayload.content as string},
+      ${uploadPayload.source as string},
+      ${JSON.stringify((uploadPayload.configuration as Record<string, unknown> | null) ?? null)}::jsonb,
+      ${(uploadPayload.location as number | null | undefined) ?? null}
+    )
+  `;
 
   if (shouldSaveToZoo) {
     const zooPayload: Record<string, unknown> = {
@@ -83,10 +91,16 @@ export async function POST(request: NextRequest) {
       zooPayload.location = location;
     }
 
-    const { error: zooError } = await supabase.from("zoo").insert(zooPayload);
-    if (zooError) {
-      return NextResponse.json({ error: zooError.message }, { status: 500 });
-    }
+    await prisma.$executeRaw`
+      INSERT INTO zoo (author, owner, file_url, configuration, location)
+      VALUES (
+        ${zooPayload.author as string},
+        ${zooPayload.owner as string},
+        ${zooPayload.file_url as string},
+        ${JSON.stringify((zooPayload.configuration as Record<string, unknown> | null) ?? null)}::jsonb,
+        ${(zooPayload.location as number | null | undefined) ?? null}
+      )
+    `;
   }
 
   revalidatePath("/game");

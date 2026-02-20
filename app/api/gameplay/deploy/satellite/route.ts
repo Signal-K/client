@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 
-import { getRouteSupabaseWithUser } from "@/lib/server/supabaseRoute";
+import { prisma } from "@/lib/server/prisma";
+import { getRouteUser } from "@/lib/server/supabaseRoute";
 
 export const dynamic = "force-dynamic";
 
@@ -20,7 +21,7 @@ function sampleIds(input: Array<{ id: number }>, count: number) {
 }
 
 export async function POST(request: NextRequest) {
-  const { supabase, user, authError } = await getRouteSupabaseWithUser();
+  const { user, authError } = await getRouteUser();
   if (authError || !user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
@@ -37,44 +38,41 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Invalid planet ID" }, { status: 400 });
   }
 
-  const [
-    { count: userClassificationCount, error: countError },
-    { data: satelliteUpgradeRows, error: satUpgradeError },
-    { data: planetRows, error: planetError },
-    { data: planetClassifications, error: classificationError },
-  ] = await Promise.all([
-    supabase.from("classifications").select("id", { count: "exact", head: true }).eq("author", user.id),
-    supabase.from("researched").select("tech_type").eq("user_id", user.id).eq("tech_type", "satellitecount"),
-    supabase.from("anomalies").select("id, content").eq("id", planetId).limit(1),
-    supabase
-      .from("classifications")
-      .select("id")
-      .eq("author", user.id)
-      .eq("anomaly", planetId)
-      .eq("classificationtype", "planet")
-      .limit(1),
+  const [classificationCountRows, satelliteUpgradeRows, planetRows, planetClassifications] = await Promise.all([
+    prisma.$queryRaw<Array<{ count: bigint }>>`
+      SELECT COUNT(*)::bigint AS count
+      FROM classifications
+      WHERE author = ${user.id}
+    `,
+    prisma.$queryRaw<Array<{ tech_type: string }>>`
+      SELECT tech_type
+      FROM researched
+      WHERE user_id = ${user.id}
+        AND tech_type = 'satellitecount'
+    `,
+    prisma.$queryRaw<Array<{ id: number; content: string | null }>>`
+      SELECT id, content
+      FROM anomalies
+      WHERE id = ${planetId}
+      LIMIT 1
+    `,
+    prisma.$queryRaw<Array<{ id: number }>>`
+      SELECT id
+      FROM classifications
+      WHERE author = ${user.id}
+        AND anomaly = ${planetId}
+        AND classificationtype = 'planet'
+      LIMIT 1
+    `,
   ]);
-
-  if (countError || satUpgradeError || planetError || classificationError) {
-    return NextResponse.json(
-      {
-        error:
-          countError?.message ||
-          satUpgradeError?.message ||
-          planetError?.message ||
-          classificationError?.message ||
-          "Failed to prepare satellite deployment",
-      },
-      { status: 500 }
-    );
-  }
 
   const planet = (planetRows || [])[0];
   if (!planet) {
     return NextResponse.json({ error: "Planet not found" }, { status: 404 });
   }
 
-  const isFastDeployEnabled = (userClassificationCount || 0) === 0;
+  const userClassificationCount = Number(classificationCountRows[0]?.count ?? 0);
+  const isFastDeployEnabled = userClassificationCount === 0;
   const deploymentDate = isFastDeployEnabled
     ? new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
     : new Date().toISOString();
@@ -86,42 +84,34 @@ export async function POST(request: NextRequest) {
   if (investigationMode === "planets") {
     selectedIds = [planetId];
   } else if (investigationMode === "weather") {
-    const { count: userCloudClassifications, error: cloudCountError } = await supabase
-      .from("classifications")
-      .select("id", { count: "exact", head: true })
-      .eq("author", user.id)
-      .in("classificationtype", ["cloud", "vortex", "radar"]);
-
-    if (cloudCountError) {
-      return NextResponse.json({ error: cloudCountError.message }, { status: 500 });
-    }
+    const cloudCountRows = await prisma.$queryRaw<Array<{ count: bigint }>>`
+      SELECT COUNT(*)::bigint AS count
+      FROM classifications
+      WHERE author = ${user.id}
+        AND classificationtype IN ('cloud', 'vortex', 'radar')
+    `;
+    const userCloudClassifications = Number(cloudCountRows[0]?.count ?? 0);
 
     const anomalySets =
-      (userCloudClassifications || 0) >= 2
+      userCloudClassifications >= 2
         ? ["lidar-jovianVortexHunter", "cloudspottingOnMars", "balloon-marsCloudShapes"]
         : ["cloudspottingOnMars"];
 
-    const { data: cloudRows, error: cloudError } = await supabase
-      .from("anomalies")
-      .select("id")
-      .in("anomalySet", anomalySets);
+    const cloudRows = await prisma.$queryRaw<Array<{ id: number }>>`
+      SELECT id
+      FROM anomalies
+      WHERE "anomalySet" = ANY(${anomalySets}::text[])
+    `;
 
-    if (cloudError) {
-      return NextResponse.json({ error: cloudError.message }, { status: 500 });
-    }
-
-    selectedIds = sampleIds(cloudRows || [], anomalyCount);
+    selectedIds = sampleIds(cloudRows, anomalyCount);
   } else {
-    const { data: p4Rows, error: p4Error } = await supabase
-      .from("anomalies")
-      .select("id")
-      .eq("anomalySet", "satellite-planetFour");
+    const p4Rows = await prisma.$queryRaw<Array<{ id: number }>>`
+      SELECT id
+      FROM anomalies
+      WHERE "anomalySet" = 'satellite-planetFour'
+    `;
 
-    if (p4Error) {
-      return NextResponse.json({ error: p4Error.message }, { status: 500 });
-    }
-
-    selectedIds = sampleIds(p4Rows || [], anomalyCount);
+    selectedIds = sampleIds(p4Rows, anomalyCount);
   }
 
   if (selectedIds.length === 0) {
@@ -138,10 +128,12 @@ export async function POST(request: NextRequest) {
     unlock_time: null,
   }));
 
-  const { error: insertError } = await supabase.from("linked_anomalies").insert(rows);
-  if (insertError) {
-    return NextResponse.json({ error: insertError.message }, { status: 500 });
-  }
+  await prisma.$executeRaw`
+    INSERT INTO linked_anomalies (author, anomaly_id, classification_id, date, automaton, unlocked, unlock_time)
+    SELECT x.author, x.anomaly_id, x.classification_id, x.date::timestamptz, x.automaton, x.unlocked, x.unlock_time
+    FROM jsonb_to_recordset(${JSON.stringify(rows)}::jsonb)
+      AS x(author text, anomaly_id int, classification_id int, date text, automaton text, unlocked boolean, unlock_time timestamptz)
+  `;
 
   revalidatePath("/viewports/satellite/deploy");
   revalidatePath("/viewports/satellite");

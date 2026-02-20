@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { PostCardSingleWithGenerator } from "@/src/components/social/posts/PostWithGen";
-import { useSession, useSupabaseClient } from "@/src/lib/auth/session-context";
+import { useSession } from "@/src/lib/auth/session-context";
 
 interface Classification {
     id: number;
@@ -16,7 +16,6 @@ interface Classification {
 };
 
 export default function DMPGenerator() {
-    const supabase = useSupabaseClient();
     const session = useSession();
 
     const [classifications, setClassifications] = useState<any[]>([]);
@@ -33,18 +32,16 @@ export default function DMPGenerator() {
         setLoading(true);
         setError(null);
         try {
-          const { data, error } = await supabase
-            .from("classifications")
-            .select('*')
-            .eq("author", session.user.id)
-            .eq('classificationtype', 'telescope-minorPlanet')
-            .order('created_at', { ascending: false }) as { data: Classification[]; error: any };
-      
-          if (error) throw error;
+          const res = await fetch(
+            `/api/gameplay/classifications?author=${encodeURIComponent(session.user.id)}&classificationtype=telescope-minorPlanet&orderBy=created_at&ascending=false&limit=200`
+          );
+          const payload = await res.json();
+          if (!res.ok) throw new Error(payload?.error || "Failed to load classifications");
+          const data = (payload?.classifications || []) as Classification[];
       
           const processedData = data.map((classification) => {
             const media = classification.media;
-            let images: string[] = [];
+            const images: string[] = [];
       
             if (Array.isArray(media) && media.length === 2 && typeof media[1] === "string") {
               images.push(media[1]);

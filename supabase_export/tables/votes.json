@@ -1,5 +1,0 @@
-[{"id":1,"user_id":"4d9a57e6-ea3c-4836-aa18-1c3ee7f6f725","classification_id":76,"anomaly_id":269343479,"created_at":"2025-02-27T13:11:19.495454+00:00","upload":null,"vote_type":null}, 
- {"id":2,"user_id":"4d9a57e6-ea3c-4836-aa18-1c3ee7f6f725","classification_id":40,"anomaly_id":4,"created_at":"2025-03-08T13:45:24.447667+00:00","upload":null,"vote_type":null}, 
- {"id":5,"user_id":"4d9a57e6-ea3c-4836-aa18-1c3ee7f6f725","classification_id":115,"anomaly_id":null,"created_at":"2025-07-21T06:58:06.176926+00:00","upload":null,"vote_type":"up"}, 
- {"id":6,"user_id":"4d9a57e6-ea3c-4836-aa18-1c3ee7f6f725","classification_id":118,"anomaly_id":null,"created_at":"2025-07-23T11:35:10.139639+00:00","upload":null,"vote_type":"up"}, 
- {"id":8,"user_id":"4d9a57e6-ea3c-4836-aa18-1c3ee7f6f725","classification_id":114,"anomaly_id":null,"created_at":"2025-08-08T05:34:34.545346+00:00","upload":null,"vote_type":"up"}]

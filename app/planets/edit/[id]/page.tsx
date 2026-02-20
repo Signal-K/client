@@ -1,20 +1,16 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useSession, useSupabaseClient } from "@/src/lib/auth/session-context";
+import { useSession } from "@/src/lib/auth/session-context";
 import Navbar from "@/src/components/layout/Navbar";
 import { PostCardSingleWithGeneratorEditMode } from "@/src/components/social/posts/PostWithGen";
-import CloudClassificationSummary from "@/src/components/deployment/missions/structures/Meteorologists/Cloudspotting/CloudAggregator";
-import BiomeAggregator from "@/src/components/discovery/data-sources/BiomeAggregator";
 
 import { Classification } from "../../[id]/page";
 
 export default function EditPlanetAnomaly({ params }: { params: { id: string } }) {
-    const supabase = useSupabaseClient();
     const session = useSession();
 
     const [classification, setClassification] = useState<Classification | null>(null);
-    const [relatedClassifications, setRelatedClassifications] = useState<Classification[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
@@ -27,28 +23,29 @@ export default function EditPlanetAnomaly({ params }: { params: { id: string } }
                 return;
             }
 
-            const { data, error } = await supabase
-                .from("classifications")
-                .select("*, anomaly:anomalies(*), classificationConfiguration, media")
-                .eq("id", params.id)
-                .single();
-
-            if (error) {
+            const response = await fetch(`/api/gameplay/classifications/${params.id}`, {
+                cache: "no-store",
+            });
+            const payload = await response.json().catch(() => null);
+            if (!response.ok || !payload?.classification) {
                 if (isMounted) setError("Failed to fetch classification.");
                 setLoading(false);
                 return;
             }
 
+            const data = payload.classification as Classification;
+
             if (data && isMounted) {
                 // Extract media URLs correctly
                 let images: string[] = [];
+                const media = data.media as (string | { uploadUrl?: string })[] | { uploadUrl?: string } | null | undefined;
 
-                if (Array.isArray(data.media)) {
-                    images = data.media
-                        .map((item: { uploadUrl: any; }) => (typeof item === "string" ? item : item?.uploadUrl))
-                        .filter(Boolean);
-                } else if (data.media?.uploadUrl) {
-                    images.push(data.media.uploadUrl);
+                if (Array.isArray(media)) {
+                    images = media
+                        .map((item) => (typeof item === "string" ? item : item?.uploadUrl))
+                        .filter((value): value is string => typeof value === "string" && value.length > 0);
+                } else if (media && typeof media === "object" && "uploadUrl" in media && media.uploadUrl) {
+                    images.push(media.uploadUrl);
                 }
 
                 setClassification({
@@ -56,22 +53,6 @@ export default function EditPlanetAnomaly({ params }: { params: { id: string } }
                     images,
                     votes: data.classificationConfiguration?.votes || 0,
                 });
-
-                // Fetch related classifications
-                const parentPlanetLocation = data.anomaly?.id;
-                if (parentPlanetLocation) {
-                    const { data: relatedData, error: relatedError } = await supabase
-                        .from("classifications")
-                        .select("*, anomaly:anomalies(*), classificationConfiguration, media")
-                        .eq("classificationConfiguration->>parentPlanetLocation", parentPlanetLocation.toString())
-                        .eq("author", session.user.id);
-
-                    if (relatedError) {
-                        if (isMounted) setError("Failed to fetch related classifications.");
-                    } else if (relatedData && isMounted) {
-                        setRelatedClassifications(relatedData);
-                    }
-                }
             }
 
             setLoading(false);
@@ -82,11 +63,7 @@ export default function EditPlanetAnomaly({ params }: { params: { id: string } }
         return () => {
             isMounted = false; // Cleanup function to avoid setting state on unmounted component
         };
-    }, [params.id, supabase, session]);
-
-    const cloudClassifications = relatedClassifications.filter(
-        (related) => related.classificationtype === "cloud"
-    );
+    }, [params.id, session]);
     
     // const handleCloudSummaryUpdate = (summary: AggregatedCloud) => {
     //     setCloudSummary(summary); 

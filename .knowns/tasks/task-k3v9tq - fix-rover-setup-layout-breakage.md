@@ -1,7 +1,7 @@
 ---
 id: k3v9tq
 title: "Fix rover setup layout breakage"
-status: in-progress
+status: completed
 priority: high
 labels:
   - setup
@@ -10,7 +10,7 @@ labels:
   - layout
   - knowns
 createdAt: '2026-02-20T00:00:00Z'
-updatedAt: '2026-02-20T00:00:00Z'
+updatedAt: '2026-02-20T13:36:00Z'
 timeSpent: 0
 ---
 

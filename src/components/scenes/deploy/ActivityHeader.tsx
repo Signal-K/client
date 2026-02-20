@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useSupabaseClient, useSession } from "@/src/lib/auth/session-context";
+import { useSession } from "@/src/lib/auth/session-context";
 import { Card } from "@/src/components/ui/card";
 import {
   Dialog,
@@ -18,7 +18,6 @@ import StardustBalance from "@/src/components/stardust/StardustBalance";
 import PlanetSelectorModal from "@/src/components/modals/PlanetSelectorModal";
 import useDeploymentStatus from "@/src/hooks/useDeploymentStatus";
 import { AvatarGenerator } from "@/src/components/profile/setup/Avatar";
-import { hasUpgrade } from "@/src/utils/userUpgrades";
 
 export default function ActivityHeader({
   landmarksExpanded,
@@ -31,7 +30,6 @@ export default function ActivityHeader({
   scrolled: boolean;
   location?: string;
 }) {
-  const supabase = useSupabaseClient();
   const session = useSession();
 
   const [profile, setProfile] = useState<{
@@ -82,26 +80,30 @@ export default function ActivityHeader({
     if (!session?.user?.id) return;
 
     const fetchData = async () => {
-      const { data: profileData } = await supabase
-        .from("profiles")
-        .select("classificationPoints, username")
-        .eq("id", session.user.id)
-        .maybeSingle();
-      setProfile(profileData);
+      const [pageDataResponse, researchSummaryResponse] = await Promise.all([
+        fetch("/api/gameplay/page-data", { cache: "no-store" }),
+        fetch("/api/gameplay/research/summary", { cache: "no-store" }),
+      ]);
 
-      // Get total classifications count
-      const { data: classifications, error: classError } = await supabase
-        .from("classifications")
-        .select("id")
-        .eq("author", session.user.id);
-      
-      if (!classError && classifications) {
-        setClassificationsCount(classifications.length);
+      const pageDataPayload = await pageDataResponse.json().catch(() => null);
+      const researchSummaryPayload = await researchSummaryResponse.json().catch(() => null);
+
+      if (pageDataResponse.ok && pageDataPayload) {
+        setProfile(pageDataPayload.profile ?? null);
+      }
+      if (researchSummaryResponse.ok && researchSummaryPayload) {
+        setClassificationsCount(Number(researchSummaryPayload?.counts?.all ?? 0));
       }
 
-      // Get researched upgrades to calculate available upgrades
-      const hasTelescopeUpgrade = await hasUpgrade(supabase, session.user.id, "probereceptors");
-      const hasSatelliteUpgrade = await hasUpgrade(supabase, session.user.id, "satellitecount");
+      const researchedTechTypes: string[] = Array.isArray(researchSummaryPayload?.researchedTechTypes)
+        ? researchSummaryPayload.researchedTechTypes
+        : [];
+      const hasTelescopeUpgrade =
+        researchedTechTypes.includes("probereceptors") ||
+        Number(researchSummaryPayload?.upgrades?.telescopeReceptors ?? 1) > 1;
+      const hasSatelliteUpgrade =
+        researchedTechTypes.includes("satellitecount") ||
+        Number(researchSummaryPayload?.upgrades?.satelliteCount ?? 1) > 1;
       
       setBothUpgradesUnlocked(hasTelescopeUpgrade && hasSatelliteUpgrade);
       
@@ -118,7 +120,7 @@ export default function ActivityHeader({
     };
 
     fetchData();
-  }, [session, supabase]);
+  }, [session]);
 
   const { deploymentStatus, planetTargets } = useDeploymentStatus();
 

@@ -1,11 +1,11 @@
 "use client";
 
-import { useSession, useSupabaseClient } from "@/src/lib/auth/session-context";
+import { useSession } from "@/src/lib/auth/session-context";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/src/components/ui/tabs";
 import { Button } from "@/src/components/ui/button";
-import { ChevronLeft, ChevronRight, CheckCircle, AlertCircle, ArrowRightLeft } from "lucide-react";
+import { CheckCircle, AlertCircle, ArrowRightLeft } from "lucide-react";
 
 interface ClassificationConfiguration {
   classificationOptions?: {
@@ -32,7 +32,6 @@ interface Classification {
 };
 
 export default function MySettlementsLocations() {
-  const supabase = useSupabaseClient();
   const session = useSession();
 
   const router = useRouter();
@@ -45,51 +44,26 @@ export default function MySettlementsLocations() {
 
   async function fetchUserLocationClassifications() {
     try {
-      const query = supabase
-        .from("classifications")
-        .select("*, anomalies(content)")
-        .in("classificationtype", ["planet", "telescope-minorPlanet"]);
-
-      if (!showAllUsers) {
-        query.eq("author", session?.user.id);
+      const response = await fetch(`/api/gameplay/locations?showAllUsers=${showAllUsers ? "true" : "false"}`, {
+        cache: "no-store",
+      });
+      const payload = await response.json().catch(() => null);
+      if (!response.ok || !payload?.locations) {
+        throw new Error(payload?.error || "Failed to fetch locations");
       }
 
-      const { data: locationClassificationData, error: lcError } = await query;
+      const enrichedClassifications = (payload.locations as any[]).map((classification) => {
+        let images: string[] = [];
+        if (Array.isArray(classification.media)) {
+          images = classification.media
+            .map((item: string | { uploadUrl?: string }) =>
+              typeof item === "string" ? item : item.uploadUrl || ""
+            )
+            .filter(Boolean);
+        }
 
-      if (lcError) throw lcError;
-
-      const enrichedClassifications = await Promise.all(
-        locationClassificationData.map(async (classification: any) => {
-          let images: string[] = [];
-          if (classification.media) {
-            if (Array.isArray(classification.media)) {
-              images = classification.media
-                .map((item: { uploadUrl: string }) =>
-                  typeof item === "string" ? item : item.uploadUrl || ""
-                )
-                .filter(Boolean);
-            }
-          }
-
-          const anomalyContent = classification.anomalies?.content || null;
-
-          let relatedClassifications: Classification[] = [];
-          const parentPlanetLocation = classification.anomaly;
-          if (parentPlanetLocation) {
-            const { data: relatedData, error: relatedError } = await supabase
-              .from("classifications")
-              .select("*")
-              .eq("classificationConfiguration->>parentPlanetLocation", parentPlanetLocation.toString())
-              .eq("author", session?.user.id);
-
-            if (!relatedError && relatedData) {
-              relatedClassifications = relatedData;
-            }
-          }
-
-          return { ...classification, images, anomalyContent, relatedClassifications };
-        })
-      );
+        return { ...classification, images };
+      });
 
       setMyLocations(enrichedClassifications);
     } catch (err: any) {
@@ -101,6 +75,7 @@ export default function MySettlementsLocations() {
   };
 
   useEffect(() => {
+    if (!session?.user?.id) return;
     fetchUserLocationClassifications();
   }, [session, showAllUsers]);
 

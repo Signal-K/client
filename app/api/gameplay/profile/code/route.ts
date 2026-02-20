@@ -1,24 +1,19 @@
 import { NextResponse } from "next/server";
 
-import { getRouteSupabaseWithUser } from "@/lib/server/supabaseRoute";
+import { prisma } from "@/lib/server/prisma";
+import { getRouteUser } from "@/lib/server/supabaseRoute";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  const { supabase, user, authError } = await getRouteSupabaseWithUser();
+  const { user, authError } = await getRouteUser();
   if (authError || !user) {
     return NextResponse.json({ referralCode: null }, { status: 200 });
   }
 
-  const { data, error } = await supabase
-    .from("profiles")
-    .select("referral_code")
-    .eq("id", user.id)
-    .maybeSingle();
+  const rows = await prisma.$queryRaw<Array<{ referral_code: string | null }>>`
+    SELECT referral_code FROM profiles WHERE id = ${user.id} LIMIT 1
+  `;
 
-  if (error) {
-    return NextResponse.json({ error: error.message, referralCode: null }, { status: 500 });
-  }
-
-  return NextResponse.json({ referralCode: data?.referral_code ?? null });
+  return NextResponse.json({ referralCode: rows[0]?.referral_code ?? null });
 }

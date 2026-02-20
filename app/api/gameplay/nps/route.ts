@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 
-import { getRouteSupabaseWithUser } from "@/lib/server/supabaseRoute";
+import { prisma } from "@/lib/server/prisma";
+import { getRouteUser } from "@/lib/server/supabaseRoute";
 
 export const dynamic = "force-dynamic";
 
 export async function POST(request: NextRequest) {
-  const { supabase, user, authError } = await getRouteSupabaseWithUser();
+  const { user, authError } = await getRouteUser();
   if (authError || !user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
@@ -19,17 +20,10 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Invalid score" }, { status: 400 });
   }
 
-  const { error } = await supabase.from("nps_surveys").insert([
-    {
-      user_id: user.id,
-      nps_score: npsScore,
-      project_interests: feedback,
-    },
-  ]);
-
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
-  }
+  await prisma.$executeRaw`
+    INSERT INTO nps_surveys (user_id, nps_score, project_interests)
+    VALUES (${user.id}, ${npsScore}, ${feedback})
+  `;
 
   revalidatePath("/game");
 

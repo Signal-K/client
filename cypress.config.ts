@@ -194,8 +194,17 @@ export default defineConfig({
                     return null
                 },
                 async waitForSupabaseHealth() {
-                    const response = await fetch(`${supabaseUrl}/auth/v1/health`)
-                    return response.ok
+                    try {
+                        const controller = new AbortController()
+                        const timeout = setTimeout(() => controller.abort(), 5000)
+                        const response = await fetch(`${supabaseUrl}/auth/v1/health`, {
+                            signal: controller.signal,
+                        })
+                        clearTimeout(timeout)
+                        return response.ok
+                    } catch {
+                        return false
+                    }
                 },
                 async countSupabaseRows({
                     table,

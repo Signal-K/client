@@ -5,13 +5,11 @@ import { useParams, useRouter } from "next/navigation"
 import PlanetViewer from "@/src/components/discovery/data-sources/Astronomers/PlanetHunters/planetViewer"
 import { type PlanetConfig, defaultPlanetConfig } from "@/src/components/discovery/planets/planet-config"
 import SettingsPanel from "@/src/components/discovery/data-sources/Astronomers/PlanetHunters/SettingsPanel"
-import { useSupabaseClient } from "@/src/lib/auth/session-context"
 import { Button } from "@/src/components/ui/button"
 import GameNavbar from "@/src/components/layout/Tes"
 
 export default function PlanetGeneratorPage() {
   const router = useRouter()
-  const supabase = useSupabaseClient()
   const params = useParams()
   const planetId = params?.id as string | undefined;
 
@@ -37,15 +35,15 @@ export default function PlanetGeneratorPage() {
           throw new Error("Invalid planet ID")
         }
 
-        const { data, error: fetchError } = await supabase
-          .from("classifications")
-          .select("*")
-          .eq("id", idAsNumber)
-          .single()
-
-        if (fetchError) {
-          throw fetchError
+        const response = await fetch(`/api/gameplay/classifications/${idAsNumber}`, {
+          cache: "no-store",
+        })
+        const payload = await response.json().catch(() => null)
+        if (!response.ok || !payload?.classification) {
+          throw new Error(payload?.error ?? "Failed to load planet data")
         }
+
+        const data = payload.classification
 
         if (!data) {
           throw new Error("Planet not found")
@@ -79,7 +77,7 @@ export default function PlanetGeneratorPage() {
     }
 
     fetchPlanetData()
-  }, [planetId, supabase])
+  }, [planetId])
 
   // Hide sidebar for this page
   useEffect(() => {

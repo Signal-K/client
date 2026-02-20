@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 
+import { prisma } from "@/lib/server/prisma";
 import { createSupabaseServerClient } from "@/lib/supabase/ssr";
 
 type VoteType = "up" | "down";
@@ -20,44 +21,38 @@ export async function toggleVoteAction(input: {
   }
 
   const { classificationId, voteType } = input;
-  const { data: existingVote, error: existingError } = await supabase
-    .from("votes")
-    .select("id, vote_type")
-    .eq("user_id", user.id)
-    .eq("classification_id", classificationId)
-    .maybeSingle();
-
-  if (existingError) {
-    return { ok: false as const, error: existingError.message };
-  }
+  const existingVoteRows = await prisma.$queryRaw<Array<{ id: number; vote_type: VoteType }>>`
+    SELECT id, vote_type
+    FROM votes
+    WHERE user_id = ${user.id}
+      AND classification_id = ${classificationId}
+    LIMIT 1
+  `;
+  const existingVote = existingVoteRows[0];
 
   if (existingVote) {
     if (existingVote.vote_type === voteType) {
-      const { error } = await supabase.from("votes").delete().eq("id", existingVote.id);
-      if (error) {
-        return { ok: false as const, error: error.message };
-      }
+      await prisma.$executeRaw`
+        DELETE FROM votes
+        WHERE id = ${existingVote.id}
+      `;
       revalidatePath(`/posts/${classificationId}`);
       return { ok: true as const, userVote: null as VoteType | null };
     }
 
-    const { error } = await supabase.from("votes").update({ vote_type: voteType }).eq("id", existingVote.id);
-    if (error) {
-      return { ok: false as const, error: error.message };
-    }
+    await prisma.$executeRaw`
+      UPDATE votes
+      SET vote_type = ${voteType}
+      WHERE id = ${existingVote.id}
+    `;
     revalidatePath(`/posts/${classificationId}`);
     return { ok: true as const, userVote: voteType as VoteType };
   }
 
-  const { error: insertError } = await supabase.from("votes").insert({
-    user_id: user.id,
-    classification_id: classificationId,
-    vote_type: voteType,
-  });
-
-  if (insertError) {
-    return { ok: false as const, error: insertError.message };
-  }
+  await prisma.$executeRaw`
+    INSERT INTO votes (user_id, classification_id, vote_type)
+    VALUES (${user.id}, ${classificationId}, ${voteType})
+  `;
 
   revalidatePath(`/posts/${classificationId}`);
   return { ok: true as const, userVote: voteType as VoteType };
@@ -83,18 +78,11 @@ export async function submitCommentAction(input: {
     return { ok: false as const, error: "Empty comment" };
   }
 
-  const { error } = await supabase.from("comments").insert({
-    content: trimmed,
-    author: user.id,
-    classification_id: classificationId,
-    parent_comment_id: parentCommentId || null,
-  });
-
-  if (error) {
-    return { ok: false as const, error: error.message };
-  }
+  await prisma.$executeRaw`
+    INSERT INTO comments (content, author, classification_id, parent_comment_id)
+    VALUES (${trimmed}, ${user.id}, ${classificationId}, ${parentCommentId || null})
+  `;
 
   revalidatePath(`/posts/${classificationId}`);
   return { ok: true as const };
 }
-

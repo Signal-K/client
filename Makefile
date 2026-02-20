@@ -15,16 +15,16 @@ clean-build:
 
 # Traditional Docker commands
 up:
-	docker-compose up
+	docker-compose -f ops/compose/compose.yml up
 
 build:
-	docker-compose build
+	docker-compose -f ops/compose/compose.yml build
 
 up-full:
-	yarn && docker-compose up --build
+	yarn && docker-compose -f ops/compose/compose.yml up --build
 
 down:
-	docker-compose down
+	docker-compose -f ops/compose/compose.yml down
 
 # Run locally without Docker (recommended for Supabase development)
 dev:
@@ -48,35 +48,35 @@ supabase-stop:
 db-types:
 	supabase gen types typescript --project-id your-project-id --schema public > types/supabase.ts
 
-# Drizzle commands (connected to Supabase)
+# Prisma commands (connected to Supabase Postgres)
 db-studio:
-	docker-compose --profile studio up drizzle-studio
+	docker-compose -f ops/compose/compose.yml --profile studio up prisma-studio
 
 db-studio-down:
-	docker-compose --profile studio down
+	docker-compose -f ops/compose/compose.yml --profile studio down
 
 db-generate:
-	yarn db:generate
+	yarn prisma:generate
 
 db-push:
-	yarn db:push
+	yarn prisma:migrate:deploy
 
 # Production commands (if using Docker for production)
 prod-build:
-	docker-compose -f docker-compose.prod.yml build
+	docker-compose -f ops/compose/docker-compose.prod.yml build
 
 prod-up:
-	docker-compose -f docker-compose.prod.yml up -d
+	docker-compose -f ops/compose/docker-compose.prod.yml up -d
 
 prod-down:
-	docker-compose -f docker-compose.prod.yml down
+	docker-compose -f ops/compose/docker-compose.prod.yml down
 
 prod-logs:
-	docker-compose -f docker-compose.prod.yml logs -f
+	docker-compose -f ops/compose/docker-compose.prod.yml logs -f
 
 # Clean up Docker
 clean:
-	docker-compose down
+	docker-compose -f ops/compose/compose.yml down
 	docker system prune -f
 
 # Setup for new developers
@@ -93,16 +93,12 @@ help:
 	@echo "  up           - Start with Docker"
 	@echo "  down         - Stop Docker containers"
 	@echo "  build        - Build Docker image"
-	@echo "  db-studio    - Start Drizzle Studio (database UI)"
-	@echo "  db-generate  - Generate Drizzle schema"
-	@echo "  db-push      - Push schema changes to Supabase"
+	@echo "  db-studio    - Start Prisma Studio (database UI)"
+	@echo "  db-generate  - Generate Prisma client"
+	@echo "  db-push      - Deploy Prisma migrations"
 	@echo "  setup        - Setup for new developers"
 	@echo "  clean        - Clean up Docker containers and images"
 	@echo "  supabase-*   - Supabase CLI commands (if installed)"
-	docker-compose up postgres -d
-	sleep 10
-	yarn db:push
-	echo "Setup complete! Run 'make dev-with-db' to start development"
 
 deploy-test:
-	docker-compose build && yarn build && vercel
+	docker-compose -f ops/compose/compose.yml build && yarn build && vercel

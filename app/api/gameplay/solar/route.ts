@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 
-import { getRouteSupabaseWithUser } from "@/lib/server/supabaseRoute";
+import { prisma } from "@/lib/server/prisma";
+import { getRouteUser } from "@/lib/server/supabaseRoute";
 
 export const dynamic = "force-dynamic";
 
@@ -22,7 +23,7 @@ type SolarActionBody =
     };
 
 export async function POST(request: NextRequest) {
-  const { supabase, user, authError } = await getRouteSupabaseWithUser();
+  const { user, authError } = await getRouteUser();
   if (authError || !user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
@@ -36,19 +37,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "weekStart and weekEnd are required" }, { status: 400 });
     }
 
-    const { data: newEvent, error } = await supabase
-      .from("solar_events")
-      .insert({
-        week_start: weekStart,
-        week_end: weekEnd,
-        was_defended: false,
-      })
-      .select()
-      .single();
-
-    if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
-    }
+    const rows = await prisma.$queryRaw<Array<Record<string, unknown>>>`
+      INSERT INTO solar_events (week_start, week_end, was_defended)
+      VALUES (${weekStart}, ${weekEnd}, false)
+      RETURNING *
+    `;
+    const newEvent = rows[0];
 
     revalidatePath("/game");
     return NextResponse.json(newEvent);
@@ -60,10 +54,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Invalid eventId" }, { status: 400 });
     }
 
-    const { error } = await supabase.from("solar_events").update({ was_defended: true }).eq("id", eventId);
-    if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
-    }
+    await prisma.$executeRaw`
+      UPDATE solar_events
+      SET was_defended = true
+      WHERE id = ${eventId}
+    `;
 
     revalidatePath("/game");
     return NextResponse.json({ success: true });
@@ -76,15 +71,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Invalid launch payload" }, { status: 400 });
     }
 
-    const { error } = await supabase.from("defensive_probes").insert({
-      event_id: eventId,
-      user_id: user.id,
-      count,
-    });
-
-    if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
-    }
+    await prisma.$executeRaw`
+      INSERT INTO defensive_probes (event_id, user_id, count)
+      VALUES (${eventId}, ${user.id}, ${count})
+    `;
 
     revalidatePath("/game");
     return NextResponse.json({ success: true });

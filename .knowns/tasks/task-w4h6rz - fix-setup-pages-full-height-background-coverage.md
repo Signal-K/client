@@ -1,7 +1,7 @@
 ---
 id: w4h6rz
 title: "Fix setup pages full-height background coverage"
-status: in-progress
+status: completed
 priority: high
 labels:
   - setup
@@ -10,7 +10,7 @@ labels:
   - backgrounds
   - knowns
 createdAt: '2026-02-20T00:00:00Z'
-updatedAt: '2026-02-20T00:00:00Z'
+updatedAt: '2026-02-20T13:36:00Z'
 timeSpent: 0
 ---
 

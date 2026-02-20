@@ -81,7 +81,7 @@ export default function DeployTelescopeViewport() {
   }, [session]);
 
   const handleDeploy = async () => {
-    if (!session || !selectedSector || alreadyDeployed) return
+    if (!selectedSector || alreadyDeployed) return
     await handleDeployAction({ userId: session?.user?.id, selectedSector, deploymentType, tessAnomalies, setDeploying, setDeploymentResult, setShowConfirmation, setDeploymentMessage, setAlreadyDeployed, generateSectorName })
   }
 
@@ -138,9 +138,14 @@ export default function DeployTelescopeViewport() {
   useEffect(() => {
     const load = async () => {
       setLoading(true)
-      await fetchAnomalies()
-      await checkDeployment()
-      setLoading(false)
+      try {
+        await fetchAnomalies()
+        await checkDeployment()
+      } catch (err) {
+        console.error("Error during telescope deploy load:", err)
+      } finally {
+        setLoading(false)
+      }
     }
     if (deploymentType) {
       load()

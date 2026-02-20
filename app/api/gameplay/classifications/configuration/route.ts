@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 
-import { getRouteSupabaseWithUser } from "@/lib/server/supabaseRoute";
+import { prisma } from "@/lib/server/prisma";
+import { getRouteUser } from "@/lib/server/supabaseRoute";
 
 export const dynamic = "force-dynamic";
 
@@ -12,7 +13,7 @@ type ConfigurationBody = {
 };
 
 export async function POST(request: NextRequest) {
-  const { supabase, user, authError } = await getRouteSupabaseWithUser();
+  const { user, authError } = await getRouteUser();
   if (authError || !user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
@@ -25,15 +26,14 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
   }
 
-  const { data: classification, error: classificationError } = await supabase
-    .from("classifications")
-    .select("id, classificationConfiguration")
-    .eq("id", classificationId)
-    .single();
-
-  if (classificationError || !classification) {
-    return NextResponse.json({ error: classificationError?.message || "Classification not found" }, { status: 404 });
-  }
+  const rows = await prisma.$queryRaw<Array<{ id: number; classificationConfiguration: Record<string, unknown> | null }>>`
+    SELECT id, "classificationConfiguration"
+    FROM classifications
+    WHERE id = ${classificationId}
+    LIMIT 1
+  `;
+  const classification = rows[0];
+  if (!classification) return NextResponse.json({ error: "Classification not found" }, { status: 404 });
 
   const existingConfig = (classification.classificationConfiguration as Record<string, unknown>) || {};
   let updatedConfiguration: Record<string, unknown>;
@@ -55,14 +55,11 @@ export async function POST(request: NextRequest) {
     };
   }
 
-  const { error: updateError } = await supabase
-    .from("classifications")
-    .update({ classificationConfiguration: updatedConfiguration })
-    .eq("id", classificationId);
-
-  if (updateError) {
-    return NextResponse.json({ error: updateError.message }, { status: 500 });
-  }
+  await prisma.$executeRaw`
+    UPDATE classifications
+    SET "classificationConfiguration" = ${JSON.stringify(updatedConfiguration)}::jsonb
+    WHERE id = ${classificationId}
+  `;
 
   revalidatePath(`/posts/${classificationId}`);
   revalidatePath(`/planets/${classificationId}`);

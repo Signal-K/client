@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 
-import { getRouteSupabaseWithUser } from "@/lib/server/supabaseRoute";
+import { prisma } from "@/lib/server/prisma";
+import { getRouteUser } from "@/lib/server/supabaseRoute";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(_request: NextRequest, { params }: { params: { id: string } }) {
-  const { supabase, user, authError } = await getRouteSupabaseWithUser();
+  const { user, authError } = await getRouteUser();
   if (authError || !user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
@@ -16,10 +17,10 @@ export async function GET(_request: NextRequest, { params }: { params: { id: str
     return NextResponse.json({ error: "Invalid deposit ID" }, { status: 400 });
   }
 
-  const { data, error } = await supabase.from("mineralDeposits").select("*").eq("id", depositId).single();
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
-  }
+  const rows = await prisma.$queryRaw<Array<Record<string, unknown>>>`
+    SELECT * FROM "mineralDeposits" WHERE id = ${depositId} LIMIT 1
+  `;
+  const data = rows[0] as Record<string, unknown> | undefined;
   if (!data) {
     return NextResponse.json({ error: "Mineral deposit not found" }, { status: 404 });
   }
@@ -31,7 +32,7 @@ export async function GET(_request: NextRequest, { params }: { params: { id: str
 }
 
 export async function POST(request: NextRequest, { params }: { params: { id: string } }) {
-  const { supabase, user, authError } = await getRouteSupabaseWithUser();
+  const { user, authError } = await getRouteUser();
   if (authError || !user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
@@ -49,15 +50,16 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
     return NextResponse.json({ error: "Invalid extraction payload" }, { status: 400 });
   }
 
-  const { data: deposit, error: depositError } = await supabase
-    .from("mineralDeposits")
-    .select("id, owner, mineralconfiguration")
-    .eq("id", depositId)
-    .single();
-
-  if (depositError || !deposit) {
-    return NextResponse.json({ error: depositError?.message || "Mineral deposit not found" }, { status: 404 });
-  }
+  const depositRows = await prisma.$queryRaw<
+    Array<{ id: number; owner: string; mineralconfiguration: Record<string, unknown> | null }>
+  >`
+    SELECT id, owner, mineralconfiguration
+    FROM "mineralDeposits"
+    WHERE id = ${depositId}
+    LIMIT 1
+  `;
+  const deposit = depositRows[0];
+  if (!deposit) return NextResponse.json({ error: "Mineral deposit not found" }, { status: 404 });
 
   if (deposit.owner !== user.id) {
     return NextResponse.json({ error: "You don't have permission to extract this deposit" }, { status: 403 });
@@ -68,18 +70,10 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
     return NextResponse.json({ error: "Deposit has no mineral type" }, { status: 400 });
   }
 
-  const { error: inventoryError } = await supabase.from("user_mineral_inventory").insert({
-    user_id: user.id,
-    mineral_deposit_id: deposit.id,
-    mineral_type: mineralType,
-    quantity: extractedQuantity,
-    purity,
-    extracted_at: new Date().toISOString(),
-  });
-
-  if (inventoryError) {
-    return NextResponse.json({ error: inventoryError.message }, { status: 500 });
-  }
+  await prisma.$executeRaw`
+    INSERT INTO user_mineral_inventory (user_id, mineral_deposit_id, mineral_type, quantity, purity, extracted_at)
+    VALUES (${user.id}, ${deposit.id}, ${String(mineralType)}, ${extractedQuantity}, ${purity}, ${new Date().toISOString()})
+  `;
 
   const updatedConfig = {
     ...deposit.mineralconfiguration,
@@ -87,14 +81,11 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
     quantity: 0,
   };
 
-  const { error: updateError } = await supabase
-    .from("mineralDeposits")
-    .update({ mineralconfiguration: updatedConfig })
-    .eq("id", deposit.id);
-
-  if (updateError) {
-    return NextResponse.json({ error: updateError.message }, { status: 500 });
-  }
+  await prisma.$executeRaw`
+    UPDATE "mineralDeposits"
+    SET mineralconfiguration = ${JSON.stringify(updatedConfig)}::jsonb
+    WHERE id = ${deposit.id}
+  `;
 
   revalidatePath("/inventory");
   revalidatePath(`/extraction/${deposit.id}`);

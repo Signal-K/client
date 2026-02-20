@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useEffect, useState } from "react";
-import { useSupabaseClient } from "@/src/lib/auth/session-context";
 import PostCard from "@/src/components/social/posts/TestPostCard";
 import GameNavbar from "@/src/components/layout/Tes";
 import StructuresOnPlanet from "@/src/components/deployment/structures/Structures";
@@ -18,8 +17,6 @@ interface Classification {
 };
 
 export default function SurveyorPostPage({ params }: { params: { id: string } }) {
-    const supabase = useSupabaseClient();
-
       const [classification, setClassification] = useState<Classification | null>(null);
       const [loading, setLoading] = useState(true);
       const [error, setError] = useState<string | null>(null);
@@ -34,13 +31,11 @@ export default function SurveyorPostPage({ params }: { params: { id: string } })
           };
     
           try {
-            const { data, error } = await supabase
-              .from("classifications")
-              .select("*")
-              .eq("id", id)
-              .single();
+            const response = await fetch(`/api/gameplay/classifications/${id}`, { cache: "no-store" });
+            const result = await response.json().catch(() => ({}));
+            const data = result?.classification;
     
-            if (error || !data) {
+            if (!response.ok || !data) {
               setError("Classification not found.");
             } else {
               const flattenedMedia = (data.media || [])
@@ -63,7 +58,7 @@ export default function SurveyorPostPage({ params }: { params: { id: string } })
         };
     
         fetchClassification();
-      }, [params.id, supabase]);
+      }, [params.id]);
     
       if (loading)
         return (

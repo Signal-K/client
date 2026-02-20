@@ -1,7 +1,7 @@
 ---
 id: r7d2km
 title: "Protect annotation and PostHog dependencies and validate tests"
-status: in-progress
+status: completed
 priority: high
 labels:
   - dependencies
@@ -10,7 +10,7 @@ labels:
   - testing
   - knowns
 createdAt: '2026-02-19T23:28:00Z'
-updatedAt: '2026-02-19T23:28:00Z'
+updatedAt: '2026-02-20T13:36:00Z'
 timeSpent: 0
 ---
 

@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 
-import { getRouteSupabaseWithUser } from "@/lib/server/supabaseRoute";
+import { prisma } from "@/lib/server/prisma";
+import { getRouteUser } from "@/lib/server/supabaseRoute";
 
 export const dynamic = "force-dynamic";
 
@@ -11,17 +12,12 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "classificationId is required" }, { status: 400 });
   }
 
-  const { supabase, user } = await getRouteSupabaseWithUser();
-  const { data: votes, error } = await supabase
-    .from("votes")
-    .select("vote_type, user_id")
-    .eq("classification_id", classificationId);
-
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
-  }
-
-  const rows = votes || [];
+  const { user } = await getRouteUser();
+  const rows = await prisma.$queryRaw<Array<{ vote_type: "up" | "down"; user_id: string }>>`
+    SELECT vote_type, user_id
+    FROM votes
+    WHERE classification_id = ${classificationId}
+  `;
   const upvotes = rows.filter((v: any) => v.vote_type === "up").length;
   const downvotes = rows.filter((v: any) => v.vote_type === "down").length;
 
@@ -46,7 +42,7 @@ type VoteBody = {
 };
 
 export async function POST(request: NextRequest) {
-  const { supabase, user, authError } = await getRouteSupabaseWithUser();
+  const { user, authError } = await getRouteUser();
   if (authError || !user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
@@ -59,17 +55,14 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Invalid classificationId" }, { status: 400 });
   }
 
-  const { data: existingVote, error: existingVoteError } = await supabase
-    .from("votes")
-    .select("id")
-    .eq("classification_id", classificationId)
-    .eq("user_id", user.id)
-    .limit(1)
-    .maybeSingle();
-
-  if (existingVoteError) {
-    return NextResponse.json({ error: existingVoteError.message }, { status: 500 });
-  }
+  const existingVoteRows = await prisma.$queryRaw<Array<{ id: number }>>`
+    SELECT id
+    FROM votes
+    WHERE classification_id = ${classificationId}
+      AND user_id = ${user.id}
+    LIMIT 1
+  `;
+  const existingVote = existingVoteRows[0];
 
   if (existingVote?.id) {
     return NextResponse.json({ success: true, alreadyVoted: true });
@@ -85,10 +78,15 @@ export async function POST(request: NextRequest) {
     insertPayload.anomaly_id = body.anomalyId;
   }
 
-  const { error } = await supabase.from("votes").insert([insertPayload]);
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
-  }
+  await prisma.$executeRaw`
+    INSERT INTO votes (user_id, classification_id, vote_type, anomaly_id)
+    VALUES (
+      ${insertPayload.user_id as string},
+      ${insertPayload.classification_id as number},
+      ${insertPayload.vote_type as "up" | "down"},
+      ${(insertPayload.anomaly_id as number | string | undefined) ?? null}
+    )
+  `;
 
   revalidatePath(`/posts/${classificationId}`);
 

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useSession, useSupabaseClient } from "@/src/lib/auth/session-context";
+import { useSession } from "@/src/lib/auth/session-context";
 import ClassificationForm from "../(classifications)/PostForm";
 import { useRouter } from "next/navigation";
 import ImageAnnotator from "../(classifications)/Annotating/AnnotatorView";
@@ -109,7 +109,6 @@ type Anomaly = {
 }; 
 
 export function DailyMinorPlanetWithId({ anomalyId }: { anomalyId: string }) {
-  const supabase = useSupabaseClient();
   const session = useSession();
   const router = useRouter();
 
@@ -141,24 +140,9 @@ export function DailyMinorPlanetWithId({ anomalyId }: { anomalyId: string }) {
         console.log("Fetching anomaly with ID:", anomalyId);
         
         if (anomalyId === "random" || !anomalyId) {
-          // Fetch a random anomaly from linked_anomalies for backward compatibility
-          const { data: linkedAnomalies, error: linkedError } = await supabase
-            .from("linked_anomalies")
-            .select(`
-              id,
-              anomaly_id,
-              anomalies!inner (
-                id,
-                content,
-                anomalySet,
-                anomalytype
-              )
-            `)
-            .eq("author", session.user.id)
-            .eq("anomalies.anomalySet", "telescope-minorPlanet");
-
-          if (linkedError) throw linkedError;
-
+          const anomaliesRes = await fetch("/api/gameplay/anomalies?anomalySet=telescope-minorPlanet&limit=50");
+          const anomaliesPayload = await anomaliesRes.json();
+          const linkedAnomalies = anomaliesRes.ok ? anomaliesPayload?.anomalies || [] : [];
           if (!linkedAnomalies || linkedAnomalies.length === 0) {
             console.log("No linked anomalies found for user");
             setError("No anomalies available for classification.");
@@ -167,8 +151,7 @@ export function DailyMinorPlanetWithId({ anomalyId }: { anomalyId: string }) {
 
           // Pick a random anomaly from the list
           const randomIndex = Math.floor(Math.random() * linkedAnomalies.length);
-          const linkedAnomaly = linkedAnomalies[randomIndex];
-          const anomaly = linkedAnomaly?.anomalies as unknown as Anomaly;
+          const anomaly = linkedAnomalies[randomIndex] as Anomaly;
 
           if (!anomaly || !anomaly.id) {
             console.error("Selected anomaly is invalid:", anomaly);
@@ -188,16 +171,11 @@ export function DailyMinorPlanetWithId({ anomalyId }: { anomalyId: string }) {
           setCurrentImageUrl(urls[0]);
         } else {
           // Fetch specific anomaly by ID
-          const { data: anomalies, error: anomalyError } = await supabase
-            .from("anomalies")
-            .select("id, content, anomalySet, anomalytype")
-            .eq("id", anomalyId)
-            .eq("anomalySet", "telescope-minorPlanet");
-
-          if (anomalyError) {
-            console.error("Database error:", anomalyError);
-            throw anomalyError;
-          }
+          const anomalyRes = await fetch(
+            `/api/gameplay/anomalies?id=${encodeURIComponent(anomalyId)}&anomalySet=telescope-minorPlanet&limit=1`
+          );
+          const anomalyPayload = await anomalyRes.json();
+          const anomalies = anomalyRes.ok ? anomalyPayload?.anomalies || [] : [];
 
           console.log("Query returned:", anomalies);
 
@@ -233,7 +211,7 @@ export function DailyMinorPlanetWithId({ anomalyId }: { anomalyId: string }) {
     };
 
     fetchAnomalyById();
-  }, [session, anomalyId, supabase, supabaseUrl]);
+  }, [session, anomalyId, supabaseUrl]);
 
   if (error) return <div className="text-red-500 p-4">{error}</div>;
   if (loading) return <div className="text-white p-4">Loading...</div>;
@@ -306,7 +284,6 @@ interface MinorPlanetProps {
 };
 
 const FirstMinorPlanetClassification: React.FC<MinorPlanetProps> = ({ anomalyid }) => {
-    const supabase = useSupabaseClient();
     const session = useSession();
 
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;

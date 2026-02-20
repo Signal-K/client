@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useSupabaseClient, useSession } from "@/src/lib/auth/session-context";
+import { useSession } from "@/src/lib/auth/session-context";
 import MissionShell from "../../../BasePlate";
 import { CloudCogIcon, FolderCog, HelpCircle, PaintBucket, Vote } from "lucide-react";
 import { AiForMarsProjectWithID, StarterAiForMars } from "@/src/components/projects/Auto/AI4Mars";
@@ -22,7 +22,6 @@ interface MissionPoints {
 };
 
 const AI4M = () => {
-    const supabase = useSupabaseClient();
     const session = useSession();
 
     const [missions, setMissions] = useState<Mission[]>([]);
@@ -170,21 +169,19 @@ const AI4M = () => {
         };
     
         const fetchMissionPoints = async (
-            session: any,
-            supabase: any
+            session: any
         ): Promise<MissionPoints> => {    
-            const { data: classifications } = await supabase
-                .from("classifications")
-                .select("id, classificationtype, classificationConfiguration")
-                .eq("author", session.user.id)
-                .eq("classificationtype", "automaton-aiForMars");
+            const classRes = await fetch(
+              `/api/gameplay/classifications?author=${encodeURIComponent(session.user.id)}&classificationtype=automaton-aiForMars&limit=500`
+            );
+            const classPayload = await classRes.json();
+            const classifications = classRes.ok ? classPayload?.classifications || [] : [];
     
             const mission1Points = classifications?.length || 0;
     
-            const { data: comments } = await supabase
-                .from("comments")
-                .select("id, classification_id")
-                .eq("author", session.user.id);
+            const activityRes = await fetch("/api/gameplay/social/my?limit=5000");
+            const activityPayload = await activityRes.json();
+            const comments = activityRes.ok ? activityPayload?.comments || [] : [];
     
             const classificationIds = classifications?.map((c: any) => c.id) || [];
             const mission2Points = comments?.filter((comment: any) =>
@@ -198,7 +195,7 @@ const AI4M = () => {
         };
     
         const updateMissionData = async () => {
-            const points = await fetchMissionPoints(session, supabase);
+            const points = await fetchMissionPoints(session);
     
             const updatedMissions = fetchMissions().map((mission) => {
                 const completedCount = points[mission.id] || 0;
@@ -210,7 +207,7 @@ const AI4M = () => {
         };
     
         updateMissionData();
-    }, [session, supabase]);    
+    }, [session]);    
 
     const maxUnlockedChapter = Math.max(
         Math.floor(experiencePoints / 9) + 1,

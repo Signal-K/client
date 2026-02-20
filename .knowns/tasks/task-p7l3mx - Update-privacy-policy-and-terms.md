@@ -1,7 +1,7 @@
 ---
 id: p7l3mx
 title: "Update privacy policy and terms"
-status: in-progress
+status: done
 priority: high
 labels:
   - legal
@@ -10,7 +10,7 @@ labels:
   - compliance
   - docs
 createdAt: '2026-02-19T23:20:00Z'
-updatedAt: '2026-02-19T23:20:00Z'
+updatedAt: "2026-02-20T14:02:10Z"
 timeSpent: 0
 ---
 

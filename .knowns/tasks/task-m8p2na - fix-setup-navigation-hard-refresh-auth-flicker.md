@@ -1,7 +1,7 @@
 ---
 id: m8p2na
 title: "Fix setup navigation hard refresh auth flicker"
-status: in-progress
+status: completed
 priority: high
 labels:
   - setup
@@ -10,7 +10,7 @@ labels:
   - routing
   - knowns
 createdAt: '2026-02-20T00:00:00Z'
-updatedAt: '2026-02-20T00:00:00Z'
+updatedAt: '2026-02-20T13:36:00Z'
 timeSpent: 0
 ---
 

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from "react";
-import { useSession, useSupabaseClient } from "@/src/lib/auth/session-context";
+import { useSession } from "@/src/lib/auth/session-context";
 import { useRouter } from "next/navigation";
 import PostCard from "@/src/components/social/posts/TestPostCard";
 import { incrementClassificationVote } from "@/src/lib/gameplay/classification-vote";
@@ -11,7 +11,6 @@ interface VotePlanetClassificationsProps {
 };
 
 export default function VotePlanetClassifications({ classificationId }: VotePlanetClassificationsProps) {
-  const supabase = useSupabaseClient();
   const session = useSession();
   const router = useRouter();
 
@@ -31,13 +30,11 @@ export default function VotePlanetClassifications({ classificationId }: VotePlan
     setError(null);
 
     try {
-      const { data, error } = await supabase
-        .from("classifications")
-        .select("*")
-        .eq("id", classificationId)
-        .single(); 
-
-      if (error) throw error;
+      const res = await fetch(`/api/gameplay/classifications?id=${encodeURIComponent(String(classificationId))}&limit=1`);
+      const payload = await res.json();
+      if (!res.ok) throw new Error(payload?.error || "Failed to load classification");
+      const data = payload?.classifications?.[0];
+      if (!data) throw new Error("Classification not found");
 
       let image: string | null = null;
       const media = data.media;

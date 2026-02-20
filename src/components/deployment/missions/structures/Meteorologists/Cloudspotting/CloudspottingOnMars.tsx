@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useSupabaseClient, useSession } from "@/src/lib/auth/session-context";
+import { useSession } from "@/src/lib/auth/session-context";
 import MissionShell from "@/src/components/deployment/missions/structures/BasePlate";
 import { CloudCogIcon, FolderCog, HelpCircle, Paintbrush2Icon, PaintBucket, Vote } from "lucide-react";
 import { CloudspottingOnMarsWithId } from "@/src/components/projects/Lidar/Clouds";
@@ -26,7 +26,6 @@ interface MissionPoints {
 }; 
 
 const CloudspottingOnMars = () => {
-    const supabase = useSupabaseClient();
     const session = useSession();
 
     const [missions, setMissions] = useState<Mission[]>([]);
@@ -106,14 +105,13 @@ const CloudspottingOnMars = () => {
         };
     
         const fetchMissionPoints = async (
-            session: any,
-            supabase: any
+            session: any
         ): Promise<MissionPoints> => {    
-            const { data: classifications } = await supabase
-                .from("classifications")
-                .select("id, classificationtype, classificationConfiguration")
-                .eq("author", session.user.id)
-                .eq("classificationtype", "cloud");
+            const classRes = await fetch(
+              `/api/gameplay/classifications?author=${encodeURIComponent(session.user.id)}&classificationtype=cloud&limit=500`
+            );
+            const classPayload = await classRes.json();
+            const classifications = classRes.ok ? classPayload?.classifications || [] : [];
     
             const mission1Points = classifications?.length || 0;
     
@@ -123,25 +121,22 @@ const CloudspottingOnMars = () => {
                 return Object.values(options).some((value) => value === true);
             }).length || 0;
     
-            const { data: comments } = await supabase
-                .from("comments")
-                .select("id, classification_id")
-                .eq("author", session.user.id);
+            const activityRes = await fetch(`/api/gameplay/social/my?limit=5000`);
+            const activityPayload = await activityRes.json();
+            const comments = activityRes.ok ? activityPayload?.comments || [] : [];
     
             const classificationIds = classifications?.map((c: any) => c.id) || [];
             const mission3Points = comments?.filter((comment: any) =>
                 classificationIds.includes(comment.classification_id)
             ).length || 0;
 
-            const {
-                data: classificationsB
-            } = await supabase
-                .from("classifications")
-                .select("id, classificationtype, classificationConfiguration")
-                .eq("author", session.user.id)
-                .eq("classificationtype", 'balloon-marsCloudShapes');
+            const shapesRes = await fetch(
+              `/api/gameplay/classifications?author=${encodeURIComponent(session.user.id)}&classificationtype=balloon-marsCloudShapes&limit=500`
+            );
+            const shapesPayload = await shapesRes.json();
+            const classificationsB = shapesRes.ok ? shapesPayload?.classifications || [] : [];
 
-            const mission4Points = classifications?.length || 0;
+            const mission4Points = classificationsB?.length || 0;
     
             return {
                 1: mission1Points,
@@ -153,7 +148,7 @@ const CloudspottingOnMars = () => {
         };
     
         const updateMissionData = async () => {
-            const points = await fetchMissionPoints(session, supabase);
+            const points = await fetchMissionPoints(session);
     
             const updatedMissions = fetchMissions().map((mission) => {
                 const completedCount = points[mission.id] || 0;
@@ -165,7 +160,7 @@ const CloudspottingOnMars = () => {
         };
     
         updateMissionData();
-    }, [session, supabase]);    
+    }, [session]);    
 
     const maxUnlockedChapter = Math.max(
         Math.floor(experiencePoints / 9) + 1,

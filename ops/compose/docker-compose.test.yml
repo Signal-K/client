@@ -1,0 +1,162 @@
+services:
+  # Next.js Application for Testing
+  nextapp-test:
+    container_name: nextapp-test
+    build:
+      context: ../..
+      dockerfile: ops/docker/next.dockerfile
+    ports:
+      - "3000:3000"
+    env_file:
+      - ../../.env.test
+    environment:
+      - NODE_ENV=test
+      - SKIP_USER_CREATION_TESTS=true
+    volumes:
+      - ../../:/app
+      - /app/node_modules
+      - /app/.next
+    working_dir: /app
+    networks:
+      - test-network
+    command: "yarn dev"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Unit Tests Service
+  unit-tests:
+    container_name: unit-tests
+    build:
+      context: ../..
+      dockerfile: ops/docker/test.dockerfile
+    env_file:
+      - ../../.env.test
+    environment:
+      - NODE_ENV=test
+    volumes:
+      - ../../:/app
+      - /app/node_modules
+    working_dir: /app
+    networks:
+      - test-network
+    command: "yarn test:unit"
+    profiles:
+      - unit
+
+  # E2E Tests Service (Headless)
+  e2e-tests-headless:
+    container_name: e2e-tests-headless
+    build:
+      context: ../..
+      dockerfile: ops/docker/test.dockerfile
+    env_file:
+      - ../../.env.test
+    environment:
+      - NODE_ENV=test
+      - SKIP_USER_CREATION_TESTS=true
+      - CYPRESS_baseUrl=http://nextapp-test:3000
+      - DISPLAY=:99
+    volumes:
+      - ../../:/app
+      - /app/node_modules
+      - /app/.cypress
+      - ../../cypress/screenshots:/app/cypress/screenshots
+      - ../../cypress/videos:/app/cypress/videos
+    working_dir: /app
+    networks:
+      - test-network
+    depends_on:
+      nextapp-test:
+        condition: service_healthy
+    command: >
+      sh -c "
+        echo 'Waiting for app to be ready...' &&
+        sleep 10 &&
+        echo 'Running E2E tests...' &&
+        yarn test:e2e:headless
+      "
+    profiles:
+      - e2e
+
+  # E2E Tests Service (Local with user creation)
+  e2e-tests-local:
+    container_name: e2e-tests-local
+    build:
+      context: ../..
+      dockerfile: ops/docker/test.dockerfile
+    env_file:
+      - ../../.env.test
+    environment:
+      - NODE_ENV=test
+      - SKIP_USER_CREATION_TESTS=false
+      - CYPRESS_baseUrl=http://nextapp-test:3000
+      - DISPLAY=:99
+    volumes:
+      - ../../:/app
+      - /app/node_modules
+      - /app/.cypress
+      - ../../cypress/screenshots:/app/cypress/screenshots
+      - ../../cypress/videos:/app/cypress/videos
+    working_dir: /app
+    networks:
+      - test-network
+    depends_on:
+      nextapp-test:
+        condition: service_healthy
+    command: >
+      sh -c "
+        echo 'Waiting for app to be ready...' &&
+        sleep 10 &&
+        echo 'Running E2E tests with user creation...' &&
+        yarn test:e2e:local
+      "
+    profiles:
+      - local-test
+
+  # All Tests Service (Unit + E2E)
+  all-tests:
+    container_name: all-tests
+    build:
+      context: ../..
+      dockerfile: ops/docker/test.dockerfile
+    env_file:
+      - ../../.env.test
+    environment:
+      - NODE_ENV=test
+      - SKIP_USER_CREATION_TESTS=true
+      - CYPRESS_baseUrl=http://nextapp-test:3000
+    volumes:
+      - ../../:/app
+      - /app/node_modules
+      - /app/.cypress
+      - ../../cypress/screenshots:/app/cypress/screenshots
+      - ../../cypress/videos:/app/cypress/videos
+    working_dir: /app
+    networks:
+      - test-network
+    depends_on:
+      nextapp-test:
+        condition: service_healthy
+    command: >
+      sh -c "
+        echo 'Running all tests...' &&
+        echo 'Step 1: Unit tests' &&
+        yarn test:unit &&
+        echo 'Step 2: E2E tests' &&
+        sleep 5 &&
+        yarn test:e2e:headless &&
+        echo 'All tests completed!'
+      "
+    profiles:
+      - all
+
+networks:
+  test-network:
+    driver: bridge
+
+volumes:
+  cypress_cache:
+  node_modules_cache:

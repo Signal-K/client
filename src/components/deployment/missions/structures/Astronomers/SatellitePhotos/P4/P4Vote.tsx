@@ -81,6 +81,7 @@ export default function VoteP4Classifications() {
             ) : (
               classifications.map((classification) => (
 <PostCardSingle
+  key={classification.id}
   classificationId={classification.id}
   title={classification.title || "Untitled"}
   author={classification.author || "Anonymous"}

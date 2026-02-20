@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { useSession, useSupabaseClient } from "@/src/lib/auth/session-context";
+import { useSession } from "@/src/lib/auth/session-context";
 import { useRouter } from "next/navigation";
 import { determineMineralType } from "@/src/utils/mineralAnalysis";
 import { useActivePlanet } from "@/src/core/context/ActivePlanet";
@@ -75,7 +75,6 @@ export function useAnnotatorLogic({
 }: ImageAnnotatorProps) {
   const router = useRouter();
 
-  const supabase = useSupabaseClient();
   const session = useSession();
 
   const [selectedImage, setSelectedImage] = useState<string | null>(
@@ -137,34 +136,34 @@ export function useAnnotatorLogic({
       if (!blob) throw new Error("Failed to create Blob from canvas");
 
       const fileName = `${Date.now()}-${session.user.id}-annotated-image.png`;
-      const { data, error } = await supabase.storage
-        .from("media")
-        .upload(fileName, blob, { contentType: "image/png" });
-
-      if (error) {
-        console.error("Upload error:", error.message);
-        throw error;
+      const file = new File([blob], fileName, { type: "image/png" });
+      const formData = new FormData();
+      formData.append("bucket", "media");
+      formData.append("file", file);
+      formData.append("fileName", fileName);
+      const uploadResponse = await fetch("/api/gameplay/storage/upload", {
+        method: "POST",
+        body: formData,
+      });
+      const uploadPayload = await uploadResponse.json().catch(() => null);
+      if (!uploadResponse.ok || !uploadPayload?.publicUrl) {
+        throw new Error(uploadPayload?.error || "Upload failed");
       }
 
       let finalUploads = uploads;
-      if (data) {
-        const url = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/media/${data.path}`;
-        finalUploads = [...uploads, [url, fileName]];
-      }
+      finalUploads = [...uploads, [uploadPayload.publicUrl, fileName]];
 
       // Check if this anomaly is in the user's linked_anomalies and get the classification_id
       let parentPlanetFromLinkedAnomaly = null;
       if (session?.user?.id && anomalyId) {
         try {
-          const { data: linkedAnomalyData, error: linkedAnomalyError } = await supabase
-            .from("linked_anomalies")
-            .select("classification_id")
-            .eq("author", session.user.id)
-            .eq("anomaly_id", anomalyId)
-            .maybeSingle();
-
-          if (!linkedAnomalyError && linkedAnomalyData?.classification_id) {
-            parentPlanetFromLinkedAnomaly = linkedAnomalyData.classification_id;
+          const response = await fetch(
+            `/api/gameplay/linked-anomalies?anomalyId=${anomalyId}&classificationIdOnly=true`,
+            { cache: "no-store" }
+          );
+          const payload = await response.json().catch(() => null);
+          if (response.ok && payload?.classification_id) {
+            parentPlanetFromLinkedAnomaly = payload.classification_id;
           }
         } catch (error) {
           console.error("Error checking linked_anomalies:", error);
@@ -287,15 +286,20 @@ export function useAnnotatorLogic({
       if (!blob) throw new Error("Failed to create Blob from canvas");
 
       const fileName = `${Date.now()}-${session.user.id}-annotated-image.png`;
-      const { data, error } = await supabase.storage
-        .from("media")
-        .upload(fileName, blob, { contentType: "image/png" });
-
-      if (error) {
-        console.error("Upload error:", error.message);
-      } else if (data) {
-        const url = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/media/${data.path}`;
-        setUploads((prev) => [...prev, [url, fileName]]);
+      const file = new File([blob], fileName, { type: "image/png" });
+      const formData = new FormData();
+      formData.append("bucket", "media");
+      formData.append("file", file);
+      formData.append("fileName", fileName);
+      const response = await fetch("/api/gameplay/storage/upload", {
+        method: "POST",
+        body: formData,
+      });
+      const payload = await response.json().catch(() => null);
+      if (!response.ok || !payload?.publicUrl) {
+        console.error("Upload error:", payload?.error || response.statusText);
+      } else {
+        setUploads((prev) => [...prev, [payload.publicUrl, fileName]]);
         setIsFormVisible(true);
       }
     } catch (err) {
@@ -446,16 +450,13 @@ export function useAnnotatorLogic({
     const fetchInventoryItemId = async () => {
       if (!session || !activePlanet) return;
       try {
-        const { data: inventoryData, error: inventoryError } = await supabase
-          .from("inventory")
-          .select("*")
-          .eq("owner", session.user.id)
-          .eq("anomaly", activePlanet.id)
-          .eq("item", structureItemId)
-          .limit(1)
-          .single();
-
-        if (inventoryError) throw inventoryError;
+        const response = await fetch(
+          `/api/gameplay/inventory/lookup?anomaly=${activePlanet.id}&item=${structureItemId}`,
+          { cache: "no-store" }
+        );
+        const payload = await response.json().catch(() => null);
+        const inventoryData = payload?.item;
+        if (!response.ok) throw new Error(payload?.error || "Failed to fetch inventory");
         if (inventoryData) setInventoryItemId(inventoryData.id);
       } catch (error: any) {
         console.error(
@@ -465,7 +466,7 @@ export function useAnnotatorLogic({
       }
     };
     fetchInventoryItemId();
-  }, [session, structureItemId]);
+  }, [session, structureItemId, activePlanet]);
 
   const createPost = async () => {
     if (!session) return;
@@ -474,15 +475,13 @@ export function useAnnotatorLogic({
     let parentPlanetFromLinkedAnomaly = null;
     if (session?.user?.id && anomalyId) {
       try {
-        const { data: linkedAnomalyData, error: linkedAnomalyError } = await supabase
-          .from("linked_anomalies")
-          .select("classification_id")
-          .eq("author", session.user.id)
-          .eq("anomaly_id", anomalyId)
-          .maybeSingle();
-
-        if (!linkedAnomalyError && linkedAnomalyData?.classification_id) {
-          parentPlanetFromLinkedAnomaly = linkedAnomalyData.classification_id;
+        const response = await fetch(
+          `/api/gameplay/linked-anomalies?anomalyId=${anomalyId}&classificationIdOnly=true`,
+          { cache: "no-store" }
+        );
+        const payload = await response.json().catch(() => null);
+        if (response.ok && payload?.classification_id) {
+          parentPlanetFromLinkedAnomaly = payload.classification_id;
         }
       } catch (error) {
         console.error("Error checking linked_anomalies:", error);
@@ -587,17 +586,11 @@ export function useAnnotatorLogic({
       if (!anomalyId || !session) return;
 
       try {
-        const { data: routes, error } = await supabase
-          .from("routes")
-          .select("routeConfiguration")
-          .eq("author", session.user.id)
-          .order("timestamp", { ascending: false })
-          .limit(1)
-          .single();
+        const response = await fetch("/api/gameplay/routes/latest", { cache: "no-store" });
+        const payload = await response.json().catch(() => null);
+        if (!response.ok || !payload?.route) return;
 
-        if (error || !routes) return;
-
-        const config = routes.routeConfiguration;
+        const config = payload.route.routeConfiguration;
         if (!config || !config.waypoints) return;
 
         // Find waypoint matching this anomaly
@@ -614,7 +607,7 @@ export function useAnnotatorLogic({
     }
 
     checkMineralDeposit();
-  }, [anomalyId, session, supabase]);
+  }, [anomalyId, session]);
 
   // Determine if we should use horizontal layout (only for Active Asteroids on desktop)
   // Use horizontal layout only for AA with h-full className on desktop (md breakpoint and up)

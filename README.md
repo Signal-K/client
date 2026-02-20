@@ -48,10 +48,10 @@ npm run docker:test:all
 npm run docker:test:clean
 
 # Manual build (if needed)
-docker-compose -f docker-compose.test.yml build
+docker-compose -f ops/compose/docker-compose.test.yml build
 
 # Start test application server manually
-docker-compose -f docker-compose.test.yml up nextapp-test
+docker-compose -f ops/compose/docker-compose.test.yml up nextapp-test
 ```
 
 #### Docker Compose Profiles
@@ -60,50 +60,50 @@ The testing environment supports multiple profiles for different testing scenari
 
 ```bash
 # Unit tests only - Fast, isolated unit testing
-docker-compose -f docker-compose.test.yml --profile unit up
+docker-compose -f ops/compose/docker-compose.test.yml --profile unit up
 
 # E2E tests only - Full application integration testing
-docker-compose -f docker-compose.test.yml --profile e2e up
+docker-compose -f ops/compose/docker-compose.test.yml --profile e2e up
 
 # Local E2E tests - Comprehensive testing with user creation
-docker-compose -f docker-compose.test.yml --profile local-test up
+docker-compose -f ops/compose/docker-compose.test.yml --profile local-test up
 
 # All tests - Complete test suite validation
-docker-compose -f docker-compose.test.yml --profile all up
+docker-compose -f ops/compose/docker-compose.test.yml --profile all up
 ```
 
 #### Advanced Docker Commands
 
 ```bash
 # Build with no cache
-docker-compose -f docker-compose.test.yml build --no-cache
+docker-compose -f ops/compose/docker-compose.test.yml build --no-cache
 
 # Run specific service
-docker-compose -f docker-compose.test.yml run --rm unit-tests yarn test:unit --run
+docker-compose -f ops/compose/docker-compose.test.yml run --rm unit-tests yarn test:unit --run
 
 # Interactive debugging
-docker-compose -f docker-compose.test.yml run --rm unit-tests bash
+docker-compose -f ops/compose/docker-compose.test.yml run --rm unit-tests bash
 
 # Check service status
-docker-compose -f docker-compose.test.yml ps
+docker-compose -f ops/compose/docker-compose.test.yml ps
 
 # Follow logs in real-time
-docker-compose -f docker-compose.test.yml logs -f
+docker-compose -f ops/compose/docker-compose.test.yml logs -f
 
 # Clean up containers and networks
-docker-compose -f docker-compose.test.yml down --remove-orphans
+docker-compose -f ops/compose/docker-compose.test.yml down --remove-orphans
 ```
 
 ### Docker Configuration Files
 
-#### `test.dockerfile`
+#### `ops/docker/test.dockerfile`
 Specialized Docker image for testing with Cypress dependencies:
 - **Base**: Node.js 22 on Debian Bullseye
 - **Features**: Pre-installed GUI libraries for headless browser testing
 - **Optimizations**: Cypress cache handling, CI-ready environment
 - **Purpose**: Runs both unit tests and E2E tests
 
-#### `next.dockerfile`
+#### `ops/docker/next.dockerfile`
 Production-ready Docker image for the Next.js application:
 - **Base**: Node.js 22 with optimized layers
 - **Features**: Multi-stage build with production optimizations
@@ -113,32 +113,32 @@ Production-ready Docker image for the Next.js application:
 
 | File | Purpose | Usage |
 |------|---------|-------|
-| `compose.yml` | Development environment | `docker-compose up` |
-| `docker-compose.test.yml` | Testing environment | `docker-compose -f docker-compose.test.yml up` |
-| `docker-compose.prod.yml` | Production deployment | `docker-compose -f docker-compose.prod.yml up` |
+| `ops/compose/compose.yml` | Development environment | `docker-compose -f ops/compose/compose.yml up` |
+| `ops/compose/docker-compose.test.yml` | Testing environment | `docker-compose -f ops/compose/docker-compose.test.yml up` |
+| `ops/compose/docker-compose.prod.yml` | Production deployment | `docker-compose -f ops/compose/docker-compose.prod.yml up` |
 
 #### Development Environment
 ```bash
 # Start development services
-docker-compose up -d
+docker-compose -f ops/compose/compose.yml up -d
 
 # Start with specific services
-docker-compose up -d db redis
+docker-compose -f ops/compose/compose.yml up -d nextapp
 
 # View logs
-docker-compose logs -f nextapp
+docker-compose -f ops/compose/compose.yml logs -f nextapp
 ```
 
 #### Production Deployment
 ```bash
 # Build and start production environment
-docker-compose -f docker-compose.prod.yml up -d
+docker-compose -f ops/compose/docker-compose.prod.yml up -d
 
 # Scale services
-docker-compose -f docker-compose.prod.yml up -d --scale nextapp=3
+docker-compose -f ops/compose/docker-compose.prod.yml up -d --scale nextapp=3
 ```
 
-#### `docker-compose.test.yml`
+#### `ops/compose/docker-compose.test.yml`
 Multi-service orchestration for comprehensive testing:
 - **nextapp-test**: Test application server (development mode)
 - **unit-tests**: Isolated unit testing service
@@ -174,16 +174,16 @@ npm run docker:test:all
 #### CI/CD Integration
 ```bash
 # 1. Build phase
-docker-compose -f docker-compose.test.yml build
+docker-compose -f ops/compose/docker-compose.test.yml build
 
 # 2. Unit tests (fast feedback)
-docker-compose -f docker-compose.test.yml --profile unit up --abort-on-container-exit
+docker-compose -f ops/compose/docker-compose.test.yml --profile unit up --abort-on-container-exit
 
 # 3. Integration tests (comprehensive validation)
-docker-compose -f docker-compose.test.yml --profile e2e up --abort-on-container-exit
+docker-compose -f ops/compose/docker-compose.test.yml --profile e2e up --abort-on-container-exit
 
 # 4. Deployment gate (full test suite)
-docker-compose -f docker-compose.test.yml --profile all up --abort-on-container-exit
+docker-compose -f ops/compose/docker-compose.test.yml --profile all up --abort-on-container-exit
 ```
 
 ### Container Architecture
@@ -211,19 +211,19 @@ docker-compose -f docker-compose.test.yml --profile all up --abort-on-container-
 
 ```bash
 # Clean rebuild if containers are corrupted
-docker-compose -f docker-compose.test.yml build --no-cache
+docker-compose -f ops/compose/docker-compose.test.yml build --no-cache
 
 # Remove all containers and networks
-docker-compose -f docker-compose.test.yml down --remove-orphans --volumes
+docker-compose -f ops/compose/docker-compose.test.yml down --remove-orphans --volumes
 
 # Check container resource usage
 docker stats
 
 # Inspect container configuration
-docker-compose -f docker-compose.test.yml config
+docker-compose -f ops/compose/docker-compose.test.yml config
 
 # Debug network connectivity
-docker-compose -f docker-compose.test.yml exec nextapp-test curl -f http://localhost:3000
+docker-compose -f ops/compose/docker-compose.test.yml exec nextapp-test curl -f http://localhost:3000
 
 # Check Docker daemon status
 docker system info
@@ -236,20 +236,20 @@ docker system prune -a
 
 If tests fail due to missing environment variables:
 1. Verify `.env.test` exists and contains proper values
-2. Check that services are using the correct env_file in docker-compose.test.yml
+2. Check that services are using the correct env_file in ops/compose/docker-compose.test.yml
 3. Ensure environment variables are properly set in container
 
 #### Performance Optimization
 
 ```bash
 # Use BuildKit for faster builds
-DOCKER_BUILDKIT=1 docker-compose -f docker-compose.test.yml build
+DOCKER_BUILDKIT=1 docker-compose -f ops/compose/docker-compose.test.yml build
 
 # Run tests in parallel (where supported)
-docker-compose -f docker-compose.test.yml up --parallel
+docker-compose -f ops/compose/docker-compose.test.yml up --parallel
 
 # Limit container resources if needed
-docker-compose -f docker-compose.test.yml up --scale unit-tests=1
+docker-compose -f ops/compose/docker-compose.test.yml up --scale unit-tests=1
 ```
 
 For detailed Docker testing documentation, see [`DOCKER_TESTING_GUIDE.md`](./DOCKER_TESTING_GUIDE.md).

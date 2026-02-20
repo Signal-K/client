@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useSupabaseClient, useSession } from "@/src/lib/auth/session-context";
+import { useSession } from "@/src/lib/auth/session-context";
 import { useRouter } from "next/navigation";
 import MissionShell from "../../BasePlate";
 import {
@@ -24,7 +24,6 @@ interface Mission {
 }
 
 const PlanetHuntersSteps = () => {
-  const supabase = useSupabaseClient();
   const session = useSession();
   const router = useRouter();
 
@@ -95,37 +94,24 @@ const PlanetHuntersSteps = () => {
 
     const fetchData = async () => {
       try {
-        const { data: classifications, error } = await supabase
-          .from("classifications")
-          .select("id, classificationConfiguration, classificationtype, author")
-          .eq("author", session.user.id)
-          .ilike("classificationtype", "planet");
-
-        if (error) throw error;
+        const classRes = await fetch(
+          `/api/gameplay/classifications?author=${encodeURIComponent(session.user.id)}&classificationtype=planet&limit=500`
+        );
+        const classPayload = await classRes.json();
+        if (!classRes.ok) throw new Error(classPayload?.error || "Failed to load classifications");
+        const classifications = classPayload?.classifications || [];
 
         setPlanetClassifications(classifications || []);
         if (classifications && classifications.length > 0 && !selectedClassificationId) {
           setSelectedClassificationId(classifications[0].id);
         }
 
-        const { data: commentsData, error: commentsError } = await supabase
-          .from("comments")
-          .select("classification_id")
-          .eq("author", session.user.id);
-        if (commentsError) throw commentsError;
-
-        const { data: votesData, error: votesError } = await supabase
-          .from("votes")
-          .select("classification_id")
-          .eq("user_id", session.user.id);
-        if (votesError) throw votesError;
-
-        const { data: temperatureData, error: tempError } = await supabase
-          .from("comments")
-          .select("id")
-          .eq("author", session.user.id)
-          .eq("category", "Temperature");
-        if (tempError) throw tempError;
+        const activityRes = await fetch(`/api/gameplay/social/my?category=Temperature&limit=5000`);
+        const activityPayload = await activityRes.json();
+        if (!activityRes.ok) throw new Error(activityPayload?.error || "Failed to load activity");
+        const commentsData = activityPayload?.comments || [];
+        const votesData = activityPayload?.votes || [];
+        const temperatureData = commentsData.filter((c: any) => c?.category === "Temperature");
 
         const mission1Completed = classifications?.length || 0;
         const mission3Completed = commentsData?.length || 0;
@@ -158,7 +144,7 @@ const PlanetHuntersSteps = () => {
     };
 
     fetchData();
-  }, [supabase, session?.user?.id]);
+  }, [session?.user?.id]);
 
   // Update missions' slugs whenever selectedClassificationId changes to replace placeholder
   useEffect(() => {

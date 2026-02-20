@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/src/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
-import { useSession, useSupabaseClient } from "@/src/lib/auth/session-context";
+import { useSession } from "@/src/lib/auth/session-context";
 import { EarthViewLayout } from "@/src/components/scenes/planetScene/layout";
 import Navbar from "@/src/components/layout/Navbar";
 import Link from "next/link";
@@ -41,7 +41,6 @@ const MissionShell = ({
   onNextChapter,
   tutorialMission,
 }: MissionShellProps) => {
-  const supabase = useSupabaseClient();
   const session = useSession();
 
   const [loading, setLoading] = useState(false);
@@ -58,19 +57,16 @@ const MissionShell = ({
 
     async function getProfile() {
       setLoading(true);
-      const { data, error } = await supabase
-        .from("profiles")
-        .select(`username, full_name, avatar_url`)
-        .eq("id", session?.user.id)
-        .single();
+      const res = await fetch("/api/gameplay/profile/me");
+      const payload = await res.json();
 
       if (!ignore) {
-        if (error) {
-          console.warn(error);
-        } else if (data) {
-          setUsername(data.username);
-          setFirstName(data?.full_name);
-          setAvatarPreview(data?.avatar_url || "");
+        if (!res.ok) {
+          console.warn(payload?.error || "Failed to fetch profile");
+        } else if (payload) {
+          setUsername(payload.username || "");
+          setFirstName(payload.full_name || "");
+          setAvatarPreview(payload.avatar_url || "");
         }
       }
 

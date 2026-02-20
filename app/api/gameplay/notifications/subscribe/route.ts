@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 
-import { getRouteSupabaseWithUser } from "@/lib/server/supabaseRoute";
+import { prisma } from "@/lib/server/prisma";
+import { getRouteUser } from "@/lib/server/supabaseRoute";
 
 export const dynamic = "force-dynamic";
 
@@ -12,7 +13,7 @@ type SubscribeBody = {
 };
 
 export async function POST(request: NextRequest) {
-  const { supabase, user, authError } = await getRouteSupabaseWithUser();
+  const { user, authError } = await getRouteUser();
   if (authError || !user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
@@ -26,30 +27,21 @@ export async function POST(request: NextRequest) {
   const auth = typeof body?.auth === "string" ? body.auth : "";
   const p256dh = typeof body?.p256dh === "string" ? body.p256dh : "";
 
-  const { data: existing, error: existingError } = await supabase
-    .from("push_subscriptions")
-    .select("id")
-    .eq("profile_id", user.id)
-    .eq("endpoint", endpoint)
-    .limit(1);
-
-  if (existingError) {
-    return NextResponse.json({ error: existingError.message }, { status: 500 });
-  }
-  if ((existing || []).length > 0) {
+  const existing = await prisma.$queryRaw<Array<{ id: number }>>`
+    SELECT id
+    FROM push_subscriptions
+    WHERE profile_id = ${user.id}
+      AND endpoint = ${endpoint}
+    LIMIT 1
+  `;
+  if (existing.length > 0) {
     return NextResponse.json({ success: true, alreadyExists: true });
   }
 
-  const { error } = await supabase.from("push_subscriptions").insert({
-    profile_id: user.id,
-    endpoint,
-    auth,
-    p256dh,
-  });
-
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
-  }
+  await prisma.$executeRaw`
+    INSERT INTO push_subscriptions (profile_id, endpoint, auth, p256dh)
+    VALUES (${user.id}, ${endpoint}, ${auth}, ${p256dh})
+  `;
 
   revalidatePath("/game");
   return NextResponse.json({ success: true, alreadyExists: false });

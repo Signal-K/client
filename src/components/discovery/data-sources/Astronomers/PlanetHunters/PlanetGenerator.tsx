@@ -14,7 +14,6 @@ import SettingsPanel from "./SettingsPanel";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/src/components/ui/dialog";
 import { Button } from "@/src/components/ui/button";
 import { Textarea } from "@/src/components/ui/textarea";
-import { useSupabaseClient } from "@/src/lib/auth/session-context";
 import { mergeClassificationConfiguration } from "@/src/lib/gameplay/classification-configuration";
 
 interface PlanetGeneratorProps {
@@ -45,7 +44,6 @@ export function PlanetGeneratorMinimal({
   style?: React.CSSProperties;
   cameraZoom?: number;
 }) {
-  const supabase = useSupabaseClient();
   const [planetConfig, setPlanetConfig] = useState<PlanetConfig>(defaultPlanetConfig);
   const [planetStats, setPlanetStats] = useState<PlanetStats>({});
 
@@ -54,11 +52,10 @@ export function PlanetGeneratorMinimal({
       const idAsNumber = Number.parseInt(classificationId);
       if (isNaN(idAsNumber)) return;
 
-      const { data, error } = await supabase
-        .from("classifications")
-        .select("classificationConfiguration")
-        .eq("id", idAsNumber)
-        .single();
+      const res = await fetch(`/api/gameplay/classifications?id=${idAsNumber}&limit=1`);
+      const payload = await res.json().catch(() => ({}));
+      const data = res.ok ? payload?.classifications?.[0] : null;
+      const error = !res.ok ? payload?.error : null;
 
       if (error || !data?.classificationConfiguration?.exportedValue) return;
 
@@ -70,7 +67,7 @@ export function PlanetGeneratorMinimal({
       }));
     };
     fetchExportedValues();
-  }, [classificationId, supabase]);
+  }, [classificationId]);
 
   // Merge handler for partial config
   const handleConfigChange = (config: Partial<PlanetConfig>) => {
@@ -113,7 +110,6 @@ export default function PlanetGenerator({
   style,
   cameraZoom,
 }: PlanetGeneratorProps) {
-  const supabase = useSupabaseClient();
   const [planetConfig, setPlanetConfig] = useState<PlanetConfig>(defaultPlanetConfig);
   const [importDialogOpen, setImportDialogOpen] = useState(false);
   const [exportDialogOpen, setExportDialogOpen] = useState(false);
@@ -155,11 +151,10 @@ export default function PlanetGenerator({
       const idAsNumber = Number.parseInt(classificationId);
       if (isNaN(idAsNumber)) return;
 
-      const { data, error } = await supabase
-        .from("classifications")
-        .select("classificationConfiguration, anomaly")
-        .eq("id", idAsNumber)
-        .single();
+      const classRes = await fetch(`/api/gameplay/classifications?id=${idAsNumber}&limit=1`);
+      const classPayload = await classRes.json().catch(() => ({}));
+      const data = classRes.ok ? classPayload?.classifications?.[0] : null;
+      const error = !classRes.ok ? classPayload?.error : null;
 
       if (error || !data?.classificationConfiguration?.exportedValue) return;
 
@@ -173,10 +168,10 @@ export default function PlanetGenerator({
       }));
 
       // Fetch mineral deposits by classification ID (discovery field)
-      const { data: depositsData, error: depositsError } = await supabase
-        .from("mineralDeposits")
-        .select("id, mineralconfiguration, location, discovery, anomaly")
-        .eq("discovery", idAsNumber);
+      const depositsRes = await fetch(`/api/gameplay/mineral-deposits?discovery=${idAsNumber}`);
+      const depositsPayload = await depositsRes.json().catch(() => ({}));
+      const depositsData = depositsRes.ok ? depositsPayload?.deposits : [];
+      const depositsError = !depositsRes.ok ? depositsPayload?.error : null;
 
 
       if (!depositsError && depositsData) {
@@ -241,10 +236,12 @@ export default function PlanetGenerator({
         }
 
       // Fetch child classifications
-      const { data: childClassData, error: childError } = await supabase
-        .from("classifications")
-        .select("id, classificationtype, content, classificationConfiguration")
-        .or(`parentPlanet.eq.${idAsNumber},source_classification_id.eq.${idAsNumber},classificationConfiguration->>parentPlanetLocation.eq.${idAsNumber}`);
+      const childRes = await fetch(
+        `/api/gameplay/classifications?classificationParent=${idAsNumber}&orderBy=created_at&ascending=false&limit=500`
+      );
+      const childPayload = await childRes.json().catch(() => ({}));
+      const childClassData = childRes.ok ? childPayload?.classifications : [];
+      const childError = !childRes.ok ? childPayload?.error : null;
 
       
 
@@ -281,7 +278,7 @@ export default function PlanetGenerator({
     };
 
     fetchExportedValues();
-  }, [classificationId, supabase]);
+  }, [classificationId]);
 
   const exportConfig = JSON.stringify(planetConfig, null, 2);
 

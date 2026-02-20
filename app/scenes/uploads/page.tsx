@@ -1,12 +1,11 @@
 'use client';
 
 import React, { useState, useEffect } from "react";
-import { useSupabaseClient, useSession } from "@/src/lib/auth/session-context";
+import { useSession } from "@/src/lib/auth/session-context";
 import Navbar from "@/src/components/layout/Navbar";
 import Link from "next/link";
 
 const BiodomeStructureBase = () => {
-  const supabase = useSupabaseClient();
   const session = useSession();
   const [uploads, setUploads] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -16,22 +15,19 @@ const BiodomeStructureBase = () => {
 
     const fetchUploads = async () => {
       setLoading(true);
-      const { data, error } = await supabase
-        .from("uploads")
-        .select("*")
-        .eq("author", session.user.id)
-        .order("created_at", { ascending: false });
+      const response = await fetch("/api/gameplay/uploads/mine", { cache: "no-store" });
+      const result = await response.json().catch(() => ({}));
 
-      if (error) {
-        console.error("Error fetching uploads:", error);
+      if (!response.ok) {
+        console.error("Error fetching uploads:", result?.error);
       } else {
-        setUploads(data || []);
+        setUploads(Array.isArray(result?.uploads) ? result.uploads : []);
       }
       setLoading(false);
     };
 
     fetchUploads();
-  }, [session, supabase]);
+  }, [session]);
 
   if (!session) {
     return <p>Please log in to view your uploads.</p>;

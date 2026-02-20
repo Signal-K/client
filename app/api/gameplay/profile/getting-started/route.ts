@@ -1,23 +1,21 @@
 import { NextResponse } from "next/server";
 
-import { getRouteSupabaseWithUser } from "@/lib/server/supabaseRoute";
+import { prisma } from "@/lib/server/prisma";
+import { getRouteUser } from "@/lib/server/supabaseRoute";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  const { supabase, user, authError } = await getRouteSupabaseWithUser();
+  const { user, authError } = await getRouteUser();
   if (authError || !user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { data: classifications, error } = await supabase
-    .from("classifications")
-    .select("classificationtype")
-    .eq("author", user.id);
-
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
-  }
+  const classifications = await prisma.$queryRaw<Array<{ classificationtype: string | null }>>`
+    SELECT classificationtype
+    FROM classifications
+    WHERE author = ${user.id}
+  `;
 
   const types = Array.from(
     new Set(
@@ -39,9 +37,8 @@ export async function GET() {
   );
 
   return NextResponse.json({
-    totalClassifications: classifications?.length || 0,
+    totalClassifications: classifications.length,
     classificationTypes: types,
     toolsUsed: toolCounts,
   });
 }
-

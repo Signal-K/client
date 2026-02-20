@@ -4,7 +4,6 @@ import React, { useEffect, useState, useRef } from "react";
 import { Card, CardContent, CardFooter } from "@/src/components/ui/card";
 import { Button } from "@/src/components/ui/button";
 import { Textarea } from "@/src/components/ui/textarea";
-import { useSupabaseClient } from "@/src/lib/auth/session-context";
 import { useRouter } from "next/navigation";
 import { CommentCard } from "@/src/components/social/comments/CommentSingle";
 
@@ -39,7 +38,6 @@ export function SurveyorComments({
   classificationConfig,
   commentStatus,
 }: PostCardSingleProps) {
-  const supabase = useSupabaseClient();
   const router = useRouter();
 
   const [comments, setComments] = useState<CommentProps[]>([]);
@@ -57,15 +55,13 @@ export function SurveyorComments({
   const fetchComments = async () => {
     setLoadingComments(true);
     try {
-      const { data, error } = await supabase
-        .from("comments")
-        .select("*")
-        .eq("classification_id", classificationId)
-        .eq("surveyor", "TRUE")
-        .order("created_at", { ascending: false });
-
-      if (error) throw error;
-      setComments(data);
+      const response = await fetch(
+        `/api/gameplay/social/comments?classificationId=${classificationId}&surveyor=true&order=desc`,
+        { cache: "no-store" }
+      );
+      const payload = await response.json().catch(() => null);
+      if (!response.ok || !payload?.comments) throw new Error(payload?.error || "Failed to fetch comments");
+      setComments(payload.comments);
     } catch (error) {
       console.error("Error fetching comments:", error);
     } finally {

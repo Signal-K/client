@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 
-import { getRouteSupabaseWithUser } from "@/lib/server/supabaseRoute";
+import { prisma } from "@/lib/server/prisma";
+import { getRouteUser } from "@/lib/server/supabaseRoute";
 
 export const dynamic = "force-dynamic";
 
@@ -42,7 +43,7 @@ function techCost(techType: string) {
 }
 
 export async function POST(request: NextRequest) {
-  const { supabase, user, authError } = await getRouteSupabaseWithUser();
+  const { user, authError } = await getRouteUser();
 
   if (authError || !user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -56,22 +57,19 @@ export async function POST(request: NextRequest) {
   }
 
   const userId = user.id;
-  const [{ data: researched, error: researchedError }, { count: classificationCount, error: countError }] =
-    await Promise.all([
-      supabase.from("researched").select("tech_type").eq("user_id", userId),
-      supabase.from("classifications").select("id", { count: "exact", head: true }).eq("author", userId),
-    ]);
+  const [researched, classificationCountRows] = await Promise.all([
+    prisma.$queryRaw<Array<{ tech_type: string }>>`
+      SELECT tech_type FROM researched WHERE user_id = ${userId}
+    `,
+    prisma.$queryRaw<Array<{ count: bigint }>>`
+      SELECT COUNT(*)::bigint AS count
+      FROM classifications
+      WHERE author = ${userId}
+    `,
+  ]);
+  const classificationCount = Number(classificationCountRows[0]?.count ?? 0);
 
-  if (researchedError || countError) {
-    return NextResponse.json(
-      {
-        error: researchedError?.message || countError?.message || "Failed to validate unlock",
-      },
-      { status: 500 }
-    );
-  }
-
-  const researchedRows = researched || [];
+  const researchedRows = researched;
   const researchedSet = new Set(researchedRows.map((r) => r.tech_type));
 
   const existingCount = researchedRows.filter((r) => r.tech_type === techType).length;
@@ -89,22 +87,20 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Requires p4Minerals first" }, { status: 400 });
   }
   if (techType === "ngtsAccess") {
-    const { count: planetCount, error: planetCountError } = await supabase
-      .from("classifications")
-      .select("id", { count: "exact", head: true })
-      .eq("author", userId)
-      .eq("classificationtype", "planet");
-
-    if (planetCountError) {
-      return NextResponse.json({ error: planetCountError.message }, { status: 500 });
-    }
+    const planetCountRows = await prisma.$queryRaw<Array<{ count: bigint }>>`
+      SELECT COUNT(*)::bigint AS count
+      FROM classifications
+      WHERE author = ${userId}
+        AND classificationtype = 'planet'
+    `;
+    const planetCount = Number(planetCountRows[0]?.count ?? 0);
     if ((planetCount || 0) < 4) {
       return NextResponse.json({ error: "Requires 4 planet classifications" }, { status: 400 });
     }
   }
 
   const spent = researchedRows.reduce((total, row) => total + techCost(row.tech_type), 0);
-  const availableStardust = Math.max(0, (classificationCount || 0) - spent);
+  const availableStardust = Math.max(0, classificationCount - spent);
   const cost = techCost(techType);
 
   if (availableStardust < cost) {
@@ -114,14 +110,10 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const { error: insertError } = await supabase.from("researched").insert({
-    user_id: userId,
-    tech_type: techType,
-  });
-
-  if (insertError) {
-    return NextResponse.json({ error: insertError.message }, { status: 500 });
-  }
+  await prisma.$executeRaw`
+    INSERT INTO researched (user_id, tech_type)
+    VALUES (${userId}, ${techType})
+  `;
 
   revalidatePath("/research");
   revalidatePath("/game");

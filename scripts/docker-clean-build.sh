@@ -5,11 +5,12 @@
 # Usage: ./scripts/docker-clean-build.sh
 
 set -e
+COMPOSE_FILE="ops/compose/compose.yml"
 
 echo "🧹 Cleaning Docker resources..."
 
 # Stop and remove containers
-docker-compose down --remove-orphans 2>/dev/null || true
+docker-compose -f "$COMPOSE_FILE" down --remove-orphans 2>/dev/null || true
 
 # Remove dangling images (saves space)
 echo "🗑️  Removing dangling images..."
@@ -19,7 +20,7 @@ docker image prune -f --filter "dangling=true" 2>/dev/null || true
 docker network prune -f 2>/dev/null || true
 
 echo "🔨 Building and starting fresh..."
-docker-compose up -d --build
+docker-compose -f "$COMPOSE_FILE" up -d --build
 
 if [ $? -eq 0 ]; then
     echo "✅ Docker containers rebuilt and started"

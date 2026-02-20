@@ -17,4 +17,4 @@ export default function HomePage() {
   }, [isLoading, user, router]);
 
   return <Landing />;
-}
+};

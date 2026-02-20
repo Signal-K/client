@@ -1,9 +1,44 @@
 import { NextRequest, NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 
-import { getRouteSupabaseWithUser } from "@/lib/server/supabaseRoute";
+import { prisma } from "@/lib/server/prisma";
+import { getRouteUser } from "@/lib/server/supabaseRoute";
 
 export const dynamic = "force-dynamic";
+
+export async function GET(request: NextRequest) {
+  const { user, authError } = await getRouteUser();
+  if (authError || !user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const discoveryParam = request.nextUrl.searchParams.get("discovery");
+  let rows: Array<Record<string, unknown>> = [];
+  if (discoveryParam) {
+    const discovery = Number(discoveryParam);
+    if (!Number.isFinite(discovery)) {
+      return NextResponse.json({ error: "Invalid discovery" }, { status: 400 });
+    }
+    rows = await prisma.$queryRaw<Array<Record<string, unknown>>>`
+      SELECT id, mineralconfiguration, location, "roverName", created_at, discovery
+      FROM "mineralDeposits"
+      WHERE owner = ${user.id}
+        AND discovery = ${discovery}
+        AND location IS NOT NULL
+      ORDER BY created_at DESC
+    `;
+  } else {
+    rows = await prisma.$queryRaw<Array<Record<string, unknown>>>`
+      SELECT id, mineralconfiguration, location, "roverName", created_at, discovery
+      FROM "mineralDeposits"
+      WHERE owner = ${user.id}
+        AND location IS NOT NULL
+      ORDER BY created_at DESC
+    `;
+  }
+
+  return NextResponse.json({ deposits: rows });
+}
 
 type MineralDepositBody = {
   anomaly?: number | string | null;
@@ -17,7 +52,7 @@ type MineralDepositBody = {
 };
 
 export async function POST(request: NextRequest) {
-  const { supabase, user, authError } = await getRouteSupabaseWithUser();
+  const { user, authError } = await getRouteUser();
   if (authError || !user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
@@ -45,10 +80,20 @@ export async function POST(request: NextRequest) {
     created_at: typeof body?.created_at === "string" ? body.created_at : new Date().toISOString(),
   };
 
-  const { data, error } = await supabase.from("mineralDeposits").insert(payload).select().single();
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
-  }
+  const rows = await prisma.$queryRaw<Array<Record<string, unknown>>>`
+    INSERT INTO "mineralDeposits" (anomaly, discovery, owner, mineralconfiguration, location, "roverName", created_at)
+    VALUES (
+      ${payload.anomaly},
+      ${payload.discovery},
+      ${payload.owner},
+      ${JSON.stringify(payload.mineralconfiguration)}::jsonb,
+      ${payload.location},
+      ${payload.roverName},
+      ${payload.created_at}
+    )
+    RETURNING *
+  `;
+  const data = rows[0];
 
   revalidatePath("/inventory");
   revalidatePath("/viewports/roover");

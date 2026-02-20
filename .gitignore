@@ -29,6 +29,10 @@ venv
 # next.js
 /.next/
 /out/
+.DS_STORE
+/.DS_Store
+./DS_Store
+.DS_Store
 
 storage_downloads/
 .storage_downloads/

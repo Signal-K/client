@@ -1,26 +1,19 @@
 import { NextResponse } from "next/server";
 
-import { getRouteSupabaseWithUser } from "@/lib/server/supabaseRoute";
+import { prisma } from "@/lib/server/prisma";
+import { getRouteUser } from "@/lib/server/supabaseRoute";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  const { supabase, user, authError } = await getRouteSupabaseWithUser();
+  const { user, authError } = await getRouteUser();
   if (authError || !user) {
     return NextResponse.json({ authenticated: false, hasReferral: false }, { status: 200 });
   }
 
-  const { data, error } = await supabase
-    .from("referrals")
-    .select("id")
-    .eq("referree_id", user.id)
-    .limit(1)
-    .maybeSingle();
+  const data = await prisma.$queryRaw<Array<{ id: number }>>`
+    SELECT id FROM referrals WHERE referree_id = ${user.id} LIMIT 1
+  `;
 
-  if (error) {
-    return NextResponse.json({ authenticated: true, hasReferral: false, error: error.message }, { status: 200 });
-  }
-
-  return NextResponse.json({ authenticated: true, hasReferral: !!data });
+  return NextResponse.json({ authenticated: true, hasReferral: data.length > 0 });
 }
-

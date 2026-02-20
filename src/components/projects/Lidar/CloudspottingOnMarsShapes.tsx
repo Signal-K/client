@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from "react";
-import { useSupabaseClient, useSession } from "@/src/lib/auth/session-context";
+import { useSession } from "@/src/lib/auth/session-context";
 import ImageAnnotator from "../(classifications)/Annotating/AnnotatorView";
 
 type Anomaly = {
@@ -12,17 +12,13 @@ type Anomaly = {
 
 interface ShapesProps {
   anomalyid: number;
-};
+}
 
-export function StarterCoMShapes({
-    anomalyid
-}: ShapesProps) {
-  const supabase = useSupabaseClient();
+export function StarterCoMShapes({ anomalyid }: ShapesProps) {
   const session = useSession();
 
   const [anomaly, setAnomaly] = useState<Anomaly | null>(null);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
-  const [baseImageUrl, setBaseImageUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [hasMineralResearch, setHasMineralResearch] = useState<boolean>(false);
 
@@ -34,86 +30,41 @@ export function StarterCoMShapes({
       }
 
       try {
-        // First, fetch the linked_anomaly to get the actual anomaly_id
-        const { data: linkedAnomalyData, error: linkedError } = await supabase
-          .from("linked_anomalies")
-          .select(`
-            id,
-            anomaly_id,
-            anomalies (
-              id,
-              content,
-              anomalySet
-            )
-          `)
-          .eq("anomaly_id", anomalyid)
-          .eq("author", session.user.id)
-          .maybeSingle();
+        const linkedRes = await fetch(`/api/gameplay/linked-anomalies?anomalyId=${anomalyid}`);
+        const linkedPayload = await linkedRes.json().catch(() => ({}));
+        const linkedAnomaly = linkedRes.ok ? linkedPayload?.linkedAnomaly : null;
 
-        if (linkedError) {
-          console.error("Error fetching linked anomaly:", linkedError);
-          
-          // Fallback: try direct anomalies table query
-          const { data: anomalyData, error: anomalyError } = await supabase
-            .from("anomalies")
-            .select("*")
-            .eq("anomalySet", "balloon-marsCloudShapes")
-            .eq("content", anomalyid);
-
-          if (anomalyError) throw anomalyError;
-
-          if (!anomalyData || anomalyData.length === 0) { 
-            setAnomaly(null);
-            setLoading(false);
-            return;
-          }
-
-          const randomAnomaly = anomalyData[Math.floor(Math.random() * anomalyData.length)] as Anomaly;
-          setAnomaly(randomAnomaly);
-
-          const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-          if (supabaseUrl && randomAnomaly?.id) {
-            setImageUrl(
-              `${supabaseUrl}/storage/v1/object/public/telescope/balloon-marsCloudsShapes/${randomAnomaly.id}/${randomAnomaly.id}/1.png`
-            );
-            setBaseImageUrl(
-              `${supabaseUrl}/storage/v1/object/public/telescope/balloon-marsCloudsShapes/${randomAnomaly.id}/${randomAnomaly.id}/2.png`
-            );
-          } else {
-            console.error("Supabase URL or Anomaly ID is missing!");
-            setAnomaly(null);
-          }
-          setLoading(false);
-          return;
+        let anomalyRecord: any = null;
+        if (linkedAnomaly?.anomaly_id) {
+          const anomalyRes = await fetch(`/api/gameplay/anomalies?id=${linkedAnomaly.anomaly_id}&limit=1`);
+          const anomalyPayload = await anomalyRes.json().catch(() => ({}));
+          anomalyRecord = anomalyRes.ok ? anomalyPayload?.anomalies?.[0] : null;
         }
 
-        if (!linkedAnomalyData || !linkedAnomalyData.anomalies) { 
+        if (!anomalyRecord) {
+          const fallbackRes = await fetch(
+            `/api/gameplay/anomalies?anomalySet=balloon-marsCloudShapes&content=${encodeURIComponent(String(anomalyid))}&limit=1`
+          );
+          const fallbackPayload = await fallbackRes.json().catch(() => ({}));
+          anomalyRecord = fallbackRes.ok ? fallbackPayload?.anomalies?.[0] : null;
+        }
+
+        if (!anomalyRecord?.id) {
           setAnomaly(null);
-          setLoading(false);
           return;
         }
-
-        const anomalyRecord = Array.isArray(linkedAnomalyData.anomalies) 
-          ? linkedAnomalyData.anomalies[0] 
-          : linkedAnomalyData.anomalies;
 
         setAnomaly({
-          id: anomalyRecord.id,
+          id: String(anomalyRecord.id),
           name: anomalyRecord.content || "Unknown",
-          details: anomalyRecord.anomalySet
+          details: anomalyRecord.anomalySet,
         });
 
         const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-        if (supabaseUrl && anomalyRecord?.id) {
+        if (supabaseUrl) {
           setImageUrl(
             `${supabaseUrl}/storage/v1/object/public/telescope/balloon-marsCloudsShapes/${anomalyRecord.id}/${anomalyRecord.id}/1.png`
           );
-          setBaseImageUrl(
-            `${supabaseUrl}/storage/v1/object/public/telescope/balloon-marsCloudsShapes/${anomalyRecord.id}/${anomalyRecord.id}/2.png`
-          );
-        } else {
-          console.error("Supabase URL or Anomaly ID is missing!");
-          setAnomaly(null);
         }
       } catch (error: any) {
         console.error("Error fetching cloud shape:", error.message);
@@ -123,38 +74,19 @@ export function StarterCoMShapes({
       }
     }
 
-    fetchAnomaly();
-  }, [session, anomalyid, supabase]);
+    void fetchAnomaly();
+  }, [session, anomalyid]);
 
   useEffect(() => {
     async function checkMineralResearch() {
       if (!session) return;
-
-      console.log("[CoM Shapes] Checking mineral research for user:", session.user.id);
-
-      try {
-        const { data, error } = await supabase
-          .from("inventory")
-          .select("id")
-          .eq("owner", session.user.id)
-          .eq("item", 3103);
-
-        console.log("[CoM Shapes] Mineral research query result:", { data, error });
-
-        if (error) {
-          console.error("[CoM Shapes] Error checking mineral research:", error);
-        }
-
-        const hasResearch = !!data && data.length > 0;
-        console.log("[CoM Shapes] Has mineral research:", hasResearch);
-        setHasMineralResearch(hasResearch);
-      } catch (error) {
-        console.error("[CoM Shapes] Exception checking mineral research:", error);
-      }
+      const inventoryRes = await fetch("/api/gameplay/inventory/mine?item=3103&limit=1");
+      const inventoryPayload = await inventoryRes.json().catch(() => ({}));
+      setHasMineralResearch(Boolean(inventoryRes.ok && inventoryPayload?.inventory?.length));
     }
 
-    checkMineralResearch();
-  }, [session, supabase]);
+    void checkMineralResearch();
+  }, [session]);
 
   if (loading) return <div><p>Loading...</p></div>;
   if (!anomaly || !imageUrl) return <div><p>No clouds found today.</p></div>;
@@ -162,49 +94,24 @@ export function StarterCoMShapes({
   const handleClassificationComplete = async () => {
     if (!session || !anomaly) return;
 
-    console.log("[CoM Shapes] Classification complete callback triggered");
-    console.log("[CoM Shapes] Session:", session.user.id);
-    console.log("[CoM Shapes] Anomaly:", anomaly.id);
-
     try {
-      const { 
-        attemptMineralDepositCreation, 
-        selectCloudMineral 
-      } = await import("@/src/utils/mineralDepositCreation");
+      const { attemptMineralDepositCreation, selectCloudMineral } = await import("@/src/utils/mineralDepositCreation");
 
-      const { data: recentClassification } = await supabase
-        .from("classifications")
-        .select("id")
-        .eq("author", session.user.id)
-        .eq("anomaly", parseInt(anomaly.id.toString()))
-        .eq("classificationtype", "balloon-marsCloudShapes")
-        .order("created_at", { ascending: false })
-        .limit(1)
-        .single();
+      const recentRes = await fetch(
+        `/api/gameplay/classifications?author=${encodeURIComponent(session.user.id)}&anomaly=${parseInt(anomaly.id)}&classificationtype=balloon-marsCloudShapes&orderBy=created_at&ascending=false&limit=1`
+      );
+      const recentPayload = await recentRes.json().catch(() => ({}));
+      const recentClassification = recentRes.ok ? recentPayload?.classifications?.[0] : null;
 
-      console.log("[CoM Shapes] Recent classification:", recentClassification);
+      if (!recentClassification?.id) return;
 
-      if (recentClassification) {
-        const mineralConfig = selectCloudMineral();
-        console.log("[CoM Shapes] Attempting mineral deposit creation with config:", mineralConfig);
-        
-        const depositCreated = await attemptMineralDepositCreation({
-          supabase,
-          userId: session.user.id,
-          anomalyId: parseInt(anomaly.id.toString()),
-          classificationId: recentClassification.id,
-          mineralConfig,
-          location: `Cloud shape formation at anomaly ${anomaly.id}`
-        });
-
-        if (depositCreated) {
-          console.log(`[CoM Shapes] ✅ SUCCESS! Created ${mineralConfig.type} deposit!`);
-        } else {
-          console.log(`[CoM Shapes] ❌ FAILED to create deposit`);
-        }
-      } else {
-        console.log("[CoM Shapes] No recent classification found");
-      }
+      await attemptMineralDepositCreation({
+        userId: session.user.id,
+        anomalyId: parseInt(anomaly.id),
+        classificationId: recentClassification.id,
+        mineralConfig: selectCloudMineral(),
+        location: `Cloud shape formation at anomaly ${anomaly.id}`,
+      });
     } catch (error) {
       console.error("[CoM Shapes] Error in mineral deposit creation:", error);
     }
@@ -236,4 +143,5 @@ export function StarterCoMShapes({
       </div>
     </div>
   );
-};
+}
+

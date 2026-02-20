@@ -4,11 +4,12 @@
 # Usage: ./scripts/docker-quick-start.sh
 
 set -e
+COMPOSE_FILE="ops/compose/compose.yml"
 
 echo "🚀 Quick Starting Docker (no rebuild)..."
 
 # Only use existing images, don't build
-docker-compose up -d --no-build
+docker-compose -f "$COMPOSE_FILE" up -d --no-build
 
 if [ $? -eq 0 ]; then
     echo "✅ Docker containers started successfully"

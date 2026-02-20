@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useSupabaseClient, useSession } from "@/src/lib/auth/session-context";
+import { useSession } from "@/src/lib/auth/session-context";
 import { useRouter } from "next/navigation";
 import { useActivePlanet } from "@/src/core/context/ActivePlanet";
 import ClassificationForm from "../(classifications)/PostForm";
@@ -22,7 +22,6 @@ interface TelescopeProps {
 export const DiskDetectorTutorial: React.FC<TelescopeProps> = ({
   anomalyId,
 }) => {
-  const supabase = useSupabaseClient();
   const session = useSession();
   const router = useRouter();
 
@@ -54,7 +53,7 @@ export const DiskDetectorTutorial: React.FC<TelescopeProps> = ({
     
     const urls: string[] = [];
     let imageIndex = 1;
-    let maxAttempts = 20; // Safety limit
+    const maxAttempts = 20; // Safety limit
     
     while (imageIndex <= maxAttempts) {
       const imageUrl = `${supabaseUrl}/storage/v1/object/public/telescope/telescope-diskDetective/${anomalyId}/${imageIndex}.png`;
@@ -132,7 +131,7 @@ export const DiskDetectorTutorial: React.FC<TelescopeProps> = ({
   };
 
   const handleSubmit = async (withDiscussion: boolean = false) => {
-    if (!session?.user?.id || !supabase) {
+    if (!session?.user?.id) {
       console.error("No session or supabase client available");
       return;
     }
@@ -454,7 +453,6 @@ export const DiskDetectorTutorial: React.FC<TelescopeProps> = ({
 };
 
 export function TelescopeDiskDetector() {
-  const supabase = useSupabaseClient();
   const session = useSession();
 
   const { activePlanet } = useActivePlanet();
@@ -475,17 +473,12 @@ export function TelescopeDiskDetector() {
       }
 
       try {
-        const { data: anomalyData, error: anomalyError } = await supabase
-          .from("anomalies")
-          .select("*")
-          .eq("author", session.user.id)
-          .eq("anomalySet", "telescope-diskDetective")
-          .limit(1)
-          .maybeSingle();
-
-        if (anomalyError) {
-          throw anomalyError;
-        }
+        const anomalyRes = await fetch(
+          `/api/gameplay/anomalies?author=${encodeURIComponent(session.user.id)}&anomalySet=telescope-diskDetective&limit=1`
+        );
+        const anomalyPayload = await anomalyRes.json().catch(() => ({}));
+        if (!anomalyRes.ok) throw new Error(anomalyPayload?.error || "Failed to load anomaly");
+        const anomalyData = anomalyPayload?.anomalies?.[0];
 
         if (anomalyData) {
           setAnomaly(anomalyData);
@@ -504,7 +497,7 @@ export function TelescopeDiskDetector() {
     }
 
     fetchAnomaly();
-  }, [session, supabase]);
+  }, [session]);
 
   useEffect(() => {
     const checkMission = async () => {
@@ -514,19 +507,9 @@ export function TelescopeDiskDetector() {
       }
 
       try {
-        const { data: missionData, error: missionError } = await supabase
-          .from("missions")
-          .select("*")
-          .eq("user", session.user.id)
-          .eq("mission", 3000009)
-          .maybeSingle();
-
-        if (missionError) {
-          console.error("Error checking mission:", missionError.message);
-          setHasMission3000009(false);
-        } else {
-          setHasMission3000009(!!missionData);
-        }
+        const missionRes = await fetch("/api/gameplay/missions/exists?mission=3000009");
+        const missionPayload = await missionRes.json().catch(() => ({}));
+        setHasMission3000009(Boolean(missionRes.ok && missionPayload?.exists));
       } catch (error: any) {
         console.error("Error in mission check:", error.message);
         setHasMission3000009(false);
@@ -536,7 +519,7 @@ export function TelescopeDiskDetector() {
     };
 
     checkMission();
-  }, [session, supabase]);
+  }, [session]);
 
   if (loading || missionLoading) {
     return <div>Loading...</div>;

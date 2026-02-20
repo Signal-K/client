@@ -1,11 +1,10 @@
 import { act, renderHook } from "@testing-library/react"
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest"
 import { useNPSManagement } from "@/hooks/useNPSManagement"
-import { useSession, useSupabaseClient } from "@/src/lib/auth/session-context"
+import { useSession } from "@/src/lib/auth/session-context"
 
 vi.mock("@/src/lib/auth/session-context", () => ({
   useSession: vi.fn(),
-  useSupabaseClient: vi.fn(),
 }))
 
 describe("useNPSManagement", () => {
@@ -19,20 +18,12 @@ describe("useNPSManagement", () => {
   })
 
   it("shows NPS modal when user has classifications and no prior NPS response", async () => {
-    const query = {
-      select: vi.fn().mockReturnThis(),
-      eq: vi.fn().mockReturnThis(),
-      limit: vi.fn().mockResolvedValue({ data: [{ id: 1 }], error: null }),
-    }
-    const npsQuery = {
-      select: vi.fn().mockReturnThis(),
-      eq: vi.fn().mockResolvedValue({ data: [], error: null }),
-    }
-    const supabase = {
-      from: vi.fn((table: string) => (table === "classifications" ? query : npsQuery)),
-    }
-
-    vi.mocked(useSupabaseClient).mockReturnValue(supabase as any)
+    const fetchSpy = vi
+      .spyOn(globalThis, "fetch")
+      .mockResolvedValue({
+        ok: true,
+        json: async () => ({ shouldShowNps: true }),
+      } as Response)
     vi.mocked(useSession).mockReturnValue({ user: { id: "user-1" } } as any)
 
     const { result } = renderHook(() => useNPSManagement())
@@ -41,9 +32,8 @@ describe("useNPSManagement", () => {
       await vi.runOnlyPendingTimersAsync()
     })
 
-    expect(query.limit).toHaveBeenCalledWith(1)
-    expect(npsQuery.eq).toHaveBeenCalledWith("user_id", "user-1")
-
+    expect(fetchSpy).toHaveBeenCalledWith("/api/gameplay/nps/status", { cache: "no-store" })
+    expect(result.current.showNpsModal).toBe(true)
     expect(result.current.handleCloseNps).toBeTypeOf("function")
   })
 })

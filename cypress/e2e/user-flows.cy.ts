@@ -1,5 +1,10 @@
 describe('User Flows', () => {
   beforeEach(() => {
+    cy.request({ url: '/', failOnStatusCode: false, timeout: 10000 }).then((res) => {
+      if (!res || res.status >= 500) {
+        throw new Error(`Dev server not reachable (status ${res?.status}). Start it with: npm run dev`)
+      }
+    })
     cy.waitForSupabase()
   })
 

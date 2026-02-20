@@ -1,13 +1,14 @@
 import { NextResponse } from "next/server";
 
-import { getRouteSupabaseWithUser } from "@/lib/server/supabaseRoute";
+import { prisma } from "@/lib/server/prisma";
+import { getRouteUser } from "@/lib/server/supabaseRoute";
 
 export const dynamic = "force-dynamic";
 
 const QUANTITY_UPGRADES = ["probereceptors", "satellitecount", "roverwaypoints"];
 
 export async function GET() {
-  const { supabase, user, authError } = await getRouteSupabaseWithUser();
+  const { user, authError } = await getRouteUser();
 
   if (authError || !user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -15,23 +16,39 @@ export async function GET() {
 
   const userId = user.id;
 
-  const [{ data: researched, error: researchedError }, { data: classifications, error: classificationsError }] =
-    await Promise.all([
-      supabase.from("researched").select("tech_type, created_at").eq("user_id", userId),
-      supabase.from("classifications").select("classificationtype").eq("author", userId),
-    ]);
+  const [researched, classifications] = await Promise.all([
+    prisma.$queryRaw<Array<{ tech_type: string; created_at: string }>>`
+      SELECT tech_type, created_at
+      FROM researched
+      WHERE user_id = ${userId}
+    `,
+    prisma.$queryRaw<Array<{ classificationtype: string }>>`
+      SELECT classificationtype
+      FROM classifications
+      WHERE author = ${userId}
+    `,
+  ]);
 
-  if (researchedError || classificationsError) {
-    return NextResponse.json(
-      {
-        error: researchedError?.message || classificationsError?.message || "Failed to fetch research summary",
-      },
-      { status: 500 }
-    );
+  const profileRows = await prisma.$queryRaw<Array<{ referral_code: string | null }>>`
+    SELECT referral_code
+    FROM profiles
+    WHERE id = ${userId}
+    LIMIT 1
+  `;
+  const referralCode = profileRows[0]?.referral_code ?? null;
+  let referralCount = 0;
+  if (referralCode) {
+    const referralRows = await prisma.$queryRaw<Array<{ count: bigint | number }>>`
+      SELECT COUNT(*)::bigint AS count
+      FROM referrals
+      WHERE referral_code = ${referralCode}
+    `;
+    referralCount = Number(referralRows[0]?.count ?? 0);
   }
+  const referralBonus = referralCount * 5;
 
-  const researchedRows = researched || [];
-  const classificationRows = classifications || [];
+  const researchedRows = researched;
+  const classificationRows = classifications;
 
   const counts = {
     all: classificationRows.length,
@@ -64,6 +81,9 @@ export async function GET() {
     userId,
     researchedEntries: researchedRows,
     researchedTechTypes: techTypes,
+    referralCode,
+    referralCount,
+    referralBonus,
     counts,
     availableStardust,
     upgrades: {

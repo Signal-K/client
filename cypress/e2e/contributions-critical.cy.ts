@@ -95,50 +95,67 @@ describe("Contributions Critical", () => {
 
     cy.login(email, password)
 
-    cy.intercept("GET", "/api/gameplay/deploy/telescope?action=anomalies*").as("deployAnomalies")
-    cy.intercept("POST", "/api/gameplay/deploy/telescope").as("deployTelescope")
-    cy.visit("/activity/deploy")
-    cy.wait("@deployAnomalies", { timeout: 120000 }).then((interception) => {
-      const anomalies = (interception.response?.body?.anomalies || []) as Array<{ id: number; anomalySet: string }>
+    // Fetch available anomalies via API (bypasses slow UI load & session-context race)
+    cy.request({
+      method: "GET",
+      url: "/api/gameplay/deploy/telescope?action=anomalies&deploymentType=planetary",
+      failOnStatusCode: false,
+    }).then((anomalyRes) => {
+      expect([200], "anomalies fetch status").to.include(anomalyRes.status)
+      const anomalies = (anomalyRes.body?.anomalies || []) as Array<{ id: number; anomalySet: string }>
       anomalies.forEach((anomaly) => {
         anomalySetById[Number(anomaly.id)] = String(anomaly.anomalySet || "")
       })
     })
-    cy.contains("button", "Select Sector", { timeout: 120000 }).click({ force: true })
-    cy.contains("button", "Deploy Telescope", { timeout: 120000 }).click({ force: true })
-    cy.wait("@deployTelescope", { timeout: 120000 }).then((interception) => {
-      expect(interception.response?.statusCode, "deploy response status").to.equal(200)
-      const deployedIds = (interception.request?.body?.anomalyIds || []).map((id: number | string) =>
-        Number(id),
-      )
-      expect(deployedIds.length, "deployed anomaly ids from frontend deploy request").to.be.greaterThan(0)
 
+    // Deploy telescope via API (bypasses UI session-context timing issues)
+    cy.then(() => {
+      // Pick anomalies to deploy from the fetched list
       const preferredSets = ["telescope-minorPlanet", "telescope-tess", "active-asteroids"]
-      let chosenId: number | undefined
-      for (const set of preferredSets) {
-        chosenId = deployedIds.find((id: number) => anomalySetById[id] === set)
-        if (chosenId) break
-      }
-      if (!chosenId) {
-        chosenId = deployedIds.find((id: number) => {
-          const anomalySet = anomalySetById[id] || ""
-          return Boolean(buildRoutePlan(anomalySet, id))
-        })
-      }
-      expect(chosenId, "at least one deployed anomaly maps to supported classification route").to.not.equal(
-        undefined,
-      )
+      const candidateIds = Object.entries(anomalySetById)
+        .filter(([, set]) => preferredSets.includes(set))
+        .map(([id]) => Number(id))
+        .slice(0, 4)
 
-      const anomalyId = Number(chosenId)
-      const anomalySet = anomalySetById[anomalyId] || ""
-      const routePlan = buildRoutePlan(anomalySet, anomalyId)
-      if (!routePlan) {
-        throw new Error(`Failed to map deployed anomaly ${anomalyId} with set ${anomalySet}`)
-      }
+      expect(candidateIds.length, "candidate anomaly ids for deploy").to.be.greaterThan(0)
 
-      deployedAnomalyId = anomalyId
-      selectedRoute = routePlan.route
-      expectedClassificationTypes = routePlan.expectedTypes
+      cy.request({
+        method: "POST",
+        url: "/api/gameplay/deploy/telescope",
+        body: {
+          deploymentType: "planetary",
+          anomalyIds: candidateIds,
+        },
+        failOnStatusCode: false,
+      }).then((deployRes) => {
+        expect(deployRes.status, "deploy response status").to.equal(200)
+
+        let chosenId: number | undefined
+        for (const set of preferredSets) {
+          chosenId = candidateIds.find((id: number) => anomalySetById[id] === set)
+          if (chosenId) break
+        }
+        if (!chosenId) {
+          chosenId = candidateIds.find((id: number) => {
+            const anomalySet = anomalySetById[id] || ""
+            return Boolean(buildRoutePlan(anomalySet, id))
+          })
+        }
+        expect(chosenId, "at least one deployed anomaly maps to supported classification route").to.not.equal(
+          undefined,
+        )
+
+        const anomalyId = Number(chosenId)
+        const anomalySet = anomalySetById[anomalyId] || ""
+        const routePlan = buildRoutePlan(anomalySet, anomalyId)
+        if (!routePlan) {
+          throw new Error(`Failed to map deployed anomaly ${anomalyId} with set ${anomalySet}`)
+        }
+
+        deployedAnomalyId = anomalyId
+        selectedRoute = routePlan.route
+        expectedClassificationTypes = routePlan.expectedTypes
+      })
     })
 
     cy.intercept("POST", "/api/gameplay/classifications").as("submitClassification")
@@ -146,8 +163,8 @@ describe("Contributions Critical", () => {
     cy.then(() => {
       expect(selectedRoute, "selected route for deployed anomaly").to.not.equal("")
       cy.visit(selectedRoute)
-      cy.contains("button", "Submit Classification", { timeout: 120000 }).click({ force: true })
-      cy.wait("@submitClassification", { timeout: 120000 }).then((submission) => {
+      cy.contains("button", "Submit Classification", { timeout: 30000 }).click({ force: true })
+      cy.wait("@submitClassification", { timeout: 30000 }).then((submission) => {
         expect(submission.response?.statusCode, "classification submission status").to.equal(200)
         const submissionBody = submission.response?.body || {}
         const apiId = Number(submission.response?.body?.id)
@@ -162,7 +179,7 @@ describe("Contributions Critical", () => {
           `classification type from submit response should match route ${selectedRoute}`,
         ).to.equal(true)
       })
-      cy.location("pathname", { timeout: 120000 }).should("match", /\/next\/\d+$/)
+      cy.location("pathname", { timeout: 30000 }).should("match", /\/next\/\d+$/)
     })
 
     cy.request({

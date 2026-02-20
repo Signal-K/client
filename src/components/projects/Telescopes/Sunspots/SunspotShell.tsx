@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useSupabaseClient, useSession } from "@/src/lib/auth/session-context";
+import { useSession } from "@/src/lib/auth/session-context";
 import MissionShell from "@/src/components/deployment/missions/structures/BasePlate";
 import { CloudCogIcon, FolderCog, HelpCircle, PaintBucket, Sun, Vote } from "lucide-react";
 
@@ -19,7 +19,6 @@ interface MissionStep {
 };
 
 const SunspotSteps = () => {
-    const supabase = useSupabaseClient();
     const session = useSession();
 
     const [steps, setSteps] = useState<MissionStep[]>([]);
@@ -62,45 +61,28 @@ const SunspotSteps = () => {
             try {
                 setLoading(true);
 
-                const {
-                    data: classificationsData,
-                    error: classificationsError,
-                } = await supabase
-                    .from("classifications")
-                    .select("*")
-                    .eq("classificationtype", 'sunspot')
-                    .eq('author', session.user.id);
-
-                if (classificationsError) {
-                    throw classificationsError;
-                };
+                const classRes = await fetch(
+                  `/api/gameplay/classifications?author=${encodeURIComponent(session.user.id)}&classificationtype=sunspot&limit=1000`
+                );
+                const classPayload = await classRes.json();
+                if (!classRes.ok) throw new Error(classPayload?.error || "Failed to load classifications");
+                const classificationsData = classPayload?.classifications || [];
 
                 const mission1CompletedCount = classificationsData?.length || 0;
 
-                const {
-                    data: commentsData,
-                    error: commentsError
-                } = await supabase
-                    .from("comments")
-                    .select("*")
-                    .eq("author", session.user.id);
-
-                const { data: votesData } = await supabase
-                    .from("votes")
-                    .select("classification_id")
-                    .eq("user_id", session.user.id);
+                const activityRes = await fetch("/api/gameplay/social/my?limit=5000");
+                const activityPayload = await activityRes.json();
+                if (!activityRes.ok) throw new Error(activityPayload?.error || "Failed to load activity");
+                const commentsData = activityPayload?.comments || [];
+                const votesData = activityPayload?.votes || [];
           
                 const validClassificationIds = new Set(
-                    classificationsData?.map((classification) => classification.id) ?? []
+                    classificationsData?.map((classification: any) => classification.id) ?? []
                 );
 
-                if (commentsError) {
-                    throw commentsError;
-                };
-
                 const mission2CompletedCount =
-                    (commentsData?.filter(({ classification_id }) => validClassificationIds.has(classification_id)).length ?? 0) +
-                    (votesData?.filter(({ classification_id }) => validClassificationIds.has(classification_id)).length ?? 0);
+                    (commentsData?.filter(({ classification_id }: any) => validClassificationIds.has(classification_id)).length ?? 0) +
+                    (votesData?.filter(({ classification_id }: any) => validClassificationIds.has(classification_id)).length ?? 0);
 
                 const totalPoints = (
                     mission1CompletedCount * missionPoints[1] +

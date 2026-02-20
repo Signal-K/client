@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useSupabaseClient, useSession } from "@/src/lib/auth/session-context";
+import { useSession } from "@/src/lib/auth/session-context";
 
 interface Milestone {
   name: string;
@@ -20,7 +20,6 @@ interface WeekMilestones {
 }
 
 export default function MilestoneHistoryList() {
-  const supabase = useSupabaseClient();
   const session = useSession();
 
   const [milestones, setMilestones] = useState<WeekMilestones[]>([]);
@@ -47,39 +46,24 @@ export default function MilestoneHistoryList() {
       } = {};
 
       for (const week of sorted) {
-        const startDate = new Date(week.weekStart);
-        const endDate = new Date(startDate);
-        endDate.setDate(startDate.getDate() + 6);
-        endDate.setHours(23, 59, 59, 999); // Include full last day
-
         const weekKey = week.weekStart;
-        progressMap[weekKey] = {};
-
-        for (const milestone of week.data) {
-          const { table, field, value } = milestone;
-
-          const { count, error } = (await supabase
-            .from(table as string) // prevent type explosion from unions
-            .select("*", { count: "exact", head: true })
-            .eq(field as string, value)
-            .or(`author.eq.${session.user.id},user_id.eq.${session.user.id}`)
-            .gte("created_at", startDate.toISOString())
-            .lte("created_at", endDate.toISOString())) as {
-            count: number | null;
-            error: any;
-          };
-
-          if (!error) {
-            progressMap[weekKey][milestone.name] = count ?? 0;
-          }
-        }
+        const progressResponse = await fetch("/api/gameplay/milestones/weekly-progress", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            weekStart: week.weekStart,
+            data: week.data,
+          }),
+        });
+        const progressPayload = await progressResponse.json().catch(() => null);
+        progressMap[weekKey] = progressPayload?.progress ?? {};
       }
 
       setUserProgress(progressMap);
     };
 
     fetchData();
-  }, [session, supabase]);
+  }, [session]);
 
   const completedByGroup: {
     [group: string]: { name: string; date: string }[];

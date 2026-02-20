@@ -8,7 +8,7 @@ import { Button } from "@/src/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/src/components/ui/card";
 import { Textarea } from "@/src/components/ui/textarea";
 import { ThumbsUp, MessageSquare, Share2 } from "lucide-react";
-import { useSession, useSupabaseClient } from "@/src/lib/auth/session-context";
+import { useSession } from "@/src/lib/auth/session-context";
 import { CommentCard } from "../comments/CommentSingle";
 import { SurveyorComments } from "./Surveyor/SurveyorPostCard";
 
@@ -52,7 +52,6 @@ export function PostCardSingle({
   commentStatus,
   onVote,
 }: PostCardSingleProps) {
-  const supabase = useSupabaseClient();
   const session = useSession();
 
   const [comments, setComments] = useState<CommentProps[]>([]);
@@ -68,14 +67,13 @@ export function PostCardSingle({
   const fetchComments = async () => {
     setLoadingComments(true);
     try {
-      const { data, error } = await supabase
-        .from("comments")
-        .select("*")
-        .eq("classification_id", classificationId)
-        .order("created_at", { ascending: false });
-
-      if (error) throw error;
-      setComments(data);
+      const response = await fetch(
+        `/api/gameplay/social/comments?classificationId=${classificationId}&order=desc`,
+        { cache: "no-store" }
+      );
+      const payload = await response.json().catch(() => null);
+      if (!response.ok || !payload?.comments) throw new Error(payload?.error || "Failed to fetch comments");
+      setComments(payload.comments);
     } catch (error) {
       console.error("Error fetching comments:", error);
     } finally {

@@ -1,15 +1,12 @@
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
-import { useSession, useSupabaseClient } from "@/src/lib/auth/session-context";
+import { useSession } from "@/src/lib/auth/session-context";
 
 interface Props {
     author: string;
 };
 
 export const AvatarGenerator: React.FC<Props> = ({ author }) => {
-  const supabase = useSupabaseClient();
-  const session = useSession();
-
     const [avatarUrl, setAvatarUrl] = useState("");
   
     useEffect(() => {
@@ -34,7 +31,6 @@ export const AvatarGenerator: React.FC<Props> = ({ author }) => {
 };
 
 export function Avatar() {
-  const supabase = useSupabaseClient();
   const session = useSession();
 
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
@@ -46,17 +42,14 @@ export function Avatar() {
     async function fetchAvatar() {
       if (!session?.user?.id) return;
 
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("avatar_url")
-        .eq("id", session.user.id)
-        .single();
+      const response = await fetch("/api/gameplay/profile/me", { cache: "no-store" });
+      const payload = await response.json().catch(() => null);
 
       if (!ignore) {
-        if (error) {
-          console.warn("Error fetching avatar: ", error.message);
-        } else if (data) {
-          setAvatarUrl(data.avatar_url || null);
+        if (!response.ok) {
+          console.warn("Error fetching avatar: ", payload?.error || response.statusText);
+        } else if (payload) {
+          setAvatarUrl(payload.avatar_url || null);
         }
         setLoading(false);
       }
@@ -67,7 +60,7 @@ export function Avatar() {
     return () => {
       ignore = true;
     };
-  }, [session, supabase]);
+  }, [session]);
 
   if (loading) {
     return <div className="w-10 h-10 rounded-full bg-gray-300 animate-pulse" />;

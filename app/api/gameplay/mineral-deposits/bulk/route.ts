@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 
-import { getRouteSupabaseWithUser } from "@/lib/server/supabaseRoute";
+import { prisma } from "@/lib/server/prisma";
+import { getRouteUser } from "@/lib/server/supabaseRoute";
 
 export const dynamic = "force-dynamic";
 
@@ -10,7 +11,7 @@ type BulkBody = {
 };
 
 export async function POST(request: NextRequest) {
-  const { supabase, user, authError } = await getRouteSupabaseWithUser();
+  const { user, authError } = await getRouteUser();
   if (authError || !user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
@@ -26,13 +27,15 @@ export async function POST(request: NextRequest) {
     owner: user.id,
   }));
 
-  const { data, error } = await supabase.from("mineralDeposits").insert(normalized).select("id");
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
-  }
+  const data = await prisma.$queryRaw<Array<{ id: number }>>`
+    INSERT INTO "mineralDeposits"
+    SELECT *
+    FROM jsonb_populate_recordset(NULL::"mineralDeposits", ${JSON.stringify(normalized)}::jsonb)
+    RETURNING id
+  `;
 
   revalidatePath("/inventory");
   revalidatePath("/viewports/roover");
 
-  return NextResponse.json({ success: true, count: data?.length || 0 });
+  return NextResponse.json({ success: true, count: data.length });
 }

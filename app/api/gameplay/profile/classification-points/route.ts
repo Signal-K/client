@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 
-import { getRouteSupabaseWithUser } from "@/lib/server/supabaseRoute";
+import { prisma } from "@/lib/server/prisma";
+import { getRouteUser } from "@/lib/server/supabaseRoute";
 
 export const dynamic = "force-dynamic";
 
@@ -10,7 +11,7 @@ type IncrementBody = {
 };
 
 export async function POST(request: NextRequest) {
-  const { supabase, user, authError } = await getRouteSupabaseWithUser();
+  const { user, authError } = await getRouteUser();
   if (authError || !user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
@@ -21,25 +22,24 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Invalid amount" }, { status: 400 });
   }
 
-  const { data: profile, error: profileError } = await supabase
-    .from("profiles")
-    .select("id, classificationPoints")
-    .eq("id", user.id)
-    .single();
+  const rows = await prisma.$queryRaw<Array<{ id: string; classificationPoints: number | null }>>`
+    SELECT id, "classificationPoints"
+    FROM profiles
+    WHERE id = ${user.id}
+    LIMIT 1
+  `;
+  const profile = rows[0];
 
-  if (profileError || !profile) {
-    return NextResponse.json({ error: profileError?.message || "Profile not found" }, { status: 404 });
+  if (!profile) {
+    return NextResponse.json({ error: "Profile not found" }, { status: 404 });
   }
 
   const nextPoints = (profile.classificationPoints || 0) + amount;
-  const { error: updateError } = await supabase
-    .from("profiles")
-    .update({ classificationPoints: nextPoints })
-    .eq("id", user.id);
-
-  if (updateError) {
-    return NextResponse.json({ error: updateError.message }, { status: 500 });
-  }
+  await prisma.$executeRaw`
+    UPDATE profiles
+    SET "classificationPoints" = ${nextPoints}
+    WHERE id = ${user.id}
+  `;
 
   revalidatePath("/game");
   revalidatePath("/profile");

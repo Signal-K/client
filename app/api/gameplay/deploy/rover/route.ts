@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 
-import { getRouteSupabaseWithUser } from "@/lib/server/supabaseRoute";
+import { prisma } from "@/lib/server/prisma";
+import { getRouteUser } from "@/lib/server/supabaseRoute";
 
 export const dynamic = "force-dynamic";
 
@@ -10,7 +11,7 @@ type RoverDeployBody = {
 };
 
 export async function POST(request: NextRequest) {
-  const { supabase, user, authError } = await getRouteSupabaseWithUser();
+  const { user, authError } = await getRouteUser();
   if (authError || !user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
@@ -26,26 +27,14 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "At least one waypoint is required" }, { status: 400 });
   }
 
-  const [{ data: roverUpgradeRows, error: roverUpgradeError }, { data: findMineralsRows, error: mineralsError }] =
-    await Promise.all([
-      supabase
-        .from("researched")
-        .select("tech_type")
-        .eq("user_id", user.id)
-        .eq("tech_type", "roverwaypoints"),
-      supabase
-        .from("researched")
-        .select("tech_type")
-        .eq("user_id", user.id)
-        .eq("tech_type", "findMinerals"),
-    ]);
-
-  if (roverUpgradeError || mineralsError) {
-    return NextResponse.json(
-      { error: roverUpgradeError?.message || mineralsError?.message || "Failed to load rover upgrades" },
-      { status: 500 }
-    );
-  }
+  const upgradeRows = await prisma.$queryRaw<Array<{ tech_type: string }>>`
+    SELECT tech_type
+    FROM researched
+    WHERE user_id = ${user.id}
+      AND tech_type IN ('roverwaypoints', 'findMinerals')
+  `;
+  const roverUpgradeRows = upgradeRows.filter((r) => r.tech_type === "roverwaypoints");
+  const findMineralsRows = upgradeRows.filter((r) => r.tech_type === "findMinerals");
 
   const maxWaypoints = (roverUpgradeRows || []).length > 0 ? 6 : 4;
   if (waypoints.length > maxWaypoints) {
@@ -53,47 +42,40 @@ export async function POST(request: NextRequest) {
   }
 
   const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
-  const { data: recentDeployments, error: recentError } = await supabase
-    .from("linked_anomalies")
-    .select("id")
-    .eq("author", user.id)
-    .eq("automaton", "Rover")
-    .gte("date", sevenDaysAgo)
-    .limit(1);
-
-  if (recentError) {
-    return NextResponse.json({ error: recentError.message }, { status: 500 });
-  }
+  const recentDeployments = await prisma.$queryRaw<Array<{ id: number }>>`
+    SELECT id
+    FROM linked_anomalies
+    WHERE author = ${user.id}
+      AND automaton = 'Rover'
+      AND date >= ${sevenDaysAgo}
+    LIMIT 1
+  `;
 
   if ((recentDeployments || []).length > 0) {
     return NextResponse.json({ error: "Rover deployment has already occurred this week" }, { status: 409 });
   }
 
-  const [classifiedRes, anomalyRes, classificationCountRes] = await Promise.all([
-    supabase
-      .from("classifications")
-      .select("anomaly")
-      .eq("classificationtype", "automaton-aiForMars")
-      .eq("author", user.id),
-    supabase.from("anomalies").select("id").eq("anomalySet", "automaton-aiForMars"),
-    supabase.from("classifications").select("id", { count: "exact", head: true }).eq("author", user.id),
+  const [classifiedRes, anomalyRes, classificationCountRows] = await Promise.all([
+    prisma.$queryRaw<Array<{ anomaly: number }>>`
+      SELECT anomaly
+      FROM classifications
+      WHERE classificationtype = 'automaton-aiForMars'
+        AND author = ${user.id}
+    `,
+    prisma.$queryRaw<Array<{ id: number }>>`
+      SELECT id
+      FROM anomalies
+      WHERE "anomalySet" = 'automaton-aiForMars'
+    `,
+    prisma.$queryRaw<Array<{ count: bigint }>>`
+      SELECT COUNT(*)::bigint AS count
+      FROM classifications
+      WHERE author = ${user.id}
+    `,
   ]);
 
-  if (classifiedRes.error || anomalyRes.error || classificationCountRes.error) {
-    return NextResponse.json(
-      {
-        error:
-          classifiedRes.error?.message ||
-          anomalyRes.error?.message ||
-          classificationCountRes.error?.message ||
-          "Failed to prepare rover deployment",
-      },
-      { status: 500 }
-    );
-  }
-
-  const classifiedIds = new Set((classifiedRes.data || []).map((c) => c.anomaly));
-  const allAnomalies = anomalyRes.data || [];
+  const classifiedIds = new Set(classifiedRes.map((c) => c.anomaly));
+  const allAnomalies = anomalyRes;
   let unclassified = allAnomalies.filter((a) => !classifiedIds.has(a.id));
 
   if (unclassified.length < waypoints.length) {
@@ -105,7 +87,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "No rover anomalies available" }, { status: 400 });
   }
 
-  const isFastDeployEnabled = (classificationCountRes.count || 0) < 4;
+  const isFastDeployEnabled = Number(classificationCountRows[0]?.count ?? 0) < 4;
   const deploymentDate = isFastDeployEnabled
     ? new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
     : new Date().toISOString();
@@ -118,10 +100,12 @@ export async function POST(request: NextRequest) {
     unlocked: true,
   }));
 
-  const { error: linkError } = await supabase.from("linked_anomalies").insert(linkedRows);
-  if (linkError) {
-    return NextResponse.json({ error: linkError.message }, { status: 500 });
-  }
+  await prisma.$executeRaw`
+    INSERT INTO linked_anomalies (author, anomaly_id, automaton, date, unlocked)
+    SELECT x.author, x.anomaly_id, x.automaton, x.date::timestamptz, x.unlocked
+    FROM jsonb_to_recordset(${JSON.stringify(linkedRows)}::jsonb)
+      AS x(author text, anomaly_id int, automaton text, date text, unlocked boolean)
+  `;
 
   const hasFindMinerals = (findMineralsRows || []).length > 0;
   const mineralWaypointIndices: number[] = [];
@@ -153,16 +137,15 @@ export async function POST(request: NextRequest) {
     ? new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
     : new Date().toISOString();
 
-  const { error: routeError } = await supabase.from("routes").insert({
-    author: user.id,
-    routeConfiguration: routeConfig,
-    location: selectedAnomalies[0]?.id || null,
-    timestamp: routeTimestamp,
-  });
-
-  if (routeError) {
-    return NextResponse.json({ error: routeError.message }, { status: 500 });
-  }
+  await prisma.$executeRaw`
+    INSERT INTO routes (author, "routeConfiguration", location, timestamp)
+    VALUES (
+      ${user.id},
+      ${JSON.stringify(routeConfig)}::jsonb,
+      ${selectedAnomalies[0]?.id || null},
+      ${routeTimestamp}
+    )
+  `;
 
   revalidatePath("/activity/deploy/roover");
   revalidatePath("/game");

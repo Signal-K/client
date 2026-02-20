@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useSupabaseClient } from "@/src/lib/auth/session-context";
 import MainHeader from "@/src/components/layout/Header/MainHeader";
 import { Card, CardContent, CardHeader, CardTitle } from "@/src/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/src/components/ui/tabs";
@@ -17,7 +16,6 @@ interface LeaderboardEntry {
 }
 
 export default function SunspotLeaderboardPage() {
-  const supabase = useSupabaseClient();
   const { isDark, toggleDarkMode } = UseDarkMode();
   
   const [probeLeaders, setProbeLeaders] = useState<LeaderboardEntry[]>([]);
@@ -29,92 +27,16 @@ export default function SunspotLeaderboardPage() {
       setLoading(true);
       
       try {
-        // Fetch probe deployment leaders
-        const { data: probeData, error: probeError } = await supabase
-          .from('defensive_probes')
-          .select(`
-            user_id,
-            count,
-            profiles!inner (
-              id,
-              username,
-              full_name,
-              avatar_url
-            )
-          `)
-          .order('count', { ascending: false });
-
-        if (probeError) throw probeError;
-
-        // Aggregate probe counts by user
-        const probeMap = new Map<string, LeaderboardEntry>();
-        probeData?.forEach((entry: any) => {
-          const userId = entry.user_id;
-          const profile = entry.profiles;
-          
-          if (probeMap.has(userId)) {
-            const existing = probeMap.get(userId)!;
-            existing.count += entry.count || 0;
-          } else {
-            probeMap.set(userId, {
-              user_id: userId,
-              username: profile.username || 'Anonymous',
-              full_name: profile.full_name || 'Unknown',
-              avatar_url: profile.avatar_url,
-              count: entry.count || 0,
-            });
-          }
+        const response = await fetch("/api/gameplay/leaderboards/sunspots", {
+          cache: "no-store",
         });
+        const result = await response.json().catch(() => ({}));
+        if (!response.ok) {
+          throw new Error(result?.error || "Failed to fetch leaderboard data");
+        }
 
-        // Sort and take top 10
-        const probeLeaderboard = Array.from(probeMap.values())
-          .sort((a, b) => b.count - a.count)
-          .slice(0, 10);
-
-        setProbeLeaders(probeLeaderboard);
-
-        // Fetch classification leaders
-        const { data: classData, error: classError } = await supabase
-          .from('classifications')
-          .select(`
-            author,
-            profiles!inner (
-              id,
-              username,
-              full_name,
-              avatar_url
-            )
-          `)
-          .eq('classificationtype', 'sunspot');
-
-        if (classError) throw classError;
-
-        // Aggregate classification counts by user
-        const classMap = new Map<string, LeaderboardEntry>();
-        classData?.forEach((entry: any) => {
-          const userId = entry.author;
-          const profile = entry.profiles;
-          
-          if (classMap.has(userId)) {
-            const existing = classMap.get(userId)!;
-            existing.count += 1;
-          } else {
-            classMap.set(userId, {
-              user_id: userId,
-              username: profile.username || 'Anonymous',
-              full_name: profile.full_name || 'Unknown',
-              avatar_url: profile.avatar_url,
-              count: 1,
-            });
-          }
-        });
-
-        // Sort and take top 10
-        const classLeaderboard = Array.from(classMap.values())
-          .sort((a, b) => b.count - a.count)
-          .slice(0, 10);
-
-        setClassificationLeaders(classLeaderboard);
+        setProbeLeaders(Array.isArray(result?.probeLeaders) ? result.probeLeaders : []);
+        setClassificationLeaders(Array.isArray(result?.classificationLeaders) ? result.classificationLeaders : []);
 
       } catch (error) {
         console.error('Error fetching leaderboards:', error);
@@ -124,7 +46,7 @@ export default function SunspotLeaderboardPage() {
     }
 
     fetchLeaderboards();
-  }, [supabase]);
+  }, []);
 
   const getAvatarUrl = (entry: LeaderboardEntry) => {
     if (entry.avatar_url) {

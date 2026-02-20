@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 
-import { getRouteSupabaseWithUser } from "@/lib/server/supabaseRoute";
+import { prisma } from "@/lib/server/prisma";
+import { getRouteUser } from "@/lib/server/supabaseRoute";
 
 export const dynamic = "force-dynamic";
 
@@ -10,7 +11,7 @@ type UnlockBody = {
 };
 
 export async function POST(request: NextRequest) {
-  const { supabase, user, authError } = await getRouteSupabaseWithUser();
+  const { user, authError } = await getRouteUser();
   if (authError || !user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
@@ -21,31 +22,23 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Invalid skillId" }, { status: 400 });
   }
 
-  const { data: existing, error: existingError } = await supabase
-    .from("user_skills")
-    .select("id")
-    .eq("user_id", user.id)
-    .eq("skill_id", skillId)
-    .limit(1)
-    .maybeSingle();
-
-  if (existingError) {
-    return NextResponse.json({ error: existingError.message }, { status: 500 });
-  }
+  const existingRows = await prisma.$queryRaw<Array<{ id: number }>>`
+    SELECT id
+    FROM user_skills
+    WHERE user_id = ${user.id}
+      AND skill_id = ${skillId}
+    LIMIT 1
+  `;
+  const existing = existingRows[0];
 
   if (existing?.id) {
     return NextResponse.json({ success: true, alreadyUnlocked: true });
   }
 
-  const { error } = await supabase.from("user_skills").insert({
-    user_id: user.id,
-    skill_id: skillId,
-    unlocked_at: new Date().toISOString(),
-  });
-
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
-  }
+  await prisma.$executeRaw`
+    INSERT INTO user_skills (user_id, skill_id, unlocked_at)
+    VALUES (${user.id}, ${skillId}, ${new Date().toISOString()})
+  `;
 
   revalidatePath("/game");
   revalidatePath("/activity/deploy");

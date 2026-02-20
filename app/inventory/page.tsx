@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import MainHeader from "@/src/components/layout/Header/MainHeader";
 import UseDarkMode from "@/src/shared/hooks/useDarkMode";
 import { usePageData } from "@/hooks/usePageData";
-import { useSession, useSupabaseClient } from "@/src/lib/auth/session-context";
+import { useSession } from "@/src/lib/auth/session-context";
 import { useRouter } from "next/navigation";
 import ActivityHeaderSection from "@/src/components/social/activity/ActivityHeaderSection";
 import { Button } from "@/src/components/ui/button";
@@ -13,7 +13,6 @@ import ToolCard from "@/src/components/deployment/missions/structures/tool-card"
 import { RoverIcon, SatelliteIcon, TelescopeComplexIcon } from "@/src/components/deployment/missions/structures/tool-icons";
 import { Card } from "@/src/components/ui/card";
 import { MineralExtraction } from "@/src/components/deployment/extraction/mineral-extraction";
-import { fetchUserUpgrades } from "@/src/utils/userUpgrades";
 
 type MineralConfiguration = {
   type: string;
@@ -34,7 +33,6 @@ interface MineralDeposit {
 }
 
 export default function UserInventoryPage() {
-  const supabase = useSupabaseClient();
   const session = useSession();
 
   const router = useRouter();
@@ -56,27 +54,14 @@ export default function UserInventoryPage() {
 
   useEffect(() => {
     let mounted = true;
-
-    const checkSession = async () => {
-      try {
-        const { data } = await supabase.auth.getSession();
-        if (!mounted) return;
-
-        const currentSession = data?.session ?? session;
-        if (!currentSession) {
-          router.push("/auth");
-        }
-      } catch (err) {
-        if (!session) router.push("/auth");
-      }
-    };
-
-    checkSession();
+    if (!session && mounted) {
+      router.push("/auth");
+    }
 
     return () => {
       mounted = false;
     };
-  }, [session, supabase, router]);
+  }, [session, router]);
 
   const {
     linkedAnomalies,
@@ -90,49 +75,40 @@ export default function UserInventoryPage() {
     loading,
   } = usePageData();
 
-  // Fetch user's mineral deposits from Supabase
+  // Fetch user's upgrades and mineral deposits via server APIs (SSR boundary)
   useEffect(() => {
     const fetchUserData = async () => {
       if (!session?.user?.id) return;
 
-      // Fetch upgrades using utility function
-      const upgrades = await fetchUserUpgrades(supabase, session.user.id);
-      
-      setTelescopeUpgrade(upgrades.telescopeUpgrade);
-      setSatelliteCount(upgrades.satelliteCount);
-      setFindMinerals(upgrades.findMinerals);
-      setRoverLevel(upgrades.roverLevel);
+      const [summaryRes, depositsRes] = await Promise.all([
+        fetch("/api/gameplay/research/summary", { cache: "no-store" }),
+        fetch("/api/gameplay/mineral-deposits", { cache: "no-store" }),
+      ]);
+      const summary = await summaryRes.json().catch(() => ({}));
+      const depositsPayload = await depositsRes.json().catch(() => ({}));
 
-      // Fetch extraction research status
-      const { data: researched } = await supabase
-        .from("researched")
-        .select("tech_type")
-        .eq("user_id", session.user.id);
+      if (!summaryRes.ok) {
+        console.error("Failed to fetch research summary", summary?.error);
+        return;
+      }
 
-      const roverExtraction = researched?.some(r => r.tech_type === "roverExtraction") || false;
-      const satelliteExtraction = researched?.some(r => r.tech_type === "satelliteExtraction") || false;
-      
-      setHasRoverExtraction(roverExtraction);
-      setHasSatelliteExtraction(satelliteExtraction);
+      const upgrades = summary?.upgrades || {};
+      setTelescopeUpgrade(Number(upgrades?.telescopeReceptors || 1) > 1);
+      setSatelliteCount(Number(upgrades?.satelliteCount || 1));
+      setFindMinerals(Boolean(upgrades?.findMineralsUnlocked));
+      setRoverLevel(Number(upgrades?.roverWaypoints || 4) > 4 ? 2 : 1);
+      setHasRoverExtraction(Boolean(upgrades?.roverExtractionUnlocked));
+      setHasSatelliteExtraction(Boolean(upgrades?.satelliteExtractionUnlocked));
 
       // If the user can find minerals, fetch deposits
-      if (upgrades.findMinerals) {
+      if (Boolean(upgrades?.findMineralsUnlocked)) {
         setDepositLoading(true);
         try {
-          // The mineralDeposits table doesn't include a `quantity` column in the DB
-          // so only select actual columns. Provide a fallback quantity when mapping.
-          const { data: deposits, error: depErr } = await supabase
-            .from("mineralDeposits")
-            .select(
-              "id, mineralconfiguration, location, roverName, created_at, discovery"
-            )
-            .not("location", "is", null)
-            .eq("owner", session.user.id);
-
-          if (depErr) {
-            console.error("Error fetching mineral deposits:", depErr);
+          const deposits = Array.isArray(depositsPayload?.deposits) ? depositsPayload.deposits : [];
+          if (!depositsRes.ok) {
+            console.error("Error fetching mineral deposits:", depositsPayload?.error);
             setMineralDeposits([]);
-          } else if (deposits) {
+          } else {
             // Filter out deposits with quantity <= 0
             const validDeposits = (deposits as any[])
               .filter((row) => {
@@ -169,7 +145,7 @@ export default function UserInventoryPage() {
     };
 
     fetchUserData();
-  }, [session, supabase]);
+  }, [session]);
 
   return (
     <div
