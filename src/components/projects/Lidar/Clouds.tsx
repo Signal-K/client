@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useSupabaseClient, useSession } from "@/src/lib/auth/session-context";
 import { useActivePlanet } from "@/src/core/context/ActivePlanet";
 import { CloudspottingOnMarsTutorial } from "./cloudspottingOnMars"; 
-import ImageAnnotator from "../(classifications)/Annotating/Annotator";
+import ImageAnnotator from "../(classifications)/Annotating/AnnotatorView";
 
 type Anomaly = {
   id: string;

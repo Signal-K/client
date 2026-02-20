@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { useSession, useSupabaseClient } from '@/src/lib/auth/session-context';
 import { useActivePlanet } from '@/src/core/context/ActivePlanet'; 
-import ImageAnnotator from '../(classifications)/Annotating/Annotator';
+import ImageAnnotator from '../(classifications)/Annotating/AnnotatorView';
 // import PreferredTerrestrialClassifications from '@/src/components/deployment/missions/structures/PickPlanet';
 import { Button } from "@/src/components/ui/button";
 import { useRouter } from 'next/navigation';

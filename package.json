@@ -20,6 +20,8 @@
     "start": "next start",
     "lint": "next lint",
     "knip": "knip",
+    "lock:check": "node scripts/check-lockfile-sync.cjs",
+    "bundle:check": "node scripts/check-bundle-budget.cjs",
     "notify:discoveries": "node scripts/notify-unclassified-discoveries.js",
     "test": "vitest",
     "test:unit": "vitest run",

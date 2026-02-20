@@ -92,5 +92,4 @@ export {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuGroup,
-  DropdownMenuPortal,
 };

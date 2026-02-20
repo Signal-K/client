@@ -46,7 +46,7 @@ const setCachedData = (data: any) => {
   }
 };
 
-export interface CommentVote {
+interface CommentVote {
   type: "comment" | "vote";
   created_at: string;
   content?: string;
@@ -54,7 +54,7 @@ export interface CommentVote {
   classification_id: number;
 }
 
-export interface Classification {
+interface Classification {
   id: number;
   classificationtype: string | null;
   content: string | null;
@@ -68,7 +68,7 @@ export interface Classification {
   };
 }
 
-export interface LinkedAnomaly {
+interface LinkedAnomaly {
   id: number;
   anomaly_id: number;
   date: string;

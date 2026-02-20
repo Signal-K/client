@@ -31,7 +31,7 @@ export interface Skill {
   requirements?: SkillRequirement[]
 };
 
-export interface SkillRequirement {
+interface SkillRequirement {
   type: "classification" | "achievement" | "level"
   classificationtype?: string
   count: number

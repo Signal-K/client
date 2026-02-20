@@ -8,7 +8,7 @@ import { Card } from "@/src/components/ui/card";
 import Section from "@/src/components/sections/Section"
 import ToolCard from "@/src/components/deployment/missions/structures/tool-card"
 import { RoverIcon, SatelliteIcon, TelescopeComplexIcon } from "@/src/components/deployment/missions/structures/tool-icons"
-import { MineralExtraction, type MineralConfiguration } from "@/src/components/deployment/extraction/mineral-extraction";
+import { MineralExtraction } from "@/src/components/deployment/extraction/mineral-extraction";
 import { Package, Wrench, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { fetchUserUpgrades } from "@/src/utils/userUpgrades";
@@ -119,7 +119,11 @@ export default function InventoryViewport() {
               (row) =>
                 ({
                   id: row.id,
-                  mineral: row.mineralconfiguration,
+                  mineral: {
+                    type: row.mineralconfiguration?.type ?? "unknown",
+                    purity: Number(row.mineralconfiguration?.purity ?? 0),
+                    ...row.mineralconfiguration,
+                  },
                   location: row.location,
                   roverName: row.roverName,
                   projectType: (row.mineralconfiguration as any)?.metadata?.source,
@@ -320,3 +324,11 @@ export default function InventoryViewport() {
     </Section>
   );
 }
+type MineralConfiguration = {
+  type: string;
+  amount?: number;
+  quantity?: number;
+  purity: number;
+  metadata?: Record<string, any>;
+  [key: string]: any;
+};

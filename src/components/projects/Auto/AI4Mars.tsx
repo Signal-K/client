@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useSession, useSupabaseClient } from "@/src/lib/auth/session-context";
 import { useActivePlanet } from "@/src/core/context/ActivePlanet";
 import ClassificationForm from "../(classifications)/PostForm";
-import ImageAnnotator from "../(classifications)/Annotating/Annotator";
+import ImageAnnotator from "../(classifications)/Annotating/AnnotatorView";
 import { Button } from "@/src/components/ui/button";
 import Link from "next/link";
 import TutorialContentBlock, { createTutorialSlides } from "../TutorialContentBlock";

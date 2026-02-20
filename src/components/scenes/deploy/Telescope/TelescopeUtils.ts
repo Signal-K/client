@@ -12,7 +12,7 @@ export interface DatabaseAnomaly {
   anomalySet: string | null
 }
 
-export type LocalAnomaly = Anomaly & { dbData: DatabaseAnomaly }
+type LocalAnomaly = Anomaly & { dbData: DatabaseAnomaly }
 
 export function seededRandom1(seed: number, salt: number = 0) {
   let x = Math.sin(seed + salt) * 10000

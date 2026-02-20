@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useSupabaseClient, useSession } from "@/src/lib/auth/session-context";
-import ImageAnnotator from "../(classifications)/Annotating/Annotator";
+import ImageAnnotator from "../(classifications)/Annotating/AnnotatorView";
 
 type Anomaly = {
   id: string;

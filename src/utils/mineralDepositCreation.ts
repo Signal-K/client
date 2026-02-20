@@ -3,7 +3,7 @@ import { SupabaseClient } from "@supabase/supabase-js";
 /**
  * Mineral deposit types and their configurations
  */
-export type MineralType = 
+type MineralType = 
   | "water-ice" 
   | "co2-ice" 
   | "metallic-hydrogen" 
@@ -33,7 +33,7 @@ interface CreateMineralDepositParams {
 /**
  * Check if user has unlocked mineral discovery research
  */
-export async function hasMineralResearch(
+async function hasMineralResearch(
   supabase: SupabaseClient, 
   userId: string
 ): Promise<boolean> {
@@ -62,7 +62,7 @@ export async function hasMineralResearch(
  * Check if planet (anomaly) has valid stats for mineral discovery
  * For cloud/atmospheric classifications, this checks the parent planet's stats
  */
-export async function isPlanetCompatible(
+async function isPlanetCompatible(
   supabase: SupabaseClient,
   userId: string,
   anomalyId: number,
@@ -155,14 +155,14 @@ export async function isPlanetCompatible(
 /**
  * Roll for mineral deposit creation (1 in 3 chance)
  */
-export function rollForMineralDeposit(): boolean {
+function rollForMineralDeposit(): boolean {
   return Math.random() < 1 / 3;
 }
 
 /**
  * Create a mineral deposit entry in the database
  */
-export async function createMineralDeposit({
+async function createMineralDeposit({
   supabase: _supabase,
   userId,
   anomalyId,

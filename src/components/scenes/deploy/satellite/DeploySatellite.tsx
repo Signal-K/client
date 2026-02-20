@@ -774,7 +774,7 @@ export default function DeploySatelliteViewport() {
         title="Satellite Operations Introduction"
         showReplayButton
       >
-        <div className={`min-h-screen h-screen w-screen flex flex-col ${
+        <div className={`min-h-full h-full w-full flex flex-col ${
           isDark 
             ? "bg-[#10141c]" 
             : "bg-gradient-to-br from-[#8ba3d1] via-[#9bb3e0] to-[#7a94c7]"

@@ -12,11 +12,17 @@ import { ArrowRight, Wrench } from "lucide-react";
 import ToolCard from "@/src/components/deployment/missions/structures/tool-card";
 import { RoverIcon, SatelliteIcon, TelescopeComplexIcon } from "@/src/components/deployment/missions/structures/tool-icons";
 import { Card } from "@/src/components/ui/card";
-import {
-  MineralExtraction,
-  type MineralConfiguration,
-} from "@/src/components/deployment/extraction/mineral-extraction";
+import { MineralExtraction } from "@/src/components/deployment/extraction/mineral-extraction";
 import { fetchUserUpgrades } from "@/src/utils/userUpgrades";
+
+type MineralConfiguration = {
+  type: string;
+  amount?: number;
+  quantity?: number;
+  purity: number;
+  metadata?: Record<string, any>;
+  [key: string]: any;
+};
 
 interface MineralDeposit {
   id: number;
@@ -137,7 +143,11 @@ export default function UserInventoryPage() {
                 (row) =>
                   ({
                     id: row.id,
-                    mineral: row.mineralconfiguration,
+                    mineral: {
+                      type: row.mineralconfiguration?.type ?? "unknown",
+                      purity: Number(row.mineralconfiguration?.purity ?? 0),
+                      ...row.mineralconfiguration,
+                    },
                     location: row.location,
                     roverName: row.roverName,
                     projectType: (row.mineralconfiguration as any)?.metadata

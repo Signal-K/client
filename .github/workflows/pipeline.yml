@@ -56,7 +56,9 @@ jobs:
           cache: "yarn"
 
       - name: Install dependencies
-        run: yarn install --frozen-lockfile
+        run: |
+          yarn lock:check
+          yarn install --frozen-lockfile
 
       - name: Setup Supabase CLI
         uses: supabase/setup-cli@v1
@@ -147,10 +149,15 @@ jobs:
           cache: "yarn"
 
       - name: Install dependencies
-        run: yarn install --frozen-lockfile
+        run: |
+          yarn lock:check
+          yarn install --frozen-lockfile
 
       - name: Build app
         run: yarn build
+
+      - name: Check bundle budgets
+        run: yarn bundle:check
 
   deploy_preview:
     if: github.event_name == 'push' && github.ref_name != 'main'
@@ -198,7 +205,9 @@ jobs:
           node-version: "20"
           cache: "yarn"
       - name: Install dependencies
-        run: yarn install --frozen-lockfile
+        run: |
+          yarn lock:check
+          yarn install --frozen-lockfile
       - name: Send discovery notifications
         env:
           SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
@@ -225,7 +234,9 @@ jobs:
           node-version: "20"
           cache: "yarn"
       - name: Install dependencies
-        run: yarn install --frozen-lockfile
+        run: |
+          yarn lock:check
+          yarn install --frozen-lockfile
       - name: Unlock SolarHealth anomalies
         env:
           SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}

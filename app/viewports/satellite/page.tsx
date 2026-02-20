@@ -1,10 +1,16 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import dynamic from "next/dynamic";
 import GameNavbar from "@/src/components/layout/Tes";
-import { Dialog, DialogContent } from "@/src/components/ui/dialog";
-import SatellitePosition from "@/src/components/scenes/deploy/satellite/SatellitePosition";
 import { usePageData } from "@/hooks/usePageData";
+
+const SatellitePosition = dynamic(
+  () => import("@/src/components/scenes/deploy/satellite/SatellitePosition"),
+  {
+    ssr: false,
+    loading: () => <div className="p-4 text-xs text-slate-400">Loading satellite viewport...</div>,
+  }
+);
 
 type PageSatellite = {
   id: string;
@@ -19,7 +25,6 @@ type PageSatellite = {
 };
 
 export default function SatelliteViewportExpandedPage() {
-  const router = useRouter();
   const { linkedAnomalies } = usePageData();
 
   // Calculate start of week (Sunday 00:01 AEST)

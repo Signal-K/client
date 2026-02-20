@@ -44,7 +44,7 @@ interface Automaton {
     };
 };  
 
-export interface InventoryItem {
+interface InventoryItem {
     item: number;
     owner: string;
     anomaly: number;

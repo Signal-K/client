@@ -5,7 +5,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/src/components/ui/ca
 import { AvatarGenerator } from '@/src/components/profile/setup/Avatar';
 import { Button } from '@/src/components/ui/button';
 import { Share2, ThumbsUpIcon, ThumbsDownIcon, MessageCircle } from 'lucide-react';
-import html2canvas from 'html2canvas';
 import { CommentForm } from '../comments/CommentForm';
 import CommentsList from '../comments/CommentListById';
 import { useRouter } from 'next/navigation';
@@ -107,6 +106,7 @@ export function SimplePostSingle({
 
     await Promise.all(imagePromises);
 
+    const { default: html2canvas } = await import('html2canvas');
     const canvas = await html2canvas(shareCardRef.current, {
       useCORS: true,
       scrollX: 0,

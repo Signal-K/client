@@ -50,7 +50,6 @@ import {
   SelectValue,
 } from "@/src/components/ui/select"
 import { useSession } from "@/src/lib/auth/session-context"
-import html2canvas from "html2canvas"
 import { AvatarGenerator } from "@/src/components/profile/setup/Avatar"
 import { PostCardSingleProps, CommentProps } from "./PostSingle"
 import SurveyorCalculator from "./Surveyor/CalculatorSurveyor";
@@ -132,6 +131,7 @@ export default function PostCard({
     try {
       await Promise.all(loadPromises)
 
+      const { default: html2canvas } = await import("html2canvas")
       const canvas = await html2canvas(shareCardRef.current, {
         useCORS: true,
         scrollX: 0,

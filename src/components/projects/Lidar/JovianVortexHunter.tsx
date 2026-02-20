@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react"; 
 import { useSession, useSupabaseClient } from "@/src/lib/auth/session-context";
-import ImageAnnotator from "../(classifications)/Annotating/Annotator";
+import ImageAnnotator from "../(classifications)/Annotating/AnnotatorView";
 import { Button } from "@/src/components/ui/button";
 import TutorialContentBlock, { createTutorialSlides } from "../TutorialContentBlock";
 

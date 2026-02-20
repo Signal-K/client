@@ -2,8 +2,6 @@
 
 import React, { useState, CSSProperties } from "react";
 // import { Header } from "@/app/components/sections/header";
-import backgroundImage from "@/public/assets/Backdrops/Negotiations.jpg";
-import Header from "@/src/components/ui/Header";
 
 interface PlanetViewLayoutProps {
   children: React.ReactNode[];

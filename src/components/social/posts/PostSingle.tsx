@@ -9,7 +9,6 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/src/comp
 import { Textarea } from "@/src/components/ui/textarea";
 import { ThumbsUp, MessageSquare, Share2 } from "lucide-react";
 import { useSession, useSupabaseClient } from "@/src/lib/auth/session-context";
-import html2canvas from "html2canvas";
 import { CommentCard } from "../comments/CommentSingle";
 import { SurveyorComments } from "./Surveyor/SurveyorPostCard";
 
@@ -171,6 +170,7 @@ export function PostCardSingle({
 
     try {
       await Promise.all(imagePromises);
+      const { default: html2canvas } = await import("html2canvas");
       const canvas = await html2canvas(shareCardRef.current, {
         useCORS: true,
         scrollX: 0,

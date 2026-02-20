@@ -353,9 +353,7 @@ export default function RoverViewportSection() {
 
     // Deploy handler
     const handleDeployRover = async () => {
-        if (typeof window !== "undefined") {
-            window.location.href="/activity/deploy/roover/";
-        }
+        router.push("/activity/deploy/roover/");
     };
 
     // Return home handler - removes routes and linked_anomalies for this user's rover

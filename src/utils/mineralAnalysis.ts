@@ -1,8 +1,8 @@
 import { AI4MCategory } from "@/types/Annotation";
 
-export type MineralType = 'iron-ore' | 'cultivable-soil' | 'gold' | 'aluminum' | 'water-ice' | 'silicate' | 'copper';
+type MineralType = 'iron-ore' | 'cultivable-soil' | 'gold' | 'aluminum' | 'water-ice' | 'silicate' | 'copper';
 
-export interface MineralConfiguration {
+interface MineralConfiguration {
   mineralType: MineralType;
   purity: number;
   estimatedQuantity: 'trace' | 'small' | 'moderate' | 'large' | 'abundant';

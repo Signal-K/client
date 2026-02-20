@@ -1,13 +1,21 @@
 'use client'
 
 import { useRouter } from "next/navigation";
+import dynamic from "next/dynamic";
 import Home from "@/app/page";
 import GameNavbar from "@/src/components/layout/Tes";
 import { Dialog, DialogContent } from "@/src/components/ui/dialog";
 import { useSession, useSupabaseClient } from "@/src/lib/auth/session-context";
-import TelescopeViewport from "@/src/components/classification/telescope/telescope-viewport";
 import { useState, useEffect } from "react";
 import Landing from "@/app/apt/page";
+
+const TelescopeViewport = dynamic(
+  () => import("@/src/components/classification/telescope/telescope-viewport"),
+  {
+    ssr: false,
+    loading: () => <div className="p-4 text-xs text-slate-400">Loading telescope viewport...</div>,
+  }
+);
 
 export default function TelescopeOnEarthPage() {
   const router = useRouter();

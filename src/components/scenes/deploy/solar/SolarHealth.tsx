@@ -8,6 +8,7 @@ import { Suspense } from "react";
 import { OrbitControls, Stars } from "@react-three/drei";
 import Section from "@/src/components/sections/Section";
 import { Sun } from "@/src/components/discovery/data-sources/Solar/Sun";
+import { useRouter } from "next/navigation";
 
 function Sun3D({ sunspots }: { sunspots: number }) {
   return (
@@ -25,6 +26,7 @@ function getWeekStart(date: Date) {
 }
 
 export default function SolarHealth() {
+  const router = useRouter();
   const supabase = useSupabaseClient();
   const session = useSession();
 
@@ -139,6 +141,7 @@ export default function SolarHealth() {
         backgroundType="inner-solar"
         infoText={"Investigate star activity to detect solar flares and measure the intensity of sunspots"}
         expandLink={"/viewports/solar"}
+        className="h-full"
       >
       <div className="relative w-full h-64 md:h-96 flex items-center justify-center py-8 md:py-12">
         {loading ? (
@@ -246,9 +249,7 @@ export default function SolarHealth() {
             <Button
               className="mt-3 w-36 text-xs"
               variant="outline"
-              onClick={() =>
-                (typeof window !== "undefined" && (window.location.href = `/structures/telescope/sunspot/db-${anomalyId}/count`))
-              }
+              onClick={() => router.push(`/structures/telescope/sunspot/db-${anomalyId}/count`)}
             >
               Count Solar Anomalies
             </Button>

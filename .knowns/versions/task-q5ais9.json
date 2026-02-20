@@ -1,0 +1,118 @@
+{
+  "taskId": "q5ais9",
+  "currentVersion": 2,
+  "versions": [
+    {
+      "id": "v1",
+      "taskId": "q5ais9",
+      "version": 1,
+      "timestamp": "2026-02-19T08:21:53.254Z",
+      "changes": [
+        {
+          "field": "status",
+          "oldValue": "todo",
+          "newValue": "in-progress"
+        }
+      ],
+      "snapshot": {
+        "title": "Migrate social mutation paths to API routes",
+        "description": "Move votes/comments writes from client-side Supabase calls to authenticated API routes and keep UI behavior unchanged.",
+        "status": "in-progress",
+        "priority": "medium",
+        "labels": [
+          "performance",
+          "api",
+          "refactor"
+        ],
+        "acceptanceCriteria": [
+          {
+            "completed": false,
+            "text": "Primary post vote flow uses API route"
+          },
+          {
+            "completed": false,
+            "text": "Primary comment submit flow uses API route"
+          },
+          {
+            "completed": false,
+            "text": "Typecheck passes"
+          }
+        ]
+      }
+    },
+    {
+      "id": "v2",
+      "taskId": "q5ais9",
+      "version": 2,
+      "timestamp": "2026-02-19T08:23:22.937Z",
+      "changes": [
+        {
+          "field": "status",
+          "oldValue": "in-progress",
+          "newValue": "done"
+        },
+        {
+          "field": "acceptanceCriteria",
+          "oldValue": [
+            {
+              "completed": false,
+              "text": "Primary post vote flow uses API route"
+            },
+            {
+              "completed": false,
+              "text": "Primary comment submit flow uses API route"
+            },
+            {
+              "completed": false,
+              "text": "Typecheck passes"
+            }
+          ],
+          "newValue": [
+            {
+              "completed": true,
+              "text": "Typecheck passes"
+            },
+            {
+              "text": "Primary post vote flow uses server action write path (cookie-authenticated)",
+              "completed": false
+            },
+            {
+              "text": "Primary comment submit flow uses server action write path (cookie-authenticated)",
+              "completed": false
+            }
+          ]
+        },
+        {
+          "field": "implementationNotes",
+          "newValue": "Architecture updated per directive: Next.js-only social writes moved to server actions instead of API writes. Added API read endpoint for vote totals/user vote."
+        }
+      ],
+      "snapshot": {
+        "title": "Migrate social mutation paths to API routes",
+        "description": "Move votes/comments writes from client-side Supabase calls to authenticated API routes and keep UI behavior unchanged.",
+        "status": "done",
+        "priority": "medium",
+        "labels": [
+          "performance",
+          "api",
+          "refactor"
+        ],
+        "acceptanceCriteria": [
+          {
+            "completed": true,
+            "text": "Typecheck passes"
+          },
+          {
+            "text": "Primary post vote flow uses server action write path (cookie-authenticated)",
+            "completed": false
+          },
+          {
+            "text": "Primary comment submit flow uses server action write path (cookie-authenticated)",
+            "completed": false
+          }
+        ],
+        "implementationNotes": "Architecture updated per directive: Next.js-only social writes moved to server actions instead of API writes. Added API read endpoint for vote totals/user vote."
+      }
+    }
+  ]
+}

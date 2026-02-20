@@ -83,7 +83,7 @@ interface ResearchedRow {
 /**
  * The exposed API when a parent holds a ref to <TotalPoints ref={...} />
  */
-export interface TotalPointsHandle {
+interface TotalPointsHandle {
   refreshPoints: () => Promise<void>;
   planetHuntersPoints: number;
   dailyMinorPlanetPoints: number;

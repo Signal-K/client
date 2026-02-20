@@ -456,7 +456,4 @@ export const SCIENTIFIC_CONTEXTS = {
   'lidar-jovianVortexHunter': 'Jupiter\'s storms can last centuries! Understanding their dynamics helps us understand atmospheric physics on gas giants throughout the universe.',
 };
 
-// Export the TutorialSlide type for use in other components
-export type { TutorialSlide };
-
 // useTutorial hook removed (deleted per cleanup request)

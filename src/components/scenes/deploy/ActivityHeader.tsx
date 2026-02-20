@@ -9,6 +9,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/src/components/ui/dialog";
+import { Wrench } from "lucide-react";
 import Link from "next/link";
 import TelescopeIcon from "@/src/components/icons/TelescopeIcon";
 import SatelliteIcon from "@/src/components/icons/SatelliteIcon";
@@ -17,7 +18,6 @@ import StardustBalance from "@/src/components/stardust/StardustBalance";
 import PlanetSelectorModal from "@/src/components/modals/PlanetSelectorModal";
 import useDeploymentStatus from "@/src/hooks/useDeploymentStatus";
 import { AvatarGenerator } from "@/src/components/profile/setup/Avatar";
-import SpannerIcon from "@/src/components/icons/SpannerIcon";
 import { hasUpgrade } from "@/src/utils/userUpgrades";
 
 export default function ActivityHeader({
@@ -230,7 +230,7 @@ export default function ActivityHeader({
                   className="group flex items-center gap-2 rounded-full border border-amber-400/40 bg-amber-200/20 px-2.5 py-1.5 text-xs font-medium text-amber-900 shadow-sm transition-all hover:border-amber-400/60 hover:bg-amber-200/30 hover:-translate-y-0.5 dark:border-amber-300/30 dark:bg-amber-300/10 dark:text-amber-100"
                 >
                   <div className="relative flex h-8 w-8 items-center justify-center rounded-full bg-amber-300/50 text-amber-900 transition-colors group-hover:bg-amber-300/70 dark:bg-amber-900/40 dark:group-hover:bg-amber-900/60">
-                    <SpannerIcon />
+                    <Wrench className="h-6 w-6" strokeWidth={1.5} />
                     <span className="absolute -top-1 -right-1 flex h-4 min-w-[1rem] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white">
                       {availableUpgrades}
                     </span>

@@ -70,9 +70,6 @@ certificates
 .env.local
 SUPABASE_EXPORT_SUMMARY.md
 
-# local task/session artifacts
-.knowns/
-
 # local Supabase data exports can contain secrets/tokens
 supabase_exports/
 

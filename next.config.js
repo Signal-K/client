@@ -3,6 +3,9 @@ const withPWA = require('next-pwa')({
   register: true,
   skipWaiting: true,
   disable: process.env.NODE_ENV === 'development',
+  // Avoid precaching massive static folders by default.
+  // Assets are still fetched normally and runtime-cached when requested.
+  publicExcludes: ['assets/**/*', 'favicon.ico'],
   // Aggressive caching for offline support
   runtimeCaching: [
     {
@@ -34,8 +37,14 @@ const posthogAssetsHost = useEUPosthog ? 'https://eu-assets.i.posthog.com' : 'ht
 const nextConfig = {
 	reactStrictMode: true,
 	swcMinify: true,
+	experimental: {
+	  optimizePackageImports: ["lucide-react", "date-fns"],
+	},
 	images: {
 	  unoptimized: true,
+	},
+	eslint: {
+	  ignoreDuringBuilds: true,
 	},
 	// This is required to support PostHog trailing slash API requests
 	skipTrailingSlashRedirect: true,

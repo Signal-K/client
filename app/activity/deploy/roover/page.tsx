@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { RoverBackground } from "@/src/components/classification/telescope/rover-background";
 import MainHeader from "@/src/components/layout/Header/MainHeader";
 import UseDarkMode from "@/src/shared/hooks/useDarkMode";
@@ -11,6 +12,7 @@ import { useAuthUser } from "@/src/hooks/useAuthUser";
 const PLANETS = ["Mars"];
 
 export default function DeployRoverPage() {
+  const router = useRouter();
   const [selectedPlanet, setSelectedPlanet] = useState("Mars");
   const [waypoints, setWaypoints] = useState<{ x: number; y: number }[]>([]);
   const mapRef = useRef<HTMLDivElement>(null);
@@ -51,12 +53,12 @@ export default function DeployRoverPage() {
       setMaxWaypoints(payload?.maxWaypoints ?? 4);
 
       if (payload?.hasExistingRoverDeployment) {
-        window.location.href = "/game?view=rover";
+        router.replace("/game?view=rover");
       }
     }
 
     loadRoverSetup();
-  }, [user]);
+  }, [user, router]);
 
   const {
     linkedAnomalies,
@@ -109,7 +111,7 @@ export default function DeployRoverPage() {
 
     setDeployMessage("Rover deployed successfully!");
     setTimeout(() => {
-      window.location.href = "/game?view=rover";
+      router.push("/game?view=rover");
     }, 2000);
   };
 

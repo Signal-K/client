@@ -89,7 +89,7 @@ export default function TutorialWrapper({
   // Show loading state while checking preferences
   if (!hasChecked || isLoading) {
     return (
-      <div className="relative">
+      <div className="relative h-full w-full">
         {children}
       </div>
     );
@@ -106,7 +106,7 @@ export default function TutorialWrapper({
           onSkip={handleSkip}
         />
         {/* Still render children behind the overlay so users see the context */}
-        <div>
+        <div className="relative h-full w-full">
           {children}
         </div>
       </>
@@ -115,7 +115,7 @@ export default function TutorialWrapper({
 
   // Tutorial completed - show content with optional replay button
   return (
-    <div className="relative">
+    <div className="relative h-full w-full">
       {showReplayButton && (
         <ReplayButton
           position={replayButtonPosition}
@@ -167,7 +167,7 @@ function ReplayButton({ position, onReplay, title }: ReplayButtonProps) {
 // Pre-built tutorial step sets for common scenarios
 // These tutorials guide users through actual interactions with the interface
 
-export const TELESCOPE_INTRO_STEPS: TutorialStep[] = [
+const TELESCOPE_INTRO_STEPS: TutorialStep[] = [
   {
     id: "telescope-welcome",
     title: "Welcome to Your Telescope! 🔭",
@@ -203,7 +203,7 @@ export const TELESCOPE_INTRO_STEPS: TutorialStep[] = [
   },
 ];
 
-export const TELESCOPE_DEPLOY_STEPS: TutorialStep[] = [
+const TELESCOPE_DEPLOY_STEPS: TutorialStep[] = [
   {
     id: "deploy-intro",
     title: "Choose Your Observation",
@@ -294,7 +294,7 @@ export const ROVER_INTRO_STEPS: TutorialStep[] = [
   },
 ];
 
-export const SOLAR_INTRO_STEPS: TutorialStep[] = [
+const SOLAR_INTRO_STEPS: TutorialStep[] = [
   {
     id: "solar-welcome",
     title: "Solar Observatory ☀️",

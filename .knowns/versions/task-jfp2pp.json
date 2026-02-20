@@ -1,0 +1,118 @@
+{
+  "taskId": "jfp2pp",
+  "currentVersion": 2,
+  "versions": [
+    {
+      "id": "v1",
+      "taskId": "jfp2pp",
+      "version": 1,
+      "timestamp": "2026-02-19T08:17:22.775Z",
+      "changes": [
+        {
+          "field": "status",
+          "oldValue": "todo",
+          "newValue": "in-progress"
+        }
+      ],
+      "snapshot": {
+        "title": "Architecture migration: API routes for standalone game/experiment mechanics",
+        "description": "Move standalone game/experiment mechanic read-write flows to authenticated API routes backed by Supabase.",
+        "status": "in-progress",
+        "priority": "high",
+        "labels": [
+          "architecture",
+          "api",
+          "performance"
+        ],
+        "acceptanceCriteria": [
+          {
+            "completed": false,
+            "text": "Core classification experiment write paths use API routes"
+          },
+          {
+            "completed": false,
+            "text": "Research mechanic read/write paths use API routes"
+          },
+          {
+            "completed": false,
+            "text": "Revalidation hooks added where writes mutate cached data"
+          }
+        ]
+      }
+    },
+    {
+      "id": "v2",
+      "taskId": "jfp2pp",
+      "version": 2,
+      "timestamp": "2026-02-19T08:17:30.760Z",
+      "changes": [
+        {
+          "field": "status",
+          "oldValue": "in-progress",
+          "newValue": "done"
+        },
+        {
+          "field": "acceptanceCriteria",
+          "oldValue": [
+            {
+              "completed": false,
+              "text": "Core classification experiment write paths use API routes"
+            },
+            {
+              "completed": false,
+              "text": "Research mechanic read/write paths use API routes"
+            },
+            {
+              "completed": false,
+              "text": "Revalidation hooks added where writes mutate cached data"
+            }
+          ],
+          "newValue": [
+            {
+              "completed": true,
+              "text": "Core classification experiment write paths use API routes"
+            },
+            {
+              "completed": true,
+              "text": "Research mechanic read/write paths use API routes"
+            },
+            {
+              "completed": true,
+              "text": "Revalidation hooks added where writes mutate cached data"
+            }
+          ]
+        },
+        {
+          "field": "implementationNotes",
+          "newValue": "Added API routes for gameplay/research/summary, gameplay/research/unlock, gameplay/classifications, gameplay/telescope/viewport. Migrated core telescope classification writes and research writes to API. Added revalidatePath calls on write routes."
+        }
+      ],
+      "snapshot": {
+        "title": "Architecture migration: API routes for standalone game/experiment mechanics",
+        "description": "Move standalone game/experiment mechanic read-write flows to authenticated API routes backed by Supabase.",
+        "status": "done",
+        "priority": "high",
+        "labels": [
+          "architecture",
+          "api",
+          "performance"
+        ],
+        "acceptanceCriteria": [
+          {
+            "completed": true,
+            "text": "Core classification experiment write paths use API routes"
+          },
+          {
+            "completed": true,
+            "text": "Research mechanic read/write paths use API routes"
+          },
+          {
+            "completed": true,
+            "text": "Revalidation hooks added where writes mutate cached data"
+          }
+        ],
+        "implementationNotes": "Added API routes for gameplay/research/summary, gameplay/research/unlock, gameplay/classifications, gameplay/telescope/viewport. Migrated core telescope classification writes and research writes to API. Added revalidatePath calls on write routes."
+      }
+    }
+  ]
+}

@@ -89,7 +89,7 @@ export function calculateProgressPercentage(current: number, threshold: number):
  * Default threshold for solar defense
  * Can be overridden in components
  */
-export const DEFAULT_DEFENSE_THRESHOLD = 100;
+const DEFAULT_DEFENSE_THRESHOLD = 100;
 
 /**
  * Minimum classifications required to launch probes

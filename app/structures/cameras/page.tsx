@@ -1,13 +1,21 @@
 'use client';
 
 import React, { act, useEffect, useState } from "react";
+import dynamic from "next/dynamic";
 import Home from "@/app/page";
 import { useSession } from "@/src/lib/auth/session-context";
 import { useRouter } from "next/navigation";
 import { BuildingIcon, CloudCogIcon, MicroscopeIcon } from "lucide-react";
-import ChatGPTImageClassifier from "@/src/components/classification/tools/image-classifier";
 import GameNavbar from "@/src/components/layout/Tes";
 import { Dialog, DialogContent } from "@/src/components/ui/dialog";
+
+const ChatGPTImageClassifier = dynamic(
+  () => import("@/src/components/classification/tools/image-classifier"),
+  {
+    ssr: false,
+    loading: () => <div className="p-4 text-xs text-slate-500">Loading classifier...</div>,
+  }
+);
 
 export default function CameraAggregatesPage() {
     const session = useSession();

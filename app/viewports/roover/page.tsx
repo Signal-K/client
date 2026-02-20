@@ -1,13 +1,17 @@
 "use client"
 
-import { useRouter } from "next/navigation"
+import dynamic from "next/dynamic"
 import GameNavbar from "@/src/components/layout/Tes"
-import { Dialog, DialogContent } from "@/src/components/ui/dialog"
-import RoverViewportSection from "@/src/components/scenes/deploy/Rover/RoverSection"
+
+const RoverViewportSection = dynamic(
+  () => import("@/src/components/scenes/deploy/Rover/RoverSection"),
+  {
+    ssr: false,
+    loading: () => <div className="p-4 text-xs text-slate-400">Loading rover viewport...</div>,
+  }
+);
 
 export default function RoverViewportExpandedPage() {
-    const router = useRouter();
-
     return (
         <div className="h-screen w-full flex flex-col overflow-hidden">
             <div className="w-full z-50 flex-shrink-0">

@@ -12,7 +12,7 @@ export type ProjectType =
   | "solar-monitoring";   // Sunspot classification
 
 // Structure types
-export type StructureType = "telescope" | "satellite" | "rover" | "solar";
+type StructureType = "telescope" | "satellite" | "rover" | "solar";
 
 // Telescope focus types
 export type TelescopeFocusType = "stellar" | "planetary";
@@ -49,11 +49,11 @@ export type TutorialId =
   | "stardust-guide";        // What is stardust
 
 // Track which tutorials have been completed
-export interface TutorialCompletion {
+interface TutorialCompletion {
   [key: string]: boolean;
 }
 
-export interface UserPreferences {
+interface UserPreferences {
   // Project interests (what the user wants to focus on)
   projectInterests: ProjectType[];
   

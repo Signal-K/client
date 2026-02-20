@@ -23,7 +23,7 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
 })
 
 // Server-side Supabase client with service role (for use in API routes)
-export const supabaseAdmin = supabaseServiceRoleKey 
+const supabaseAdmin = supabaseServiceRoleKey 
   ? createClient(supabaseUrl, supabaseServiceRoleKey, {
       auth: {
         autoRefreshToken: false,
@@ -33,7 +33,7 @@ export const supabaseAdmin = supabaseServiceRoleKey
   : null
 
 // Type definitions for your database tables
-export interface Database {
+interface Database {
   public: {
     Tables: {
       profiles: {
@@ -125,6 +125,6 @@ export interface Database {
   }
 }
 
-export type Tables<T extends keyof Database['public']['Tables']> = Database['public']['Tables'][T]['Row']
-export type TablesInsert<T extends keyof Database['public']['Tables']> = Database['public']['Tables'][T]['Insert']
-export type TablesUpdate<T extends keyof Database['public']['Tables']> = Database['public']['Tables'][T]['Update']
+type Tables<T extends keyof Database['public']['Tables']> = Database['public']['Tables'][T]['Row']
+type TablesInsert<T extends keyof Database['public']['Tables']> = Database['public']['Tables'][T]['Insert']
+type TablesUpdate<T extends keyof Database['public']['Tables']> = Database['public']['Tables'][T]['Update']

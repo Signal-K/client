@@ -65,9 +65,7 @@ export default function TelescopeViewportSection() {
 
   // Deploy handler (stub)
   const handleDeployTelescope = async () => {
-    if (typeof window !== "undefined") {
-      window.location.href = "/activity/deploy/";
-    }
+    router.push("/activity/deploy/");
   };
 
   const [state, setState] = useState<TelescopeViewportState>({
@@ -102,6 +100,7 @@ export default function TelescopeViewportSection() {
           "View your telescope and everything you've discovered so far. Deploy your telescope each week and check back to browse through objects of interest and classify them."
         }
         expandLink={"/structures/telescope"}
+        className="h-full"
       >
       <div className="relative w-full flex items-center justify-center py-8 md:py-12" style={{ minHeight: '480px' }}>
         {!hasTelescopeDeployed ? (

@@ -1,0 +1,197 @@
+{
+  "taskId": "9k164d",
+  "currentVersion": 4,
+  "versions": [
+    {
+      "id": "v1",
+      "taskId": "9k164d",
+      "version": 1,
+      "timestamp": "2026-02-19T08:17:36.507Z",
+      "changes": [
+        {
+          "field": "status",
+          "oldValue": "todo",
+          "newValue": "in-progress"
+        },
+        {
+          "field": "implementationNotes",
+          "newValue": "Added Supabase SSR server client utility via @supabase/ssr and replaced route helper to use cookie-based SSR auth. Removed useSession from migrated hooks/components: useMilestones, useAchievements, CompactResearchPanel, SkillTreeSection, SkillTreeView, TelescopeViewport."
+        }
+      ],
+      "snapshot": {
+        "title": "Architecture migration: Supabase SSR + server actions for Next.js-only flows",
+        "description": "Replace auth-helpers-react session usage in migrated Next.js app-only flows with server-side Supabase + server actions using HTTP-only cookies.",
+        "status": "in-progress",
+        "priority": "high",
+        "labels": [
+          "architecture",
+          "ssr",
+          "server-actions"
+        ],
+        "acceptanceCriteria": [
+          {
+            "completed": false,
+            "text": "Migrated flow removes @supabase/auth-helpers-react and useSession"
+          },
+          {
+            "completed": false,
+            "text": "Server actions perform writes for migrated flow"
+          },
+          {
+            "completed": false,
+            "text": "Cache revalidation implemented for migrated writes"
+          }
+        ],
+        "implementationNotes": "Added Supabase SSR server client utility via @supabase/ssr and replaced route helper to use cookie-based SSR auth. Removed useSession from migrated hooks/components: useMilestones, useAchievements, CompactResearchPanel, SkillTreeSection, SkillTreeView, TelescopeViewport."
+      }
+    },
+    {
+      "id": "v2",
+      "taskId": "9k164d",
+      "version": 2,
+      "timestamp": "2026-02-19T08:19:27.578Z",
+      "changes": [
+        {
+          "field": "implementationNotes",
+          "oldValue": "Added Supabase SSR server client utility via @supabase/ssr and replaced route helper to use cookie-based SSR auth. Removed useSession from migrated hooks/components: useMilestones, useAchievements, CompactResearchPanel, SkillTreeSection, SkillTreeView, TelescopeViewport.",
+          "newValue": "Added Supabase SSR server client utility via @supabase/ssr and replaced route helper to use cookie-based SSR auth. Removed useSession from migrated hooks/components: useMilestones, useAchievements, CompactResearchPanel, SkillTreeSection, SkillTreeView, TelescopeViewport.\n\nBlocking step added: create compatibility specsheet before further migration changes."
+        }
+      ],
+      "snapshot": {
+        "title": "Architecture migration: Supabase SSR + server actions for Next.js-only flows",
+        "description": "Replace auth-helpers-react session usage in migrated Next.js app-only flows with server-side Supabase + server actions using HTTP-only cookies.",
+        "status": "in-progress",
+        "priority": "high",
+        "labels": [
+          "architecture",
+          "ssr",
+          "server-actions"
+        ],
+        "acceptanceCriteria": [
+          {
+            "completed": false,
+            "text": "Migrated flow removes @supabase/auth-helpers-react and useSession"
+          },
+          {
+            "completed": false,
+            "text": "Server actions perform writes for migrated flow"
+          },
+          {
+            "completed": false,
+            "text": "Cache revalidation implemented for migrated writes"
+          }
+        ],
+        "implementationNotes": "Added Supabase SSR server client utility via @supabase/ssr and replaced route helper to use cookie-based SSR auth. Removed useSession from migrated hooks/components: useMilestones, useAchievements, CompactResearchPanel, SkillTreeSection, SkillTreeView, TelescopeViewport.\n\nBlocking step added: create compatibility specsheet before further migration changes."
+      }
+    },
+    {
+      "id": "v3",
+      "taskId": "9k164d",
+      "version": 3,
+      "timestamp": "2026-02-19T08:24:03.745Z",
+      "changes": [
+        {
+          "field": "implementationNotes",
+          "oldValue": "Added Supabase SSR server client utility via @supabase/ssr and replaced route helper to use cookie-based SSR auth. Removed useSession from migrated hooks/components: useMilestones, useAchievements, CompactResearchPanel, SkillTreeSection, SkillTreeView, TelescopeViewport.\n\nBlocking step added: create compatibility specsheet before further migration changes.",
+          "newValue": "Added Supabase SSR server client utility via @supabase/ssr and replaced route helper to use cookie-based SSR auth. Removed useSession from migrated hooks/components: useMilestones, useAchievements, CompactResearchPanel, SkillTreeSection, SkillTreeView, TelescopeViewport.\n\nBlocking step added: create compatibility specsheet before further migration changes.\n\nAdded specsheet: @doc/specs/migration/minigame-compatibility-matrix-and-parity-contract. Migrated primary social writes to server actions in src/components/social/actions.ts and removed useSession/useSupabaseClient from SimplePostSingle and CommentForm."
+        }
+      ],
+      "snapshot": {
+        "title": "Architecture migration: Supabase SSR + server actions for Next.js-only flows",
+        "description": "Replace auth-helpers-react session usage in migrated Next.js app-only flows with server-side Supabase + server actions using HTTP-only cookies.",
+        "status": "in-progress",
+        "priority": "high",
+        "labels": [
+          "architecture",
+          "ssr",
+          "server-actions"
+        ],
+        "acceptanceCriteria": [
+          {
+            "completed": false,
+            "text": "Migrated flow removes @supabase/auth-helpers-react and useSession"
+          },
+          {
+            "completed": false,
+            "text": "Server actions perform writes for migrated flow"
+          },
+          {
+            "completed": false,
+            "text": "Cache revalidation implemented for migrated writes"
+          }
+        ],
+        "implementationNotes": "Added Supabase SSR server client utility via @supabase/ssr and replaced route helper to use cookie-based SSR auth. Removed useSession from migrated hooks/components: useMilestones, useAchievements, CompactResearchPanel, SkillTreeSection, SkillTreeView, TelescopeViewport.\n\nBlocking step added: create compatibility specsheet before further migration changes.\n\nAdded specsheet: @doc/specs/migration/minigame-compatibility-matrix-and-parity-contract. Migrated primary social writes to server actions in src/components/social/actions.ts and removed useSession/useSupabaseClient from SimplePostSingle and CommentForm."
+      }
+    },
+    {
+      "id": "v4",
+      "taskId": "9k164d",
+      "version": 4,
+      "timestamp": "2026-02-19T08:28:15.163Z",
+      "changes": [
+        {
+          "field": "acceptanceCriteria",
+          "oldValue": [
+            {
+              "completed": false,
+              "text": "Migrated flow removes @supabase/auth-helpers-react and useSession"
+            },
+            {
+              "completed": false,
+              "text": "Server actions perform writes for migrated flow"
+            },
+            {
+              "completed": false,
+              "text": "Cache revalidation implemented for migrated writes"
+            }
+          ],
+          "newValue": [
+            {
+              "completed": true,
+              "text": "Migrated flow removes @supabase/auth-helpers-react and useSession"
+            },
+            {
+              "completed": true,
+              "text": "Server actions perform writes for migrated flow"
+            },
+            {
+              "completed": true,
+              "text": "Cache revalidation implemented for migrated writes"
+            }
+          ]
+        },
+        {
+          "field": "implementationNotes",
+          "oldValue": "Added Supabase SSR server client utility via @supabase/ssr and replaced route helper to use cookie-based SSR auth. Removed useSession from migrated hooks/components: useMilestones, useAchievements, CompactResearchPanel, SkillTreeSection, SkillTreeView, TelescopeViewport.\n\nBlocking step added: create compatibility specsheet before further migration changes.\n\nAdded specsheet: @doc/specs/migration/minigame-compatibility-matrix-and-parity-contract. Migrated primary social writes to server actions in src/components/social/actions.ts and removed useSession/useSupabaseClient from SimplePostSingle and CommentForm.",
+          "newValue": "Added Supabase SSR server client utility via @supabase/ssr and replaced route helper to use cookie-based SSR auth. Removed useSession from migrated hooks/components: useMilestones, useAchievements, CompactResearchPanel, SkillTreeSection, SkillTreeView, TelescopeViewport.\n\nBlocking step added: create compatibility specsheet before further migration changes.\n\nAdded specsheet: @doc/specs/migration/minigame-compatibility-matrix-and-parity-contract. Migrated primary social writes to server actions in src/components/social/actions.ts and removed useSession/useSupabaseClient from SimplePostSingle and CommentForm.\n\nProfile/setup batch migrated from auth-helpers to SSR/server actions: src/components/profile/setup/ProfileSetup.tsx, src/components/profile/setup/FinishProfile.tsx, src/components/profile/setup/Referrals.tsx, src/components/profile/setup/GettingStartedViewport.tsx, app/research/page.tsx. Added server actions file src/components/profile/setup/actions.ts and API routes app/api/gameplay/profile/getting-started/route.ts + app/api/gameplay/profile/referral-status/route.ts. Writes now server-side with revalidation."
+        }
+      ],
+      "snapshot": {
+        "title": "Architecture migration: Supabase SSR + server actions for Next.js-only flows",
+        "description": "Replace auth-helpers-react session usage in migrated Next.js app-only flows with server-side Supabase + server actions using HTTP-only cookies.",
+        "status": "in-progress",
+        "priority": "high",
+        "labels": [
+          "architecture",
+          "ssr",
+          "server-actions"
+        ],
+        "acceptanceCriteria": [
+          {
+            "completed": true,
+            "text": "Migrated flow removes @supabase/auth-helpers-react and useSession"
+          },
+          {
+            "completed": true,
+            "text": "Server actions perform writes for migrated flow"
+          },
+          {
+            "completed": true,
+            "text": "Cache revalidation implemented for migrated writes"
+          }
+        ],
+        "implementationNotes": "Added Supabase SSR server client utility via @supabase/ssr and replaced route helper to use cookie-based SSR auth. Removed useSession from migrated hooks/components: useMilestones, useAchievements, CompactResearchPanel, SkillTreeSection, SkillTreeView, TelescopeViewport.\n\nBlocking step added: create compatibility specsheet before further migration changes.\n\nAdded specsheet: @doc/specs/migration/minigame-compatibility-matrix-and-parity-contract. Migrated primary social writes to server actions in src/components/social/actions.ts and removed useSession/useSupabaseClient from SimplePostSingle and CommentForm.\n\nProfile/setup batch migrated from auth-helpers to SSR/server actions: src/components/profile/setup/ProfileSetup.tsx, src/components/profile/setup/FinishProfile.tsx, src/components/profile/setup/Referrals.tsx, src/components/profile/setup/GettingStartedViewport.tsx, app/research/page.tsx. Added server actions file src/components/profile/setup/actions.ts and API routes app/api/gameplay/profile/getting-started/route.ts + app/api/gameplay/profile/referral-status/route.ts. Writes now server-side with revalidation."
+      }
+    }
+  ]
+}

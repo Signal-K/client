@@ -1,4 +1,4 @@
-export interface GroupableClassification {
+interface GroupableClassification {
   classificationtype: string | null;
   classificationConfiguration?: {
     annotationOptions?: string[];
