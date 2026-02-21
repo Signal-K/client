@@ -21,7 +21,7 @@ export interface ClassificationAchievement {
   }[];
 }
 
-export interface MineralDepositAchievement {
+interface MineralDepositAchievement {
   type: "mineral-deposit";
   count: number;
   milestones: {
@@ -30,7 +30,7 @@ export interface MineralDepositAchievement {
   }[];
 }
 
-export interface PlanetCompletionAchievement {
+interface PlanetCompletionAchievement {
   type: "planet-completion";
   count: number;
   milestones: {
@@ -39,7 +39,7 @@ export interface PlanetCompletionAchievement {
   }[];
 }
 
-export interface AllUpgradesProgress {
+interface AllUpgradesProgress {
   type: "all-upgrades";
   total: number;
   unlocked: number;
@@ -50,7 +50,7 @@ export interface AllUpgradesProgress {
   }[];
 }
 
-export interface ClassificationDiversityProgress {
+interface ClassificationDiversityProgress {
   type: "classification-diversity";
   total: number;
   completed: number;
@@ -64,7 +64,7 @@ export interface ClassificationDiversityProgress {
   }[];
 }
 
-export interface ResourceExtractionProgress {
+interface ResourceExtractionProgress {
   type: "resource-extraction";
   total: number;
   extracted: number;
@@ -75,7 +75,7 @@ export interface ResourceExtractionProgress {
   }[];
 }
 
-export type Achievement =
+type Achievement =
   | ClassificationAchievement
   | MineralDepositAchievement
   | PlanetCompletionAchievement;
@@ -88,7 +88,7 @@ export interface AchievementProgress {
   totalAchievements: number;
 }
 
-export interface MilestoneProgress {
+interface MilestoneProgress {
   allUpgrades: AllUpgradesProgress;
   classificationDiversity: ClassificationDiversityProgress;
   resourceExtraction: ResourceExtractionProgress;

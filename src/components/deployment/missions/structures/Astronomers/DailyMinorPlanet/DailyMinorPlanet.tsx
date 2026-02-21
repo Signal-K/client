@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
+import { useSession } from "@/src/lib/auth/session-context";
 import { useParams } from "next/navigation";
 import { BarChartBigIcon, GlassWater, Guitar, HelpCircle, PenBoxIcon, RadioIcon, SpeechIcon, TelescopeIcon, VoteIcon } from "lucide-react";
 import MissionShell from "../../BasePlate";
@@ -21,7 +21,6 @@ interface Mission {
 };
 
 const DailyMinorPlanetMissions = () => {
-  const supabase = useSupabaseClient();
   const session = useSession();
   const params = useParams();
 
@@ -168,54 +167,45 @@ const DailyMinorPlanetMissions = () => {
 
     const fetchMissionData = async () => {
       try {
-        const { data: classificationsData, error: classificationsError } = await supabase
-            .from("classifications")
-            .select("id, classificationConfiguration") 
-            .eq("classificationtype", "telescope-minorPlanet")
-            .eq("author", session.user.id);      
-
-        if (classificationsError) throw classificationsError;
+        const classRes = await fetch(
+          `/api/gameplay/classifications?author=${encodeURIComponent(session.user.id)}&classificationtype=telescope-minorPlanet&limit=1000`
+        );
+        const classPayload = await classRes.json();
+        if (!classRes.ok) throw new Error(classPayload?.error || "Failed to load classifications");
+        const classificationsData = classPayload?.classifications || [];
 
         const mission1CompletedCount = classificationsData?.length || 0;
 
         const mission2CompletedCount =
-          classificationsData?.filter(({ classificationConfiguration }) => {
+          classificationsData?.filter(({ classificationConfiguration }: any) => {
             const options = classificationConfiguration?.classificationOptions?.[""] || {};
             const hasValidOptions = ["2", "3", "4"].some((option) => options[option]);
             const hasInvalidOption = options["1"];
             return hasValidOptions && !hasInvalidOption;
           }).length || 0;
 
-        const { data: commentData, error: commentError } = await supabase
-          .from("comments")
-          .select("classification_id")
-          .eq("author", session.user.id);
-
-        if (commentError) throw commentError;
-
-        const { data: voteData, error: voteError } = await supabase
-          .from("votes")
-          .select("classification_id")
-          .eq("user_id", session.user.id);
-
-        if (voteError) throw voteError;
+        const activityRes = await fetch("/api/gameplay/social/my?limit=5000");
+        const activityPayload = await activityRes.json();
+        if (!activityRes.ok) throw new Error(activityPayload?.error || "Failed to load activity");
+        const commentData = activityPayload?.comments || [];
+        const voteData = activityPayload?.votes || [];
 
         const validClassificationIds = new Set(
-          classificationsData.map((classification) => classification.id)
+          classificationsData.map((classification: any) => classification.id)
         );
 
-        const mission3CommentCount = commentData?.filter(({ classification_id }) =>
+        const mission3CommentCount = commentData?.filter(({ classification_id }: any) =>
           validClassificationIds.has(classification_id)
         ).length || 0;
 
-        const mission3VoteCount = voteData?.filter(({ classification_id }) =>
+        const mission3VoteCount = voteData?.filter(({ classification_id }: any) =>
           validClassificationIds.has(classification_id)
         ).length || 0;
 
         const mission3CompletedCount = mission3CommentCount + mission3VoteCount;
 
-        const mission4CompletedCount = classificationsData?.filter(({ id: classificationId }) => {
-          const voteCount = voteData?.filter(({ classification_id }) => classification_id === classificationId)
+        const mission4CompletedCount = classificationsData?.filter(({ id: classificationId }: any) => {
+          const voteCount = voteData?.filter(({ classification_id }: any) => classification_id === classificationId)
             .length;
           return voteCount > 4.9999;
         }).length || 0;
@@ -255,7 +245,7 @@ const DailyMinorPlanetMissions = () => {
     };
 
     fetchMissionData();
-  }, [supabase, session?.user]);
+  }, [session?.user]);
 
   const handlePreviousChapter = () => {
     if (currentChapter > 1) setCurrentChapter(currentChapter - 1);

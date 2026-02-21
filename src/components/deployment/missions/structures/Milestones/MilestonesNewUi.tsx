@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
+import { useSession } from "@/src/lib/auth/session-context";
 import { Zap } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/src/components/ui/card";
 
@@ -23,23 +23,11 @@ interface WeekMilestones {
 
 interface UserMilestone {
   id: string;
-  user_id: string;
   week_start: string;
-  milestone_data: {
-    name: string;
-    structure: string;
-    group: string;
-    icon: string;
-    table: "classifications" | "comments";
-    field: string;
-    value: string;
-    requiredCount: number;
-    extendedDescription: string;
-  };
+  milestone_data: Milestone;
 }
 
 export function NewMilestones() {
-  const supabase = useSupabaseClient();
   const session = useSession();
 
   const [milestones, setMilestones] = useState<UserMilestone[]>([]);
@@ -56,16 +44,16 @@ export function NewMilestones() {
       const weekday = today.getDay(); // Sunday = 0
       const weekStart = new Date(today);
       weekStart.setDate(today.getDate() - weekday);
-
-      const { data, error } = await supabase
-        .from("user_milestones")
-        .select("*")
-        .eq("user_id", session.user.id)
-        .eq("week_start", weekStart.toLocaleDateString("en-CA")); // formats as YYYY-MM-DD
-
-      if (!error && data) {
-        setMilestones(data as UserMilestone[]);
-      }
+      const response = await fetch("/api/gameplay/milestones", { cache: "no-store" });
+      const payload = await response.json().catch(() => null);
+      const weekStartKey = weekStart.toLocaleDateString("en-CA");
+      const week = (payload?.playerMilestones || []).find((w: WeekMilestones) => w.weekStart === weekStartKey);
+      const normalized: UserMilestone[] = (week?.data || []).map((milestone: Milestone, index: number) => ({
+        id: `${weekStartKey}-${index}`,
+        week_start: weekStartKey,
+        milestone_data: milestone,
+      }));
+      setMilestones(normalized);
     };
 
     fetchMilestones();
@@ -79,39 +67,16 @@ export function NewMilestones() {
     const fetchProgress = async () => {
       const progressMap: { [name: string]: number } = {};
       const weekStartDate = new Date(milestones[0].week_start);
-      const weekEndDate = new Date(weekStartDate);
-      weekEndDate.setDate(weekStartDate.getDate() + 6);
-
-      for (const milestone of milestones) {
-        const {
-          table,
-          field,
-          value
-        } = milestone.milestone_data;
-
-        // Skip if any required values are undefined
-        if (!table || !field || value === undefined) {
-          console.warn('Skipping milestone with undefined data:', milestone.milestone_data);
-          continue;
-        }
-
-        const {
-          count,
-          error
-        } = await supabase
-          .from(table)
-          .select("*", { count: "exact" })
-          .eq("author", session.user.id)
-          .eq(field, value)
-          .gte("created_at", weekStartDate.toISOString())
-          .lte("created_at", weekEndDate.toISOString());
-
-        if (!error && count !== null) {
-          progressMap[milestone.milestone_data.name] = count;
-        } else if (error) {
-          console.error('Error fetching milestone progress:', error);
-        }
-      }
+      const response = await fetch("/api/gameplay/milestones/weekly-progress", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          weekStart: weekStartDate.toISOString().slice(0, 10),
+          data: milestones.map((m) => m.milestone_data),
+        }),
+      });
+      const payload = await response.json().catch(() => null);
+      Object.assign(progressMap, payload?.progress || {});
 
       setProgress(progressMap);
     };

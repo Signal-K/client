@@ -5,7 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card } from "@/src/components/ui/card"
 import { Textarea } from "@/src/components/ui/textarea"
 import { Plus, Trash2, Copy, ClipboardPasteIcon as Paste } from 'lucide-react'
-import { useSupabaseClient } from '@supabase/auth-helpers-react'
+import { mergeClassificationConfiguration } from "@/src/lib/gameplay/classification-configuration"
 
 type CloudShape = 'arch' | 'loop' | 'wisp'
 type Cloud = {
@@ -107,8 +107,6 @@ const getCloudColor = (altitude: number, shape: CloudShape) => {
 };
 
 export default function CloudSignal({ classificationConfig, classificationId }: CloudSignalProps) {
-  const supabase = useSupabaseClient();
-
   // From sb
   const initialClouds = classificationConfig?.cloudData || [];
   const [exporting, setExporting] = useState<boolean>(false);
@@ -155,27 +153,12 @@ export default function CloudSignal({ classificationConfig, classificationId }: 
     setExporting(true);
   
     try {
-      const { data, error } = await supabase
-        .from("classifications")
-        .select("classificationConfiguration")
-        .eq("id", classificationId)
-        .single();
-  
-      if (error) throw error;
-  
-      const currentConfig = data?.classificationConfiguration || {};
-      const newCloudConfig = {
-        cloudData: clouds, // Use clouds as the new cloud configuration
-      };
-  
-      const updatedConfig = { ...currentConfig, ...newCloudConfig };
-  
-      const { error: updateError } = await supabase
-        .from("classifications")
-        .update({ classificationConfiguration: updatedConfig })
-        .eq("id", classificationId);
-  
-      if (updateError) throw updateError;
+      const result = await mergeClassificationConfiguration(Number(classificationId), {
+        cloudData: clouds,
+      });
+      if (!result.ok) {
+        throw new Error(result.error || "Failed to export cloud configuration");
+      }
   
       alert("Cloud configuration exported successfully!");
     } catch (err) {

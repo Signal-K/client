@@ -29,6 +29,10 @@ venv
 # next.js
 /.next/
 /out/
+.DS_STORE
+/.DS_Store
+./DS_Store
+.DS_Store
 
 storage_downloads/
 .storage_downloads/
@@ -44,6 +48,7 @@ storage_downloads/
 
 # debug
 npm-debug.log*
+package-lock.json
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
@@ -68,3 +73,10 @@ public/workbox-f1770938.js
 certificates
 .env.local
 SUPABASE_EXPORT_SUMMARY.md
+
+# local Supabase data exports can contain secrets/tokens
+supabase_exports/
+
+# cypress artifacts
+cypress/screenshots/
+cypress/videos/

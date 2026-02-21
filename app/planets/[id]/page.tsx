@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useCallback, useState, useMemo } from "react";
-import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
+import { useSession } from "@/src/lib/auth/session-context";
 import { PostCardSingleWithGenerator } from "@/src/components/social/posts/PostWithGen";
 import Image from "next/image";
 import { Button } from "@/src/components/ui/button";
@@ -100,7 +100,6 @@ export default function TestPlanetWrapper() {
   const params = useParams();
   const id = params?.id as string;
   
-  const supabase = useSupabaseClient();
   const session = useSession();
 
   const [classification, setClassification] = useState<Classification | null>(null);
@@ -195,76 +194,40 @@ export default function TestPlanetWrapper() {
       if (!params?.id) return;
 
       const fetchClassifications = async () => {
-          const { data, error } = await supabase
-              .from("classifications")
-              .select("*, anomaly:anomalies(*), classificationConfiguration, media")
-              .eq('id', params.id)
-              .single();
-
-          if (error) {
-              console.error("Error fetching classification", error);
+          const response = await fetch(`/api/gameplay/planets/${params.id}`, { cache: "no-store" });
+          const payload = await response.json().catch(() => null);
+          if (!response.ok || !payload?.classification) {
+              console.error("Error fetching classification", payload?.error || response.statusText);
               setError("Failed to fetch classification data");
               return;
           }
 
+          const data = payload.classification as Classification;
           setClassification(data);
           setAnomaly(data.anomaly);
 
           const periodFromField = data.classificationConfiguration?.additionalFields?.field_0;
           if (periodFromField) setPeriod(periodFromField);
 
-          const parentPlanetLocation = data.anomaly?.id;
-          if (parentPlanetLocation) {
-              const query = supabase
-                  .from("classifications")
-                  .select("*, anomaly:anomalies(*), classificationConfiguration, media")
-                  .eq("classificationConfiguration->>parentPlanetLocation", parentPlanetLocation.toString());
-
-              const { data: relatedData, error: relatedError } = await query;
-
-              if (relatedError) {
-                  setError("Failed to fetch related classifications")
-                  setLoading(false);
-                  return;
-              }
-
-              if (relatedData) {
-                  const votePromises = relatedData.map(async (related) => {
-                    const { count, error: votesError } = await supabase
-                      .from("votes")
-                      .select("*", { count: "exact" })
-                      .eq("classification_id", related.id);
-        
-                    if (votesError) {
-                      console.error("Error fetching votes:", votesError);
-                      return { ...related, votes: 0 };
-                    }
-        
-                    return { ...related, votes: count };
-                  });
-        
-                  const relatedClassificationsWithVotes = await Promise.all(votePromises);
-                  setRelatedClassifications(relatedClassificationsWithVotes);
-              }
-          }
+          setRelatedClassifications((payload.relatedClassifications ?? []) as Classification[]);
 
           setLoading(false);
       };
 
       fetchClassifications();
-  }, [session]);
+  }, [session, params?.id]);
 
   const fetchComments = async () => {
     if (!classification) return;
   
-    const { data, error } = await supabase
-      .from("comments")
-      .select("*")
-      .eq("classification_id", classification.id)
-      .order("created_at", { ascending: false });
-  
-    if (error) {
-      console.error("Error fetching comments: ", error);
+    const response = await fetch(
+      `/api/gameplay/social/comments?classificationId=${classification.id}&order=desc`,
+      { cache: "no-store" }
+    );
+    const payload = await response.json().catch(() => null);
+    const data = payload?.comments;
+    if (!response.ok || !Array.isArray(data)) {
+      console.error("Error fetching comments: ", payload?.error || response.statusText);
     } else {
       let aggregatedComments: any[] = [];
   
@@ -329,15 +292,14 @@ export default function TestPlanetWrapper() {
   const fetchDensity  = async () => {
     if (!classification) return;
 
-    const { data, error } = await supabase
-      .from("comments")
-      .select("*")
-      .eq("classification_id", classification.id)
-      .eq("category", "Density")
-      .order("created_at", { ascending: false });
-
-    if (error) {
-      console.error("Error fetching comments: ", error);
+    const response = await fetch(
+      `/api/gameplay/social/comments?classificationId=${classification.id}&category=Density&order=desc`,
+      { cache: "no-store" }
+    );
+    const payload = await response.json().catch(() => null);
+    const data = payload?.comments;
+    if (!response.ok || !Array.isArray(data)) {
+      console.error("Error fetching comments: ", payload?.error || response.statusText);
     } else if (data && data.length > 0 && data[0].value) {
       const densityValue = parseFloat(data[0].value);
       if (!isNaN(densityValue)) {
@@ -352,7 +314,7 @@ export default function TestPlanetWrapper() {
       if (cloudSummary && p4Summary && ai4MSummary) {
         console.log(cloudSummary, p4Summary, ai4MSummary);
       }
-  }, [classification, supabase]);
+  }, [classification]);
 
   useEffect(() => {
       const timer = setInterval(() => {
@@ -363,7 +325,7 @@ export default function TestPlanetWrapper() {
       }, 1000);
   
       return () => clearInterval(timer);
-  }, [supabase]);
+  }, []);
   
   const handleViewChange = (view: FocusView) => {
       setCurrentView(view)

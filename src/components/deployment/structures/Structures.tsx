@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useCallback, useEffect, useState } from "react";
-import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
+import { useSession } from "@/src/lib/auth/session-context";
 import { useActivePlanet } from "@/src/core/context/ActivePlanet";
 import { InventoryStructureItem, StructureItemDetail } from "@/types/Items";
 // import IndividualStructure, { IndividualStructureProps } from "./IndividualStructure";
@@ -17,7 +17,6 @@ interface Props {
 };
 
 export default function Structures() {
-  const supabase = useSupabaseClient();
   const session = useSession();
   const router = useRouter();
   const { activePlanet } = useActivePlanet();
@@ -49,13 +48,12 @@ export default function Structures() {
       });
       setItemDetails(itemMap);
 
-      const { data: inventoryData, error } = await supabase
-        .from("inventory")
-        .select("*")
-        .eq("owner", session.user.id)
-        .eq("anomaly", activePlanet.id);
-
-      if (error) throw error;
+      const inventoryRes = await fetch(`/api/gameplay/inventory/mine?anomaly=${activePlanet.id}&limit=500`);
+      const inventoryPayload = await inventoryRes.json();
+      if (!inventoryRes.ok) {
+        throw new Error(inventoryPayload?.error || "Failed to load inventory");
+      }
+      const inventoryData = inventoryPayload?.inventory || [];
 
       const groups = {
         Orbital: [] as InventoryStructureItem[],
@@ -84,7 +82,7 @@ export default function Structures() {
     } finally {
       setLoading(false);
     }
-  }, [session, supabase, activePlanet]);
+  }, [session, activePlanet]);
 
   useEffect(() => {
     fetchStructures();

@@ -1,7 +1,5 @@
-# Docker files
-next.dockerfile
-Dockerfile*
-docker-compose*.yml
+# Docker orchestration files
+ops/compose/*.yml
 .dockerignore
 
 # Dependencies

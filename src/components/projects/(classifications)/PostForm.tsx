@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
+import { useSession } from "@/src/lib/auth/session-context";
 import { useActivePlanet } from "@/src/core/context/ActivePlanet";
 
 import {
@@ -40,7 +40,6 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({
   parentClassificationId,
   annotationOptions,
 }) => {
-  const supabase = useSupabaseClient();
   const session = useSession();
 
   const { activePlanet } = useActivePlanet();
@@ -48,7 +47,6 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({
   const [content, setContent] = useState<string>("");
   const [uploads, setUploads] = useState<string[]>([]);
   const [isUploading, setIsUploading] = useState<boolean>(false);
-  const [avatar_url, setAvatarUrl] = useState<string | undefined>(undefined);
   const [selectedOptions, setSelectedOptions] = useState<{
     [groupIndex: number]: { [optionId: number]: boolean };
   }>({});
@@ -153,32 +151,6 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({
 
   const showTextArea = classificationOptions.length === 0;
 
-  useEffect(() => {
-    const fetchUserProfile = async () => {
-      if (!session) return;
-
-      try {
-        const { data, error } = await supabase
-          .from("profiles")
-          .select("username, avatar_url")
-          .eq("id", session?.user?.id)
-          .single();
-
-        if (data) {
-          setAvatarUrl(data.avatar_url);
-        }
-
-        if (error) {
-          console.error("Error fetching profile: ", error.message);
-        }
-      } catch (error: any) {
-        console.error("Unexpected error: ", error);
-      }
-    };
-
-    fetchUserProfile();
-  }, [session, supabase]);
-
     const handleMineralDepositCreation = async (
     anomalyId: number,
     classificationId: number,
@@ -193,20 +165,17 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({
       cutoff.setUTCDate(now.getUTCDate() - daysToLastSaturday);
       cutoff.setUTCHours(14, 1, 0, 0);
 
-      const { data: routes, error: routeError } = await supabase
-        .from("routes")
-        .select("*")
-        .eq("author", userId)
-        .gte("timestamp", cutoff.toISOString())
-        .order("timestamp", { ascending: false })
-        .limit(1);
+      const routeResponse = await fetch(
+        `/api/gameplay/routes/latest?since=${encodeURIComponent(cutoff.toISOString())}`,
+        { cache: "no-store" }
+      );
+      const routePayload = await routeResponse.json().catch(() => null);
+      const route = routePayload?.route;
 
-      if (routeError || !routes || routes.length === 0) {
+      if (!routeResponse.ok || !route) {
         // no recent route found for mineral deposit check
         return;
       }
-
-      const route = routes[0];
       const config = route.routeConfiguration;
 
       if (!config || !config.waypoints || !config.mineralWaypoints) {
@@ -258,24 +227,22 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({
         },
       };
 
-      // Create the mineral deposit entry
-      const { data: mineralDeposit, error: mineralError } = await supabase
-        .from("mineralDeposits")
-        .insert({
+      const response = await fetch("/api/gameplay/mineral-deposits", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
           anomaly: anomalyId,
-          owner: userId,
+          discovery: classificationId,
           mineralconfiguration: mineralConfiguration,
           location: `Mars - Waypoint ${anomalyIndex + 1}`,
-          discovery: classificationId,
-          roverName: "Mars Rover Alpha", // You can make this dynamic if needed
-        })
-        .select()
-        .single();
-
-      if (mineralError) {
-        console.error("Error creating mineral deposit:", mineralError);
-      } else {
-        // mineral deposit created successfully
+          roverName: "Mars Rover Alpha",
+        }),
+      });
+      if (!response.ok) {
+        const payload = await response.json().catch(() => ({}));
+        console.error("Error creating mineral deposit:", payload?.error);
       }
     } catch (error) {
       console.error("Unexpected error in mineral deposit creation:", error);
@@ -287,17 +254,16 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({
       if (!session?.user?.id || !activePlanet?.id || !structureItemId) return;
 
       try {
-        const { data: inventoryData, error: inventoryError } = await supabase
-          .from("inventory")
-          .select("id, configuration")
-          .eq("owner", session.user.id)
-          .eq("anomaly", activePlanet.id)
-          .eq("item", structureItemId)
-          .order("id", { ascending: true })
-          .limit(1)
-          .single();
+        const response = await fetch(
+          `/api/gameplay/inventory/lookup?anomaly=${activePlanet.id}&item=${structureItemId}`,
+          { cache: "no-store" }
+        );
+        const payload = await response.json().catch(() => null);
+        const inventoryData = payload?.item;
 
-        if (inventoryError) throw inventoryError;
+        if (!response.ok) {
+          throw new Error(payload?.error || "Failed to fetch inventory item");
+        }
 
         if (inventoryData) {
           setInventoryItemId(inventoryData.id);
@@ -309,7 +275,7 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({
     };
 
     fetchInventoryItemId();
-  }, [session?.user?.id, activePlanet?.id, structureItemId, supabase]);
+  }, [session?.user?.id, activePlanet?.id, structureItemId]);
 
   const handleOptionClick = (groupIndex: number, optionId: number) => {
     setSelectedOptions((prev) => ({
@@ -336,15 +302,13 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({
     let parentPlanetFromLinkedAnomaly = null;
     if (session?.user?.id && anomalyId) {
       try {
-        const { data: linkedAnomalyData, error: linkedAnomalyError } = await supabase
-          .from("linked_anomalies")
-          .select("classification_id")
-          .eq("author", session.user.id)
-          .eq("anomaly_id", anomalyId)
-          .maybeSingle();
-
-        if (!linkedAnomalyError && linkedAnomalyData?.classification_id) {
-          parentPlanetFromLinkedAnomaly = linkedAnomalyData.classification_id;
+        const response = await fetch(
+          `/api/gameplay/linked-anomalies?anomalyId=${anomalyId}&classificationIdOnly=true`,
+          { cache: "no-store" }
+        );
+        const payload = await response.json().catch(() => null);
+        if (response.ok && payload?.classification_id) {
+          parentPlanetFromLinkedAnomaly = payload.classification_id;
         }
       } catch (error) {
         console.error("Error checking linked_anomalies:", error);
@@ -362,64 +326,58 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({
     };
 
     try {
-      let currentConfig: any = {};
       if (inventoryItemId) {
-        const { data: inventoryData, error: inventoryError } = await supabase
-          .from("inventory")
-          .select("configuration")
-          .eq("id", inventoryItemId)
-          .single();
+        const inventoryResponse = await fetch("/api/gameplay/inventory/use", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            inventoryId: inventoryItemId,
+            decrementBy: 1,
+          }),
+        });
+        if (!inventoryResponse.ok) {
+          const payload = await inventoryResponse.json().catch(() => ({}));
+          throw new Error(payload?.error || "Failed to update inventory uses");
+        }
+      }
 
-        if (inventoryError) throw inventoryError;
+      const classificationResponse = await fetch("/api/gameplay/classifications", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          content,
+          media: [uploads, assetMentioned],
+          anomaly: anomalyId,
+          classificationtype: anomalyType,
+          classificationConfiguration,
+        }),
+      });
 
-        currentConfig = inventoryData?.configuration || {};
-        if (currentConfig.Uses) {
-          currentConfig.Uses = Math.max(0, currentConfig.Uses - 1);
-        };
-      };
-
-      if (inventoryItemId) {
-        const { error: updateError } = await supabase
-          .from("inventory")
-          .update({ configuration: currentConfig })
-          .eq("id", inventoryItemId);
-
-        if (updateError) {
-          throw updateError;
-        };
-      };
-
-      const { data: classificationData, error: classificationError } =
-        await supabase
-          .from("classifications")
-          .insert({
-            author: session?.user?.id,
-            content,
-            media: [uploads, assetMentioned],
-            anomaly: anomalyId,
-            classificationtype: anomalyType,
-            classificationConfiguration,
-          })
-          .select()
-          .single();
-
-      if (classificationError) {
-        console.error(
-          "Error creating classification: ",
-          classificationError.message
-        );
+      if (!classificationResponse.ok) {
+        const payload = await classificationResponse.json().catch(() => ({}));
+        console.error("Error creating classification: ", payload?.error);
         alert("Failed to create classification. Please try again.");
         return;
       } else {
+        const classificationData = await classificationResponse.json();
         // On successful classification, delete linked_anomalies entries
-        const { error: deleteError } = await supabase
-          .from("linked_anomalies")
-          .delete()
-          .eq("author", session?.user.id)
-          .eq("anomaly_id", anomalyId);
+        const deleteResponse = await fetch("/api/gameplay/linked-anomalies", {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            anomalyId,
+          }),
+        });
 
-        if (deleteError) {
-          console.error("Error deleting linked anomalies:", deleteError.message);
+        if (!deleteResponse.ok) {
+          const payload = await deleteResponse.json().catch(() => ({}));
+          console.error("Error deleting linked anomalies:", payload?.error);
         }
 
         // Check if this classification is for a waypoint with a mineral deposit
@@ -442,23 +400,19 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({
 
       // await handleMissionComplete();
 
-      const { data: profileData, error: profileError } = await supabase
-        .from("profiles")
-        .select("classificationPoints")
-        .eq("id", session?.user?.id)
-        .single();
-
-      if (profileError) throw profileError;
-
-      const newClassificationPoints =
-        (profileData?.classificationPoints || 0) + 1;
-
-      const { error: updatePointsError } = await supabase
-        .from("profiles")
-        .update({ classificationPoints: newClassificationPoints })
-        .eq("id", session?.user?.id);
-
-      if (updatePointsError) throw updatePointsError;
+      const pointsResponse = await fetch("/api/gameplay/profile/classification-points", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          amount: 1,
+        }),
+      });
+      if (!pointsResponse.ok) {
+        const payload = await pointsResponse.json().catch(() => ({}));
+        throw new Error(payload?.error || "Failed to update classification points");
+      }
     } catch (error: any) {
       console.error("Unexpected error:", error);
     };
@@ -471,24 +425,27 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({
       try {
         const fileArray = Array.from(files);
         for (const file of fileArray) {
-          const fileName = `${Date.now()}-${session.user.id}-${file.name}`;
-          const { data, error } = await supabase.storage
-            .from("media")
-            .upload(fileName, file);
-
-          if (error) {
-            console.error("Upload error:", error.message);
-          } else if (data) {
-            const url = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/media/${data.path}`;
-            setUploads((prevUploads) => [...prevUploads, url]);
-          };
-        };
+          const formData = new FormData();
+          formData.append("bucket", "media");
+          formData.append("file", file);
+          formData.append("fileName", `${Date.now()}-${session.user.id}-${file.name}`);
+          const response = await fetch("/api/gameplay/storage/upload", {
+            method: "POST",
+            body: formData,
+          });
+          const payload = await response.json().catch(() => null);
+          if (!response.ok || !payload?.publicUrl) {
+            console.error("Upload error:", payload?.error || response.statusText);
+          } else {
+            setUploads((prevUploads) => [...prevUploads, payload.publicUrl]);
+          }
+        }
       } catch (err) {
         console.error("Unexpected error during file upload:", err);
       } finally {
         setIsUploading(false);
-      };
-    };
+      }
+    }
   };
 
   const [additionalFields, setAdditionalFields] = useState<{

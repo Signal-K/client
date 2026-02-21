@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import { SimplePostSingle } from "@/src/components/social/posts/SimplePostSingle";
 import StructuresOnPlanet from "@/src/components/deployment/structures/Structures";
 import Navbar from "@/src/components/layout/Navbar";
@@ -22,8 +21,6 @@ interface Classification {
 };
 
 export default function SinglePostPage({ params }: { params: { id: string } }) {
-  const supabase = useSupabaseClient();
-
   const router = useRouter();
 
   const [classification, setClassification] = useState<Classification | null>(null);
@@ -41,15 +38,13 @@ export default function SinglePostPage({ params }: { params: { id: string } }) {
       }
 
       try {
-        const { data, error } = await supabase
-          .from("classifications")
-          .select("*")
-          .eq("id", id)
-          .single();
+        const response = await fetch(`/api/gameplay/classifications/${id}`, { cache: "no-store" });
+        const result = await response.json().catch(() => ({}));
 
-        if (error || !data) {
+        if (!response.ok || !result?.classification) {
           setError("Classification not found.");
         } else {
+          const data = result.classification;
           const flattenedMedia = (data.media || [])
             .flat()
             .filter((url: string) => typeof url === "string" && url.startsWith("http"));
@@ -59,29 +54,16 @@ export default function SinglePostPage({ params }: { params: { id: string } }) {
             media: flattenedMedia,
           });
 
-          // Fetch source classification media if it exists
-          const sourceId = data.classificationConfiguration?.source_classification_id;
-          if (sourceId) {
-            const { data: sourceData } = await supabase
-              .from("classifications")
-              .select("media")
-              .eq("id", sourceId)
-              .single();
-
-            if (sourceData?.media) {
-              const extractedMedia: string[] = [];
-              if (Array.isArray(sourceData.media)) {
-                for (const item of sourceData.media) {
-                  if (Array.isArray(item) && typeof item[0] === "string" && item[0].startsWith("http")) {
-                    extractedMedia.push(item[0]);
-                  } else if (typeof item === "string" && item.startsWith("http")) {
-                    extractedMedia.push(item);
-                  }
-                }
-              }
-              setSourceClassificationMedia(extractedMedia);
+          const extractedMedia: string[] = [];
+          const sourceMedia = Array.isArray(result?.sourceMedia) ? result.sourceMedia : [];
+          for (const item of sourceMedia) {
+            if (Array.isArray(item) && typeof item[0] === "string" && item[0].startsWith("http")) {
+              extractedMedia.push(item[0]);
+            } else if (typeof item === "string" && item.startsWith("http")) {
+              extractedMedia.push(item);
             }
           }
+          setSourceClassificationMedia(extractedMedia);
         }
       } catch (err) {
         console.error(err);
@@ -92,7 +74,7 @@ export default function SinglePostPage({ params }: { params: { id: string } }) {
     };
 
     fetchClassification();
-  }, [params.id, supabase]);
+  }, [params.id]);
 
   if (loading)
     return (

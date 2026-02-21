@@ -1,9 +1,7 @@
-import { SupabaseClient } from "@supabase/supabase-js";
-
 /**
  * Mineral deposit types and their configurations
  */
-export type MineralType = 
+type MineralType = 
   | "water-ice" 
   | "co2-ice" 
   | "metallic-hydrogen" 
@@ -22,7 +20,6 @@ interface MineralDepositConfig {
 }
 
 interface CreateMineralDepositParams {
-  supabase: SupabaseClient;
   userId: string;
   anomalyId: number;
   classificationId: number;
@@ -33,25 +30,13 @@ interface CreateMineralDepositParams {
 /**
  * Check if user has unlocked mineral discovery research
  */
-export async function hasMineralResearch(
-  supabase: SupabaseClient, 
-  userId: string
+async function hasMineralResearch(
+  _userId: string
 ): Promise<boolean> {
   try {
-    const { data, error } = await supabase
-      .from("inventory")
-      .select("id")
-      .eq("owner", userId)
-      .eq("item", 3103); // Mineral discovery structure item ID
-
-    if (error) {
-      console.error("[Mineral Research] Error checking research:", error);
-      return false;
-    }
-
-    const hasResearch = !!data && data.length > 0;
-    
-    return hasResearch;
+    const response = await fetch("/api/gameplay/inventory/mine?item=3103&limit=1");
+    const payload = await response.json().catch(() => ({}));
+    return Boolean(response.ok && Array.isArray(payload?.inventory) && payload.inventory.length > 0);
   } catch (error) {
     console.error("[Mineral Research] Exception checking research:", error);
     return false;
@@ -62,8 +47,7 @@ export async function hasMineralResearch(
  * Check if planet (anomaly) has valid stats for mineral discovery
  * For cloud/atmospheric classifications, this checks the parent planet's stats
  */
-export async function isPlanetCompatible(
-  supabase: SupabaseClient,
+async function isPlanetCompatible(
   userId: string,
   anomalyId: number,
   classificationId?: number
@@ -73,11 +57,9 @@ export async function isPlanetCompatible(
 
     // If a classification ID is provided, check if it references a parent planet
     if (classificationId) {
-      const { data: classification } = await supabase
-        .from("classifications")
-        .select("classificationConfiguration")
-        .eq("id", classificationId)
-        .single();
+      const classRes = await fetch(`/api/gameplay/classifications?id=${classificationId}&limit=1`);
+      const classPayload = await classRes.json().catch(() => ({}));
+      const classification = classRes.ok ? classPayload?.classifications?.[0] : null;
 
       if (classification?.classificationConfiguration) {
         let config;
@@ -91,11 +73,9 @@ export async function isPlanetCompatible(
             
             
             // Get the parent planet classification to find its anomaly
-            const { data: parentClassification } = await supabase
-              .from("classifications")
-              .select("anomaly")
-              .eq("id", config.parentPlanet)
-              .single();
+            const parentRes = await fetch(`/api/gameplay/classifications?id=${config.parentPlanet}&limit=1`);
+            const parentPayload = await parentRes.json().catch(() => ({}));
+            const parentClassification = parentRes.ok ? parentPayload?.classifications?.[0] : null;
             
             if (parentClassification) {
               planetAnomalyId = parentClassification.anomaly;
@@ -108,14 +88,13 @@ export async function isPlanetCompatible(
     }
 
     // Check if planet has a classification with stats (from satellite survey)
-    const { data: classifications, error } = await supabase
-      .from("classifications")
-      .select("classificationConfiguration")
-      .eq("author", userId)
-      .eq("anomaly", planetAnomalyId);
-
-    if (error) {
-      console.error("[Mineral Compatibility] Error fetching classifications:", error);
+    const classificationsRes = await fetch(
+      `/api/gameplay/classifications?author=${encodeURIComponent(userId)}&anomaly=${planetAnomalyId}&limit=500`
+    );
+    const classificationsPayload = await classificationsRes.json().catch(() => ({}));
+    const classifications = classificationsRes.ok ? classificationsPayload?.classifications : [];
+    if (!classificationsRes.ok) {
+      console.error("[Mineral Compatibility] Error fetching classifications:", classificationsPayload?.error);
       return false;
     }
 
@@ -146,7 +125,6 @@ export async function isPlanetCompatible(
     }
 
     return false;
-    return false;
   } catch (error) {
     console.error("[Mineral Compatibility] Exception checking planet:", error);
     return false;
@@ -156,15 +134,14 @@ export async function isPlanetCompatible(
 /**
  * Roll for mineral deposit creation (1 in 3 chance)
  */
-export function rollForMineralDeposit(): boolean {
+function rollForMineralDeposit(): boolean {
   return Math.random() < 1 / 3;
 }
 
 /**
  * Create a mineral deposit entry in the database
  */
-export async function createMineralDeposit({
-  supabase,
+async function createMineralDeposit({
   userId,
   anomalyId,
   classificationId,
@@ -172,26 +149,26 @@ export async function createMineralDeposit({
   location
 }: CreateMineralDepositParams): Promise<{ success: boolean; depositId?: number; error?: any }> {
   try {
-    const { data, error } = await supabase
-      .from("mineralDeposits")
-      .insert({
+    const response = await fetch("/api/gameplay/mineral-deposits", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
         owner: userId,
         anomaly: anomalyId,
         discovery: classificationId,
         mineralconfiguration: mineralConfig,
         location: typeof window !== "undefined" ? location || null : null,
-        created_at: new Date().toISOString()
-      })
-      .select("id")
-      .single();
+        created_at: new Date().toISOString(),
+      }),
+    });
+    const result = await response.json().catch(() => ({}));
 
-    if (error) {
-      console.error("[Mineral Deposit] Error creating deposit:", error);
-      return { success: false, error };
+    if (!response.ok) {
+      console.error("[Mineral Deposit] Error creating deposit:", result?.error);
+      return { success: false, error: result?.error || "Failed to create mineral deposit" };
     }
 
-    
-    return { success: true, depositId: data.id };
+    return { success: true, depositId: result?.id };
   } catch (error) {
     console.error("[Mineral Deposit] Exception creating deposit:", error);
     return { success: false, error };
@@ -203,7 +180,6 @@ export async function createMineralDeposit({
  * Returns true if deposit was created, false otherwise
  */
 export async function attemptMineralDepositCreation({
-  supabase,
   userId,
   anomalyId,
   classificationId,
@@ -211,14 +187,14 @@ export async function attemptMineralDepositCreation({
   location
 }: CreateMineralDepositParams): Promise<boolean> {
   // Check if user has mineral research
-  const hasResearch = await hasMineralResearch(supabase, userId);
+  const hasResearch = await hasMineralResearch(userId);
   if (!hasResearch) {
     
     return false;
   }
 
   // Check if planet is compatible (pass classificationId to check parent planet reference)
-  const isCompatible = await isPlanetCompatible(supabase, userId, anomalyId, classificationId);
+  const isCompatible = await isPlanetCompatible(userId, anomalyId, classificationId);
   if (!isCompatible) {
     
     return false;
@@ -232,7 +208,6 @@ export async function attemptMineralDepositCreation({
 
   // Create the deposit
   const result = await createMineralDeposit({
-    supabase,
     userId,
     anomalyId,
     classificationId,

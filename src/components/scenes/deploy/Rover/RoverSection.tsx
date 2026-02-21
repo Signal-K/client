@@ -3,7 +3,7 @@
 import Section from "@/src/components/sections/Section";
 import TutorialWrapper, { ROVER_INTRO_STEPS } from "@/src/components/onboarding/TutorialWrapper";
 import { Anomaly } from "@/types/Structures/telescope";
-import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
+import { useSession } from "@/src/lib/auth/session-context";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/src/components/ui/button";
@@ -11,11 +11,10 @@ import { SciFiAnomalyComponent } from "@/src/components/classification/viewport/
 
 export default function RoverViewportSection() {
     const router = useRouter();
-    const supabase = useSupabaseClient();
     const session = useSession();
 
     const [isLoading, setIsLoading] = useState<boolean>(true);
-    const [hasRoverDeployed, setHasRoverDeployed] = useState<Boolean>(false);
+    const [hasRoverDeployed, setHasRoverDeployed] = useState<boolean>(false);
     const [linkedAnomalies, setLinkedAnomalies] = useState<Anomaly[]>([]);
 
     const [selectedAnomaly, setSelectedAnomaly] = useState<Anomaly | null>(null);
@@ -49,31 +48,26 @@ export default function RoverViewportSection() {
     useEffect(() => {
         async function fetchClassificationCount() {
             if (!session) return;
-            const { count, error } = await supabase
-                .from("classifications")
-                .select("id", { count: "exact" })
-                .eq("author", session.user.id);
-            
-            const classificationCount = count || 0;
+            const countRes = await fetch("/api/gameplay/classifications/count");
+            const countPayload = await countRes.json();
+            const classificationCount = countRes.ok ? Number(countPayload?.count || 0) : 0;
             setUserClassificationCount(classificationCount);
             setIsFastDeployEnabled(classificationCount < 4);
         }
         
         async function checkRoverUpgrade() {
             if (!session) return;
-            const { data: upgrade, error } = await supabase
-                .from("researched")
-                .select("*")
-                .eq("user_id", session.user.id)
-                .eq("tech_type", "roverwaypoints")
-                .maybeSingle();
-            
-            setHasRoverUpgrade(!!upgrade);
+            const summaryRes = await fetch("/api/gameplay/research/summary");
+            const summaryPayload = await summaryRes.json();
+            const researchedTypes = Array.isArray(summaryPayload?.researchedTechTypes)
+              ? summaryPayload.researchedTechTypes
+              : [];
+            setHasRoverUpgrade(researchedTypes.includes("roverwaypoints"));
         }
         
         fetchClassificationCount();
         checkRoverUpgrade();
-    }, [session, supabase]);
+    }, [session]);
     
     // Check for linked_anomalies of relevant type
     useEffect(() => {
@@ -85,17 +79,24 @@ export default function RoverViewportSection() {
             }
 
             // Fetch linked anomalies
-            const { data: linked, error: linkedError } = await supabase
-                .from("linked_anomalies")
-                .select("*, anomaly:anomalies(*)")
-                .eq("author", session.user.id)
-                .in("automaton", ["Rover"]);
+            const linkedRes = await fetch("/api/gameplay/linked-anomalies?automaton=Rover");
+            const linkedPayload = await linkedRes.json();
+            const linked = linkedRes.ok ? linkedPayload?.linkedAnomalies || [] : [];
+
+            let anomaliesById = new Map<number, any>();
+            const linkedAnomalyIds = [...new Set((linked || []).map((l: any) => Number(l.anomaly_id)).filter(Number.isFinite))];
+            if (linkedAnomalyIds.length > 0) {
+              const anomalyRes = await fetch(`/api/gameplay/anomalies?ids=${linkedAnomalyIds.join(",")}&limit=500`);
+              const anomalyPayload = await anomalyRes.json();
+              const anomalies = anomalyRes.ok ? anomalyPayload?.anomalies || [] : [];
+              anomaliesById = new Map(anomalies.map((a: any) => [Number(a.id), a]));
+            }
 
             setHasRoverDeployed((linked && linked.length > 0) || false);
 
             // Map user's linked_anomalies to their anomalies[id] counterpart
             const mapped = (linked || []).map((row: any) => ({
-                ...row.anomaly,
+                ...(anomaliesById.get(Number(row.anomaly_id)) || {}),
                 id: `db-${row.anomaly_id}`,
                 x: Math.random() * 80 + 10,
                 y: Math.random() * 80 + 10,
@@ -110,7 +111,7 @@ export default function RoverViewportSection() {
             setLinkedAnomalies(mapped);
 
             // Get set of anomaly_ids still linked
-            const linkedIds = new Set((linked || []).map(l => l.anomaly_id));
+            const linkedIds = new Set((linked || []).map((l: any) => l.anomaly_id));
 
             // Fetch waypoints/routes if rover deployed
             if (linked && linked.length > 0) {
@@ -121,12 +122,10 @@ export default function RoverViewportSection() {
                 cutoff.setUTCDate(now.getUTCDate() - daysToLastSaturday);
                 cutoff.setUTCHours(14, 1, 0, 0);
 
-                const { data: routes, error: routesError } = await supabase
-                    .from("routes")
-                    .select("*")
-                    .eq("author", session.user.id)
-                    .gte("timestamp", cutoff.toISOString())
-                    .order("timestamp", { ascending: true });
+                const routesRes = await fetch("/api/gameplay/routes/latest");
+                const routesPayload = await routesRes.json();
+                const latestRoute = routesRes.ok ? routesPayload?.route || null : null;
+                const routes = latestRoute && latestRoute.timestamp >= cutoff.toISOString() ? [latestRoute] : [];
 
                 if (routes && routes.length > 0) {
                     const latestRoute = routes[routes.length - 1];
@@ -149,17 +148,12 @@ export default function RoverViewportSection() {
                     if (routeAnomalies.size > 0) {
                         const anomalyIdsToFetch = [...routeAnomalies];
                         console.log("Querying classifications for author:", session.user.id, "and anomaly IDs:", anomalyIdsToFetch);
-                        const { data, error } = await supabase
-                            .from("classifications")
-                            .select("*")
-                            .eq("author", session.user.id)
-                            .in("anomaly", anomalyIdsToFetch);
-
-                        if (error) {
-                            console.error("Error fetching classifications:", error);
-                        }
-                        if (data) {
-                            classData = data;
+                        const classRes = await fetch(
+                          `/api/gameplay/classifications?author=${encodeURIComponent(session.user.id)}&anomalies=${anomalyIdsToFetch.join(",")}&orderBy=created_at&ascending=false&limit=500`
+                        );
+                        const classPayload = await classRes.json();
+                        if (classRes.ok && Array.isArray(classPayload?.classifications)) {
+                          classData = classPayload.classifications;
                         }
                     }
 
@@ -331,7 +325,7 @@ export default function RoverViewportSection() {
             setIsLoading(false);
         }
         fetchLinkedAnomaliesAndWaypoints();
-    }, [session, supabase, isFastDeployEnabled]);
+    }, [session, isFastDeployEnabled]);
 
     // Ticking effect to update remaining ms until next waypoint arrival
     useEffect(() => {
@@ -353,9 +347,7 @@ export default function RoverViewportSection() {
 
     // Deploy handler
     const handleDeployRover = async () => {
-        if (typeof window !== "undefined") {
-            window.location.href="/activity/deploy/roover/";
-        }
+        router.push("/activity/deploy/roover/");
     };
 
     // Return home handler - removes routes and linked_anomalies for this user's rover
@@ -364,35 +356,12 @@ export default function RoverViewportSection() {
          
         setIsReturningHome(true);
         try {
-            // Delete all linked_anomalies for this user's rover
-            const { error: linkedError } = await supabase
-                .from('linked_anomalies')
-                .delete()
-                .eq('author', session.user.id)
-                .eq('automaton', 'Rover');
-
-            if (linkedError) {
-                console.error('Error deleting linked anomalies:', linkedError);
-                alert('Failed to clear rover mission data. Please try again.');
-                return;
-            }
-
-            // Delete all routes for this user for this week
-            const now = new Date();
-            const utcDay = now.getUTCDay(); // 0=Sun, 6=Sat
-            const daysToLastSaturday = utcDay === 6 ? 0 : (utcDay + 1) % 7;
-            const cutoff = new Date(now);
-            cutoff.setUTCDate(now.getUTCDate() - daysToLastSaturday);
-            cutoff.setUTCHours(14, 1, 0, 0);
-
-            const { error: routeError } = await supabase
-                .from('routes')
-                .delete()
-                .eq('author', session.user.id)
-                .gte('timestamp', cutoff.toISOString());
-
-            if (routeError) {
-                console.error('Error deleting routes:', routeError);
+            const response = await fetch("/api/gameplay/deploy/rover/return", {
+                method: "POST",
+            });
+            const payload = await response.json().catch(() => ({}));
+            if (!response.ok) {
+                console.error("Error returning rover home:", payload?.error);
                 alert('Failed to clear route data. Please try again.');
                 return;
             }

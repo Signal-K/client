@@ -9,7 +9,7 @@ import { Download, Upload, Save } from "lucide-react"
 import BasicSettings from "./Settings/BasicSettings";
 import TerrainSettings from "./Settings/TerrainSettings";
 import ColorSettings from "./Settings/ColourSettings";
-import { useSupabaseClient } from "@supabase/auth-helpers-react";
+import { mergeClassificationConfiguration } from "@/src/lib/gameplay/classification-configuration";
 
 interface SettingsPanelProps {
   planetConfig: PlanetConfig
@@ -18,8 +18,6 @@ interface SettingsPanelProps {
 }
 
 export default function SettingsPanel({ planetConfig, onChange, classificationId }: SettingsPanelProps) {
-  const supabase = useSupabaseClient();
-
   const [importText, setImportText] = useState("")
   const [importError, setImportError] = useState("")
   const [showExport, setShowExport] = useState(false)
@@ -44,31 +42,11 @@ export default function SettingsPanel({ planetConfig, onChange, classificationId
     setSaveStatus("saving")
 
     try {
-      // First, fetch the existing classification configuration
-      const { data: existingData, error: fetchError } = await supabase
-        .from("classifications")
-        .select("classificationConfiguration")
-        .eq("id", classificationId)
-        .single()
-
-      if (fetchError) {
-        throw fetchError
-      }
-
-      // Merge the planet configuration with existing configuration
-      const updatedConfig = {
-        ...existingData.classificationConfiguration,
+      const result = await mergeClassificationConfiguration(classificationId, {
         planetConfiguration: planetConfig,
-      }
-
-      // Update the classification with the merged configuration
-      const { error: updateError } = await supabase
-        .from("classifications")
-        .update({ classificationConfiguration: updatedConfig })
-        .eq("id", classificationId)
-
-      if (updateError) {
-        throw updateError
+      });
+      if (!result.ok) {
+        throw new Error(result.error || "Failed to save configuration");
       }
 
       setSaveStatus("saved")

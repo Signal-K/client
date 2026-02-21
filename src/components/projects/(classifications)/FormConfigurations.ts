@@ -1,10 +1,10 @@
-export interface ClassificationOption {
+interface ClassificationOption {
   id: number;
   text?: string;
   subOptions?: ClassificationOption[];
 };
 
-export interface FormConfig {
+interface FormConfig {
   title?: string; 
   richTextFields: number;
   options?: ClassificationOption[];

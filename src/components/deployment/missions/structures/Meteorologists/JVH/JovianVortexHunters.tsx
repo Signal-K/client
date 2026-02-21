@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
+import { useSession } from "@/src/lib/auth/session-context";
 import MissionShell from "../../BasePlate";
 import { LidarJVHSatelliteWithId } from "@/src/components/projects/Lidar/JovianVortexHunter";
 import { CloudCogIcon, CloudHail, HelpCircle, ShovelIcon } from "lucide-react";
@@ -27,7 +27,6 @@ interface MissionPoints {
 };
 
 const JovianVortexHunters = () => {
-    const supabase = useSupabaseClient();
     const session = useSession();
 
     const [missions, setMissions] = useState<Mission[]>([]);
@@ -147,21 +146,20 @@ const JovianVortexHunters = () => {
         if (!session) return;
 
         const fetchMissionPoints = async (): Promise<MissionPoints> => {
-            const { data: classifications } = await supabase
-                .from("classifications")
-                .select("id")
-                .eq("author", session.user.id)
-                .eq("classificationtype", "lidar-jovianVortexHunter");
+            const classRes = await fetch(
+              `/api/gameplay/classifications?author=${encodeURIComponent(session.user.id)}&classificationtype=lidar-jovianVortexHunter&limit=500`
+            );
+            const classPayload = await classRes.json();
+            const classifications = classRes.ok ? classPayload?.classifications || [] : [];
 
             const mission1Points = classifications?.length || 0;
 
-            const { data: comments } = await supabase
-                .from("comments")
-                .select("id, classification_id")
-                .eq("author", session.user.id);
+            const activityRes = await fetch("/api/gameplay/social/my?limit=5000");
+            const activityPayload = await activityRes.json();
+            const comments = activityRes.ok ? activityPayload?.comments || [] : [];
 
-            const classificationIds = classifications?.map((c) => c.id) || [];
-            const mission2Points = comments?.filter((comment) =>
+            const classificationIds = classifications?.map((c: any) => c.id) || [];
+            const mission2Points = comments?.filter((comment: any) =>
                 classificationIds.includes(comment.classification_id)
             ).length || 0;
 
@@ -183,7 +181,7 @@ const JovianVortexHunters = () => {
         };
 
         updateMissionData();
-    }, [session, supabase]);
+    }, [session]);
 
     const tutorialMission: Mission = {
         id: 1000,

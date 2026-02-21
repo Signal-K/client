@@ -1,9 +1,9 @@
 "use client";
 
-import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import { useEffect, useState } from "react";
 import { Input } from "@/src/components/ui/input";
 import { Button } from "@/src/components/ui/button";
+import { completeProfileAction } from "./actions";
 
 function generateReferralCode(length = 8) {
   const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -15,9 +15,6 @@ function generateReferralCode(length = 8) {
 }
 
 export default function CompleteProfileForm({ onSuccess }: { onSuccess: () => void }) {
-  const supabase = useSupabaseClient();
-  const session = useSession();
-
   const [username, setUsername] = useState("");
   const [fullName, setFullName] = useState("");
   const [ownReferralCode, setOwnReferralCode] = useState("");
@@ -30,8 +27,6 @@ export default function CompleteProfileForm({ onSuccess }: { onSuccess: () => vo
   }, []);
 
   const handleSubmit = async () => {
-    if (!session) return;
-
     if (username.trim().length < 3) {
       setErrorMsg("Username must be at least 3 characters.");
       return;
@@ -39,75 +34,16 @@ export default function CompleteProfileForm({ onSuccess }: { onSuccess: () => vo
 
     setLoading(true);
     setErrorMsg("");
-
-    const userId = session.user.id;
-
-    const updates = {
-      id: userId,
-      username: username.trim(),
-      full_name: fullName.trim(),
-      referral_code: ownReferralCode,
-      updated_at: new Date(),
-    };
-
-    // Step 1: Update Profile
-    const { error: updateError } = await supabase.from("profiles").upsert(updates);
-
-    if (updateError) {
-      if (updateError.message.includes("profiles_username_key")) {
-        setErrorMsg("That username is already taken. Please choose another one.");
-      } else if (updateError.message.includes("profiles_referral_code_key")) {
-        setErrorMsg("Referral code already exists. Please try again.");
-      } else {
-        setErrorMsg(updateError.message || "Failed to update profile.");
-      }
+    const result = await completeProfileAction({
+      username,
+      fullName,
+      ownReferralCode,
+      referrerCodeInput,
+    });
+    if (!result.ok) {
+      setErrorMsg(result.error || "Failed to update profile.");
       setLoading(false);
       return;
-    }
-
-    // Step 2: Handle referral (if input provided)
-    if (referrerCodeInput.trim()) {
-      // Check if user already has a referral
-      const { data: existingReferral, error: referralCheckError } = await supabase
-        .from("referrals")
-        .select("id")
-        .eq("referree_id", userId)
-        .maybeSingle();
-
-      if (!referralCheckError && !existingReferral) {
-        // Find user with referral_code
-        const { data: referrerProfile } = await supabase
-          .from("profiles")
-          .select("id, referral_code")
-          .eq("referral_code", referrerCodeInput.trim())
-          .maybeSingle();
-
-        if (referrerProfile) {
-          // Create referral from current user → referrer
-          await supabase.from("referrals").insert({
-            referree_id: userId,
-            referral_code: referrerCodeInput.trim(),
-          });
-
-          // Check if the referrer was also referred by someone else
-          const { data: referrersReferral } = await supabase
-            .from("referrals")
-            .select("referral_code")
-            .eq("referree_id", referrerProfile.id)
-            .maybeSingle();
-
-          if (referrersReferral) {
-            // Create an extended referral from current user → referrer's referrer
-            await supabase.from("referrals").insert({
-              referree_id: userId,
-              referral_code: referrersReferral.referral_code,
-            });
-          }
-        } else {
-          // Referral code not found — soft fail, but don't stop profile completion
-          console.warn("Invalid referral code provided");
-        }
-      }
     }
 
     if (typeof onSuccess === "function") {

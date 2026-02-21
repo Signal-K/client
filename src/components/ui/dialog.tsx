@@ -94,7 +94,6 @@ export {
   DialogTrigger,
   DialogContent,
   DialogHeader,
-  DialogFooter,
   DialogTitle,
   DialogDescription,
 };

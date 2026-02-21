@@ -2,7 +2,7 @@
 import TotalPoints from "@/src/components/deployment/missions/structures/Stardust/Total";
 
 import type React from "react"
-import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
+import { useSession } from "@/src/lib/auth/session-context";
 import { useState, useEffect } from "react"
 import { Button } from "@/src/components/ui/button"
 import { Card, CardContent } from "@/src/components/ui/card"
@@ -66,7 +66,6 @@ export default function Sidebar() {
 
 // Supabase session and client
   // Supabase session and client
-  const supabase = useSupabaseClient();
   const session = useSession();
   // Tool deployment state
   const [toolDeployment, setToolDeployment] = useState({
@@ -91,11 +90,10 @@ export default function Sidebar() {
         setAutomatonNotifications([]);
         return;
       }
-      const { data, error } = await supabase
-        .from("linked_anomalies")
-        .select("id, automaton, anomaly_id")
-        .eq("author", session.user.id);
-      if (error || !Array.isArray(data)) {
+      const response = await fetch("/api/gameplay/linked-anomalies", { cache: "no-store" });
+      const payload = await response.json().catch(() => null);
+      const data = payload?.linkedAnomalies;
+      if (!response.ok || !Array.isArray(data)) {
         setAutomatonNotifications([]);
         return;
       }
@@ -177,7 +175,7 @@ export default function Sidebar() {
       ]);
     }
     fetchNotifications();
-  }, [session, supabase]);
+  }, [session]);
   // Responsive: minimised by default on mobile/small desktop
   const getDefaultCollapsed = () => {
     if (typeof window !== 'undefined') {

@@ -49,8 +49,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/src/components/ui/select"
-import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react"
-import html2canvas from "html2canvas"
+import { useSession } from "@/src/lib/auth/session-context"
 import { AvatarGenerator } from "@/src/components/profile/setup/Avatar"
 import { PostCardSingleProps, CommentProps } from "./PostSingle"
 import SurveyorCalculator from "./Surveyor/CalculatorSurveyor";
@@ -71,7 +70,6 @@ export default function PostCard({
   commentStatus,
   onVote,
 }: PostCardSingleProps) {
-  const supabase = useSupabaseClient()
   const session = useSession()
 
   const [voteCount, setVoteCount] = useState(votes)
@@ -84,15 +82,18 @@ export default function PostCard({
     if (!session) return
 
     try {
-      const { error } = await supabase.from("votes").insert([
-        {
-          user_id: session.user.id,
-          classification_id: classificationId,
-          anomaly_id: anomalyId,
-        },
-      ])
-
-      if (error) throw error
+      const response = await fetch("/api/gameplay/social/votes", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          classificationId,
+          anomalyId,
+          voteType: "up",
+        }),
+      })
+      const result = await response.json().catch(() => ({}))
+      if (!response.ok) throw new Error(result?.error || "Failed to vote")
+      if (result?.alreadyVoted) return
       setVoteCount((prev) => prev + 1)
       if (onVote) onVote()
     } catch (error: any) {
@@ -130,6 +131,7 @@ export default function PostCard({
     try {
       await Promise.all(loadPromises)
 
+      const { default: html2canvas } = await import("html2canvas")
       const canvas = await html2canvas(shareCardRef.current, {
         useCORS: true,
         scrollX: 0,

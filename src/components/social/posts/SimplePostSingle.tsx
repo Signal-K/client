@@ -5,11 +5,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/src/components/ui/ca
 import { AvatarGenerator } from '@/src/components/profile/setup/Avatar';
 import { Button } from '@/src/components/ui/button';
 import { Share2, ThumbsUpIcon, ThumbsDownIcon, MessageCircle } from 'lucide-react';
-import html2canvas from 'html2canvas';
-import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
 import { CommentForm } from '../comments/CommentForm';
 import CommentsList from '../comments/CommentListById';
 import { useRouter } from 'next/navigation';
+import { toggleVoteAction } from '../actions';
 
 interface SimplePostSingleProps {
   title: string;
@@ -32,9 +31,6 @@ export function SimplePostSingle({
 }: SimplePostSingleProps) {
   const router = useRouter();
 
-  const supabase = useSupabaseClient();
-  const session = useSession();
-
   // Combine images with sourceMedia for the slider
   const allImages = sourceMedia.length > 0 ? [...images, ...sourceMedia] : images;
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -48,59 +44,36 @@ export function SimplePostSingle({
 
   useEffect(() => {
     fetchVotes();
-  }, [id, session?.user?.id]);
+  }, [id]);
 
   const fetchVotes = async () => {
     try {
-      const { data: votes, error } = await supabase
-        .from('votes')
-        .select('vote_type, user_id')
-        .eq('classification_id', id);
-
-      if (error) throw error;
-
-      const upvotes = votes.filter((v) => v.vote_type === 'up').length;
-      const downvotes = votes.filter((v) => v.vote_type === 'down').length;
-
-      setVoteTotal(upvotes - downvotes);
-
-      if (session?.user?.id) {
-        const userVote = votes.find((v) => v.user_id === session.user.id);
-        setUserVote(userVote?.vote_type || null);
+      const response = await fetch(`/api/gameplay/social/votes?classificationId=${id}`, {
+        method: "GET",
+        cache: "no-store",
+      });
+      const payload = await response.json();
+      if (!response.ok) {
+        throw new Error(payload?.error || "Failed to load votes");
       }
+      setVoteTotal(payload.voteTotal || 0);
+      setUserVote(payload.userVote || null);
     } catch (error) {
       console.error('Error fetching votes:', error);
     }
   };
 
   const handleVote = async (type: 'up' | 'down') => {
-    if (!session) return;
-
     try {
-      const { data: existingVote } = await supabase
-        .from('votes')
-        .select('*')
-        .eq('user_id', session.user.id)
-        .eq('classification_id', id)
-        .maybeSingle();
-
-      if (existingVote) {
-        if (existingVote.vote_type === type) {
-          await supabase.from('votes').delete().eq('id', existingVote.id);
-          setUserVote(null);
-        } else {
-          await supabase.from('votes').update({ vote_type: type }).eq('id', existingVote.id);
-          setUserVote(type);
-        }
-      } else {
-        await supabase.from('votes').insert({
-          user_id: session.user.id,
-          classification_id: id,
-          vote_type: type,
-        });
-        setUserVote(type);
+      const result = await toggleVoteAction({
+        classificationId: Number(id),
+        voteType: type,
+      });
+      if (!result.ok) {
+        console.error("Voting error:", result.error);
+        return;
       }
-
+      setUserVote(result.userVote);
       fetchVotes();
     } catch (error) {
       console.error('Voting error:', error);
@@ -133,6 +106,7 @@ export function SimplePostSingle({
 
     await Promise.all(imagePromises);
 
+    const { default: html2canvas } = await import('html2canvas');
     const canvas = await html2canvas(shareCardRef.current, {
       useCORS: true,
       scrollX: 0,

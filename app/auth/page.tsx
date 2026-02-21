@@ -1,19 +1,19 @@
 "use client";
 
 import { useEffect } from "react";
-import { useSession } from "@supabase/auth-helpers-react";
 import { useRouter } from "next/navigation";
 import EnhancedAuthPage from "@/src/components/profile/auth/EnhancedAuth";
+import { useAuthUser } from "@/src/hooks/useAuthUser";
 
 const Login = () => {
-    const session = useSession();
+    const { user } = useAuthUser();
     const router = useRouter();
 
     useEffect(() => {
-        if (session) {
+        if (user) {
             router.push('/game');
         }
-    }, [session, router]);
+    }, [user, router]);
 
     return <EnhancedAuthPage />;
 };

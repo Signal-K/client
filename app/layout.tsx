@@ -7,7 +7,10 @@ export const metadata: Metadata = {
   title: "Star Sailors",
   description: "Catalogue the Stars",
   icons: {
-    icon: "/favicon.ico",
+    icon: [
+      { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icon-512.png", sizes: "512x512", type: "image/png" },
+    ],
     apple: [
       {
         url: "/assets/Captn.jpg",
@@ -48,8 +51,24 @@ export const viewport: Viewport = {
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
+  const posthogApiKey =
+    process.env.posthog_api_key ??
+    process.env.POSTHOG_API_KEY ??
+    process.env.NEXT_PUBLIC_POSTHOG_KEY;
+  const posthogProjectId =
+    process.env.posthog_project_id ??
+    process.env.POSTHOG_PROJECT_ID;
+  const posthogRegion =
+    process.env.posthog_region ??
+    process.env.POSTHOG_REGION ??
+    "US Cloud";
+
   return (
-    <PostHogProvider>
+    <PostHogProvider
+      apiKey={posthogApiKey}
+      projectId={posthogProjectId}
+      region={posthogRegion}
+    >
       <RootLayoutClient>{children}</RootLayoutClient>
     </PostHogProvider>
   );

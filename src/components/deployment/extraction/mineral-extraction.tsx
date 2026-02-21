@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Drill, Satellite, Droplet, Snowflake, Gem, Beaker, MapPin, ChevronRight } from "lucide-react"
 import { getMineralDisplayName } from "@/src/utils/mineralAnalysis"
 
-export interface MineralConfiguration {
+interface MineralConfiguration {
   type: string
   amount?: number
   quantity?: number
@@ -20,7 +20,7 @@ export interface MineralConfiguration {
   }
 }
 
-export interface MineralDepositProps {
+interface MineralDepositProps {
   id: number
   mineralConfiguration: MineralConfiguration
   location?: string

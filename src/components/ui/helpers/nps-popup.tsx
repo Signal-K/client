@@ -5,8 +5,8 @@ import { Button } from "@/src/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/src/components/ui/card";
 import { Textarea } from "@/src/components/ui/textarea";
 import { X } from "lucide-react";
-import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { Label } from "@/src/components/ui/label";
+import { useAuthUser } from "@/src/hooks/useAuthUser";
 
 interface NPSPopupProps {
   isOpen: boolean;
@@ -15,8 +15,7 @@ interface NPSPopupProps {
 };
 
 export default function NPSPopup({ isOpen, onClose, userId }: NPSPopupProps) {
-  const supabase = useSupabaseClient();
-  const session = useSession();
+  const { user } = useAuthUser();
 
   const [npsScore, setNpsScore] = useState<number | null>(null);
   const [why, setWhy] = useState<string | null>(null);
@@ -27,19 +26,22 @@ export default function NPSPopup({ isOpen, onClose, userId }: NPSPopupProps) {
 
   const handleSubmit = async () => {
     if (npsScore === null || isSubmitting) return;
+    if (!user?.id && !userId) return;
 
     setIsSubmitting(true);
-    const { error } = await supabase.from("nps_surveys").insert([
-      {
-        user_id: session?.user.id ?? userId,
-        nps_score: npsScore,
-        project_interests: why,
-      },
-    ]);
+    const response = await fetch("/api/gameplay/nps", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        npsScore,
+        feedback: why,
+      }),
+    });
+    const payload = await response.json().catch(() => null);
     setIsSubmitting(false);
 
-    if (error) {
-      console.error("Error submitting NPS survey:", error);
+    if (!response.ok) {
+      console.error("Error submitting NPS survey:", payload?.error || response.statusText);
       return;
     }
 

@@ -1,17 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Scale, Users, Shield, AlertTriangle, CheckCircle, Globe } from "lucide-react";
+import { Scale, Users, Shield, CheckCircle, Globe } from "lucide-react";
 import Link from "next/link";
 
 export default function TermsOfServicePage() {
-  const [isDark, setIsDark] = useState(false);
-
-  useEffect(() => {
-    // Check if dark mode is enabled
-    setIsDark(document.documentElement.classList.contains("dark"));
-  }, []);
-
   return (
     <div className="min-h-screen w-full relative flex justify-center pb-20">
       {/* Background gradient similar to main page */}
@@ -48,7 +40,7 @@ export default function TermsOfServicePage() {
           <div className="flex items-center justify-center gap-4 mt-6 text-sm text-muted-foreground">
             <span className="flex items-center gap-1">
               <CheckCircle className="w-4 h-4" />
-              Effective: July 27, 2025
+              Effective: February 19, 2026
             </span>
             <span className="flex items-center gap-1">
               <Users className="w-4 h-4" />
@@ -304,9 +296,9 @@ export default function TermsOfServicePage() {
                 <h3 className="font-semibold text-foreground mb-3">Your Right to Leave</h3>
                 <div className="space-y-2 text-sm text-muted-foreground">
                   <p>• You can delete your account at any time through your profile settings</p>
-                  <p>• Account deletion removes your personal information from our systems</p>
+                  <p>• Account deletion removes or anonymizes personal information from our systems</p>
                   <p>• Your scientific contributions may remain in anonymized research datasets</p>
-                  <p>• We'll process deletion requests within 30 days</p>
+                  <p>• We'll process deletion requests within a reasonable timeframe, typically within 30 days</p>
                 </div>
               </div>
 
@@ -352,8 +344,8 @@ export default function TermsOfServicePage() {
                 </p>
                 <div className="p-3 bg-card/50 rounded-lg">
                   <p className="text-xs text-muted-foreground">
-                    <strong>Current version:</strong> 1.0 (July 27, 2025)<br />
-                    <strong>Next review:</strong> January 2026
+                    <strong>Current version:</strong> 1.1 (February 19, 2026)<br />
+                    <strong>Next review:</strong> August 2026
                   </p>
                 </div>
               </div>

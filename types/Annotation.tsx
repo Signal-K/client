@@ -1,4 +1,4 @@
-export interface Point {
+interface Point {
   x: number;
   y: number;
 };
@@ -328,9 +328,9 @@ export const AI4MCATEGORIES: Record<AI4MCategory, CategoryConfig> = {
   },
 };
 
-export type MineralType = 'iron-ore' | 'cultivable-soil' | 'gold' | 'aluminum' | 'water-ice' | 'silicate' | 'copper';
+type MineralType = 'iron-ore' | 'cultivable-soil' | 'gold' | 'aluminum' | 'water-ice' | 'silicate' | 'copper';
 
-export interface MineralConfiguration {
+interface MineralConfiguration {
   mineralType: MineralType;
   purity: number;
   estimatedQuantity: 'trace' | 'small' | 'moderate' | 'large' | 'abundant';
@@ -338,7 +338,7 @@ export interface MineralConfiguration {
   confidence: number; // 0-100, based on classification quality
 };
 
-export interface MineralDepositData {
+interface MineralDepositData {
   anomaly: number;
   owner: string;
   mineralconfiguration: MineralConfiguration;
@@ -347,9 +347,9 @@ export interface MineralDepositData {
   roverName: string;
 };
 
-export type DrawingMode = 'freehand' | 'rectangle' | 'circle';
+type DrawingMode = 'freehand' | 'rectangle' | 'circle';
 
-export interface Shape {
+interface Shape {
   type: DrawingMode;
   startPoint: Point;
   endPoint: Point;
@@ -369,7 +369,7 @@ export type DrawingObject = {
   category: AI4MCategory | P4Category;
 };
 
-export interface Line {
+interface Line {
   points: Point[];
   color: string;
   width: number;

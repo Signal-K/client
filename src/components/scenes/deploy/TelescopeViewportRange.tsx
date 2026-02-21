@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useCallback } from "react"
-import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react"
+import { useSession } from "@/src/lib/auth/session-context"
 import { useRouter } from "next/navigation"
 import { TelescopeView } from "@/src/components/classification/telescope/telescope-view"
 import type { Anomaly, Star } from "@/types/Structures/telescope"
@@ -21,7 +21,6 @@ import { useUserPreferences, TelescopeFocusType } from "@/src/hooks/useUserPrefe
 export type DeploymentType = "stellar" | "planetary";
 
 export default function DeployTelescopeViewport() {
-  const supabase = useSupabaseClient()
   const session = useSession();
 
   const router = useRouter()
@@ -70,20 +69,20 @@ export default function DeployTelescopeViewport() {
     [deploymentType]
   )
 
-  const fetchAnomalies = async () => fetchAnomaliesAction(supabase, deploymentType, session, setTessAnomalies)
+  const fetchAnomalies = async () => fetchAnomaliesAction(deploymentType, setTessAnomalies)
 
-  const checkDeployment = async () => checkDeploymentAction(supabase, session, setAlreadyDeployed, setDeploymentMessage)
+  const checkDeployment = async () => checkDeploymentAction(setAlreadyDeployed, setDeploymentMessage)
 
   const loadSector = useCallback((x: number, y: number) => loadSectorAction(x, y, tessAnomalies, setStars, setSectorAnomalies, generateAnomalyFromDB), [tessAnomalies, generateAnomalyFromDB])
 
     useEffect(() => {
     if (!session) return;
-    (async () => fetchSkillProgressAction(supabase, session, setSkillProgress))()
+    (async () => fetchSkillProgressAction(setSkillProgress))()
   }, [session]);
 
   const handleDeploy = async () => {
-    if (!session || !selectedSector || alreadyDeployed) return
-    await handleDeployAction({ supabase, session, selectedSector, deploymentType, tessAnomalies, setDeploying, setDeploymentResult, setShowConfirmation, setDeploymentMessage, setAlreadyDeployed, generateSectorName })
+    if (!selectedSector || alreadyDeployed) return
+    await handleDeployAction({ userId: session?.user?.id, selectedSector, deploymentType, tessAnomalies, setDeploying, setDeploymentResult, setShowConfirmation, setDeploymentMessage, setAlreadyDeployed, generateSectorName })
   }
 
   const handleAnomalyClick = (a: Anomaly) => setFocusedAnomaly(a)
@@ -139,9 +138,14 @@ export default function DeployTelescopeViewport() {
   useEffect(() => {
     const load = async () => {
       setLoading(true)
-      await fetchAnomalies()
-      await checkDeployment()
-      setLoading(false)
+      try {
+        await fetchAnomalies()
+        await checkDeployment()
+      } catch (err) {
+        console.error("Error during telescope deploy load:", err)
+      } finally {
+        setLoading(false)
+      }
     }
     if (deploymentType) {
       load()

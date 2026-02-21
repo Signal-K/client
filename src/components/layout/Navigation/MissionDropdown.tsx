@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/src/components/ui/popover";
 import { Badge, ChevronDown, Trophy } from "lucide-react";
 import { Button } from "@/src/components/ui/button";
@@ -21,9 +20,6 @@ interface MilestoneWeek {
 }
 
 export function MissionsPopover() {
-  const supabase = useSupabaseClient();
-  const session = useSession();
-
   const [currentWeekIndex, setCurrentWeekIndex] = useState<number>(0);
   const [milestones, setMilestones] = useState<MilestoneWeek[]>([]);
   const [userProgress, setUserProgress] = useState<Record<string, number>>({});
@@ -58,49 +54,27 @@ export function MissionsPopover() {
   }, []);
 
   useEffect(() => {
-    if (!session || milestones.length === 0) return;
+    if (milestones.length === 0) return;
 
     const fetchProgress = async () => {
-      const progress: Record<string, number> = {};
       const weekData = milestones[currentWeekIndex];
 
       if (!weekData) return;
-
-      const { weekStart, data } = weekData;
-      const startDate = new Date(weekStart);
-      const endDate = new Date(startDate);
-      endDate.setDate(startDate.getDate() + 6);
-      endDate.setHours(23, 59, 59, 999);
-
-      for (const milestone of data) {
-        const { table, field, value } = milestone;
-
-        // Avoid select("*") — only select primary keys to minimize type complexity
-        let query = supabase
-          .from(table)
-          .select("id", { count: "exact", head: false })
-          .eq(field, value)
-          .gte("created_at", startDate.toISOString())
-          .lte("created_at", endDate.toISOString());
-
-        const userField = ["votes", "classifications", "comments"].includes(table)
-          ? "user_id"
-          : "author";
-
-        query = query.eq(userField, session.user.id);
-
-        const { count, error } = await query;
-
-        if (!error && typeof count === "number") {
-          progress[milestone.name] = count;
-        }
+      const response = await fetch("/api/gameplay/milestones/weekly-progress", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(weekData),
+      });
+      const payload = await response.json().catch(() => null);
+      if (!response.ok) {
+        setUserProgress({});
+        return;
       }
-
-      setUserProgress(progress);
+      setUserProgress(payload?.progress || {});
     };
 
     fetchProgress();
-  }, [session, milestones, currentWeekIndex, supabase]);
+  }, [milestones, currentWeekIndex]);
 
   return (
     <Popover>

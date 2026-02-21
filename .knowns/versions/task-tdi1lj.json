@@ -1,0 +1,34 @@
+{
+  "taskId": "tdi1lj",
+  "currentVersion": 1,
+  "versions": [
+    {
+      "id": "v1",
+      "taskId": "tdi1lj",
+      "version": 1,
+      "timestamp": "2026-02-19T10:19:57.840Z",
+      "changes": [
+        {
+          "field": "status",
+          "oldValue": "in-progress",
+          "newValue": "todo"
+        }
+      ],
+      "snapshot": {
+        "title": "Add link/referrals between client and saily",
+        "description": "<!-- SECTION:DESCRIPTION:BEGIN -->\n<!-- SECTION:DESCRIPTION:END -->",
+        "status": "todo",
+        "priority": "high",
+        "labels": [
+          "refs",
+          "ecosystem",
+          "invites",
+          "saily",
+          "client"
+        ],
+        "acceptanceCriteria": [],
+        "implementationNotes": "Kickoff audit completed for referral integration points in client:\n- Referral submission/read endpoints already exist (`app/api/gameplay/profile/referral-status/route.ts`, `app/api/gameplay/profile/code/route.ts`).\n- Referral UI surfaces found in `app/research/page.tsx`, `src/components/profile/setup/Referrals.tsx`, and `src/components/layout/Tes.tsx`.\n\nRemaining blocker for full completion:\n- Saily-side referral URL/contract is not yet defined in this repo (no `saily` domain/SDK/config references found). Next step is to add a shared referral-link builder once target URL/query contract is provided."
+      }
+    }
+  ]
+}

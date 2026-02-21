@@ -1,7 +1,6 @@
 "use client"
 
 import React, { useState, useEffect, useCallback } from "react"
-import { useSession } from "@supabase/auth-helpers-react"
 import type { Anomaly, ViewMode } from "@/types/Structures/telescope"
 import type { projects } from "@/src/shared/data/projects"
 import { missions } from "@/src/components/deployment/missions/data"
@@ -55,7 +54,6 @@ export interface TelescopeViewportState {
 }
 
 const TelescopeViewport: React.FC = () => {
-  const session = useSession()
   const databaseOps = useDatabaseOperations()
 
   const initialState: TelescopeViewportState = {
@@ -155,8 +153,6 @@ const TelescopeViewport: React.FC = () => {
   const loadViewportData = async () => {
     setViewportState((prev) => ({ ...prev, loading: true }))
 
-    const userId = session?.user?.id || "4d9a57e6-ea3c-4836-aa18-1c3ee7f6f725"
-
     try {
       const [anomaliesData, userClassData, allClassData] = await Promise.all([
         databaseOps.fetchAnomalies(),
@@ -255,8 +251,6 @@ const TelescopeViewport: React.FC = () => {
   const performClassification = async () => {
     if (!viewportState.selectedAnomaly) return
 
-    const userId = session?.user?.id || "4d9a57e6-ea3c-4836-aa18-1c3ee7f6f725"
-
     const typeMap = {
       exoplanet: "planet",
       sunspot: "sunspot",
@@ -265,7 +259,7 @@ const TelescopeViewport: React.FC = () => {
     } as const
 
     const classType = typeMap[viewportState.selectedAnomaly?.type as keyof typeof typeMap] || "planet"
-    const result = await databaseOps.createClassification(viewportState.selectedAnomaly.id, classType, userId)
+    const result = await databaseOps.createClassification(viewportState.selectedAnomaly.id, classType)
 
     if (result) {
       setViewportState((prev) => ({
@@ -320,7 +314,7 @@ const TelescopeViewport: React.FC = () => {
       viewportState.currentSector.x, 
       viewportState.currentSector.y
     )
-    let projectItems = projectId ? sectorItems.filter((item) => item.project === projectId) : sectorItems
+    const projectItems = projectId ? sectorItems.filter((item) => item.project === projectId) : sectorItems
     
     if (projectItems.length === 0 && viewportState.anomalies.length > 0) {
       const allItems = projectId ? viewportState.anomalies.filter((item) => item.project === projectId) : viewportState.anomalies
@@ -332,7 +326,7 @@ const TelescopeViewport: React.FC = () => {
 
   useEffect(() => {
     loadViewportData()
-  }, [session])
+  }, [])
 
   useEffect(() => {
     if (!viewportState.loading) {

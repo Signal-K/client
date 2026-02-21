@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from "react";
-import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
+import { useSession } from "@/src/lib/auth/session-context";
 import Navbar from "@/src/components/layout/Navbar";
 import { PostCardSingleWithGenerator } from "@/src/components/social/posts/PostWithGen";
 
@@ -37,7 +37,6 @@ type Anomaly = {
 };
 
 export default function CloudDetailsClient({ id }: { id: number }) {
-  const supabase = useSupabaseClient();
   const session = useSession();
 
   const [classification, setClassification] = useState<Classification | null>(null);
@@ -52,17 +51,16 @@ export default function CloudDetailsClient({ id }: { id: number }) {
     }
 
     const fetchClassification = async () => {
-      const { data, error } = await supabase
-        .from("classifications")
-        .select("*, anomaly:anomalies(*), classificationConfiguration, media")
-        .eq("id", id)
-        .single();
-
-      if (error) {
+      const res = await fetch(
+        `/api/gameplay/classifications?id=${encodeURIComponent(String(id))}&includeAnomaly=true&limit=1`
+      );
+      const payload = await res.json();
+      if (!res.ok || !payload?.classifications?.[0]) {
         setError("Failed to fetch classification.");
         setLoading(false);
         return;
       }
+      const data = payload.classifications[0] as Classification;
 
       setClassification(data);
       setAnomaly(data.anomaly);

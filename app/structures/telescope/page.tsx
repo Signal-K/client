@@ -1,18 +1,25 @@
 'use client'
 
 import { useRouter } from "next/navigation";
+import dynamic from "next/dynamic";
 import Home from "@/app/page";
 import GameNavbar from "@/src/components/layout/Tes";
 import { Dialog, DialogContent } from "@/src/components/ui/dialog";
-import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
-import TelescopeViewport from "@/src/components/classification/telescope/telescope-viewport";
+import { useSession } from "@/src/lib/auth/session-context";
 import { useState, useEffect } from "react";
 import Landing from "@/app/apt/page";
+
+const TelescopeViewport = dynamic(
+  () => import("@/src/components/classification/telescope/telescope-viewport"),
+  {
+    ssr: false,
+    loading: () => <div className="p-4 text-xs text-slate-400">Loading telescope viewport...</div>,
+  }
+);
 
 export default function TelescopeOnEarthPage() {
   const router = useRouter();
   const session = useSession();
-  const supabase = useSupabaseClient();
   const [simpleMode, setSimpleMode] = useState(false); // default: viewport mode
   const [isChecking, setIsChecking] = useState(true);
 
@@ -21,20 +28,14 @@ export default function TelescopeOnEarthPage() {
       if (!session?.user?.id) return;
 
       try {
-        // Check if user has any linked anomalies (indicating they've deployed a telescope)
-        const { data: linkedAnomalies, error } = await supabase
-          .from("linked_anomalies")
-          .select("id")
-          .eq("author", session.user.id)
-          .limit(1);
-
-        if (error) {
-          console.error("Error checking linked anomalies:", error);
+        const response = await fetch("/api/gameplay/deploy/status", { cache: "no-store" });
+        const payload = await response.json().catch(() => null);
+        if (!response.ok || !payload?.deploymentStatus) {
+          console.error("Error checking telescope access:", payload?.error || response.statusText);
           return;
         }
 
-        // If no linked anomalies found, redirect to deploy page
-        if (!linkedAnomalies || linkedAnomalies.length === 0) {
+        if (!payload.deploymentStatus?.telescope?.deployed) {
           router.push("/activity/deploy");
           return;
         }
@@ -49,7 +50,7 @@ export default function TelescopeOnEarthPage() {
     if (session) {
       checkTelescopeAccess();
     }
-  }, [session, supabase, router]);
+  }, [session, router]);
 
   if (!session) return <Landing />;
 

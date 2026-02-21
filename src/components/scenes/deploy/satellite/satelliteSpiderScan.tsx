@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { ChevronUp, ChevronDown, Satellite } from 'lucide-react';
-import { useSupabaseClient, useSession } from '@supabase/auth-helpers-react';
+import { useSession } from '@/src/lib/auth/session-context';
 import { useRouter } from 'next/navigation';
 import { DatabaseAnomaly } from '../Telescope/TelescopeUtils';
 import { PlanetGeneratorMinimal } from '@/src/components/discovery/data-sources/Astronomers/PlanetHunters/PlanetGenerator';
@@ -146,7 +146,6 @@ const OrbitalPaths: React.FC<{ anomalies: SatelliteSpiderScanProps['anomalies'] 
 };
 
 const SatelliteSpiderScan: React.FC<SatelliteSpiderScanProps> = ({ anomalies }) => {
-  const supabase = useSupabaseClient();
   const session = useSession();
   const router = useRouter();
   
@@ -214,20 +213,23 @@ const SatelliteSpiderScan: React.FC<SatelliteSpiderScanProps> = ({ anomalies }) 
       if (!session?.user?.id || anomalies.length === 0) return;
 
       const anomalyIds = anomalies.map(a => a.id);
-      const { data: classifications, error } = await supabase
-        .from('classifications')
-        .select('anomaly')
-        .eq('author', session.user.id)
-        .in('anomaly', anomalyIds);
-
-      if (!error && classifications) {
-        const classifiedIds = new Set(classifications.map(c => c.anomaly));
+      const res = await fetch(
+        `/api/gameplay/classifications?author=${encodeURIComponent(session.user.id)}&anomalies=${anomalyIds.join(",")}&limit=500`
+      );
+      const payload = await res.json().catch(() => ({}));
+      const classifications = res.ok ? payload?.classifications : [];
+      if (classifications) {
+        const classifiedIds = new Set<number>(
+          classifications
+            .map((c: any) => Number(c.anomaly))
+            .filter((id: number) => Number.isFinite(id))
+        );
         setClassifiedAnomalies(classifiedIds);
       }
     };
 
     checkClassifiedAnomalies();
-  }, [anomalies, session, supabase]);
+  }, [anomalies, session]);
 
   // Function to recall the satellite
   const handleRecallSatellite = async () => {
@@ -235,14 +237,17 @@ const SatelliteSpiderScan: React.FC<SatelliteSpiderScanProps> = ({ anomalies }) 
     
     setIsRecalling(true);
     try {
-      const { error } = await supabase
-        .from('linked_anomalies')
-        .delete()
-        .eq('author', session.user.id)
-        .eq('automaton', 'WeatherSatellite');
+      const response = await fetch("/api/gameplay/linked-anomalies", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          automaton: "WeatherSatellite",
+        }),
+      });
+      const payload = await response.json().catch(() => ({}));
 
-      if (error) {
-        console.error('Error recalling satellite:', error);
+      if (!response.ok) {
+        console.error('Error recalling satellite:', payload?.error);
         alert('Failed to recall satellite. Please try again.');
       } else {
         // Redirect to home or satellite viewport after successful recall

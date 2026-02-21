@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useEffect } from "react"
-import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react"
+import { useSession, useSupabaseClient } from "@/src/lib/auth/session-context"
 import { useRouter } from "next/navigation"
 import GameNavbar from "@/src/components/layout/Tes"
 import { Dialog, DialogContent } from "@/src/components/ui/dialog"

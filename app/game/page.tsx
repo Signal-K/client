@@ -3,8 +3,8 @@
 import { Suspense, useState, useEffect, useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import dynamic from "next/dynamic";
-import { useSession, useSessionContext } from "@supabase/auth-helpers-react";
 import { usePostHog } from "posthog-js/react";
+import { useAuthUser } from "@/src/hooks/useAuthUser";
 
 // Dynamic heavy components
 const TelescopeBackground = dynamic(
@@ -106,10 +106,12 @@ import {
 
 type ViewMode = "base" | "telescope" | "satellite" | "rover" | "solar" | "inventory";
 
+const POSTHOG_SURVEY_ID = "019bb036-6cd7-0000-fc06-1c83a01e7759";
+const POSTHOG_SURVEY_SHOWN_KEY = "posthog_survey_g5zk5h_shown_v1";
+
 // Create a separate component for the search params logic
 function GamePageContent() {
-  const session = useSession();
-  const { isLoading: isAuthLoading } = useSessionContext();
+  const { user, isLoading: isAuthLoading } = useAuthUser();
   const posthog = usePostHog();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -120,6 +122,7 @@ function GamePageContent() {
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [showPreferencesModal, setShowPreferencesModal] = useState(false);
+  const [openedViewports, setOpenedViewports] = useState<Set<ViewMode>>(new Set());
 
   // Hooks
   const {
@@ -142,10 +145,10 @@ function GamePageContent() {
 
   // Show preferences modal on first visit or new device
   useEffect(() => {
-    if (!preferencesLoading && needsPreferencesPrompt && session) {
+    if (!preferencesLoading && needsPreferencesPrompt && user) {
       setShowPreferencesModal(true);
     }
-  }, [preferencesLoading, needsPreferencesPrompt, session]);
+  }, [preferencesLoading, needsPreferencesPrompt, user]);
 
         // Determine which structures to show based on preferences
         const shouldShowStructure = (structureType: "telescope" | "satellite" | "rover" | "solar") => {
@@ -265,27 +268,90 @@ function GamePageContent() {
 
         // Track page view
         useEffect(() => {
-          if (session?.user) {
+          if (user) {
             posthog?.capture("game_page_viewed", {
-              user_id: session.user.id,
+              user_id: user.id,
               classification_count: classifications.length,
               discovery_count: linkedAnomalies.length,
             });
           }
-        }, [session, posthog, classifications.length, linkedAnomalies.length]);
+        }, [user, posthog, classifications.length, linkedAnomalies.length]);
+
+        // Show the PostHog survey once, after meaningful engagement in gameplay.
+        useEffect(() => {
+          if (!user || !posthog || activeView !== "base") {
+            return;
+          }
+
+          if (showNpsModal || showPreferencesModal || showProfileModal) {
+            return;
+          }
+
+          if (typeof window === "undefined") {
+            return;
+          }
+
+          const alreadyShown = window.localStorage.getItem(POSTHOG_SURVEY_SHOWN_KEY) === "1";
+          if (alreadyShown) {
+            return;
+          }
+
+          const meaningfulViewports = ["telescope", "satellite", "rover", "solar"].filter((view) =>
+            openedViewports.has(view as ViewMode)
+          ).length;
+          const hasMeaningfulProgress =
+            classifications.length >= 3 ||
+            linkedAnomalies.length >= 5 ||
+            meaningfulViewports >= 2;
+
+          if (!hasMeaningfulProgress) {
+            return;
+          }
+
+          const timeout = window.setTimeout(() => {
+            posthog.displaySurvey(POSTHOG_SURVEY_ID);
+            posthog.capture("posthog_survey_triggered", {
+              survey_id: POSTHOG_SURVEY_ID,
+              trigger_page: "game",
+              classifications: classifications.length,
+              linked_anomalies: linkedAnomalies.length,
+              meaningful_viewports: meaningfulViewports,
+            });
+            window.localStorage.setItem(POSTHOG_SURVEY_SHOWN_KEY, "1");
+          }, 12000);
+
+          return () => window.clearTimeout(timeout);
+        }, [
+          user,
+          posthog,
+          activeView,
+          showNpsModal,
+          showPreferencesModal,
+          showProfileModal,
+          classifications.length,
+          linkedAnomalies.length,
+          openedViewports,
+        ]);
 
         // Redirect unauthenticated users
         useEffect(() => {
-          if (!isAuthLoading && !session) {
+          if (!isAuthLoading && !user) {
             router.push("/");
           }
-        }, [isAuthLoading, session, router]);
+        }, [isAuthLoading, user, router]);
 
         // Handle view navigation
         const handleViewChange = (view: ViewMode) => {
           console.log("[DEBUG] handleViewChange called with:", view);
           console.log("[DEBUG] current activeView:", activeView);
           setActiveView(view);
+          if (view !== "base" && view !== "inventory") {
+            setOpenedViewports((prev) => {
+              const next = new Set(prev);
+              next.add(view);
+              return next;
+            });
+          }
           posthog?.capture("viewport_opened", { viewport: view });
         };
 
@@ -304,7 +370,7 @@ function GamePageContent() {
         const needsProfileSetup = !profile?.username || !profile?.full_name;
 
         // Loading state
-        if (!session) {
+        if (!user) {
           return (
             <div className="min-h-screen w-full flex items-center justify-center text-sm text-muted-foreground">
               Redirecting…
@@ -370,8 +436,8 @@ function GamePageContent() {
               </main>
 
               {/* NPS Popup */}
-              {showNpsModal && session && (
-                <NPSPopup userId={session.user.id} isOpen={true} onClose={handleCloseNps} />
+              {showNpsModal && user && (
+                <NPSPopup userId={user.id} isOpen={true} onClose={handleCloseNps} />
               )}
 
               <PWAPrompt />
@@ -588,8 +654,8 @@ function GamePageContent() {
               </Dialog>
 
               {/* NPS Popup */}
-              {showNpsModal && session && (
-                <NPSPopup userId={session.user.id} isOpen={true} onClose={handleCloseNps} />
+              {showNpsModal && user && (
+                <NPSPopup userId={user.id} isOpen={true} onClose={handleCloseNps} />
               )}
 
               {/* Project Preferences Modal */}

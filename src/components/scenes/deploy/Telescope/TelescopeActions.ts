@@ -3,129 +3,43 @@ import type { Anomaly, Star } from "@/types/Structures/telescope"
 import { seededRandom1 } from "./TelescopeUtils"
 import { generateStars } from "@/src/components/classification/telescope/utils/sector-utils"
 
-export async function fetchAnomalies(supabase: any, deploymentType: string | null, session: any, setTessAnomalies: (a: DatabaseAnomaly[]) => void) {
+export async function fetchAnomalies(deploymentType: string | null, setTessAnomalies: (a: DatabaseAnomaly[]) => void) {
   try {
-    let setsToFetch: string[] = [];
-    if (deploymentType === "stellar") {
-      setsToFetch = ['diskDetective', 'superwasp-variable', 'telescope-superwasp-variable'];
-    } else if (deploymentType === "planetary") {
-      setsToFetch = ['telescope-tess', 'telescope-minorPlanet'];
-      
-      // Check for active asteroids unlock
-      let includeActiveAsteroids = false;
-      if (session?.user?.id) {
-        const { count, error: countError } = await supabase
-          .from("classifications")
-          .select("id", { count: "exact", head: true })
-          .eq("author", session.user.id)
-          .eq("classificationtype", "telescope-minorPlanet");
-        if (!countError && typeof count === 'number' && count >= 2) {
-          includeActiveAsteroids = true;
-        }
-      }
-      if (includeActiveAsteroids) setsToFetch.push('active-asteroids');
-      
-      // Check for NGTS access unlock
-      let includeNGTS = false;
-      if (session?.user?.id) {
-        const { data: ngtsData, error: ngtsError } = await supabase
-          .from("researched")
-          .select("tech_type")
-          .eq("user_id", session.user.id)
-          .eq("tech_type", "ngtsAccess")
-          .single();
-        
-        if (!ngtsError && ngtsData) {
-          includeNGTS = true;
-        }
-      }
-      if (includeNGTS) setsToFetch.push('telescope-ngts');
-    } else {
+    if (deploymentType !== "stellar" && deploymentType !== "planetary") {
       return;
     }
 
-    const { data, error } = await supabase
-      .from("anomalies")
-      .select("*")
-      .in("anomalySet", setsToFetch);
-
-    if (error) {
-      console.error("Error fetching anomalies: ", error);
+    const response = await fetch(
+      `/api/gameplay/deploy/telescope?action=anomalies&deploymentType=${deploymentType}`,
+      { cache: "no-store" }
+    );
+    const payload = await response.json().catch(() => null);
+    if (!response.ok) {
+      console.error("Error fetching anomalies:", payload?.error || response.statusText);
       return;
     }
 
-    if (data) {
-      // fetched anomalies by set
-      setTessAnomalies(data as DatabaseAnomaly[]);
-    }
+    setTessAnomalies((payload?.anomalies || []) as DatabaseAnomaly[]);
   } catch (err) {
     console.error("Unexpected error in fetchAnomalies: ", err);
   }
 }
 
-export async function checkDeployment(supabase: any, session: any, setAlreadyDeployed: (b: boolean) => void, setDeploymentMessage: (m: string | null) => void) {
-  if (!session?.user?.id) return
-  const userId = session.user.id
-  const oneWeekAgo = new Date()
-  oneWeekAgo.setDate(oneWeekAgo.getDate() - 7)
-
-  const { data: linkedAnomalies, error: linkedAnomaliesError } = await supabase
-    .from("linked_anomalies")
-    .select("*")
-    .eq("automaton", "Telescope")
-    .eq("author", userId)
-    .gte("date", oneWeekAgo.toISOString())
-
-  if (linkedAnomaliesError) {
-    console.error("Error fetching linked anomalies:", linkedAnomaliesError)
-    return
-  }
-
-  const { data: comments, error: commentsError } = await supabase
-    .from("comments")
-    .select("id, classification_id, classification:classifications(author)")
-    .eq("author", userId)
-    .gte("created_at", oneWeekAgo.toISOString())
-
-  if (commentsError) {
-    console.error("Error fetching comments:", commentsError)
-    return
-  }
-
-  const validComments = (comments || []).filter((c: any) => c.classification?.author && c.classification.author !== userId)
-
-  const { data: votes, error: votesError } = await supabase
-    .from("votes")
-    .select("id, classification_id, classification:classifications(author)")
-    .eq("user_id", userId)
-    .eq("vote_type", "up")
-    .gte("created_at", oneWeekAgo.toISOString())
-
-  if (votesError) {
-    console.error("Error fetching votes:", votesError)
-    return
-  }
-
-  const validVotes = (votes || []).filter((v: any) => v.classification?.author && v.classification.author !== userId)
-
-  const linkedCount = linkedAnomalies?.length ?? 0
-  const commentsCount = validComments.length
-  const votesCount = validVotes.length
-  const additionalDeploys = Math.floor(votesCount / 3) + commentsCount
-  const totalAllowedDeploys = linkedCount + additionalDeploys
-  const userCanRedeploy = totalAllowedDeploys > linkedCount
-
-  // deployment counts computed: linkedCount/commentsCount/votesCount/totalAllowedDeploys
-
-  if (linkedCount === 0) {
-    setAlreadyDeployed(false)
-    setDeploymentMessage(null)
-  } else if (userCanRedeploy) {
-    setAlreadyDeployed(false)
-    setDeploymentMessage("You have earned additional deploys by interacting with the community this week!")
-  } else {
-    setAlreadyDeployed(true)
-    setDeploymentMessage("Telescope has already been deployed this week. Recalibrate & search again next week.")
+export async function checkDeployment(
+  setAlreadyDeployed: (b: boolean) => void,
+  setDeploymentMessage: (m: string | null) => void
+) {
+  try {
+    const response = await fetch("/api/gameplay/deploy/telescope?action=status", { cache: "no-store" });
+    const payload = await response.json().catch(() => null);
+    if (!response.ok) {
+      console.error("Error fetching deployment status:", payload?.error || response.statusText);
+      return;
+    }
+    setAlreadyDeployed(Boolean(payload?.alreadyDeployed));
+    setDeploymentMessage(payload?.deploymentMessage ?? null);
+  } catch (err) {
+    console.error("Unexpected error checking deployment status:", err);
   }
 }
 
@@ -139,35 +53,18 @@ export function loadSector(x: number, y: number, tessAnomalies: DatabaseAnomaly[
   setSectorAnomalies(candidates)
 }
 
-export async function fetchSkillProgress(supabase: any, session: any, setSkillProgress: (s: { [k:string]: number }) => void) {
-  if (!session) return
-  const skillCounts: { [key: string]: number} = { telescope: 0, weather: 0 }
-  const start = new Date("2000-01-01").toISOString()
-
-  const queries = [
-    supabase
-      .from("classifications")
-      .select("*", { count: "exact" })
-      .eq("author", session.user.id)
-      .in("classificationtype", ["planet", "telescope-minorPlanet"])
-      .gte("created_at", start),
-    supabase
-      .from("classifications")
-      .select("*", { count: "exact" })
-      .eq("author", session.user.id)
-      .in("classificationtype", ["cloud", "lidar-jovianVortexHunter"])
-      .gte("created_at", start),
-  ]
-
-  const [telescopeRes, weatherRes] = await Promise.all(queries)
-  if (!telescopeRes.error && telescopeRes.count !== null) skillCounts.telescope = telescopeRes.count
-  if (!weatherRes.error && weatherRes.count !== null) skillCounts.weather = weatherRes.count
-  setSkillProgress(skillCounts)
+export async function fetchSkillProgress(setSkillProgress: (s: { [k:string]: number }) => void) {
+  const response = await fetch("/api/gameplay/deploy/telescope?action=skill-progress", { cache: "no-store" });
+  const payload = await response.json().catch(() => null);
+  if (!response.ok) {
+    console.error("Error fetching skill progress:", payload?.error || response.statusText);
+    return;
+  }
+  setSkillProgress(payload?.skillProgress || { telescope: 0, weather: 0 });
 }
 
 type HandleDeployParams = {
-  supabase: any
-  session: any
+  userId?: string | null
   selectedSector: { x:number; y:number } | null
   deploymentType: string | null
   tessAnomalies: DatabaseAnomaly[]
@@ -180,24 +77,22 @@ type HandleDeployParams = {
 }
 
 export async function handleDeployAction(params: HandleDeployParams) {
-  const { supabase, session, selectedSector, deploymentType, tessAnomalies, setDeploying, setDeploymentResult, setShowConfirmation, setDeploymentMessage, setAlreadyDeployed, generateSectorName } = params
+  const { userId, selectedSector, deploymentType, tessAnomalies, setDeploying, setDeploymentResult, setShowConfirmation, setDeploymentMessage, setAlreadyDeployed, generateSectorName } = params
 
-  if (!session || !selectedSector) return
+  if (!selectedSector) return
 
   setDeploying(true)
   const seed = selectedSector.x * 1000 + selectedSector.y
 
   let anomalyCount = 4
-  if (session?.user?.id) {
-    const { data: researched } = await supabase
-      .from("researched")
-      .select("tech_type")
-      .eq("user_id", session.user.id)
-      .eq("tech_type", "probereceptors")
-    if (researched && researched.length > 0) {
-      anomalyCount = 6
-      // telescope upgrade detected
+  try {
+    const progressRes = await fetch("/api/gameplay/research/summary", { cache: "no-store" });
+    const progressPayload = await progressRes.json().catch(() => null);
+    if (progressRes.ok && (progressPayload?.researched || []).some((r: any) => r.tech_type === "probereceptors")) {
+      anomalyCount = 6;
     }
+  } catch (error) {
+    console.warn("Could not resolve upgrade status for deployment", error);
   }
   anomalyCount = Math.min(anomalyCount, 6)
 
@@ -262,9 +157,18 @@ export async function handleDeployAction(params: HandleDeployParams) {
   if (selectedAnomalies.length > 6) selectedAnomalies = selectedAnomalies.slice(0,6)
   if (selectedAnomalies.length > anomalyCount) selectedAnomalies = selectedAnomalies.slice(0, anomalyCount)
 
-  const inserts = selectedAnomalies.map(anomaly => supabase.from("linked_anomalies").insert({ author: session.user.id, anomaly_id: anomaly.id, classification_id: null, automaton: "Telescope" }))
-  const results = await Promise.all(inserts)
-  const hasError = results.some((r:any)=>r.error)
+  let hasError = false;
+  const deployResponse = await fetch("/api/gameplay/deploy/telescope", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      deploymentType,
+      anomalyIds: selectedAnomalies.map((anomaly) => Number(anomaly.id)).filter((id) => Number.isFinite(id)),
+    }),
+  });
+  if (!deployResponse.ok) {
+    hasError = true;
+  }
 
   if (!hasError) {
     const anomalyNames = selectedAnomalies.map(a => a.content || `${deploymentType === "stellar" ? "DSK" : "TESS"}-${String(a.id).padStart(3, "0")}`)
@@ -274,10 +178,12 @@ export async function handleDeployAction(params: HandleDeployParams) {
       const notificationTitle = "Telescope Deployed Successfully"
       const targetType = deploymentType === "stellar" ? "stellar objects" : "exoplanet candidates"
       const notificationBody = `${selectedAnomalies.length} ${targetType} discovered in ${sectorName}`
-      await fetch('/api/notify-my-discoveries', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: session.user.id, customMessage: { title: notificationTitle, body: notificationBody, url: '/structures/telescope' } })
-      })
+      if (userId) {
+        await fetch('/api/notify-my-discoveries', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId, customMessage: { title: notificationTitle, body: notificationBody, url: '/structures/telescope' } })
+        })
+      }
     } catch (e) { console.error('Failed to send deployment notification:', e) }
     setShowConfirmation(true)
   }

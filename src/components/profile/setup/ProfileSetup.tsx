@@ -1,16 +1,14 @@
 import React, { useEffect, useState, type ChangeEvent } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/src/core/context/ActivePlanet";
+import { getCurrentProfileAction, updateProfileSetupAction } from "./actions";
 
 interface ProfileSetupFormProps {
   onProfileUpdate: () => void | null;
 };
 
 export default function ProfileSetupForm({ onProfileUpdate }: ProfileSetupFormProps) {
-  const supabase = useSupabaseClient();
-  const session = useSession();
   const { activePlanet } = useActivePlanet();
   const router = useRouter();
 
@@ -28,31 +26,25 @@ export default function ProfileSetupForm({ onProfileUpdate }: ProfileSetupFormPr
     let ignore = false;
     async function getProfile() {
       setLoading(true);
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("username, full_name, avatar_url")
-        .eq("id", session?.user?.id)
-        .single();
+      const result = await getCurrentProfileAction();
 
-      if (!ignore && data) {
-        setUsername(data.username || "");
-        setFirstName(data.full_name || "");
-        setAvatarPreview(data.avatar_url || null);
-      } else if (error) {
-        console.warn(error.message);
+      if (!ignore && result.ok && result.data) {
+        setUsername(result.data.username || "");
+        setFirstName(result.data.full_name || "");
+        setAvatarPreview(result.data.avatar_url || null);
+      } else if (!result.ok) {
+        console.warn(result.error);
       }
 
       setLoading(false);
     }
 
-    if (session?.user?.id) {
-      getProfile();
-    }
+    getProfile();
 
     return () => {
       ignore = true;
     };
-  }, [session, supabase]);
+  }, []);
 
   // useEffect(() => {
   //   async function fetchInventory() {
@@ -88,66 +80,26 @@ export default function ProfileSetupForm({ onProfileUpdate }: ProfileSetupFormPr
 
   async function updateProfile(event: React.FormEvent) {
     event.preventDefault();
-    if (!username || !session?.user?.email) {
-      setError("Username and email are required.");
+    if (!username) {
+      setError("Username is required.");
       return;
     }
 
     setLoading(true);
     setError(null);
 
-    // Ensure inventory contains items 23 and 24
-    // if (inventoryItems) {
-    //   const existingItems = inventoryItems.map((item) => item.item);
-    //   const itemsToAdd = [23, 24].filter((item) => !existingItems.includes(item)).map((item) => ({
-    //     item,
-    //     owner: session.user.id,
-    //     anomay: activePlanet?.id,
-    //     quantity: 1,
-    //     time_of_deploy: new Date(),
-    //   }));
-
-    //   if (itemsToAdd.length > 0) {
-    //     const { error: insertError } = await supabase.from("inventory").insert(itemsToAdd);
-    //     if (insertError) {
-    //       setError(insertError.message);
-    //       setLoading(false);
-    //       return;
-    //     }
-    //   }
-    // }
-
-    let avatar_url = avatarPreview;
-
+    const formData = new FormData();
+    formData.set("username", username);
+    formData.set("firstName", firstName);
+    formData.set("existingAvatarPreview", avatarPreview || "");
     if (avatar) {
-      const fileName = `${Date.now()}-${session.user.id}-avatar.png`;
-      const { data, error } = await supabase.storage
-        .from("avatars")
-        .upload(fileName, avatar, {
-          contentType: avatar.type,
-        });
-
-      if (error) {
-        setError(error.message);
-        setLoading(false);
-        return;
-      }
-
-      avatar_url = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/avatars/${data?.path}`;
+      formData.set("avatar", avatar);
     }
 
-    const updates = {
-      id: session.user.id,
-      username,
-      full_name: firstName,
-      avatar_url,
-      updated_at: new Date(),
-    };
+    const result = await updateProfileSetupAction(formData);
 
-    const { error: updateError } = await supabase.from("profiles").upsert(updates);
-
-    if (updateError) {
-      setError(updateError.message);
+    if (!result.ok) {
+      setError(result.error);
     } else {
       router.push("/");
       onProfileUpdate?.();

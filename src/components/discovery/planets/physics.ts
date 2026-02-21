@@ -1,5 +1,5 @@
 // Mineral deposit types and states
-export type MineralType = 
+type MineralType = 
   | "water-ice" 
   | "co2-ice" 
   | "metallic-hydrogen" 
@@ -15,10 +15,10 @@ export type MineralType =
   | "silicate"
   | "carbon";
 
-export type MineralState = "solid" | "liquid" | "gas" | "plasma";
+type MineralState = "solid" | "liquid" | "gas" | "plasma";
 
 // Deposit position on planet surface
-export interface DepositPosition {
+interface DepositPosition {
   latitude: number; // -90 to 90
   longitude: number; // -180 to 180
 }

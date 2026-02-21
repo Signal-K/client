@@ -6,14 +6,14 @@ import { Menu, Transition } from "@headlessui/react";
 import { Avatar } from "../profile/setup/Avatar";
 import Link from "next/link";
 import { useActivePlanet } from "@/src/core/context/ActivePlanet";
-import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import MilestoneCard from "../deployment/missions/structures/Milestones/MilestoneCard";
 import JournalPage from "../deployment/missions/structures/Stardust/Journal";
 import { BellDotIcon, TrophyIcon } from "lucide-react";
 import MySettlementsLocations from "@/src/components/classification/UserLocations";
+import { useAuthUser } from "@/src/hooks/useAuthUser";
 
 export default function Navbar() {
-  const supabase = useSupabaseClient();
+  const { supabase } = useAuthUser();
   const { activePlanet } = useActivePlanet();
   const router = useRouter();
 

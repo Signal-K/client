@@ -1,17 +1,16 @@
 "use client"
 
 import React, { useEffect, useState } from "react";
-import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
+import { useSession } from "@/src/lib/auth/session-context";
 import { useRouter } from "next/navigation";
 import { Button } from "@/src/components/ui/button";
 import { Card } from "@/src/components/ui/card";
 import Section from "@/src/components/sections/Section"
 import ToolCard from "@/src/components/deployment/missions/structures/tool-card"
 import { RoverIcon, SatelliteIcon, TelescopeComplexIcon } from "@/src/components/deployment/missions/structures/tool-icons"
-import { MineralExtraction, type MineralConfiguration } from "@/src/components/deployment/extraction/mineral-extraction";
+import { MineralExtraction } from "@/src/components/deployment/extraction/mineral-extraction";
 import { Package, Wrench, Sparkles } from "lucide-react";
 import Link from "next/link";
-import { fetchUserUpgrades } from "@/src/utils/userUpgrades";
 
 type TabType = "minerals" | "tools";
 
@@ -41,7 +40,6 @@ interface InventoryViewportInterface {
 export default function InventoryViewport() {
   const router = useRouter();
 
-  const supabase = useSupabaseClient();
   const session = useSession();
 
   if (!session) {
@@ -71,44 +69,35 @@ export default function InventoryViewport() {
     setState((prev) => ({ ...prev, activeTab: tab }));
   };
 
-  // Fetch user upgrades and mineral deposits
+  // Fetch user upgrades and mineral deposits via server APIs
   useEffect(() => {
     const fetchUserData = async () => {
       if (!session?.user?.id) return;
 
-      // Fetch upgrades using utility function
-      const upgrades = await fetchUserUpgrades(supabase, session.user.id);
-
-      // Fetch extraction research status
-      const { data: researched } = await supabase
-        .from("researched")
-        .select("tech_type")
-        .eq("user_id", session.user.id);
-
-      const hasRoverExtraction = researched?.some(r => r.tech_type === "roverExtraction") || false;
-      const hasSatelliteExtraction = researched?.some(r => r.tech_type === "satelliteExtraction") || false;
+      const [summaryRes, depositsRes] = await Promise.all([
+        fetch("/api/gameplay/research/summary", { cache: "no-store" }),
+        fetch("/api/gameplay/mineral-deposits", { cache: "no-store" }),
+      ]);
+      const summary = await summaryRes.json().catch(() => ({}));
+      const depositsPayload = await depositsRes.json().catch(() => ({}));
+      const upgrades = summary?.upgrades || {};
+      const hasRoverExtraction = Boolean(upgrades?.roverExtractionUnlocked);
+      const hasSatelliteExtraction = Boolean(upgrades?.satelliteExtractionUnlocked);
 
       setState((prev) => ({
         ...prev,
-        telescopeUpgrade: upgrades.telescopeUpgrade,
-        satelliteCount: upgrades.satelliteCount,
-        findMinerals: upgrades.findMinerals,
-        roverLevel: upgrades.roverLevel,
+        telescopeUpgrade: Number(upgrades?.telescopeReceptors || 1) > 1,
+        satelliteCount: Number(upgrades?.satelliteCount || 1),
+        findMinerals: Boolean(upgrades?.findMineralsUnlocked),
+        roverLevel: Number(upgrades?.roverWaypoints || 4) > 4 ? 2 : 1,
         hasRoverExtraction,
         hasSatelliteExtraction,
       }));
 
       // Fetch mineral deposits if unlocked
-      if (upgrades.findMinerals) {
-        const { data: deposits, error: depErr } = await supabase
-          .from("mineralDeposits")
-          .select(
-            "id, mineralconfiguration, location, roverName, created_at, discovery"
-          )
-          .not("location", "is", null)
-          .eq("owner", session.user.id);
-
-        if (!depErr && deposits) {
+      if (Boolean(upgrades?.findMineralsUnlocked)) {
+        const deposits = Array.isArray(depositsPayload?.deposits) ? depositsPayload.deposits : [];
+        if (depositsRes.ok && deposits) {
           // Filter out deposits with quantity <= 0
           const validDeposits = (deposits as any[])
             .filter((row) => {
@@ -119,7 +108,11 @@ export default function InventoryViewport() {
               (row) =>
                 ({
                   id: row.id,
-                  mineral: row.mineralconfiguration,
+                  mineral: {
+                    type: row.mineralconfiguration?.type ?? "unknown",
+                    purity: Number(row.mineralconfiguration?.purity ?? 0),
+                    ...row.mineralconfiguration,
+                  },
                   location: row.location,
                   roverName: row.roverName,
                   projectType: (row.mineralconfiguration as any)?.metadata?.source,
@@ -141,7 +134,7 @@ export default function InventoryViewport() {
     };
 
     fetchUserData();
-  }, [session, supabase]);
+  }, [session]);
 
   return (
     <Section
@@ -320,3 +313,11 @@ export default function InventoryViewport() {
     </Section>
   );
 }
+type MineralConfiguration = {
+  type: string;
+  amount?: number;
+  quantity?: number;
+  purity: number;
+  metadata?: Record<string, any>;
+  [key: string]: any;
+};

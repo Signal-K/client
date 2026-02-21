@@ -8,8 +8,7 @@ import { Button } from "@/src/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/src/components/ui/card";
 import { Textarea } from "@/src/components/ui/textarea";
 import { ThumbsUp, MessageSquare, Share2 } from "lucide-react";
-import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
-import html2canvas from "html2canvas";
+import { useSession } from "@/src/lib/auth/session-context";
 import { CommentCard } from "../comments/CommentSingle";
 import { SurveyorComments } from "./Surveyor/SurveyorPostCard";
 
@@ -53,7 +52,6 @@ export function PostCardSingle({
   commentStatus,
   onVote,
 }: PostCardSingleProps) {
-  const supabase = useSupabaseClient();
   const session = useSession();
 
   const [comments, setComments] = useState<CommentProps[]>([]);
@@ -69,14 +67,13 @@ export function PostCardSingle({
   const fetchComments = async () => {
     setLoadingComments(true);
     try {
-      const { data, error } = await supabase
-        .from("comments")
-        .select("*")
-        .eq("classification_id", classificationId)
-        .order("created_at", { ascending: false });
-
-      if (error) throw error;
-      setComments(data);
+      const response = await fetch(
+        `/api/gameplay/social/comments?classificationId=${classificationId}&order=desc`,
+        { cache: "no-store" }
+      );
+      const payload = await response.json().catch(() => null);
+      if (!response.ok || !payload?.comments) throw new Error(payload?.error || "Failed to fetch comments");
+      setComments(payload.comments);
     } catch (error) {
       console.error("Error fetching comments:", error);
     } finally {
@@ -92,16 +89,21 @@ export function PostCardSingle({
     if (!session?.user?.id) return;
 
     try {
-      const { error } = await supabase.from("votes").insert([
-        {
-          user_id: session.user.id,
-          classification_id: classificationId,
-          anomaly_id: anomalyId,
-        },
-      ]);
-
-      if (error) {
-        console.error("Error inserting vote: ", error);
+      const response = await fetch("/api/gameplay/social/votes", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          classificationId,
+          anomalyId,
+          voteType: "up",
+        }),
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        console.error("Error inserting vote:", result?.error || "Unknown vote error");
+        return;
+      }
+      if (result?.alreadyVoted) {
         return;
       }
 
@@ -117,17 +119,18 @@ export function PostCardSingle({
     if (!newComment.trim()) return;
 
     try {
-      const { error } = await supabase
-        .from("comments")
-        .insert([
-          {
-            content: newComment,
-            classification_id: classificationId,
-            author: session?.user?.id,
-          },
-        ]);
-
-      if (error) throw error;
+      const response = await fetch("/api/gameplay/social/comments", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          content: newComment,
+          classificationId,
+        }),
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        throw new Error(result?.error || "Failed to add comment");
+      }
 
       setNewComment("");
       fetchComments();
@@ -165,6 +168,7 @@ export function PostCardSingle({
 
     try {
       await Promise.all(imagePromises);
+      const { default: html2canvas } = await import("html2canvas");
       const canvas = await html2canvas(shareCardRef.current, {
         useCORS: true,
         scrollX: 0,

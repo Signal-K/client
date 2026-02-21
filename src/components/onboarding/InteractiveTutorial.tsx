@@ -373,7 +373,7 @@ export default function InteractiveTutorial({
 }
 
 // Preset tutorial flows
-export const ONBOARDING_STEPS: TutorialStep[] = [
+const ONBOARDING_STEPS: TutorialStep[] = [
   {
     id: "welcome",
     title: "Welcome to Star Sailors! 🚀",
@@ -423,7 +423,7 @@ export const ONBOARDING_STEPS: TutorialStep[] = [
   },
 ];
 
-export const DEPLOYMENT_STEPS: TutorialStep[] = [
+const DEPLOYMENT_STEPS: TutorialStep[] = [
   {
     id: "select-location",
     title: "Choose a Location",

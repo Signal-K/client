@@ -1,16 +1,16 @@
 'use client';
 
 import React, { useEffect, useState } from "react";
-import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
+import { useSession } from "@/src/lib/auth/session-context";
 import { useRouter } from "next/navigation";
 import PostCard from "@/src/components/social/posts/TestPostCard";
+import { incrementClassificationVote } from "@/src/lib/gameplay/classification-vote";
 
 interface VotePlanetClassificationsProps { 
   classificationId: string | number;
 };
 
 export default function VotePlanetClassifications({ classificationId }: VotePlanetClassificationsProps) {
-  const supabase = useSupabaseClient();
   const session = useSession();
   const router = useRouter();
 
@@ -30,13 +30,11 @@ export default function VotePlanetClassifications({ classificationId }: VotePlan
     setError(null);
 
     try {
-      const { data, error } = await supabase
-        .from("classifications")
-        .select("*")
-        .eq("id", classificationId)
-        .single(); 
-
-      if (error) throw error;
+      const res = await fetch(`/api/gameplay/classifications?id=${encodeURIComponent(String(classificationId))}&limit=1`);
+      const payload = await res.json();
+      if (!res.ok) throw new Error(payload?.error || "Failed to load classification");
+      const data = payload?.classifications?.[0];
+      if (!data) throw new Error("Classification not found");
 
       let image: string | null = null;
       const media = data.media;
@@ -68,47 +66,34 @@ export default function VotePlanetClassifications({ classificationId }: VotePlan
   }, [session, classificationId]);
 
   const handleVote = async (classificationId: number, currentConfig: any) => {
-    try {
-      
-      const currentVotes = currentConfig?.votes || 0;
+    const updatedVotes = await incrementClassificationVote(
+      classificationId,
+      currentConfig?.votes || 0
+    );
 
-      const updatedConfig = {
-        ...currentConfig,
-        votes: currentVotes + 1,
-      };
+    if (updatedVotes === null) {
+      return;
+    }
 
-      
+    setClassification((prev: any) =>
+      prev ? { ...prev, votes: updatedVotes } : prev
+    );
 
-      const { error } = await supabase
-        .from("classifications")
-        .update({ classificationConfiguration: updatedConfig })
-        .eq("id", classificationId);
-      if (error) {
-        console.error("PHVote: Error updating classificationConfiguration:", error);
-      } else {
-        setClassification((prev: any) =>
-          prev ? { ...prev, votes: updatedConfig.votes } : prev
-        );
-        
-        // Show success popup
-        setShowSuccessPopup(true);
-        
-        // Redirect after 3 seconds
-        const redirectTimeout = setTimeout(() => {
-          try {
-            router.push('/');
-          } catch (error) {
-            console.error("PHVote: Router.push error:", error);
-            // Fallback to window.location
-            if (typeof window !== "undefined") {
-              window.location.href = '/';
-            }
-          }
-        }, 3000);
-      };
-    } catch (error) {
-      console.error("PHVote: Error voting:", error);
-    };
+    // Show success popup
+    setShowSuccessPopup(true);
+
+    // Redirect after 3 seconds
+    setTimeout(() => {
+      try {
+        router.push('/');
+      } catch (error) {
+        console.error("PHVote: Router.push error:", error);
+        // Fallback to window.location
+        if (typeof window !== "undefined") {
+          window.location.href = '/';
+        }
+      }
+    }, 3000);
   };
 
   return (

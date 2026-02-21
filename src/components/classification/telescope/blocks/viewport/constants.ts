@@ -2,7 +2,7 @@ import type { DatabaseAnomaly } from "../types"
 import { seededRandom, generateSectorName } from "@/src/components/classification/telescope/utils/sector-utils"
 
 // Anomaly type mapping configuration
-export const ANOMALY_TYPES = {
+const ANOMALY_TYPES = {
   exoplanet: {
     project: "planet-hunters",
     colors: ["#78cce2", "#4e7988", "#005066", "#78cce2", "#4e7988", "#005066", "#78cce2", "#4e7988"],
@@ -30,9 +30,9 @@ export const ANOMALY_TYPES = {
   },
 } as const
 
-export type AnomalyType = keyof typeof ANOMALY_TYPES
+type AnomalyType = keyof typeof ANOMALY_TYPES
 
-export function normalizeAnomalyType(type: string | null): AnomalyType {
+function normalizeAnomalyType(type: string | null): AnomalyType {
   switch (type) {
     case "planet":
     case "telescope-tess":

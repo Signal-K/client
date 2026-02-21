@@ -52,7 +52,7 @@ export const projects: Project[] = [
 // Rover/surface exploration projects
 import { Mountain, Gem } from "lucide-react"
 
-export const roverProjects = [
+const roverProjects = [
   {
     id: "geological-survey",
     name: "SeisCAM Geological Survey",

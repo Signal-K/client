@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
+import { useSession } from '@/src/lib/auth/session-context';
 import Image from 'next/image';
 import { Button } from '@/src/components/ui/button';
 import { Card, CardContent } from '@/src/components/ui/card';
@@ -60,7 +60,6 @@ export default function TutorialContentBlock({
   scientificContext,
   structureType
 }: TutorialContentBlockProps) {
-  const supabase = useSupabaseClient();
   const session = useSession();
   
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -90,20 +89,16 @@ export default function TutorialContentBlock({
       }
 
       try {
-        const { data, error } = await supabase
-          .from('classifications')
-          .select('id')
-          .eq('author', session.user.id)
-          .eq('classificationtype', classificationtype)
-          .limit(1);
-
-        if (error) {
-          console.error('Error checking classification history:', error);
+        const response = await fetch(
+          `/api/gameplay/classifications/exists?classificationtype=${encodeURIComponent(classificationtype)}`,
+          { cache: "no-store" }
+        );
+        const payload = await response.json().catch(() => null);
+        if (!response.ok || !payload) {
+          console.error('Error checking classification history:', payload?.error || response.statusText);
           setShowTutorial(false);
         } else {
-          // If no classifications found, show tutorial
-          const isFirstTime = !data || data.length === 0;
-          setShowTutorial(isFirstTime);
+          setShowTutorial(!payload.exists);
         }
       } catch (error) {
         console.error('Error in first-time check:', error);
@@ -115,7 +110,7 @@ export default function TutorialContentBlock({
     };
 
     checkFirstTimeUser();
-  }, [session, supabase, classificationtype, forceShow]);
+  }, [session, classificationtype, forceShow]);
 
   const nextSlide = () => {
     if (currentSlide < slides.length - 1) {
@@ -455,8 +450,5 @@ export const SCIENTIFIC_CONTEXTS = {
   'automaton-aiForMars': 'Training AI rovers helps real Mars missions. Your terrain classifications directly inform how Perseverance and Curiosity navigate, making future exploration safer and more efficient.',
   'lidar-jovianVortexHunter': 'Jupiter\'s storms can last centuries! Understanding their dynamics helps us understand atmospheric physics on gas giants throughout the universe.',
 };
-
-// Export the TutorialSlide type for use in other components
-export type { TutorialSlide };
 
 // useTutorial hook removed (deleted per cleanup request)

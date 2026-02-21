@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
+import { useSession } from "@/src/lib/auth/session-context";
 import { Sparkles } from "lucide-react";
 
 interface StardustBalanceProps {
@@ -12,54 +12,27 @@ export default function StardustBalance({ onPointsUpdate }: StardustBalanceProps
   const [stardustPoints, setStardustPoints] = useState<number>(0);
   const [loading, setLoading] = useState(true);
   const session = useSession();
-  const supabase = useSupabaseClient();
 
   useEffect(() => {
     if (!session?.user?.id) return;
 
     const fetchStardustBalance = async () => {
       try {
-        // Fetch all points sources
-        const [
-          { data: classifications },
-          { data: researched },
-          { data: profile }
-        ] = await Promise.all([
-          supabase
-            .from("classifications")
-            .select("id, classificationtype")
-            .eq("author", session.user.id),
-          supabase
-            .from("researched")
-            .select("tech_type")
-            .eq("user_id", session.user.id),
-          supabase
-            .from("profiles")
-            .select("referral_code")
-            .eq("id", session.user.id)
-            .maybeSingle()
-        ]);
-
-        // Calculate base points from classifications (1 point each)
-        const basePoints = classifications?.length || 0;
-
-        // Only count purchased upgrades that cost stardust (not automatic unlocks)
-        const paidUpgrades = researched?.filter(r => 
-          ['probereceptors', 'satellitecount', 'probecount', 'proberange', 'rovercount'].includes(r.tech_type)
-        ) || [];
-
-        // Calculate penalty from research upgrades (10 points each)
-        const researchPenalty = paidUpgrades.length * 10;
-
-        // Calculate referral bonus if they have a referral code
-        let referralBonus = 0;
-        if (profile?.referral_code) {
-          const { count } = await supabase
-            .from("referrals")
-            .select("id", { count: "exact", head: true })
-            .eq("referral_code", profile.referral_code);
-          referralBonus = (count || 0) * 5;
+        const response = await fetch("/api/gameplay/research/summary", {
+          cache: "no-store",
+        });
+        const payload = await response.json().catch(() => null);
+        if (!response.ok || !payload) {
+          throw new Error(payload?.error ?? "Failed to load stardust balance");
         }
+
+        const basePoints = Number(payload?.counts?.all ?? 0);
+        const techTypes = Array.isArray(payload?.researchedTechTypes) ? payload.researchedTechTypes : [];
+        const paidUpgrades = techTypes.filter((techType: string) =>
+          ["probereceptors", "satellitecount", "probecount", "proberange", "rovercount"].includes(techType)
+        );
+        const researchPenalty = paidUpgrades.length * 10;
+        const referralBonus = Number(payload?.referralBonus ?? 0);
 
         const totalPoints = Math.max(0, basePoints + referralBonus - researchPenalty);
         
@@ -73,7 +46,7 @@ export default function StardustBalance({ onPointsUpdate }: StardustBalanceProps
     };
 
     fetchStardustBalance();
-  }, [session, supabase, onPointsUpdate]);
+  }, [session, onPointsUpdate]);
 
   if (loading) {
     return (

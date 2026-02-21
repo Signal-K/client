@@ -1,10 +1,10 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
+import { useSession } from "@/src/lib/auth/session-context";
 import { useActivePlanet } from "@/src/core/context/ActivePlanet";
 import ClassificationForm from "../(classifications)/PostForm";
-import ImageAnnotator from "../(classifications)/Annotating/Annotator";
+import ImageAnnotator from "../(classifications)/Annotating/AnnotatorView";
 import TutorialContentBlock, { createTutorialSlides } from "../TutorialContentBlock";
 
 interface SelectedAnomalyProps {
@@ -18,7 +18,6 @@ interface TelescopeProps {
 const SunspotDetectorTutorial: React.FC<TelescopeProps> = ({
     anomalyId,
 }) => {
-    const supabase = useSupabaseClient();
     const session = useSession(); 
     const { activePlanet } = useActivePlanet();
 
@@ -102,7 +101,6 @@ type Anomaly = {
 };
 
 export function StarterSunspot({ anomalyId }: { anomalyId?: string }) {
-    const supabase = useSupabaseClient();
     const session = useSession();
 
     const [anomaly, setAnomaly] = useState<Anomaly | null>(null);
@@ -126,34 +124,29 @@ export function StarterSunspot({ anomalyId }: { anomalyId?: string }) {
             try {
                 // If anomalyId is provided, fetch that anomaly directly
                 if (anomalyId) {
-                    const { data: anomalyData, error: anomalyError } = await supabase
-                        .from("anomalies")
-                        .select("*")
-                        .eq("id", anomalyId)
-                        .single();
-
-                    if (anomalyError) throw anomalyError;
+                    const anomalyRes = await fetch(`/api/gameplay/anomalies?id=${encodeURIComponent(anomalyId)}&limit=1`);
+                    const anomalyPayload = await anomalyRes.json();
+                    if (!anomalyRes.ok || !anomalyPayload?.anomalies?.[0]) {
+                      throw new Error(anomalyPayload?.error || "Anomaly not found");
+                    }
+                    const anomalyData = anomalyPayload.anomalies[0];
 
                     if (anomalyData) {
                         setAnomaly(anomalyData);
                         setImageUrl(`${supabaseUrl}/storage/v1/object/public/telescope/telescope-sunspots/${anomalyData.id}.png`);
                     }
                 } else {
-                    // Fetch user's linked anomaly
-                    const { data: linkedData, error: linkedError } = await supabase
-                        .from("linked_anomalies")
-                        .select("*, anomalies(*)")
-                        .eq("author", session.user.id)
-                        .eq("anomalies.anomalySet", "telescope-sunspots")
-                        .limit(1)
-                        .single();
-
-                    if (linkedError) throw linkedError;
-
-                    if (linkedData?.anomalies) {
-                        setLinkedRow(linkedData);
-                        setAnomaly(linkedData.anomalies);
-                        setImageUrl(`${supabaseUrl}/storage/v1/object/public/telescope/telescope-sunspots/${linkedData.anomalies.id}.png`);
+                    const anomalyRes = await fetch(
+                      `/api/gameplay/anomalies?anomalySet=telescope-sunspots&limit=1`
+                    );
+                    const anomalyPayload = await anomalyRes.json();
+                    if (!anomalyRes.ok || !anomalyPayload?.anomalies?.[0]) {
+                      throw new Error(anomalyPayload?.error || "No sunspots available");
+                    }
+                    const anomalyData = anomalyPayload.anomalies[0];
+                    if (anomalyData) {
+                        setAnomaly(anomalyData);
+                        setImageUrl(`${supabaseUrl}/storage/v1/object/public/telescope/telescope-sunspots/${anomalyData.id}.png`);
                     }
                 }
             } catch (error: any) {
@@ -166,7 +159,7 @@ export function StarterSunspot({ anomalyId }: { anomalyId?: string }) {
         }
 
         fetchData();
-    }, [session, anomalyId, supabase]);
+    }, [session, anomalyId]);
 
     if (loading) {
         return <div className="text-white p-4">Loading sunspot data...</div>;

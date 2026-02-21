@@ -1,0 +1,114 @@
+{
+  "taskId": "utvnlb",
+  "currentVersion": 2,
+  "versions": [
+    {
+      "id": "v1",
+      "taskId": "utvnlb",
+      "version": 1,
+      "timestamp": "2026-02-19T08:17:06.095Z",
+      "changes": [
+        {
+          "field": "implementationNotes",
+          "newValue": "Implemented: research+achievements+milestones API routes, classification API route, telescope viewport API route, SSR supabase route utility, migrated key client flows to API fetch."
+        }
+      ],
+      "snapshot": {
+        "title": "Migrate classification write paths to API routes",
+        "description": "Move high-traffic classification insertion/update logic from client-side Supabase calls to authenticated Next API routes while keeping Supabase as persistence layer and avoiding schema migrations.",
+        "status": "todo",
+        "priority": "high",
+        "labels": [
+          "performance",
+          "api",
+          "refactor"
+        ],
+        "acceptanceCriteria": [
+          {
+            "completed": false,
+            "text": "Classification submission from core telescope viewport no longer writes directly from browser"
+          },
+          {
+            "completed": false,
+            "text": "API route validates auth and payload before DB write"
+          },
+          {
+            "completed": false,
+            "text": "Typecheck passes"
+          }
+        ],
+        "implementationNotes": "Implemented: research+achievements+milestones API routes, classification API route, telescope viewport API route, SSR supabase route utility, migrated key client flows to API fetch."
+      }
+    },
+    {
+      "id": "v2",
+      "taskId": "utvnlb",
+      "version": 2,
+      "timestamp": "2026-02-19T08:17:14.495Z",
+      "changes": [
+        {
+          "field": "status",
+          "oldValue": "todo",
+          "newValue": "done"
+        },
+        {
+          "field": "acceptanceCriteria",
+          "oldValue": [
+            {
+              "completed": false,
+              "text": "Classification submission from core telescope viewport no longer writes directly from browser"
+            },
+            {
+              "completed": false,
+              "text": "API route validates auth and payload before DB write"
+            },
+            {
+              "completed": false,
+              "text": "Typecheck passes"
+            }
+          ],
+          "newValue": [
+            {
+              "completed": true,
+              "text": "Classification submission from core telescope viewport no longer writes directly from browser"
+            },
+            {
+              "completed": true,
+              "text": "API route validates auth and payload before DB write"
+            },
+            {
+              "completed": true,
+              "text": "Typecheck passes"
+            }
+          ]
+        }
+      ],
+      "snapshot": {
+        "title": "Migrate classification write paths to API routes",
+        "description": "Move high-traffic classification insertion/update logic from client-side Supabase calls to authenticated Next API routes while keeping Supabase as persistence layer and avoiding schema migrations.",
+        "status": "done",
+        "priority": "high",
+        "labels": [
+          "performance",
+          "api",
+          "refactor"
+        ],
+        "acceptanceCriteria": [
+          {
+            "completed": true,
+            "text": "Classification submission from core telescope viewport no longer writes directly from browser"
+          },
+          {
+            "completed": true,
+            "text": "API route validates auth and payload before DB write"
+          },
+          {
+            "completed": true,
+            "text": "Typecheck passes"
+          }
+        ],
+        "implementationNotes": "Implemented: research+achievements+milestones API routes, classification API route, telescope viewport API route, SSR supabase route utility, migrated key client flows to API fetch."
+      }
+    }
+  ]
+}

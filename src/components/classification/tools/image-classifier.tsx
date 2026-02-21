@@ -5,13 +5,9 @@ import type React from "react"
 import { useState, useRef, useEffect } from "react"
 import Webcam from "react-webcam"
 import axios from "axios"
-import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react"
 import { useActivePlanet } from "@/src/core/context/ActivePlanet"
 
 export default function ChatGPTImageClassifier() {
-  const supabase = useSupabaseClient()
-  const session = useSession()
-
   const { activePlanet } = useActivePlanet()
 
   const [image, setImage] = useState<File | null>(null)
@@ -23,7 +19,6 @@ export default function ChatGPTImageClassifier() {
   const [comment, setComment] = useState<string>("")
   const webcamRef = useRef<Webcam | null>(null)
   const [scanPosition, setScanPosition] = useState(0);
-  const [fileUrlTO, setFileUrlTo] = useState<string | null>(null)
 
   // Animation for scanner line
   useEffect(() => {
@@ -83,49 +78,32 @@ const captureWebcamImage = () => {
   }
 };
 
-// Upload image to Supabase
+// Upload image and create related entries through the API
 const uploadImageToSupabase = async (file: File) => {
   if (!file) return;
   setLoading(true);
 
-  const fileName = `${Date.now()}-${file.name}`;
-
   try {
-    const { data: uploadData, error: uploadError } = await supabase.storage.from("uploads").upload(fileName, file);
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("comment", comment);
+    formData.append("source", useWebcam ? "Webcam" : "Upload");
+    formData.append("location", location || String(activePlanet?.id || 30));
+    formData.append("configuration", JSON.stringify(response || {}));
+    formData.append("saveToZoo", "true");
 
-    if (uploadError) {
-      console.error("Upload error:", uploadError.message);
+    const res = await fetch("/api/gameplay/zoodex/entries", {
+      method: "POST",
+      body: formData,
+    });
+    const result = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      console.error("Upload API error:", result?.error || "Failed to save upload");
       return;
-    };
+    }
 
-    if (uploadData) {
-      const fileUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/uploads/${uploadData.path}`;
-      setFileUrlTo(fileUrl);
-      console.log('test')
-
-      const { data: uploadEntry, error: entryError } = await supabase
-        .from("uploads")
-        .insert({
-          author: session?.user?.id,
-          location: activePlanet?.id || 30,
-          content: comment,
-          file_url: fileUrl,
-          configuration: response,
-          source: "Webcam",
-        })
-        .single();
-
-        console.log(uploadData);
-
-      if (entryError) {
-        console.error("Entry error:", entryError.message);
-      } else {
-        console.log("Upload entry:", uploadEntry);
-        if (typeof window !== "undefined") {
-          window.location.reload();
-        }
-        // saveLifeEntity();
-      }
+    if (typeof window !== "undefined") {
+      window.location.reload();
     }
   } catch (err) {
     console.error("Unexpected error during file upload:", err);
@@ -186,32 +164,6 @@ const sendImage = async () => {
       setLoading(false);
   }
 };
-
-const saveLifeEntity = async () => {
-  if (!session) {
-    return
-  }
-
-  try {
-    // Save a new entry to the "zoo" table with reference to the image and data
-    const { data: entityEntry, error: entityError } = await supabase.from("zoo").insert({
-      author: session?.user?.id,
-      file_url: fileUrlTO || '',
-      owner: session?.user?.id,
-      // location: activePlanet?.id || 30,
-      configuration: response, // Ensure that the classification data is saved
-      // uploaded: "", // You can store the URL or other related information
-    })
-
-    if (entityError) {
-      console.error("Entity error:", entityError.message)
-    } else {
-      console.log("Entity saved:", entityEntry)
-    }
-  } catch (err: any) {
-    console.error("Error saving entity:", err)
-  }
-}
 
   return (
     <div className="fixed inset-0 w-full h-full flex flex-col bg-gradient-to-b from-red-700 to-red-900 overflow-hidden">

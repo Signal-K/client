@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { PostCardSingleWithGenerator } from "@/src/components/social/posts/PostWithGen";
-import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
+import { useSession } from "@/src/lib/auth/session-context";
 
 type Classification = {
   id: string;
@@ -20,7 +20,6 @@ type Classification = {
 };
 
 export default function JVHCloudClassificationGenerator() {
-  const supabase = useSupabaseClient();
   const session = useSession();
 
   const [classifications, setClassifications] = useState<Classification[]>([]);
@@ -38,18 +37,16 @@ export default function JVHCloudClassificationGenerator() {
     setError(null);
 
     try {
-      const { data, error } = await supabase
-        .from("classifications")
-        .select("*")
-        .eq("author", session.user.id)
-        .eq("classificationtype", "lidar-jovianVortexHunter")
-        .order("created_at", { ascending: false });
-
-      if (error) throw error;
+      const res = await fetch(
+        `/api/gameplay/classifications?author=${encodeURIComponent(session.user.id)}&classificationtype=lidar-jovianVortexHunter&orderBy=created_at&ascending=false&limit=200`
+      );
+      const payload = await res.json();
+      if (!res.ok) throw new Error(payload?.error || "Failed to load classifications");
+      const data = payload?.classifications || [];
 
       const processedData = data.map((classification: Classification) => {
         const media = classification.media;
-        let images: string[] = [];
+        const images: string[] = [];
 
         if (Array.isArray(media) && media.length === 2 && typeof media[1] === "string") {
           images.push(media[1]);

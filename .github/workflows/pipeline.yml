@@ -1,0 +1,271 @@
+name: Pipeline
+
+on:
+  push:
+    branches:
+      - "**"
+  pull_request:
+    branches:
+      - "**"
+  schedule:
+    - cron: "0 6 * * *"   # notify discoveries (daily)
+    - cron: "0 0 * * *"   # unlock solarhealth (daily)
+    - cron: "0 14 * * 6"  # delete anomaly log (weekly)
+    - cron: "0 21 * * 0"  # codeql (weekly)
+  workflow_dispatch:
+    inputs:
+      run_notify_discoveries:
+        description: "Run discovery notification maintenance job"
+        required: false
+        default: false
+        type: boolean
+      run_unlock_solarhealth:
+        description: "Run solarhealth unlock maintenance job"
+        required: false
+        default: false
+        type: boolean
+      run_delete_anomaly_log:
+        description: "Run anomaly log cleanup maintenance job"
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pipeline-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test_suite:
+    if: github.event_name != 'schedule'
+    runs-on: ubuntu-latest
+    env:
+      NODE_ENV: test
+      SKIP_USER_CREATION_TESTS: "true"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "yarn"
+
+      - name: Install dependencies
+        run: |
+          yarn lock:check
+          yarn install --frozen-lockfile
+
+      - name: Setup Supabase CLI
+        if: github.event_name != 'push' || github.ref_name == 'main'
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Start local Supabase
+        if: github.event_name != 'push' || github.ref_name == 'main'
+        run: supabase start
+
+      - name: Normalize local test env defaults
+        if: github.event_name != 'push' || github.ref_name == 'main'
+        run: |
+          SUPABASE_URL="${SUPABASE_URL:-${{ vars.SUPABASE_URL }}}"
+          NEXT_PUBLIC_SUPABASE_URL="${NEXT_PUBLIC_SUPABASE_URL:-${{ vars.NEXT_PUBLIC_SUPABASE_URL }}}"
+          NEXT_PUBLIC_SUPABASE_ANON_KEY="${NEXT_PUBLIC_SUPABASE_ANON_KEY:-${{ vars.NEXT_PUBLIC_SUPABASE_ANON_KEY }}}"
+          SUPABASE_SERVICE_ROLE_KEY="${SUPABASE_SERVICE_ROLE_KEY:-${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}}"
+
+          SUPABASE_URL="${SUPABASE_URL:-http://127.0.0.1:54321}"
+          NEXT_PUBLIC_SUPABASE_URL="${NEXT_PUBLIC_SUPABASE_URL:-http://127.0.0.1:54321}"
+
+          STATUS_ENV="$(supabase status -o env 2>/dev/null || true)"
+          if [ -n "${STATUS_ENV}" ]; then
+            LOCAL_PUBLISHABLE="$(printf '%s\n' "${STATUS_ENV}" | sed -n 's/^ANON_KEY=//p' | tail -n1 | sed 's/^"//; s/"$//')"
+            LOCAL_SECRET="$(printf '%s\n' "${STATUS_ENV}" | sed -n 's/^SERVICE_ROLE_KEY=//p' | tail -n1 | sed 's/^"//; s/"$//')"
+            if [ -z "${LOCAL_PUBLISHABLE}" ]; then
+              LOCAL_PUBLISHABLE="$(printf '%s\n' "${STATUS_ENV}" | sed -n 's/^PUBLISHABLE_KEY=//p' | tail -n1 | sed 's/^"//; s/"$//')"
+            fi
+            if [ -z "${LOCAL_SECRET}" ]; then
+              LOCAL_SECRET="$(printf '%s\n' "${STATUS_ENV}" | sed -n 's/^SECRET_KEY=//p' | tail -n1 | sed 's/^"//; s/"$//')"
+            fi
+          fi
+          if [ -z "${LOCAL_PUBLISHABLE}" ] || [ -z "${LOCAL_SECRET}" ]; then
+            STATUS_TEXT="$(supabase status)"
+            LOCAL_PUBLISHABLE="$(printf '%s\n' "${STATUS_TEXT}" | sed -n 's/^| Publishable | \(.*\) |$/\1/p' | tail -n1)"
+            LOCAL_SECRET="$(printf '%s\n' "${STATUS_TEXT}" | sed -n 's/^| Secret      | \(.*\) |$/\1/p' | tail -n1)"
+          fi
+
+          NEXT_PUBLIC_SUPABASE_ANON_KEY="${NEXT_PUBLIC_SUPABASE_ANON_KEY:-$LOCAL_PUBLISHABLE}"
+          SUPABASE_SERVICE_ROLE_KEY="${SUPABASE_SERVICE_ROLE_KEY:-$LOCAL_SECRET}"
+
+          if [ -z "${NEXT_PUBLIC_SUPABASE_ANON_KEY}" ] || [ -z "${SUPABASE_SERVICE_ROLE_KEY}" ]; then
+            echo "Unable to resolve local Supabase auth keys from supabase status." >&2
+            exit 1
+          fi
+
+          echo "SUPABASE_URL=${SUPABASE_URL}" >> "$GITHUB_ENV"
+          echo "NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}" >> "$GITHUB_ENV"
+          echo "NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY}" >> "$GITHUB_ENV"
+          echo "SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}" >> "$GITHUB_ENV"
+
+      - name: Run unit tests
+        run: yarn test:unit
+
+      - name: Run Cypress smoke (minimal)
+        if: github.event_name == 'push' && github.ref_name == 'main'
+        run: env -u ELECTRON_RUN_AS_NODE yarn start-server-and-test "yarn dev" http://localhost:3000 "yarn test:e2e:smoke:minimal"
+
+      - name: Run Cypress smoke (full for PR to main)
+        if: >
+          github.event_name == 'pull_request' && github.base_ref == 'main'
+        run: env -u ELECTRON_RUN_AS_NODE yarn start-server-and-test "yarn dev" http://localhost:3000 "yarn test:e2e:smoke:full"
+
+      - name: Upload Cypress artifacts
+        if: >
+          always() && (
+            (github.event_name == 'push' && github.ref_name == 'main') ||
+            (github.event_name == 'pull_request' && github.base_ref == 'main')
+          )
+        uses: actions/upload-artifact@v4
+        with:
+          name: cypress-artifacts
+          path: |
+            cypress/videos
+            cypress/screenshots
+
+  build_app:
+    if: github.event_name != 'schedule'
+    needs: test_suite
+    runs-on: ubuntu-latest
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+      VAPID_PUBLIC_KEY: ${{ secrets.VAPID_PUBLIC_KEY }}
+      VAPID_PRIVATE_KEY: ${{ secrets.VAPID_PRIVATE_KEY }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "yarn"
+
+      - name: Install dependencies
+        run: |
+          yarn lock:check
+          yarn install --frozen-lockfile
+
+      - name: Build app
+        run: yarn build
+
+      - name: Check bundle budgets
+        run: yarn bundle:check
+
+  deploy_preview:
+    if: github.event_name == 'push' && github.ref_name != 'main'
+    needs: build_app
+    runs-on: ubuntu-latest
+    env:
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Pull Vercel Environment Information
+        run: npx vercel@latest pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }} --scope=${{ secrets.VERCEL_ORG_ID }}
+      - name: Build Project Artifacts
+        run: npx vercel@latest build --token=${{ secrets.VERCEL_TOKEN }} --scope=${{ secrets.VERCEL_ORG_ID }}
+      - name: Deploy Project Artifacts to Vercel Staging
+        run: npx vercel@latest deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }} --scope=${{ secrets.VERCEL_ORG_ID }}
+
+  deploy_production:
+    if: github.event_name == 'push' && github.ref_name == 'main'
+    needs: build_app
+    runs-on: ubuntu-latest
+    env:
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Pull Vercel Environment Information
+        run: npx vercel@latest pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }} --scope=${{ secrets.VERCEL_ORG_ID }}
+      - name: Build Project Artifacts
+        run: npx vercel@latest build --prod --token=${{ secrets.VERCEL_TOKEN }} --scope=${{ secrets.VERCEL_ORG_ID }}
+      - name: Deploy Project Artifacts to Vercel
+        run: npx vercel@latest deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }} --scope=${{ secrets.VERCEL_ORG_ID }}
+
+  notify_unclassified_discoveries:
+    if: >
+      (github.event_name == 'schedule' && github.event.schedule == '0 6 * * *') ||
+      (github.event_name == 'workflow_dispatch' && inputs.run_notify_discoveries == true)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "yarn"
+      - name: Install dependencies
+        run: |
+          yarn lock:check
+          yarn install --frozen-lockfile
+      - name: Send discovery notifications
+        env:
+          SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          NEXT_PUBLIC_VAPID_PUBLIC_KEY: ${{ secrets.VAPID_PUBLIC_KEY }}
+          VAPID_PRIVATE_KEY: ${{ secrets.VAPID_PRIVATE_KEY }}
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: node scripts/notify-unclassified-discoveries.js
+
+  unlock_solarhealth_anomalies:
+    if: >
+      (github.event_name == 'schedule' && github.event.schedule == '0 0 * * *') ||
+      (github.event_name == 'workflow_dispatch' && inputs.run_unlock_solarhealth == true) ||
+      (github.event_name == 'push' && contains(github.event.head_commit.message, 'SSM-257'))
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "yarn"
+      - name: Install dependencies
+        run: |
+          yarn lock:check
+          yarn install --frozen-lockfile
+      - name: Unlock SolarHealth anomalies
+        env:
+          SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: node scripts/unlock-solarhealth-anomalies.js
+
+  delete_push_anomaly_log:
+    if: >
+      (github.event_name == 'schedule' && github.event.schedule == '0 14 * * 6') ||
+      (github.event_name == 'workflow_dispatch' && inputs.run_delete_anomaly_log == true)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.21"
+      - name: Install dependencies
+        run: go mod tidy
+      - name: Delete push anomaly log
+        env:
+          SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: go run scripts/delete_push_anomaly_log.go

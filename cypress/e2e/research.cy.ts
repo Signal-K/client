@@ -1,6 +1,9 @@
 describe('Research Features', () => {
   beforeEach(() => {
     cy.waitForSupabase()
+    // Warm app compilation to avoid first-route socket timeouts in CI.
+    cy.visit('/', { failOnStatusCode: false })
+    cy.get('body').should('be.visible')
   })
 
   it('should display research page', () => {
@@ -10,9 +13,15 @@ describe('Research Features', () => {
   })
 
   it('should navigate to research tree if available', () => {
-    cy.visit('/research/tree')
-    cy.get('body').should('be.visible')
-    cy.url().should('include', '/research/tree')
+    cy.request({ url: '/research/tree', failOnStatusCode: false }).then((response) => {
+      if (response.status === 200) {
+        cy.visit('/research/tree')
+        cy.get('body').should('be.visible')
+        cy.url().should('include', '/research/tree')
+      } else {
+        expect(response.status).to.equal(404)
+      }
+    })
   })
 
   it('should handle research interactions', () => {

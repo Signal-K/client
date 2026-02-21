@@ -81,9 +81,10 @@ const TelescopeDeploySidebar: React.FC<TelescopeDeploySidebarProps> = ({
           </p>
         )}
         
-        {!selectedSector && sectorAnomalies.length > 0 && (
+        {!selectedSector && (
           <Button
             onClick={onSelectSector}
+            data-testid="select-sector-btn"
             className={`w-full ${isMobile ? 'h-8 text-xs px-2' : 'h-11'} font-bold shadow-lg transition-all duration-300 ${
               isDarkMode
                 ? 'bg-gradient-to-r from-[#4e7988] to-[#78cce2] hover:from-[#78cce2] hover:to-[#a8dce8] text-[#002439]'

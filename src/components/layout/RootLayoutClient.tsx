@@ -1,9 +1,8 @@
 "use client";
 
 import "@/styles/globals.css";
-import { createPagesBrowserClient } from "@supabase/auth-helpers-nextjs";
-import { SessionContextProvider } from "@supabase/auth-helpers-react";
-import { useEffect, useState, ReactNode } from "react";
+import { SessionContextProvider } from "@/src/lib/auth/session-context";
+import { useEffect, ReactNode } from "react";
 import { ActivePlanetProvider, useActivePlanet } from "@/src/core/context/ActivePlanet";
 import { Analytics } from "@vercel/analytics/react";
 // import Sidebar from "../ui/Panels/Sidebar";
@@ -23,20 +22,14 @@ function LayoutContent({ children }: { children: ReactNode }) {
 }
 
 export default function RootLayoutClient({ children }: { children: ReactNode }) {
-  const [supabaseClient] = useState(() => createPagesBrowserClient());
-
-  // Get session from supabaseClient
-  const [session, setSession] = useState<any>(null);
-
-  useEffect(() => {
-    supabaseClient.auth.getSession().then(({ data }) => {
-      setSession(data?.session ?? null);
-    });
-  }, [supabaseClient]);
-
   // Register service worker for offline access
   useEffect(() => {
     if (typeof window !== "undefined" && "serviceWorker" in navigator) {
+      // Keep service workers out of Cypress/test runs; they interfere with HMR/chunk loading.
+      if ((window as any).Cypress || process.env.NODE_ENV === "test") {
+        return;
+      }
+
       // First, try to register our custom service worker
       navigator.serviceWorker
         .register("/service-worker.js", { scope: "/" })
@@ -84,7 +77,7 @@ export default function RootLayoutClient({ children }: { children: ReactNode }) 
       </head>
       <body>
         {/* <PostHogProvider> */}
-        <SessionContextProvider supabaseClient={supabaseClient} initialSession={null}>
+        <SessionContextProvider>
           {/* <ThemeProviders attribute="class" defaultTheme="system" enableSystem> */}
           <ActivePlanetProvider>
             {/* <MissionProvider> */}

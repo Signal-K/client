@@ -3,34 +3,25 @@ const withPWA = require('next-pwa')({
   register: true,
   skipWaiting: true,
   disable: process.env.NODE_ENV === 'development',
-  // Aggressive caching for offline support
-  runtimeCaching: [
-    {
-      urlPattern: /^https?.*/,
-      handler: 'NetworkFirst',
-      options: {
-        cacheName: 'offlineCache',
-        expiration: {
-          maxEntries: 200,
-          maxAgeSeconds: 30 * 24 * 60 * 60 // 30 days
-        },
-        networkTimeoutSeconds: 10
-      }
-    }
-  ],
-  buildExcludes: [/middleware-manifest\.json$/],
-  fallbacks: {
-    // Fallback for document (HTML pages)
-    document: '/offline',
-  }
 });
+
+const configuredPosthogRegion = (process.env.posthog_region || process.env.POSTHOG_REGION || 'US Cloud').toLowerCase();
+const useEUPosthog = configuredPosthogRegion.includes('eu');
+const posthogIngestHost = useEUPosthog ? 'https://eu.i.posthog.com' : 'https://us.i.posthog.com';
+const posthogAssetsHost = useEUPosthog ? 'https://eu-assets.i.posthog.com' : 'https://us-assets.i.posthog.com';
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
 	reactStrictMode: true,
 	swcMinify: true,
+	experimental: {
+	  optimizePackageImports: ["lucide-react", "date-fns"],
+	},
 	images: {
 	  unoptimized: true,
+	},
+	eslint: {
+	  ignoreDuringBuilds: true,
 	},
 	// This is required to support PostHog trailing slash API requests
 	skipTrailingSlashRedirect: true,
@@ -87,18 +78,18 @@ const nextConfig = {
 			  ? 'http://127.0.0.1:5328/api/:path*' // Next.js API during development
 			  : '/api/', // Next.js API in production
 		},
-		// PostHog rewrites to support local ingest proxy (EU cluster)
+		// PostHog rewrites to support local ingest proxy by region
 		{
 		  source: '/ingest/static/:path*',
-		  destination: 'https://eu-assets.i.posthog.com/static/:path*',
+		  destination: `${posthogAssetsHost}/static/:path*`,
 		},
 		{
 		  source: '/ingest/:path*',
-		  destination: 'https://eu.i.posthog.com/:path*',
+		  destination: `${posthogIngestHost}/:path*`,
 		},
 		{
 		  source: '/ingest/flags',
-		  destination: 'https://eu.i.posthog.com/flags',
+		  destination: `${posthogIngestHost}/flags`,
 		},
 	  ];
 	},

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
+import { useSession } from "@/src/lib/auth/session-context";
 import { Progress } from "@/src/components/ui/progress";
 import { Button } from "@/src/components/ui/button";
 import Link from "next/link";
@@ -17,8 +17,38 @@ type TechItem = {
   progress: number;
 };
 
+async function fetchTechTreeData(): Promise<TechItem[]> {
+  const response = await fetch("/api/gameplay/research/summary", { cache: "no-store" });
+  const payload = await response.json().catch(() => null);
+  if (!response.ok || !payload) {
+    throw new Error(payload?.error ?? "Error loading research");
+  }
+
+  const techTypes: string[] = Array.isArray(payload.researchedTechTypes) ? payload.researchedTechTypes : [];
+  const counts: Record<string, number> = {};
+  for (const techType of techTypes) {
+    counts[techType] = (counts[techType] || 0) + 1;
+  }
+
+  const techDefinitions: Omit<TechItem, "level" | "progress">[] = [
+    { id: "probecount", name: "Probe Count", tech_type: "probecount", maxLevel: 3 },
+    { id: "proberange", name: "Probe Range", tech_type: "proberange", maxLevel: 5 },
+    { id: "ballooncount", name: "Balloon Count", tech_type: "ballooncount", maxLevel: 3 },
+    { id: "stationcount", name: "Station Count", tech_type: "stationcount", maxLevel: 2 },
+    { id: "cameracount", name: "Camera Count", tech_type: "cameracount", maxLevel: 3 },
+  ];
+
+  return techDefinitions.map((tech) => {
+    const level = counts[tech.tech_type] || 0;
+    return {
+      ...tech,
+      level,
+      progress: Math.min((level / tech.maxLevel) * 100, 100),
+    };
+  });
+}
+
 export default function TechnologyPopover() {
-  const supabase = useSupabaseClient();
   const session = useSession();
   const [techTree, setTechTree] = useState<TechItem[]>([]);
 
@@ -29,39 +59,13 @@ export default function TechnologyPopover() {
   }, [session]);
 
   const fetchUserTechData = async () => {
-    const { data, error } = await supabase
-      .from("researched")
-      .select("tech_type")
-      .eq("user_id", session?.user.id);
-
-    if (error) {
+    try {
+      const fullTree = await fetchTechTreeData();
+      setTechTree(fullTree);
+    } catch (error) {
       console.error("Error loading research:", error);
       return;
     }
-
-    const counts: Record<string, number> = {};
-    data.forEach(({ tech_type }) => {
-      counts[tech_type] = (counts[tech_type] || 0) + 1;
-    });
-
-    const techDefinitions: Omit<TechItem, "level" | "progress">[] = [
-      { id: "probecount", name: "Probe Count", tech_type: "probecount", maxLevel: 3 },
-      { id: "proberange", name: "Probe Range", tech_type: "proberange", maxLevel: 5 },
-      { id: "ballooncount", name: "Balloon Count", tech_type: "ballooncount", maxLevel: 3 },
-      { id: "stationcount", name: "Station Count", tech_type: "stationcount", maxLevel: 2 },
-      { id: "cameracount", name: "Camera Count", tech_type: "cameracount", maxLevel: 3 },
-    ];
-
-    const fullTree: TechItem[] = techDefinitions.map((tech) => {
-      const level = counts[tech.tech_type] || 0;
-      return {
-        ...tech,
-        level,
-        progress: Math.min((level / tech.maxLevel) * 100, 100),
-      };
-    });
-
-    setTechTree(fullTree);
   };
 
   return (
@@ -104,7 +108,6 @@ export default function TechnologyPopover() {
 export function TechnologySection() {
   // For mobile, only
 
-  const supabase = useSupabaseClient();
   const session = useSession();
   const [techTree, setTechTree] = useState<TechItem[]>([]);
 
@@ -115,39 +118,13 @@ export function TechnologySection() {
   }, [session]);
 
   const fetchUserTechData = async () => {
-    const { data, error } = await supabase
-      .from("researched")
-      .select("tech_type")
-      .eq("user_id", session?.user.id);
-
-    if (error) {
+    try {
+      const fullTree = await fetchTechTreeData();
+      setTechTree(fullTree);
+    } catch (error) {
       console.error("Error loading research:", error);
       return;
     }
-
-    const counts: Record<string, number> = {};
-    data.forEach(({ tech_type }) => {
-      counts[tech_type] = (counts[tech_type] || 0) + 1;
-    });
-
-    const techDefinitions: Omit<TechItem, "level" | "progress">[] = [
-      { id: "probecount", name: "Probe Count", tech_type: "probecount", maxLevel: 3 },
-      { id: "proberange", name: "Probe Range", tech_type: "proberange", maxLevel: 5 },
-      { id: "ballooncount", name: "Balloon Count", tech_type: "ballooncount", maxLevel: 3 },
-      { id: "stationcount", name: "Station Count", tech_type: "stationcount", maxLevel: 2 },
-      { id: "cameracount", name: "Camera Count", tech_type: "cameracount", maxLevel: 3 },
-    ];
-
-    const fullTree: TechItem[] = techDefinitions.map((tech) => {
-      const level = counts[tech.tech_type] || 0;
-      return {
-        ...tech,
-        level,
-        progress: Math.min((level / tech.maxLevel) * 100, 100),
-      };
-    });
-
-    setTechTree(fullTree);
   };
 
   return (

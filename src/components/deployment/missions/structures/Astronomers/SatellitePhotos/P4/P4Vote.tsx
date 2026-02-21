@@ -2,18 +2,9 @@
 
 import React, { useEffect, useState } from "react";
 import { PostCardSingle } from "@/src/components/social/posts/PostSingle";
-import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
-
-interface Classification {
-    id: number;
-    created_at: string;
-    content: string | null; 
-    author: string | null;
-    anomaly: number | null;
-    media: any | null; 
-    classificationtype: string | null;
-    classificationConfiguration: any | null; 
-};
+import { useSession, useSupabaseClient } from "@/src/lib/auth/session-context";
+import { incrementClassificationVote } from "@/src/lib/gameplay/classification-vote";
+import { fetchClassificationsForVoting } from "@/src/lib/gameplay/classification-list";
 
 export default function VoteP4Classifications() {
     const supabase = useSupabaseClient();
@@ -33,29 +24,20 @@ export default function VoteP4Classifications() {
         setLoading(true);
         setError(null);
         try {
-          const { data, error } = await supabase
-            .from("classifications")
-            .select('*')
-            .eq('classificationtype', 'satellite-planetFour')
-            .order('created_at', { ascending: false }) as { data: Classification[]; error: any };
-      
-          if (error) throw error;
-      
-          const processedData = data.map((classification) => {
-            const media = classification.media;
-            console.log(classification.media);
-            let images: string[] = [];
-          
-            if (Array.isArray(media)) {
-              images = media.map((item) => item.url); 
-            } else if (media?.url) {
-              images = [media.url]; 
-            }
-          
-            return {
-              ...classification,
-              images, 
-            };
+          const processedData = await fetchClassificationsForVoting({
+            supabase,
+            classificationType: "satellite-planetFour",
+            getImages: (media) => {
+              if (Array.isArray(media)) {
+                return media
+                  .map((item: any) => item?.url)
+                  .filter((url: unknown): url is string => typeof url === "string");
+              }
+              if (media && typeof media === "object" && "url" in media && typeof (media as any).url === "string") {
+                return [(media as any).url];
+              }
+              return [];
+            },
           });          
       
           setClassifications(processedData);
@@ -72,33 +54,22 @@ export default function VoteP4Classifications() {
     }, [session]);
 
     const handleVote = async (classificationId: number, currentConfig: any) => {
-        try {
-          const currentVotes = currentConfig?.votes || 0;
-    
-          const updatedConfig = {
-            ...currentConfig,
-            votes: currentVotes + 1,
-          };
-    
-          const { error } = await supabase
-            .from("classifications")
-            .update({ classificationConfiguration: updatedConfig })
-            .eq("id", classificationId);
-    
-          if (error) {
-            console.error("Error updating classificationConfiguration:", error);
-          } else {
-            setClassifications((prevClassifications) =>
-              prevClassifications.map((classification) =>
-                classification.id === classificationId
-                  ? { ...classification, votes: updatedConfig.votes }
-                  : classification
-              )
-            );
-          }
-        } catch (error) {
-          console.error("Error voting:", error);
-        };
+        const updatedVotes = await incrementClassificationVote(
+          classificationId,
+          currentConfig?.votes || 0
+        );
+
+        if (updatedVotes === null) {
+          return;
+        }
+
+        setClassifications((prevClassifications) =>
+          prevClassifications.map((classification) =>
+            classification.id === classificationId
+              ? { ...classification, votes: updatedVotes }
+              : classification
+          )
+        );
     };
 
     return (
@@ -110,6 +81,7 @@ export default function VoteP4Classifications() {
             ) : (
               classifications.map((classification) => (
 <PostCardSingle
+  key={classification.id}
   classificationId={classification.id}
   title={classification.title || "Untitled"}
   author={classification.author || "Anonymous"}

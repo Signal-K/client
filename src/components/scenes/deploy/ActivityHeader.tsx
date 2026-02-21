@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
+import { useSession } from "@/src/lib/auth/session-context";
 import { Card } from "@/src/components/ui/card";
 import {
   Dialog,
@@ -9,6 +9,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/src/components/ui/dialog";
+import { Wrench } from "lucide-react";
 import Link from "next/link";
 import TelescopeIcon from "@/src/components/icons/TelescopeIcon";
 import SatelliteIcon from "@/src/components/icons/SatelliteIcon";
@@ -17,8 +18,6 @@ import StardustBalance from "@/src/components/stardust/StardustBalance";
 import PlanetSelectorModal from "@/src/components/modals/PlanetSelectorModal";
 import useDeploymentStatus from "@/src/hooks/useDeploymentStatus";
 import { AvatarGenerator } from "@/src/components/profile/setup/Avatar";
-import SpannerIcon from "@/src/components/icons/SpannerIcon";
-import { hasUpgrade } from "@/src/utils/userUpgrades";
 
 export default function ActivityHeader({
   landmarksExpanded,
@@ -31,7 +30,6 @@ export default function ActivityHeader({
   scrolled: boolean;
   location?: string;
 }) {
-  const supabase = useSupabaseClient();
   const session = useSession();
 
   const [profile, setProfile] = useState<{
@@ -82,26 +80,30 @@ export default function ActivityHeader({
     if (!session?.user?.id) return;
 
     const fetchData = async () => {
-      const { data: profileData } = await supabase
-        .from("profiles")
-        .select("classificationPoints, username")
-        .eq("id", session.user.id)
-        .maybeSingle();
-      setProfile(profileData);
+      const [pageDataResponse, researchSummaryResponse] = await Promise.all([
+        fetch("/api/gameplay/page-data", { cache: "no-store" }),
+        fetch("/api/gameplay/research/summary", { cache: "no-store" }),
+      ]);
 
-      // Get total classifications count
-      const { data: classifications, error: classError } = await supabase
-        .from("classifications")
-        .select("id")
-        .eq("author", session.user.id);
-      
-      if (!classError && classifications) {
-        setClassificationsCount(classifications.length);
+      const pageDataPayload = await pageDataResponse.json().catch(() => null);
+      const researchSummaryPayload = await researchSummaryResponse.json().catch(() => null);
+
+      if (pageDataResponse.ok && pageDataPayload) {
+        setProfile(pageDataPayload.profile ?? null);
+      }
+      if (researchSummaryResponse.ok && researchSummaryPayload) {
+        setClassificationsCount(Number(researchSummaryPayload?.counts?.all ?? 0));
       }
 
-      // Get researched upgrades to calculate available upgrades
-      const hasTelescopeUpgrade = await hasUpgrade(supabase, session.user.id, "probereceptors");
-      const hasSatelliteUpgrade = await hasUpgrade(supabase, session.user.id, "satellitecount");
+      const researchedTechTypes: string[] = Array.isArray(researchSummaryPayload?.researchedTechTypes)
+        ? researchSummaryPayload.researchedTechTypes
+        : [];
+      const hasTelescopeUpgrade =
+        researchedTechTypes.includes("probereceptors") ||
+        Number(researchSummaryPayload?.upgrades?.telescopeReceptors ?? 1) > 1;
+      const hasSatelliteUpgrade =
+        researchedTechTypes.includes("satellitecount") ||
+        Number(researchSummaryPayload?.upgrades?.satelliteCount ?? 1) > 1;
       
       setBothUpgradesUnlocked(hasTelescopeUpgrade && hasSatelliteUpgrade);
       
@@ -118,43 +120,24 @@ export default function ActivityHeader({
     };
 
     fetchData();
-  }, [session, supabase]);
+  }, [session]);
 
   const { deploymentStatus, planetTargets } = useDeploymentStatus();
 
   const handleSendSatellite = async (planetId: number, planetName: string) => {
     if (!session) return;
 
-    const userId = session.user.id;
-
     try {
-      // Get random cloud anomaly
-      const { data: cloudAnomalies, error } = await supabase
-        .from("anomalies")
-        .select("id")
-        .eq("anomalytype", "cloud");
-
-      if (error || !cloudAnomalies || cloudAnomalies.length === 0) return;
-
-      const randomIndex = Math.floor(Math.random() * cloudAnomalies.length);
-      const selectedAnomaly = cloudAnomalies[randomIndex];
-
-      const insertPayload = [
-        {
-          author: userId,
-          anomaly_id: selectedAnomaly.id,
-          classification_id: planetId,
-          automaton: "WeatherSatellite",
-        },
-        {
-          author: userId,
-          anomaly_id: selectedAnomaly.id,
-          classification_id: planetId,
-          automaton: "WeatherSatellite",
-        },
-      ];
-
-      await supabase.from("linked_anomalies").insert(insertPayload);
+      const response = await fetch("/api/gameplay/deploy/satellite/quick", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ planetClassificationId: planetId }),
+      });
+      const payload = await response.json().catch(() => null);
+      if (!response.ok) {
+        console.error("Error deploying satellite:", payload?.error || response.statusText);
+        return;
+      }
 
       // Show success message and animation
       setDeploymentMessage(`🛰️ Satellite successfully deployed to ${planetName}!`);
@@ -249,7 +232,7 @@ export default function ActivityHeader({
                   className="group flex items-center gap-2 rounded-full border border-amber-400/40 bg-amber-200/20 px-2.5 py-1.5 text-xs font-medium text-amber-900 shadow-sm transition-all hover:border-amber-400/60 hover:bg-amber-200/30 hover:-translate-y-0.5 dark:border-amber-300/30 dark:bg-amber-300/10 dark:text-amber-100"
                 >
                   <div className="relative flex h-8 w-8 items-center justify-center rounded-full bg-amber-300/50 text-amber-900 transition-colors group-hover:bg-amber-300/70 dark:bg-amber-900/40 dark:group-hover:bg-amber-900/60">
-                    <SpannerIcon />
+                    <Wrench className="h-6 w-6" strokeWidth={1.5} />
                     <span className="absolute -top-1 -right-1 flex h-4 min-w-[1rem] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white">
                       {availableUpgrades}
                     </span>

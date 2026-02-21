@@ -1,0 +1,118 @@
+{
+  "taskId": "xbdv2s",
+  "currentVersion": 2,
+  "versions": [
+    {
+      "id": "v1",
+      "taskId": "xbdv2s",
+      "version": 1,
+      "timestamp": "2026-02-19T08:19:35.486Z",
+      "changes": [
+        {
+          "field": "status",
+          "oldValue": "todo",
+          "newValue": "in-progress"
+        }
+      ],
+      "snapshot": {
+        "title": "Specsheet: minigame compatibility matrix for migration",
+        "description": "Create a cross-referenced specsheet covering all citizen-science projects/minigames, their components/chapters, routes, tests, mechanics, and visual parity constraints to preserve behavior during architecture migration.",
+        "status": "in-progress",
+        "priority": "high",
+        "labels": [
+          "spec",
+          "migration",
+          "qa"
+        ],
+        "acceptanceCriteria": [
+          {
+            "completed": false,
+            "text": "Every project/minigame has route+component mapping"
+          },
+          {
+            "completed": false,
+            "text": "Each project lists current test coverage and gaps"
+          },
+          {
+            "completed": false,
+            "text": "Spec defines no-regression behavior and visual parity checklist"
+          }
+        ]
+      }
+    },
+    {
+      "id": "v2",
+      "taskId": "xbdv2s",
+      "version": 2,
+      "timestamp": "2026-02-19T08:21:29.899Z",
+      "changes": [
+        {
+          "field": "status",
+          "oldValue": "in-progress",
+          "newValue": "done"
+        },
+        {
+          "field": "acceptanceCriteria",
+          "oldValue": [
+            {
+              "completed": false,
+              "text": "Every project/minigame has route+component mapping"
+            },
+            {
+              "completed": false,
+              "text": "Each project lists current test coverage and gaps"
+            },
+            {
+              "completed": false,
+              "text": "Spec defines no-regression behavior and visual parity checklist"
+            }
+          ],
+          "newValue": [
+            {
+              "completed": true,
+              "text": "Every project/minigame has route+component mapping"
+            },
+            {
+              "completed": true,
+              "text": "Each project lists current test coverage and gaps"
+            },
+            {
+              "completed": true,
+              "text": "Spec defines no-regression behavior and visual parity checklist"
+            }
+          ]
+        },
+        {
+          "field": "implementationNotes",
+          "newValue": "Created compatibility matrix spec with chapter refs, project/component/route/test mapping, parity contract, and migration validation checklist."
+        }
+      ],
+      "snapshot": {
+        "title": "Specsheet: minigame compatibility matrix for migration",
+        "description": "Create a cross-referenced specsheet covering all citizen-science projects/minigames, their components/chapters, routes, tests, mechanics, and visual parity constraints to preserve behavior during architecture migration.",
+        "status": "done",
+        "priority": "high",
+        "labels": [
+          "spec",
+          "migration",
+          "qa"
+        ],
+        "acceptanceCriteria": [
+          {
+            "completed": true,
+            "text": "Every project/minigame has route+component mapping"
+          },
+          {
+            "completed": true,
+            "text": "Each project lists current test coverage and gaps"
+          },
+          {
+            "completed": true,
+            "text": "Spec defines no-regression behavior and visual parity checklist"
+          }
+        ],
+        "implementationNotes": "Created compatibility matrix spec with chapter refs, project/component/route/test mapping, parity contract, and migration validation checklist."
+      }
+    }
+  ]
+}

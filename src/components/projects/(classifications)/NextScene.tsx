@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
+import { useSession } from "@/src/lib/auth/session-context";
 import { useRouter } from "next/navigation";
 import { Button } from "@/src/components/ui/button";
 import {
@@ -77,7 +77,6 @@ const badgeColors = [
 ];
 
 export default function ClientClassificationPage({ id }: Props) {
-  const supabase = useSupabaseClient();
   const session = useSession();
   const router = useRouter();
 
@@ -96,7 +95,7 @@ export default function ClientClassificationPage({ id }: Props) {
 
     const urls: string[] = [];
     let imageIndex = 1;
-    let maxAttempts = 20; // Safety limit
+    const maxAttempts = 20; // Safety limit
 
     while (imageIndex <= maxAttempts) {
       const imageUrl = `${supabaseUrl}/storage/v1/object/public/telescope/telescope-diskDetective/${anomalyId}/${imageIndex}.png`;
@@ -134,65 +133,41 @@ export default function ClientClassificationPage({ id }: Props) {
 
   useEffect(() => {
     async function fetchMineralDeposit() {
-      const { data, error } = await supabase
-        .from("mineralDeposits")
-        .select("*")
-        .eq("discovery", id)
-        .maybeSingle();
-
-      if (!error && data) {
+      const response = await fetch(`/api/gameplay/mineral-deposits?discovery=${id}`, {
+        cache: "no-store",
+      });
+      const payload = await response.json().catch(() => null);
+      const data = payload?.deposits?.[0];
+      if (response.ok && data) {
         // mineral deposit found
         setMineralDeposit(data);
-      } else if (error) {
-        console.error("[NextScene] Error fetching mineral deposit:", error);
+      } else if (!response.ok) {
+        console.error("[NextScene] Error fetching mineral deposit:", payload?.error || response.statusText);
       } else {
         // no mineral deposit for this classification
       }
     }
 
     fetchMineralDeposit();
-  }, [id, supabase]);
+  }, [id]);
 
   useEffect(() => {
     const fetchClassification = async () => {
-      const { data, error } = await supabase
-        .from("classifications")
-        .select("*")
-        .eq("id", id)
-        .single();
+      const response = await fetch(`/api/gameplay/classifications/${id}`, {
+        cache: "no-store",
+      });
+      const payload = await response.json().catch(() => null);
+      const data = payload?.classification;
 
-      if (error) {
-        console.error("Error fetching classification:", error);
+      if (!response.ok || !data) {
+        console.error("Error fetching classification:", payload?.error || response.statusText);
         return;
       }
 
       // classification configuration and annotation options loaded
 
       setClassification(data);
-      
-      // Fetch source classification media if it exists
-      const sourceId = data.classificationConfiguration?.source_classification_id;
-      if (sourceId) {
-        const { data: sourceData } = await supabase
-          .from("classifications")
-          .select("media")
-          .eq("id", sourceId)
-          .single();
-
-        if (sourceData?.media) {
-          const extractedMedia: string[] = [];
-          if (Array.isArray(sourceData.media)) {
-            for (const item of sourceData.media) {
-              if (Array.isArray(item) && typeof item[0] === "string" && item[0].startsWith("http")) {
-                extractedMedia.push(item[0]);
-              } else if (typeof item === "string" && item.startsWith("http")) {
-                extractedMedia.push(item);
-              }
-            }
-          }
-          setSourceClassificationMedia(extractedMedia);
-        }
-      }
+      setSourceClassificationMedia(Array.isArray(payload?.sourceMedia) ? payload.sourceMedia : []);
       
       setLoading(false);
 
@@ -210,7 +185,7 @@ export default function ClientClassificationPage({ id }: Props) {
     };
 
     fetchClassification();
-  }, [id, supabase, session]);
+  }, [id, session]);
 
   const checkMilestones = async (
     classificationType: string,
@@ -250,23 +225,21 @@ export default function ClientClassificationPage({ id }: Props) {
 
       const milestoneStatuses = await Promise.all(
         relevantMilestones.map(async (m: any) => {
-          const { count, error } = await supabase
-            .from("classifications")
-            .select("", { count: "exact", head: true })
-            .eq("author", session?.user?.id)
-            .eq("classificationtype", classificationType)
-            .gte("created_at", start)
-            .lt("created_at", end);
-
-          if (error) {
-            console.error("Milestone count error:", error);
+          const countResponse = await fetch(
+            `/api/gameplay/classifications/count?classificationtype=${encodeURIComponent(classificationType)}&createdAtGte=${encodeURIComponent(start)}&createdAtLt=${encodeURIComponent(end)}`,
+            { cache: "no-store" }
+          );
+          const countPayload = await countResponse.json().catch(() => null);
+          const count = Number(countPayload?.count ?? 0);
+          if (!countResponse.ok) {
+            console.error("Milestone count error:", countPayload?.error || countResponse.statusText);
           }
 
           return {
             name: m.name,
             requiredCount: m.requiredCount ?? 5,
-            currentCount: count ?? 0,
-            achieved: (count ?? 0) >= (m.requiredCount ?? 5),
+            currentCount: count,
+            achieved: count >= (m.requiredCount ?? 5),
           };
         })
       );

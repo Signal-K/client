@@ -26,21 +26,21 @@ yarn build
 make build-app
 ```
 
-### Database Operations (Drizzle ORM + Supabase)
+### Database Operations (Prisma + Supabase Postgres)
 ```bash
-# Generate database schema
-yarn db:generate
+# Generate Prisma client
+yarn prisma:generate
 
-# Push schema changes to database
-yarn db:push
+# Pull current database schema
+yarn prisma:pull
 
-# Open Drizzle Studio (database UI)
-yarn db:studio
+# Open Prisma Studio (database UI)
+yarn prisma:studio
 # or via Docker
 make db-studio
 
 # Database migrations
-yarn db:migrate
+yarn prisma:migrate:deploy
 ```
 
 ### Testing
@@ -86,18 +86,18 @@ yarn docker:test:clean
 ### Docker Operations
 ```bash
 # Development with Docker
-docker-compose up
+docker-compose -f ops/compose/compose.yml up
 # or
 make up
 
 # Production deployment
-docker-compose -f docker-compose.prod.yml up -d
+docker-compose -f ops/compose/docker-compose.prod.yml up -d
 # or
 make prod-up
 
 # Test environment
-docker-compose -f docker-compose.test.yml --profile unit up
-docker-compose -f docker-compose.test.yml --profile e2e up
+docker-compose -f ops/compose/docker-compose.test.yml --profile unit up
+docker-compose -f ops/compose/docker-compose.test.yml --profile e2e up
 ```
 
 ### Linting and Code Quality
@@ -145,7 +145,7 @@ The codebase uses a **user-centric component architecture** rather than technica
 
 ### Key Technologies
 - **Frontend**: Next.js 14, React 18, TypeScript, Tailwind CSS
-- **Database**: Supabase with Drizzle ORM (PostgreSQL)
+- **Database**: Supabase Postgres with Prisma ORM
 - **3D Graphics**: Three.js with React Three Fiber
 - **Testing**: Vitest (unit), Cypress (E2E)
 - **Styling**: Tailwind CSS, Radix UI, Framer Motion
@@ -178,7 +178,7 @@ import { Button } from '@/src/components/ui/button'
 - **e2e-tests-local**: Local E2E testing with user creation
 - **db**: PostgreSQL database
 - **redis**: Redis cache
-- **drizzle-studio**: Database UI tool
+- **prisma-studio**: Database UI tool
 
 #### Testing Profiles
 - **`unit`**: Fast, isolated unit testing
@@ -194,7 +194,7 @@ The application integrates with a Flask backend for citizen science features:
 
 ### Key Development Notes
 - Components are organized by **user mechanics** not technical implementation
-- Database schema is managed through Drizzle ORM in `src/core/database/schema.ts`
+- Database schema is managed through Prisma in `prisma/schema.prisma`
 - All routes have been validated for the user-centric reorganization
 - Docker testing environment provides consistent CI/CD integration
 - Three.js components use React Three Fiber patterns

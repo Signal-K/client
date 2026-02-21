@@ -1,7 +1,6 @@
 'use client'
 
 import React, { useEffect, useState } from "react";
-import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import { AvatarGenerator } from "@/src/components/profile/setup/Avatar";
 import { Card, CardContent } from "@/src/components/ui/card";
 
@@ -24,8 +23,6 @@ interface CommentsListProps {
 export default function CommentsList({
     classificationId
 }: CommentsListProps) {
-    const supabase = useSupabaseClient();
-
     const [comments, setComments] = useState<Comment[]>([]);
 
     const [loading, setLoading] = useState<boolean>(true);
@@ -37,20 +34,17 @@ export default function CommentsList({
     const fetchComments = async () => {
         setLoading(true);
 
-        const {
-            data,
-            error
-        } = await supabase
-            .from("comments")
-            .select('*')
-            .eq('classification_id', classificationId)
-            .order('created_at', { ascending: false });
-
-        if (error) {
-            console.error("Failed to fetch comments: ", error.message);
+        const response = await fetch(
+            `/api/gameplay/social/comments?classificationId=${classificationId}&order=desc`,
+            { cache: "no-store" }
+        );
+        const payload = await response.json().catch(() => null);
+        if (!response.ok || !payload?.comments) {
+            console.error("Failed to fetch comments: ", payload?.error || response.statusText);
+            setComments([]);
         } else {
-            setComments(data);
-        };
+            setComments(payload.comments);
+        }
 
         setLoading(false);
     };
@@ -89,8 +83,6 @@ export default function CommentsList({
 export function SurveyorCommentList({
     classificationId
 }: CommentsListProps) {
-    const supabase = useSupabaseClient();
-
     const [comments, setComments] = useState<Comment[]>([]);
 
     const [loading, setLoading] = useState<boolean>(true);
@@ -103,35 +95,16 @@ export function SurveyorCommentList({
         setLoading(true);
 
         try {
-            const { data, error } = await supabase
-                .from("comments")
-                .select("*")
-                .eq("classification_id", classificationId)
-                .eq("surveyor", true)
-                .order('created_at', { ascending: true });
-
-            if (error) {
-                // If surveyor column doesn't exist, fall back to all comments
-                if (error.message?.includes('surveyor')) {
-                    console.warn('Surveyor column not found, falling back to all comments');
-                    const { data: fallbackData, error: fallbackError } = await supabase
-                        .from("comments")
-                        .select("*")
-                        .eq("classification_id", classificationId)
-                        .order('created_at', { ascending: true });
-                    
-                    if (fallbackError) {
-                        console.error("Failed to fetch comments:", fallbackError.message);
-                        setComments([]);
-                    } else {
-                        setComments(fallbackData || []);
-                    }
-                } else {
-                    console.error("Failed to fetch surveyor comments:", error.message);
-                    setComments([]);
-                }
+            const response = await fetch(
+                `/api/gameplay/social/comments?classificationId=${classificationId}&surveyor=true&order=asc`,
+                { cache: "no-store" }
+            );
+            const payload = await response.json().catch(() => null);
+            if (!response.ok || !payload?.comments) {
+                console.error("Failed to fetch surveyor comments:", payload?.error || response.statusText);
+                setComments([]);
             } else {
-                setComments(data || []);
+                setComments(payload.comments || []);
             }
         } catch (err) {
             console.error("Error fetching comments:", err);

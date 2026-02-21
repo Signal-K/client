@@ -1,13 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useSession } from "@supabase/auth-helpers-react";
 import { Button } from "@/src/components/ui/button";
 import { Card, CardContent } from "@/src/components/ui/card";
 import { Alert, AlertDescription } from "@/src/components/ui/alert";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/src/components/ui/dialog";
 import { Star, UserPlus, X, Clock } from "lucide-react";
 import ConvertAnonymousAccount from "./ConvertAnonymousAccount";
+import { useAuthUser } from "@/src/hooks/useAuthUser";
 
 interface AnonymousUserPromptProps {
   classificationsCount?: number;
@@ -22,11 +22,11 @@ export default function AnonymousUserPrompt({
   timeSpent = 0,
   showPrompt = false
 }: AnonymousUserPromptProps) {
-  const session = useSession();
+  const { user } = useAuthUser();
   const [isOpen, setIsOpen] = useState(false);
   const [isDismissed, setIsDismissed] = useState(false);
   
-  const isAnonymousUser = session?.user?.is_anonymous;
+  const isAnonymousUser = Boolean((user as any)?.is_anonymous);
   
   // Determine if we should show the upgrade prompt
   const shouldShowPrompt = isAnonymousUser && !isDismissed && (

@@ -7,7 +7,7 @@ import { Badge } from "@/src/components/ui/badge"
 import { Star, Zap, Target, Disc } from "lucide-react"
 import type { Anomaly } from "@/types/Structures/telescope"
 
-export interface AnomalyDialogProps {
+interface AnomalyDialogProps {
   showClassifyDialog: boolean
   setShowClassifyDialog: (show: boolean) => void
   selectedAnomaly: any

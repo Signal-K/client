@@ -1,13 +1,14 @@
 "use client"
 
-import { useRouter } from "next/navigation"
+import dynamic from "next/dynamic"
 import GameNavbar from "@/src/components/layout/Tes"
-import { Dialog, DialogContent } from "@/src/components/ui/dialog"
-import SolarHealth from "@/src/components/scenes/deploy/solar/SolarHealth"
+
+const SolarHealth = dynamic(() => import("@/src/components/scenes/deploy/solar/SolarHealth"), {
+  ssr: false,
+  loading: () => <div className="p-4 text-xs text-slate-400">Loading solar viewport...</div>,
+});
 
 export default function SolarHealthViewportExpandedPage() {
-    const router = useRouter();
-
     return (
         <div className="h-screen w-full flex flex-col overflow-hidden">
             <div className="w-full z-50 flex-shrink-0">

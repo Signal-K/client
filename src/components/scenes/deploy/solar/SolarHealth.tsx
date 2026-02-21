@@ -1,13 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
+import { useSession } from "@/src/lib/auth/session-context";
 import { Button } from "@/src/components/ui/button";
 import { Canvas } from "@react-three/fiber";
 import { Suspense } from "react";
 import { OrbitControls, Stars } from "@react-three/drei";
 import Section from "@/src/components/sections/Section";
 import { Sun } from "@/src/components/discovery/data-sources/Solar/Sun";
+import { useRouter } from "next/navigation";
 
 function Sun3D({ sunspots }: { sunspots: number }) {
   return (
@@ -25,7 +26,7 @@ function getWeekStart(date: Date) {
 }
 
 export default function SolarHealth() {
-  const supabase = useSupabaseClient();
+  const router = useRouter();
   const session = useSession();
 
   const [sunspotAnomalies, setSunspotAnomalies] = useState<any[]>([]);
@@ -45,37 +46,35 @@ export default function SolarHealth() {
       }
       setLoading(true);
       // Fetch sunspot anomalies
-      const { data: anomalies } = await supabase
-        .from("anomalies")
-        .select("*")
-        .eq("anomalySet", "sunspot");
-      setSunspotAnomalies(anomalies || []);
+      const anomaliesResponse = await fetch("/api/gameplay/anomalies?anomalySet=sunspot", {
+        cache: "no-store",
+      });
+      const anomaliesPayload = await anomaliesResponse.json().catch(() => null);
+      setSunspotAnomalies(anomaliesPayload?.anomalies || []);
 
       // Fetch linked anomalies
       const weekStart = getWeekStart(now).toISOString();
-      const { data: linked } = await supabase
-        .from("linked_anomalies")
-        .select("*")
-        .eq("author", session.user.id)
-        .eq("automaton", automatonType)
-        .gte("date", weekStart);
-      setLinkedSunspots((linked || []).filter((l) => !isExpired(l)));
+      const linkedResponse = await fetch(
+        `/api/gameplay/linked-anomalies?automaton=${encodeURIComponent(automatonType)}&dateGte=${encodeURIComponent(weekStart)}`,
+        { cache: "no-store" }
+      );
+      const linkedPayload = await linkedResponse.json().catch(() => null);
+      setLinkedSunspots((linkedPayload?.linkedAnomalies || []).filter((l: any) => !isExpired(l)));
 
       // Fetch sunspot classifications for this user in the last week
-      const { data: sunspotClassifications } = await supabase
-        .from("classifications")
-        .select("id")
-        .eq("author", session.user.id)
-        .eq("classificationtype", "sunspot")
-        .gte("created_at", weekStart);
-      setSunspots((sunspotClassifications || []).length);
+      const countResponse = await fetch(
+        `/api/gameplay/classifications/count?classificationtype=sunspot&createdAtGte=${encodeURIComponent(weekStart)}`,
+        { cache: "no-store" }
+      );
+      const countPayload = await countResponse.json().catch(() => null);
+      setSunspots(Number(countPayload?.count ?? 0));
 
       setLoading(false);
     }
     fetchSunspotData();
     const interval = setInterval(() => setNow(new Date()), 60000);
     return () => clearInterval(interval);
-  }, [session, supabase, now]);
+  }, [session, now]);
 
   // Helper: is anomaly unlocked
   function isUnlocked(linked: any) {
@@ -100,25 +99,21 @@ export default function SolarHealth() {
   // Handle participate
   async function handleParticipate() {
     setParticipating(true);
-    for (const anomaly of sunspotAnomalies) {
-      await supabase.from("linked_anomalies").insert({
-        author: session?.user.id,
-        anomaly_id: anomaly.id,
-        automaton: automatonType,
-        unlocked: false,
-        date: now.toISOString(),
-      });
-    }
+    const response = await fetch("/api/gameplay/deploy/solar", { method: "POST" });
+    const payload = await response.json().catch(() => null);
     setParticipating(false);
+    if (!response.ok) {
+      console.error("Error joining solar mission:", payload?.error || response.statusText);
+      return;
+    }
     // Refresh
     const weekStart = getWeekStart(now).toISOString();
-    const { data: linked } = await supabase
-      .from("linked_anomalies")
-      .select("*")
-      .eq("author", session?.user.id)
-      .eq("automaton", automatonType)
-      .gte("date", weekStart);
-    setLinkedSunspots((linked || []).filter((l) => !isExpired(l)));
+    const linkedResponse = await fetch(
+      `/api/gameplay/linked-anomalies?automaton=${encodeURIComponent(automatonType)}&dateGte=${encodeURIComponent(weekStart)}`,
+      { cache: "no-store" }
+    );
+    const linkedPayload = await linkedResponse.json().catch(() => null);
+    setLinkedSunspots((linkedPayload?.linkedAnomalies || []).filter((l: any) => !isExpired(l)));
   }
 
   // Find first linked sunspot anomaly for this week
@@ -142,6 +137,7 @@ export default function SolarHealth() {
         backgroundType="inner-solar"
         infoText={"Investigate star activity to detect solar flares and measure the intensity of sunspots"}
         expandLink={"/viewports/solar"}
+        className="h-full"
       >
       <div className="relative w-full h-64 md:h-96 flex items-center justify-center py-8 md:py-12">
         {loading ? (
@@ -249,9 +245,7 @@ export default function SolarHealth() {
             <Button
               className="mt-3 w-36 text-xs"
               variant="outline"
-              onClick={() =>
-                (typeof window !== "undefined" && (window.location.href = `/structures/telescope/sunspot/db-${anomalyId}/count`))
-              }
+              onClick={() => router.push(`/structures/telescope/sunspot/db-${anomalyId}/count`)}
             >
               Count Solar Anomalies
             </Button>

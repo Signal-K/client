@@ -5,7 +5,7 @@ import clsx from "clsx";
 // Optionally import your backgrounds here
 // import { TelescopeBackground } from "@/src/components/backgrounds/TelescopeBackground";
 
-export interface SectionProps {
+interface SectionProps {
   variant?: "viewport" | "default" | "highlight" | "minimal";
   backgroundType?: "stars" | "planets" | "rover" | "none" | string;
   className?: string;

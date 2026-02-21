@@ -3,8 +3,8 @@
 import { useState } from "react";
 import { Button } from "@/src/components/ui/button";
 import { Textarea } from "@/src/components/ui/textarea";
-import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useRouter } from "next/navigation";
+import { submitCommentAction } from "../actions";
 import {
     ToastProvider,
     Toast,
@@ -24,8 +24,6 @@ export function CommentForm({
     parentCommentId,
     onSubmit,
 }: CommentFormProps) {
-    const supabase = useSupabaseClient();
-    const session = useSession();
     const router = useRouter();
 
     const [content, setContent] = useState<string>('');
@@ -59,48 +57,38 @@ export function CommentForm({
             return;
         };
 
-        if (!session) {
-            showToast('Not signed in', 'You must be signed in to post a comment');
-            return;
-        };
-
         setSubmitting(true);
 
-        const { error } = await supabase
-            .from("comments")
-            .insert({
-                content,
-                author: session.user.id,
-                classification_id: classificationId,
-                parent_comment_id: parentCommentId || null,
-            });
+        const result = await submitCommentAction({
+            content,
+            classificationId,
+            parentCommentId,
+        });
 
-            if (error) {
-                showToast('Submission failed', 'Unable to post your comment');
-                console.error(error);
-            } else {
-                setContent('');
-                setShowSuccessPopup(true);
-                onSubmit?.();
-                setContent('');
-                setShowSuccessPopup(true);
-                onSubmit?.();
-                
-                // Show popup and redirect after 3 seconds
-                const redirectTimeout = setTimeout(() => {
-                    try {
-                        router.push('/');
-                    } catch (error) {
-                        console.error('CommentForm: Router.push error:', error);
-                        // Fallback to window.location
-                        if (typeof window !== "undefined") {
-                            window.location.href = '/';
-                        }
-                    }
-                }, 3000);
-            };
-
+        if (!result.ok) {
+            showToast('Submission failed', result.error || 'Unable to post your comment');
             setSubmitting(false);
+            return;
+        }
+
+        setContent('');
+        setShowSuccessPopup(true);
+        onSubmit?.();
+
+        // Show popup and redirect after 3 seconds
+        setTimeout(() => {
+            try {
+                router.push('/');
+            } catch (error) {
+                console.error('CommentForm: Router.push error:', error);
+                // Fallback to window.location
+                if (typeof window !== "undefined") {
+                    window.location.href = '/';
+                }
+            }
+        }, 3000);
+
+        setSubmitting(false);
     };
 
     return (

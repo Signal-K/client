@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, createContext, useContext, ReactNode } from 'react';
-import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
+import { useSession } from '@/src/lib/auth/session-context';
 
 // Define the type for the context value
 interface ActivePlanetContextValue {
@@ -23,99 +23,51 @@ const ActivePlanetContext = createContext<ActivePlanetContextValue>({
 
 // Create a provider component
 export const ActivePlanetProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const supabase = useSupabaseClient();
   const session = useSession();
   const [activePlanet, setActivePlanet] = useState<any | null>(null);
   const [classifications, setClassifications] = useState<any[]>([]);
 
   useEffect(() => {
     const fetchPlanetData = async () => {
-      if (!session) return;
+      if (!session?.user?.id) return;
 
       try {
-        let { data: profile, error: profileError } = await supabase
-          .from("profiles")
-          .select("location")
-          .eq("id", session.user.id)
-          .single();
+        const response = await fetch(
+          `/api/gameplay/active-planet?userId=${encodeURIComponent(session.user.id)}`
+        );
+        const result = await response.json().catch(() => ({}));
 
-        if (profileError) throw profileError;
-
-        let location = typeof window !== "undefined" ? profile?.location ?? 30 : 30;
-
-        // If the location is null, update it to 30
-        if (profile?.location === null) {
-          const { error: updateError } = await supabase
-            .from('profiles')
-            .update({ location: 30 })
-            .eq('id', session.user.id);
-
-          if (updateError) throw updateError;
+        if (!response.ok) {
+          throw new Error(result?.error || "Failed to fetch active planet data");
         }
 
-        const { data: planet, error: planetError } = await supabase
-          .from("anomalies")
-          .select("*")
-          .eq("id", location)
-          .single();
-
-        if (planetError) throw planetError;
-
-        if (planet) {
-          setActivePlanet(planet);
-
-          const { data: classificationsData, error: classificationsError } = await supabase
-            .from("classifications")
-            .select('*')
-            .eq('author', session.user.id)
-            .eq('anomaly', planet.id)
-            .eq('classificationtype', 'lightcurve');
-
-          if (classificationsError) throw classificationsError;
-
-          setClassifications(classificationsData);
-        }
+        setActivePlanet(result?.planet ?? null);
+        setClassifications(Array.isArray(result?.classifications) ? result.classifications : []);
       } catch (error: any) {
         console.error("Error fetching data: ", error.message);
       }
     };
 
     fetchPlanetData();
-  }, [session, supabase]);
+  }, [session]);
 
   const updatePlanetLocation = async (newLocation: number) => {
-    if (!session) return;
+    if (!session?.user?.id) return;
 
     try {
-      const { error: updateError } = await supabase
-        .from('profiles')
-        .update({ location: newLocation })
-        .eq('id', session.user.id);
+      const response = await fetch("/api/gameplay/active-planet", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: session.user.id, location: newLocation }),
+      });
+      const result = await response.json().catch(() => ({}));
 
-      if (updateError) throw updateError;
-
-      const { data: planet, error: planetError } = await supabase
-        .from("anomalies")
-        .select("*")
-        .eq("id", newLocation)
-        .single();
-
-      if (planetError) throw planetError;
-
-      if (planet) {
-        setActivePlanet(planet);
-
-        const { data: classificationsData, error: classificationsError } = await supabase
-          .from("classifications")
-          .select('*')
-          .eq('author', session.user.id)
-          .eq('anomaly', planet.id)
-          .eq('classificationtype', 'lightcurve');
-
-        if (classificationsError) throw classificationsError;
-
-        setClassifications(classificationsData);
+      if (!response.ok) {
+        throw new Error(result?.error || "Failed to update active planet location");
       }
+
+      setActivePlanet(result?.planet ?? null);
+      setClassifications(Array.isArray(result?.classifications) ? result.classifications : []);
     } catch (error: any) {
       console.error("Error updating planet location: ", error.message);
     }

@@ -1,7 +1,7 @@
 'use client'
 
 import Home from "@/app/page";
-import { useSession } from "@supabase/auth-helpers-react";
+import { useSession } from "@/src/lib/auth/session-context";
 import {
   BuildingIcon,
   CameraOffIcon,
@@ -11,7 +11,7 @@ import {
   RssIcon
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import React from "react";
+import React, { useEffect } from "react";
 import GameNavbar from "@/src/components/layout/Tes";
 import { Dialog, DialogContent } from "@/src/components/ui/dialog";
 
@@ -20,9 +20,15 @@ export default function WeatherBalloonOnEarthPage() {
 
   const router = useRouter();
 
+  useEffect(() => {
+    if (!session) {
+      router.replace("/");
+    }
+  }, [session, router]);
+
   if (!session) {
-    router.push("/");
-  };
+    return null;
+  }
 
   const actions = [
     {

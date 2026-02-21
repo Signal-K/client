@@ -29,9 +29,11 @@ enabled = false
 port = 54322
 # Port used by db diff command to initialize the shadow database.
 shadow_port = 54320
+# Maximum amount of time to wait for health check when starting the local database.
+health_timeout = "2m"
 # The database major version to use. This has to be the same as your remote database's. Run `SHOW
 # server_version;` on the remote database to check.
-major_version = 17
+major_version = 15
 
 [db.pooler]
 enabled = false
@@ -162,7 +164,7 @@ refresh_token_reuse_interval = 10
 # Allow/disallow new user signups to your project.
 enable_signup = true
 # Allow/disallow anonymous sign-ins to your project.
-enable_anonymous_sign_ins = true
+enable_anonymous_sign_ins = false
 # Allow/disallow testing manual linking of accounts
 enable_manual_linking = false
 # Passwords shorter than this value will be rejected as weak. Minimum 6, recommended 8 or more.
@@ -295,7 +297,7 @@ max_frequency = "5s"
 
 # Use an external OAuth provider. The full list of providers are: `apple`, `azure`, `bitbucket`,
 # `discord`, `facebook`, `github`, `gitlab`, `google`, `keycloak`, `linkedin_oidc`, `notion`, `twitch`,
-# `twitter`, `slack`, `spotify`, `workos`, `zoom`.
+# `twitter`, `x`, `slack`, `spotify`, `workos`, `zoom`.
 [auth.external.apple]
 enabled = false
 client_id = ""

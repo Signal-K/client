@@ -7,7 +7,7 @@ export interface SolarEvent {
   updated_at: string;
 }
 
-export interface DefensiveProbe {
+interface DefensiveProbe {
   id: string;
   event_id: string;
   user_id: string;
@@ -24,6 +24,6 @@ export interface CommunityProgress {
   percentComplete: number;
 }
 
-export interface SolarEventWithProgress extends SolarEvent {
+interface SolarEventWithProgress extends SolarEvent {
   communityProgress: CommunityProgress;
 }

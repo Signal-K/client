@@ -6,7 +6,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/src/comp
 import { Button } from "@/src/components/ui/button";
 import { ThumbsUp, MessageSquare, FeatherIcon, PencilLineIcon, EyeIcon, EyeOffIcon } from "lucide-react";
 import { Badge } from "@/src/components/ui/badge";
-import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
+import { useSession } from "@/src/lib/auth/session-context";
 import { CommentCard } from "../comments/CommentSingle";
 
 import CloudSignal from "@/src/components/deployment/missions/structures/Meteorologists/Cloudspotting/CloudSignal";
@@ -15,7 +15,6 @@ import CloudSignal from "@/src/components/deployment/missions/structures/Meteoro
 // import CloudClassifier from "@/src/components/discovery/data-sources/Meteorologists/JVH/cloud-classifier";
 // import { PlanetScene } from "@/src/components/discovery/data-sources/Astronomers/PlanetHunters/V2/planet-scene";
 // import { FullPlanetGenerator } from "@/src/components/discovery/data-sources/Astronomers/PlanetHunters/V2/full-planet-generator";
-import SimplePlanetGenerator from "@/src/components/discovery/data-sources/Astronomers/PlanetHunters/SimplePlanetGenerator";
 import Link from "next/link";
 import { Textarea } from "@/src/components/ui/textarea";
 import { SurveyorComments } from "./Surveyor/SurveyorPostCard";
@@ -66,7 +65,6 @@ export function PostCardSingleWithGenerator({
   toggle,
   onVote,
 }: PostCardSingleProps) {
-  const supabase = useSupabaseClient();
   const session = useSession();
 
   const [comments, setComments] = useState<CommentProps[]>([]);
@@ -81,14 +79,13 @@ export function PostCardSingleWithGenerator({
   const fetchComments = async () => {
     setLoadingComments(true);
     try {
-      const { data, error } = await supabase
-        .from("comments")
-        .select("*")
-        .eq("classification_id", classificationId)
-        .order("created_at", { ascending: false });
-
-      if (error) throw error;
-      setComments(data);
+      const response = await fetch(
+        `/api/gameplay/social/comments?classificationId=${classificationId}&order=desc`,
+        { cache: "no-store" }
+      );
+      const payload = await response.json().catch(() => null);
+      if (!response.ok || !payload?.comments) throw new Error(payload?.error || "Failed to fetch comments");
+      setComments(payload.comments);
     } catch (error) {
       console.error("Error fetching comments:", error);
     } finally {
@@ -100,18 +97,22 @@ export function PostCardSingleWithGenerator({
     if (!session) return;
 
     try {
-      const { error } = await supabase
-        .from("votes")
-        .insert([
-          {
-            user_id: session.user.id,
-            classification_id: classificationId,
-            anomaly_id: anomalyId,
-          },
-        ]);
+      const response = await fetch("/api/gameplay/social/votes", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          classificationId,
+          anomalyId,
+          voteType: "up",
+        }),
+      });
+      const result = await response.json().catch(() => ({}));
 
-      if (error) {
-        console.error('Error inserting vote: ', error);
+      if (!response.ok) {
+        console.error("Error inserting vote:", result?.error);
+        return;
+      }
+      if (result?.alreadyVoted) {
         return;
       }
 
@@ -257,7 +258,6 @@ export function PostCardSingleWithGeneratorEditMode({
   // commentStatus,
   onVote,
 }: PostCardSingleProps) {
-  const supabase = useSupabaseClient();
   const session = useSession();
 
   const [comments, setComments] = useState<CommentProps[]>([]);
@@ -276,20 +276,24 @@ export function PostCardSingleWithGeneratorEditMode({
   const fetchComments = async () => {
     setLoadingComments(true);
     try {
-      const { data, error } = await supabase
-        .from("comments")
-        .select("*")
-        .eq("classification_id", classificationId)
-        .order("created_at", { ascending: false });
+      const response = await fetch(
+        `/api/gameplay/social/comments?classificationId=${classificationId}&order=desc`,
+        { cache: "no-store" }
+      );
+      const payload = await response.json().catch(() => null);
+      const data = payload?.comments;
+      if (!response.ok || !Array.isArray(data)) throw new Error(payload?.error || "Failed to fetch comments");
 
-        if (classificationConfig?.classificationType === "telescope-minorPlanet" || classificationConfig?.classificationType === "planet") {
-          const surveyor = comments.filter((comment) => comment.isSurveyor);
-          const nonSurveyor = comments.filter((comment) => !comment.isSurveyor);
-          setSurveyorComments(surveyor);
-          setNonSurveyorComments(nonSurveyor);
-        };
+      if (
+        classificationConfig?.classificationType === "telescope-minorPlanet" ||
+        classificationConfig?.classificationType === "planet"
+      ) {
+        const surveyor = data.filter((comment: any) => comment.surveyor);
+        const nonSurveyor = data.filter((comment: any) => !comment.surveyor);
+        setSurveyorComments(surveyor);
+        setNonSurveyorComments(nonSurveyor);
+      }
 
-      if (error) throw error;
       setComments(data);
     } catch (error) {
       console.error("Error fetching comments:", error);
@@ -319,17 +323,16 @@ export function PostCardSingleWithGeneratorEditMode({
     if (!newComment.trim()) return;
 
     try {
-      const { error } = await supabase
-        .from("comments")
-        .insert([
-          {
-            content: newComment,
-            classification_id: classificationId,
-            author: session?.user?.id,
-          },
-        ]);
-
-      if (error) throw error;
+      const response = await fetch("/api/gameplay/social/comments", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          content: newComment,
+          classificationId,
+        }),
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(result?.error || "Failed to add comment");
 
       setNewComment("");
       fetchComments();

@@ -4,7 +4,6 @@ import React, { useEffect, useState, useRef } from "react";
 import { Card, CardContent, CardFooter } from "@/src/components/ui/card";
 import { Button } from "@/src/components/ui/button";
 import { Textarea } from "@/src/components/ui/textarea";
-import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useRouter } from "next/navigation";
 import { CommentCard } from "@/src/components/social/comments/CommentSingle";
 
@@ -39,8 +38,6 @@ export function SurveyorComments({
   classificationConfig,
   commentStatus,
 }: PostCardSingleProps) {
-  const supabase = useSupabaseClient();
-  const session = useSession();
   const router = useRouter();
 
   const [comments, setComments] = useState<CommentProps[]>([]);
@@ -58,15 +55,13 @@ export function SurveyorComments({
   const fetchComments = async () => {
     setLoadingComments(true);
     try {
-      const { data, error } = await supabase
-        .from("comments")
-        .select("*")
-        .eq("classification_id", classificationId)
-        .eq("surveyor", "TRUE")
-        .order("created_at", { ascending: false });
-
-      if (error) throw error;
-      setComments(data);
+      const response = await fetch(
+        `/api/gameplay/social/comments?classificationId=${classificationId}&surveyor=true&order=desc`,
+        { cache: "no-store" }
+      );
+      const payload = await response.json().catch(() => null);
+      if (!response.ok || !payload?.comments) throw new Error(payload?.error || "Failed to fetch comments");
+      setComments(payload.comments);
     } catch (error) {
       console.error("Error fetching comments:", error);
     } finally {
@@ -80,24 +75,19 @@ export function SurveyorComments({
     if (!commentInput?.trim()) return;
 
     try {
-      
-      const { error } = await supabase.from("comments").insert([
-        {
+      const response = await fetch("/api/gameplay/surveyor/comments", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          classificationId,
           content: commentInput,
-          classification_id: classificationId,
-          author: session?.user?.id,
           configuration: { planetType, commentInput },
           surveyor: "TRUE",
           category: "PlanetType",
-        },
-      ]);
-
-      
-
-      if (error) {
-        
-        throw error;
-      }
+        }),
+      });
+      const payload = await response.json().catch(() => null);
+      if (!response.ok) throw new Error(payload?.error || "Failed to post surveyor comment");
 
       
       
@@ -137,20 +127,20 @@ export function SurveyorComments({
     if (!t1?.trim() || !t2?.trim()) return;
 
     try {
-      
-      const { error } = await supabase.from("comments").insert([
-        {
+      const response = await fetch("/api/gameplay/surveyor/comments", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          classificationId,
           content: `${t1}\n\n${t2}`,
-          classification_id: classificationId,
-          author: session?.user?.id,
           configuration: { temperature: `${t1}, ${t2}` },
           surveyor: "TRUE",
           value: t2,
           category: "Temperature",
-        },
-      ]);
-
-      if (error) throw error;
+        }),
+      });
+      const payload = await response.json().catch(() => null);
+      if (!response.ok) throw new Error(payload?.error || "Failed to post temperature comment");
       
       
       setTemperatureInputs((prev) => ({
@@ -188,20 +178,20 @@ export function SurveyorComments({
     if (!d1?.trim() || !d2?.trim()) return;
 
     try {
-      
-      const { error } = await supabase.from("comments").insert([
-        {
+      const response = await fetch("/api/gameplay/surveyor/comments", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          classificationId,
           content: `${d1}\n\n${d2}`,
-          classification_id: classificationId,
-          author: session?.user?.id,
           configuration: { density: `${d1}, ${d2}` },
           surveyor: "TRUE",
           value: d2,
           category: "Density",
-        },
-      ]);
-
-      if (error) throw error;
+        }),
+      });
+      const payload = await response.json().catch(() => null);
+      if (!response.ok) throw new Error(payload?.error || "Failed to post density comment");
 
       
       setDensityInputs((prev) => ({

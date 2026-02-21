@@ -3,7 +3,7 @@ import { SupabaseClient } from '@supabase/supabase-js';
 /**
  * Interface for user upgrade data
  */
-export interface UserUpgrades {
+interface UserUpgrades {
   telescopeUpgrade: boolean;
   telescopeReceptors: number;
   satelliteCount: number;
@@ -99,7 +99,7 @@ export async function fetchUserUpgrades(
  * @param userId - User ID to fetch satellite count for
  * @returns Number of satellites available (1 base + upgrades)
  */
-export async function getSatelliteCount(
+async function getSatelliteCount(
   supabase: SupabaseClient,
   userId: string
 ): Promise<number> {

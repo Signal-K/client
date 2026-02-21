@@ -1,12 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { CompactUpgradeCard } from "./CompactUpgradeCard";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
-import { getSatelliteCount } from "@/src/utils/userUpgrades";
 
 interface UpgradeData {
   // Telescope upgrades
@@ -73,9 +71,6 @@ interface UpgradeData {
 }
 
 export default function CompactResearchPanel() {
-  const supabase = useSupabaseClient();
-  const session = useSession();
-  
   const [upgradeData, setUpgradeData] = useState<UpgradeData>({
     telescopeReceptors: { current: 1, max: 2, available: false },
     satelliteCount: { current: 1, max: 2, available: false },
@@ -97,73 +92,40 @@ export default function CompactResearchPanel() {
 
   useEffect(() => {
     fetchUpgradeData();
-  }, [session]);
+  }, []);
 
   const fetchUpgradeData = async () => {
-    if (!session?.user) return;
-
     setLoading(true);
     try {
-      // Get researched upgrades
-      const { data: researched } = await supabase
-        .from("researched")
-        .select("tech_type")
-        .eq("user_id", session.user.id);
+      const response = await fetch("/api/gameplay/research/summary");
+      const payload = await response.json();
+      if (!response.ok) {
+        throw new Error(payload?.error || "Failed to fetch research summary");
+      }
 
-      // Get all classifications for stardust calculation
-      const { data: allClassifications } = await supabase
-        .from("classifications")
-        .select("id")
-        .eq("author", session.user.id);
+      const {
+        availableStardust,
+        counts,
+        upgrades,
+      }: {
+        availableStardust: number;
+        counts: { asteroid: number; cloud: number; planet: number };
+        upgrades: {
+          telescopeReceptors: number;
+          satelliteCount: number;
+          roverWaypoints: number;
+          spectroscopyUnlocked: boolean;
+          findMineralsUnlocked: boolean;
+          p4MineralsUnlocked: boolean;
+          roverExtractionUnlocked: boolean;
+          satelliteExtractionUnlocked: boolean;
+          ngtsAccessUnlocked: boolean;
+        };
+      } = payload;
 
-      // Get specific classification counts
-      const { data: asteroidClassifications } = await supabase
-        .from("classifications")
-        .select("id")
-        .eq("author", session.user.id)
-        .eq("classificationtype", "telescope-minorPlanet");
-
-      const { data: cloudClassifications } = await supabase
-        .from("classifications")
-        .select("id")
-        .eq("author", session.user.id)
-        .eq("classificationtype", "cloud");
-
-      const { data: planetClassifications } = await supabase
-        .from("classifications")
-        .select("id")
-        .eq("author", session.user.id)
-        .eq("classificationtype", "planet");
-
-      // Calculate current upgrade levels
-      const telescopeUpgrades = researched?.filter(r => r.tech_type === "probereceptors").length || 0;
-      const satelliteUpgrades = researched?.filter(r => r.tech_type === "satellitecount").length || 0;
-      const roverWaypointUpgrades = researched?.filter(r => r.tech_type === "roverwaypoints").length || 0;
-      const spectroscopyUnlocked = researched?.some(r => r.tech_type === "spectroscopy") || false;
-      const findMineralsUnlocked = researched?.some(r => r.tech_type === "findMinerals") || false;
-      const p4MineralsUnlocked = researched?.some(r => r.tech_type === "p4Minerals") || false;
-      const roverExtractionUnlocked = researched?.some(r => r.tech_type === "roverExtraction") || false;
-      const satelliteExtractionUnlocked = researched?.some(r => r.tech_type === "satelliteExtraction") || false;
-      const ngtsAccessUnlocked = researched?.some(r => r.tech_type === "ngtsAccess") || false;
-
-      // Use utility function for satellite count
-      const currentSatelliteCount = await getSatelliteCount(supabase, session.user.id);
-
-      // Calculate stardust with tiered pricing
-      const basePoints = allClassifications?.length || 0;
-      
-      // Quantity upgrades cost 10 stardust each
-      const quantityUpgrades = ['probereceptors', 'satellitecount', 'roverwaypoints'];
-      
-      // Calculate penalty: 10 for quantity upgrades, 2 for data/measurement upgrades
-      const researchPenalty = (researched || []).reduce((total, r) => {
-        const isQuantityUpgrade = quantityUpgrades.includes(r.tech_type);
-        return total + (isQuantityUpgrade ? 10 : 2);
-      }, 0);
-      
-      const availableStardust = Math.max(0, basePoints - researchPenalty);
-
-      
+      const telescopeUpgrades = Math.max(0, upgrades.telescopeReceptors - 1);
+      const satelliteUpgrades = Math.max(0, upgrades.satelliteCount - 1);
+      const roverWaypointUpgrades = Math.max(0, (upgrades.roverWaypoints - 4) / 2);
 
       setUpgradeData({
         telescopeReceptors: {
@@ -172,7 +134,7 @@ export default function CompactResearchPanel() {
           available: availableStardust >= 10 && telescopeUpgrades < 1,
         },
         satelliteCount: {
-          current: currentSatelliteCount,
+          current: upgrades.satelliteCount,
           max: 2,
           available: availableStardust >= 10 && satelliteUpgrades < 1,
         },
@@ -182,32 +144,32 @@ export default function CompactResearchPanel() {
           available: availableStardust >= 10 && roverWaypointUpgrades < 1,
         },
         spectroscopy: {
-          unlocked: spectroscopyUnlocked,
-          available: availableStardust >= 2 && !spectroscopyUnlocked,
+          unlocked: upgrades.spectroscopyUnlocked,
+          available: availableStardust >= 2 && !upgrades.spectroscopyUnlocked,
         },
         findMinerals: {
-          unlocked: findMineralsUnlocked,
-          available: availableStardust >= 2 && !findMineralsUnlocked,
+          unlocked: upgrades.findMineralsUnlocked,
+          available: availableStardust >= 2 && !upgrades.findMineralsUnlocked,
         },
         p4FindMinerals: {
-          unlocked: p4MineralsUnlocked,
-          available: availableStardust >= 2 && !p4MineralsUnlocked,
+          unlocked: upgrades.p4MineralsUnlocked,
+          available: availableStardust >= 2 && !upgrades.p4MineralsUnlocked,
         },
         roverExtraction: {
-          unlocked: roverExtractionUnlocked,
-          available: availableStardust >= 2 && !roverExtractionUnlocked && findMineralsUnlocked,
+          unlocked: upgrades.roverExtractionUnlocked,
+          available: availableStardust >= 2 && !upgrades.roverExtractionUnlocked && upgrades.findMineralsUnlocked,
         },
         satelliteExtraction: {
-          unlocked: satelliteExtractionUnlocked,
-          available: availableStardust >= 2 && !satelliteExtractionUnlocked && p4MineralsUnlocked,
+          unlocked: upgrades.satelliteExtractionUnlocked,
+          available: availableStardust >= 2 && !upgrades.satelliteExtractionUnlocked && upgrades.p4MineralsUnlocked,
         },
         ngtsAccess: {
-          unlocked: ngtsAccessUnlocked,
-          available: availableStardust >= 2 && !ngtsAccessUnlocked && (planetClassifications?.length || 0) >= 4,
+          unlocked: upgrades.ngtsAccessUnlocked,
+          available: availableStardust >= 2 && !upgrades.ngtsAccessUnlocked && (counts.planet || 0) >= 4,
         },
-        asteroidClassifications: asteroidClassifications?.length || 0,
-        cloudClassifications: cloudClassifications?.length || 0,
-        planetClassifications: planetClassifications?.length || 0,
+        asteroidClassifications: counts.asteroid || 0,
+        cloudClassifications: counts.cloud || 0,
+        planetClassifications: counts.planet || 0,
         availableStardust,
       });
     } catch (error) {
@@ -218,15 +180,20 @@ export default function CompactResearchPanel() {
   };
 
   const handleUpgrade = async (techType: string, cost: number) => {
-    if (!session?.user || upgradeData.availableStardust < cost) return;
+    if (upgradeData.availableStardust < cost) return;
 
     try {
-      await supabase.from("researched").insert([
-        {
-          user_id: session.user.id,
-          tech_type: techType,
+      const response = await fetch("/api/gameplay/research/unlock", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-      ]);
+        body: JSON.stringify({ techType }),
+      });
+      if (!response.ok) {
+        const payload = await response.json().catch(() => ({}));
+        throw new Error(payload?.error || "Failed to unlock upgrade");
+      }
       
       // Refresh data
       await fetchUpgradeData();

@@ -1,38 +1,43 @@
-import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs'
-import { NextResponse } from 'next/server'
-import type { NextRequest } from 'next/server'
+import { createServerClient } from "@supabase/ssr";
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 
 export async function middleware(req: NextRequest) {
-  const res = NextResponse.next()
-  const supabase = createMiddlewareClient({ req, res })
+  let res = NextResponse.next({ request: { headers: req.headers } });
+
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return req.cookies.getAll();
+        },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value, options }) => req.cookies.set(name, value));
+          res = NextResponse.next({ request: { headers: req.headers } });
+          cookiesToSet.forEach(({ name, value, options }) => res.cookies.set(name, value, options));
+        },
+      },
+    }
+  );
 
   const {
     data: { session },
-  } = await supabase.auth.getSession()
+  } = await supabase.auth.getSession();
 
-  // If user is signed in and the current path is / redirect the user to /game
-  if (session && req.nextUrl.pathname === '/') {
-    const redirectUrl = new URL('/game', req.url)
-    const redirectRes = NextResponse.redirect(redirectUrl)
-    
-    // Copy cookies from the response object (which may contain refreshed tokens)
-    // to the redirect response to ensure the session persists.
-    const cookiesToSet = res.cookies.getAll()
-    cookiesToSet.forEach(cookie => {
-      redirectRes.cookies.set(cookie.name, cookie.value, cookie)
-    })
-    
-    return redirectRes
+  if (session && req.nextUrl.pathname === "/") {
+    const redirectUrl = new URL("/game", req.url);
+    return NextResponse.redirect(redirectUrl);
   }
 
-  // If user is not signed in and the current path is /game redirect the user to /
-  if (!session && req.nextUrl.pathname.startsWith('/game')) {
-    return NextResponse.redirect(new URL('/', req.url))
+  if (!session && req.nextUrl.pathname.startsWith("/game")) {
+    return NextResponse.redirect(new URL("/", req.url));
   }
 
-  return res
+  return res;
 }
 
 export const config = {
-  matcher: ['/', '/game/:path*'],
-}
+  matcher: ["/", "/game/:path*"],
+};

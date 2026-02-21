@@ -12,66 +12,49 @@
 Cypress.Commands.add('login', (email: string, password: string) => {
   cy.session([email, password], () => {
     cy.visit('/auth')
-    
-    // Try multiple selectors for email input
-    const emailSelectors = [
-      '[data-testid="email-input"]',
-      'input[type="email"]',
-      'input[name="email"]',
-      '#email',
-      'input[placeholder*="Email"]',
-      'input[placeholder*="email"]'
-    ]
-    
-    let emailFound = false
-    emailSelectors.forEach(selector => {
-      cy.get('body').then(($body) => {
-        if ($body.find(selector).length > 0 && !emailFound) {
-          cy.get(selector).type(email)
-          emailFound = true
-        }
-      })
+
+    cy.get('body').then(($body) => {
+      const emailSelectors = [
+        '[data-testid="email-input"]',
+        'input[type="email"]',
+        'input[name="email"]',
+        '#email',
+        'input[placeholder*="Email"]',
+        'input[placeholder*="email"]'
+      ]
+      const passwordSelectors = [
+        '[data-testid="password-input"]',
+        'input[type="password"]',
+        'input[name="password"]',
+        '#password',
+        'input[placeholder*="Password"]',
+        'input[placeholder*="password"]'
+      ]
+      const buttonSelectors = [
+        '[data-testid="login-button"]',
+        'button[type="submit"]',
+        'input[type="submit"]'
+      ]
+
+      const emailSelector = emailSelectors.find((selector) => $body.find(`${selector}:enabled`).length > 0)
+      const passwordSelector = passwordSelectors.find((selector) => $body.find(`${selector}:enabled`).length > 0)
+      const buttonSelector = buttonSelectors.find((selector) => $body.find(`${selector}:enabled`).length > 0)
+
+      if (!emailSelector || !passwordSelector || !buttonSelector) {
+        throw new Error('Unable to find enabled login form controls')
+      }
+
+      cy.get(`${emailSelector}:enabled`).first().should('be.visible').click({ force: true })
+      cy.get(`${emailSelector}:enabled`).first().clear({ force: true })
+      cy.get(`${emailSelector}:enabled`).first().type(email, { force: true, delay: 20 })
+
+      cy.get(`${passwordSelector}:enabled`).first().should('be.visible').click({ force: true })
+      cy.get(`${passwordSelector}:enabled`).first().clear({ force: true })
+      cy.get(`${passwordSelector}:enabled`).first().type(password, { force: true, delay: 20 })
+
+      cy.get(`${buttonSelector}:enabled`).first().should('be.visible').click({ force: true })
     })
-    
-    // Try multiple selectors for password input
-    const passwordSelectors = [
-      '[data-testid="password-input"]',
-      'input[type="password"]',
-      'input[name="password"]',
-      '#password',
-      'input[placeholder*="Password"]',
-      'input[placeholder*="password"]'
-    ]
-    
-    let passwordFound = false
-    passwordSelectors.forEach(selector => {
-      cy.get('body').then(($body) => {
-        if ($body.find(selector).length > 0 && !passwordFound) {
-          cy.get(selector).type(password)
-          passwordFound = true
-        }
-      })
-    })
-    
-    // Try multiple selectors for login button
-    const buttonSelectors = [
-      '[data-testid="login-button"]',
-      'button[type="submit"]',
-      'input[type="submit"]',
-      'button:contains("Sign In")',
-      'button:contains("Login")'
-    ]
-    
-    let buttonFound = false
-    buttonSelectors.forEach(selector => {
-      cy.get('body').then(($body) => {
-        if ($body.find(selector).length > 0 && !buttonFound) {
-          cy.get(selector).click()
-          buttonFound = true
-        }
-      })
-    })
-    
+
     cy.wait(2000)
     // Don't require specific URL since auth flow might vary
   })
@@ -86,91 +69,33 @@ Cypress.Commands.add('createTestUser', () => {
   
   const testEmail = `test-${Date.now()}@example.com`
   const testPassword = 'testpassword123'
-  
-  cy.visit('/auth/register')
-  cy.wait(2000)
-  
-  // Try multiple selectors for email input
-  const emailSelectors = [
-    '[data-testid="email-input"]',
-    'input[type="email"]',
-    'input[name="email"]',
-    '#email',
-    'input[placeholder*="Email"]',
-    'input[placeholder*="email"]'
-  ]
-  
-  let emailFound = false
-  emailSelectors.forEach(selector => {
-    cy.get('body').then(($body) => {
-      if ($body.find(selector).length > 0 && !emailFound) {
-        cy.get(selector).type(testEmail)
-        emailFound = true
-      }
-    })
+
+  cy.task('createSupabaseTestUser', { email: testEmail, password: testPassword }).then((user: any) => {
+    cy.wrap(user).as('testUser')
+    Cypress.env('TEST_USER_ID', user.id)
   })
-  
-  // Try multiple selectors for password input
-  const passwordSelectors = [
-    '[data-testid="password-input"]',
-    'input[type="password"]',
-    'input[name="password"]',
-    '#password',
-    'input[placeholder*="Password"]',
-    'input[placeholder*="password"]'
-  ]
-  
-  let passwordFound = false
-  passwordSelectors.forEach(selector => {
-    cy.get('body').then(($body) => {
-      if ($body.find(selector).length > 0 && !passwordFound) {
-        cy.get(selector).type(testPassword)
-        passwordFound = true
-      }
-    })
-  })
-  
-  // Try multiple selectors for register button
-  const buttonSelectors = [
-    '[data-testid="register-button"]',
-    'button[type="submit"]',
-    'input[type="submit"]',
-    'button:contains("Sign Up")',
-    'button:contains("Register")',
-    'button:contains("Create")'
-  ]
-  
-  let buttonFound = false
-  buttonSelectors.forEach(selector => {
-    cy.get('body').then(($body) => {
-      if ($body.find(selector).length > 0 && !buttonFound) {
-        cy.get(selector).click()
-        buttonFound = true
-      }
-    })
-  })
-  
-  cy.wait(3000)
-  
-  // Store credentials for later use
-  cy.wrap({ email: testEmail, password: testPassword }).as('testUser')
 })
 
 // Wait for Supabase to be ready
 Cypress.Commands.add('waitForSupabase', () => {
-  // Instead of checking for window.supabase, just wait for the page to load
-  cy.window().should('exist')
-  // Give the app time to initialize
-  cy.wait(1000)
-  // Check that we're not getting any immediate loading errors
-  cy.get('body').should('be.visible')
+  cy.task('waitForSupabaseHealth').then((healthy) => {
+    if (!healthy) {
+      cy.log('Supabase health unavailable; continuing smoke flow without blocking')
+      return
+    }
+    cy.window().should('exist')
+    cy.wait(1000)
+    cy.get('body').should('be.visible')
+  })
 })
 
 // Cleanup test data (useful for local testing)
 Cypress.Commands.add('cleanupTestData', () => {
-  if (!Cypress.env('SKIP_USER_CREATION_TESTS')) {
-    cy.log('Cleaning up test data')
-    // Add cleanup logic here if needed
-    // This could include API calls to remove test users, posts, etc.
+  if (Cypress.env('SKIP_USER_CREATION_TESTS')) return
+
+  const userId = Cypress.env('TEST_USER_ID')
+  if (userId) {
+    cy.task('cleanupSupabaseTestUser', { userId })
+    Cypress.env('TEST_USER_ID', null)
   }
 })

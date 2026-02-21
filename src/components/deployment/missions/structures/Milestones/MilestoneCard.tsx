@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
+import { useSession } from "@/src/lib/auth/session-context";
 import { Button } from "@/src/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/src/components/ui/tabs";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -20,7 +20,6 @@ interface WeekMilestones {
 };
 
 export default function MilestoneCard() {
-    const supabase = useSupabaseClient();
     const session = useSession();
 
     const [milestones, setMilestones] = useState<WeekMilestones[]>([]);
@@ -72,30 +71,17 @@ export default function MilestoneCard() {
             if (!weekData[currentWeekIndex]) return;
 
             const { weekStart, data } = weekData[currentWeekIndex];
-
-            const startDate = new Date(weekStart);
-            const endDate = new Date(startDate);
-            endDate.setDate(startDate.getDate() + 6);
-
-            for (const milestone of data) {
-                const { table, field, value } = milestone;
-
-                let query = supabase
-                    .from(table)
-                    .select("*", { count: "exact" })
-                    .gte("created_at", startDate.toISOString())
-                    .lte("created_at", endDate.toISOString())
-                    .eq(field, value);
-
-                if (!isCommunity && session.user.id) {
-                    query = query.eq("author", session.user.id);
-                }
-
-                const { count, error } = await query;
-                if (!error && count !== null) {
-                    progress[milestone.name] = count;
-                }
-            }
+            const response = await fetch("/api/gameplay/milestones/weekly-progress", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    weekStart,
+                    data,
+                    community: isCommunity,
+                }),
+            });
+            const payload = await response.json().catch(() => null);
+            Object.assign(progress, payload?.progress || {});
 
             if (isCommunity) {
                 setCommunityProgress(progress);

@@ -1,34 +1,38 @@
 "use client"
 
 import { useRouter } from "next/navigation"
-import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react"
 import GameNavbar from "@/src/components/layout/Tes";
 import DeploySatelliteViewport from "@/src/components/scenes/deploy/satellite/DeploySatellite";
 import UseDarkMode from "@/src/shared/hooks/useDarkMode";
 import { useEffect, useState } from "react";
-import { hasUpgrade } from "@/src/utils/userUpgrades";
+import { useAuthUser } from "@/src/hooks/useAuthUser";
 
 export default function SatelliteDeployPage() {
     const router = useRouter();
     const { isDark } = UseDarkMode();
-    const supabase = useSupabaseClient();
-    const session = useSession();
+    const { user } = useAuthUser();
     const [hasSatelliteUpgrade, setHasSatelliteUpgrade] = useState(false);
 
     useEffect(() => {
-        if (!session?.user?.id) return;
+        if (!user?.id) return;
 
         const check = async () => {
             try {
-                const upgrade = await hasUpgrade(supabase, session.user.id, "satellitecount");
-                setHasSatelliteUpgrade(upgrade);
+                const response = await fetch("/api/gameplay/research/summary", { cache: "no-store" });
+                const payload = await response.json().catch(() => null);
+                if (!response.ok) {
+                    setHasSatelliteUpgrade(false);
+                    return;
+                }
+                const researched = Array.isArray(payload?.researched) ? payload.researched : [];
+                setHasSatelliteUpgrade(researched.some((r: any) => r.tech_type === "satellitecount"));
             } catch (e) {
                 console.warn("Failed to check researched tech", e)
             }
         }
 
         check()
-    }, [session, supabase])
+    }, [user])
 
     return (
         <div 

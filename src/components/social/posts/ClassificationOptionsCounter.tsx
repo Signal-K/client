@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useSupabaseClient, useSession } from '@supabase/auth-helpers-react';
+import { useSession } from '@/src/lib/auth/session-context';
 import { SciFiPanel } from '@/src/components/ui/styles/sci-fi/panel';
 
 interface ClassificationOptionCounts {
@@ -14,9 +14,7 @@ interface ClassificationOptionCounts {
 export default function ClassificationOptionsCounter() {
   const [counts, setCounts] = useState<ClassificationOptionCounts>({ 1: 0, 2: 0, 3: 0, 4: 0 });
   const [totalClassifications, setTotalClassifications] = useState(0);
-  const [rawConfigurations, setRawConfigurations] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const supabase = useSupabaseClient();
   const session = useSession();
 
   useEffect(() => {
@@ -25,47 +23,24 @@ export default function ClassificationOptionsCounter() {
 
       setIsLoading(true);
 
-      const { data, error } = await supabase
-        .from("classifications")
-        .select('classificationConfiguration')
-        .eq('author', session.user.id)
-        .eq('classificationtype', 'lidar-jovianVortexHunter');
-
-      if (error) {
-        console.error('Error fetching classifications:', error.message);
+      const response = await fetch(
+        "/api/gameplay/classifications/options-counter?classificationType=lidar-jovianVortexHunter",
+        { cache: "no-store" }
+      );
+      const payload = await response.json().catch(() => null);
+      if (!response.ok || !payload) {
+        console.error('Error fetching classifications:', payload?.error || response.statusText);
         setIsLoading(false);
         return;
       }
 
-      const aggregatedCounts: ClassificationOptionCounts = { 1: 0, 2: 0, 3: 0, 4: 0 };
-      const rawConfigs: any[] = [];
-
-      data?.forEach((item) => {
-        const config = item.classificationConfiguration;
-        rawConfigs.push(config);
-
-        if (config?.classificationOptions) {
-          Object.values(config.classificationOptions).forEach((options) => {
-            if (options && typeof options === 'object') {
-              Object.keys(options).forEach((key) => {
-                const optionNumber = parseInt(key, 10);
-                // if (options[key] && aggregatedCounts[optionNumber] !== undefined) {
-                //   aggregatedCounts[optionNumber]++;
-                // }
-              });
-            }
-          });
-        }
-      });
-
-      setRawConfigurations(rawConfigs);
-      setCounts(aggregatedCounts);
-      setTotalClassifications(data?.length || 0);
+      setCounts(payload.counts || { 1: 0, 2: 0, 3: 0, 4: 0 });
+      setTotalClassifications(Number(payload.totalClassifications || 0));
       setIsLoading(false);
     };
 
     fetchData();
-  }, [session, supabase]);
+  }, [session]);
 
   if (isLoading) {
     return <div>Loading...</div>;

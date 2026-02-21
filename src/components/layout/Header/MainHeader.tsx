@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { Bell, Sun, Moon, User, UserPlus, UserX, Zap, LogOut, Sparkles } from "lucide-react";
 import {
   DropdownMenu,
@@ -24,6 +23,7 @@ import ConvertAnonymousAccount from "@/src/components/profile/auth/ConvertAnonym
 import ProjectPreferencesModal from "@/src/components/onboarding/ProjectPreferencesModal";
 import { useUserPreferences, ProjectType } from "@/src/hooks/useUserPreferences";
 import Link from "next/link";
+import { useAuthUser } from "@/src/hooks/useAuthUser";
 
 interface CommentVote {
   type: "comment" | "vote";
@@ -58,13 +58,12 @@ export default function MainHeader({
   activityFeed,
   otherClassifications,
 }: MainHeaderProps) {
-  const session = useSession();
-  const supabase = useSupabaseClient();
+  const { user, supabase } = useAuthUser();
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [projectPreferencesOpen, setProjectPreferencesOpen] = useState(false);
   const { preferences, savePreferences } = useUserPreferences();
   
-  const isAnonymousUser = session?.user?.is_anonymous;
+  const isAnonymousUser = Boolean((user as any)?.is_anonymous);
 
   const handleUpgradeClick = () => {
     setShowUpgradeModal(true);
@@ -163,7 +162,7 @@ export default function MainHeader({
                   ) : (
                     <>
                       <p className="text-sm font-medium leading-none">Your Account</p>
-                      <p className="text-xs leading-none text-muted-foreground">{session?.user?.email || "User"}</p>
+                      <p className="text-xs leading-none text-muted-foreground">{user?.email || "User"}</p>
                     </>
                   )}
                 </div>

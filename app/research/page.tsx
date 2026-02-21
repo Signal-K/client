@@ -3,37 +3,37 @@
 import React, { useEffect, useRef, useState } from "react";
 import ActivityHeaderSection from "@/src/components/social/activity/ActivityHeaderSection";
 import { Button } from "@/src/components/ui/button";
-import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import CompactResearchPanel from "@/src/components/research/CompactResearchPanel";
 import ReferralCodePanel from "@/src/components/profile/setup/Referrals";
 import UseDarkMode from "@/src/shared/hooks/useDarkMode";
 import MainHeader from "@/src/components/layout/Header/MainHeader";
 import { TelescopeBackground } from "@/src/components/classification/telescope/telescope-background";
 import Login from "../auth/page";
+import { submitReferralCodeAction } from "@/src/components/profile/setup/actions";
 
 // Small helper component to show how stardust was spent
-function StardustSummary({ supabase, session, cardColor, textColor }: { supabase: any; session: any; cardColor: string; textColor: string }) {
+function StardustSummary({ textColor }: { textColor: string }) {
   const [items, setItems] = useState<{ tech_type: string; created_at?: string }[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchResearched() {
-      if (!session?.user?.id) {
+      try {
+        const response = await fetch("/api/gameplay/research/summary");
+        const payload = await response.json();
+        if (!response.ok) {
+          throw new Error(payload?.error || "Failed to load stardust spending");
+        }
+        setItems((payload?.researchedEntries || []) as { tech_type: string; created_at?: string }[]);
+      } catch (error) {
+        console.error("Error loading stardust spending:", error);
         setItems([]);
+      } finally {
         setLoading(false);
-        return;
       }
-      const { data } = await supabase
-        .from('researched')
-        .select('tech_type, created_at')
-        .eq('user_id', session.user.id)
-        .order('created_at', { ascending: true });
-
-      setItems(data || []);
-      setLoading(false);
     }
     fetchResearched();
-  }, [session, supabase]);
+  }, []);
 
   if (loading) return <div className="text-sm text-muted-foreground">Loading...</div>;
 
@@ -65,11 +65,10 @@ function StardustSummary({ supabase, session, cardColor, textColor }: { supabase
 };
 
 export default function ResearchPage() {
-  const supabase = useSupabaseClient();
-  const session = useSession();
   const { isDark, toggleDarkMode } = UseDarkMode();
 
   // Referral related states
+  const [authenticated, setAuthenticated] = useState<boolean>(true);
   const [userHasReferral, setUserHasReferral] = useState<boolean | null>(null);
   const [referralCodeInput, setReferralCodeInput] = useState("");
   const [referralError, setReferralError] = useState<string | null>(null);
@@ -77,28 +76,21 @@ export default function ResearchPage() {
   const [referralSuccess, setReferralSuccess] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!session?.user?.id) return;
     const checkReferral = async () => {
-      const { data, error } = await supabase
-        .from("referrals")
-        .select("id")
-        .eq("referree_id", session.user.id)
-        .limit(1)
-        .maybeSingle();
-      if (error) {
-        console.error("Error checking referral:", error.message);
-        setUserHasReferral(false);
-      } else {
-        setUserHasReferral(!!data);
-      }
+      const response = await fetch("/api/gameplay/profile/referral-status", {
+        method: "GET",
+      });
+      const payload = await response.json();
+      setAuthenticated(!!payload?.authenticated);
+      setUserHasReferral(!!payload?.hasReferral);
     };
     checkReferral();
-  }, [session, supabase]);
+  }, []);
 
   const handleReferralSubmit = async () => {
     setReferralError(null);
     setReferralSuccess(null);
-    if (!session?.user?.id) {
+    if (!authenticated) {
       setReferralError("You must be logged in to submit a referral code.");
       return;
     }
@@ -108,12 +100,9 @@ export default function ResearchPage() {
     }
     setIsSubmittingReferral(true);
     try {
-      const { error } = await supabase.from("referrals").insert({
-        referree_id: session.user.id,
-        referral_code: referralCodeInput.trim(),
-      });
-      if (error) {
-        setReferralError("Failed to submit referral code. Please try again.");
+      const result = await submitReferralCodeAction(referralCodeInput.trim());
+      if (!result.ok) {
+        setReferralError(result.error || "Failed to submit referral code. Please try again.");
         setIsSubmittingReferral(false);
         return;
       }
@@ -127,7 +116,7 @@ export default function ResearchPage() {
     };
   };
 
-  if (!session) {
+  if (!authenticated) {
     return (
       <Login />
     );
@@ -179,7 +168,7 @@ export default function ResearchPage() {
             {/* Stardust Spending Summary */}
             <div className={`p-4 ${cardColor} rounded-lg shadow-sm border ${borderColor}`}>
               <h4 className={`text-base font-semibold ${isDark ? "text-[#81A1C1]" : "text-[#5E81AC]"} mb-2`}>Stardust Spending</h4>
-              <StardustSummary supabase={supabase} session={session} cardColor={cardColor} textColor={textColor} />
+              <StardustSummary textColor={textColor} />
             </div>
 
             {/* Referral Section - Compact Integration */}

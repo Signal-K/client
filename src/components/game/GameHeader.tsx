@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { Bell, User, UserX, Zap, Sparkles, LogOut } from "lucide-react";
 import {
   DropdownMenu,
@@ -23,6 +22,7 @@ import ProjectPreferencesModal from "@/src/components/onboarding/ProjectPreferen
 import { useUserPreferences, ProjectType } from "@/src/hooks/useUserPreferences";
 import Link from "next/link";
 import { cn } from "@/src/shared/utils";
+import { useAuthUser } from "@/src/hooks/useAuthUser";
 
 interface GameHeaderProps {
   stardust?: number;
@@ -37,13 +37,12 @@ export default function GameHeader({
   onNotificationsClick,
   className,
 }: GameHeaderProps) {
-  const session = useSession();
-  const supabase = useSupabaseClient();
+  const { user, supabase } = useAuthUser();
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [projectPreferencesOpen, setProjectPreferencesOpen] = useState(false);
   const { preferences, savePreferences } = useUserPreferences();
 
-  const isAnonymousUser = session?.user?.is_anonymous;
+  const isAnonymousUser = Boolean((user as any)?.is_anonymous);
 
   const handleProjectPreferencesSave = (interests: ProjectType[]) => {
     savePreferences({ projectInterests: interests });
@@ -131,7 +130,7 @@ export default function GameHeader({
                       </Badge>
                     </div>
                   ) : (
-                    <span className="text-sm">{session?.user?.email || "User"}</span>
+                    <span className="text-sm">{user?.email || "User"}</span>
                   )}
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
