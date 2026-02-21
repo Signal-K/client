@@ -236,6 +236,42 @@ export default defineConfig({
                     const rows = (await response.json()) as Array<{ id: number }>
                     return Array.isArray(rows) ? rows.length : 0
                 },
+                async fetchAnomalies({
+                    deploymentType,
+                }: {
+                    deploymentType: 'stellar' | 'planetary'
+                }) {
+                    if (!resolvedServiceRoleKey) {
+                        throw new Error('SUPABASE_SERVICE_ROLE_KEY is required for fetchAnomalies')
+                    }
+
+                    const sets =
+                        deploymentType === 'stellar'
+                            ? ['diskDetective', 'superwasp-variable', 'telescope-superwasp-variable']
+                            : ['telescope-tess', 'telescope-minorPlanet']
+
+                    const orFilter = sets.map((s) => `anomalySet.eq.${s}`).join(',')
+                    const params = new URLSearchParams()
+                    params.set('select', 'id,anomalySet')
+                    params.set('or', `(${orFilter})`)
+                    params.set('limit', '20')
+
+                    const response = await fetch(
+                        `${supabaseUrl}/rest/v1/anomalies?${params.toString()}`,
+                        {
+                            method: 'GET',
+                            headers: restAuthHeaders,
+                        },
+                    )
+
+                    if (!response.ok) {
+                        const message = await response.text()
+                        throw new Error(`Failed to fetch anomalies: ${message}`)
+                    }
+
+                    const rows = (await response.json()) as Array<{ id: number; anomalySet: string }>
+                    return rows
+                },
             })
 
             return config

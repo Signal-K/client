@@ -99,6 +99,16 @@ interface PlanetStats {
   radius?: number;
   [key: string]: any;
 };
+
+function secureRandomUnit(): number {
+  const randomBuffer = new Uint32Array(1);
+  crypto.getRandomValues(randomBuffer);
+  return randomBuffer[0] / 4294967296;
+}
+
+function secureRandomBetween(min: number, max: number): number {
+  return secureRandomUnit() * (max - min) + min;
+}
 export default function PlanetGenerator({
   classificationId,
   editMode,
@@ -200,8 +210,8 @@ export default function PlanetGenerator({
                   } else {
                     // Plain string, generate random
                     position = {
-                      latitude: Math.random() * 180 - 90,
-                      longitude: Math.random() * 360 - 180,
+                      latitude: secureRandomBetween(-90, 90),
+                      longitude: secureRandomBetween(-180, 180),
                     };
                   }
                 } else {
@@ -209,14 +219,14 @@ export default function PlanetGenerator({
                 }
               } catch (e) {
                 position = {
-                  latitude: Math.random() * 180 - 90,
-                  longitude: Math.random() * 360 - 180,
+                  latitude: secureRandomBetween(-90, 90),
+                  longitude: secureRandomBetween(-180, 180),
                 };
               }
             } else {
               position = {
-                latitude: Math.random() * 180 - 90,
-                longitude: Math.random() * 360 - 180,
+                latitude: secureRandomBetween(-90, 90),
+                longitude: secureRandomBetween(-180, 180),
               };
             }
 
@@ -225,7 +235,7 @@ export default function PlanetGenerator({
               type,
               state,
               position,
-              size: 0.02 + Math.random() * 0.03,
+              size: secureRandomBetween(0.02, 0.05),
               purity: config?.purity || 50,
               amount: config?.amount,
               classificationId: deposit.discovery
@@ -254,14 +264,14 @@ export default function PlanetGenerator({
               position = typeof configLocation === 'string' ? JSON.parse(configLocation) : configLocation;
             } catch {
               position = {
-                latitude: Math.random() * 180 - 90,
-                longitude: Math.random() * 360 - 180,
+                latitude: secureRandomBetween(-90, 90),
+                longitude: secureRandomBetween(-180, 180),
               };
             }
           } else {
             position = {
-              latitude: Math.random() * 180 - 90,
-              longitude: Math.random() * 360 - 180,
+              latitude: secureRandomBetween(-90, 90),
+              longitude: secureRandomBetween(-180, 180),
             };
           }
 

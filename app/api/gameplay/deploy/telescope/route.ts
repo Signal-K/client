@@ -53,13 +53,13 @@ export async function GET(request: NextRequest) {
         prisma.$queryRaw<Array<{ count: bigint }>>`
           SELECT COUNT(*)::bigint AS count
           FROM classifications
-          WHERE author = ${user.id}
+          WHERE author = ${user.id}::uuid
             AND classificationtype = 'telescope-minorPlanet'
         `,
         prisma.$queryRaw<Array<{ tech_type: string }>>`
           SELECT tech_type
           FROM researched
-          WHERE user_id = ${user.id}
+          WHERE user_id = ${user.id}::uuid
             AND tech_type = 'ngtsAccess'
           LIMIT 1
         `,
@@ -92,21 +92,21 @@ export async function GET(request: NextRequest) {
         SELECT id
         FROM linked_anomalies
         WHERE automaton = 'Telescope'
-          AND author = ${user.id}
+          AND author = ${user.id}::uuid
           AND date >= ${oneWeekAgo.toISOString()}
       `,
       prisma.$queryRaw<Array<{ id: number; classification_author: string | null }>>`
         SELECT c.id, cls.author AS classification_author
         FROM comments c
         LEFT JOIN classifications cls ON cls.id = c.classification_id
-        WHERE c.author = ${user.id}
+        WHERE c.author = ${user.id}::uuid
           AND c.created_at >= ${oneWeekAgo.toISOString()}
       `,
       prisma.$queryRaw<Array<{ id: number; classification_author: string | null }>>`
         SELECT v.id, cls.author AS classification_author
         FROM votes v
         LEFT JOIN classifications cls ON cls.id = v.classification_id
-        WHERE v.user_id = ${user.id}
+        WHERE v.user_id = ${user.id}::uuid
           AND v.vote_type = 'up'
           AND v.created_at >= ${oneWeekAgo.toISOString()}
       `,
@@ -143,14 +143,14 @@ export async function GET(request: NextRequest) {
       prisma.$queryRaw<Array<{ count: bigint }>>`
         SELECT COUNT(*)::bigint AS count
         FROM classifications
-        WHERE author = ${user.id}
+        WHERE author = ${user.id}::uuid
           AND classificationtype IN ('planet', 'telescope-minorPlanet')
           AND created_at >= ${start}
       `,
       prisma.$queryRaw<Array<{ count: bigint }>>`
         SELECT COUNT(*)::bigint AS count
         FROM classifications
-        WHERE author = ${user.id}
+        WHERE author = ${user.id}::uuid
           AND classificationtype IN ('cloud', 'lidar-jovianVortexHunter')
           AND created_at >= ${start}
       `,
@@ -190,7 +190,7 @@ export async function POST(request: NextRequest) {
   const upgradeRows = await prisma.$queryRaw<Array<{ tech_type: string }>>`
     SELECT tech_type
     FROM researched
-    WHERE user_id = ${user.id}
+    WHERE user_id = ${user.id}::uuid
       AND tech_type = 'probereceptors'
   `;
 
