@@ -1,4 +1,7 @@
 describe('User Flows', () => {
+  const pickSelector = ($body: JQuery<HTMLElement>, selectors: string[]): string | undefined =>
+    selectors.find((selector) => $body.find(selector).length > 0)
+
   beforeEach(() => {
     cy.request({ url: '/', failOnStatusCode: false, timeout: 10000 }).then((res) => {
       if (!res || res.status >= 500) {
@@ -47,45 +50,36 @@ describe('User Flows', () => {
       '#password'
     ]
 
-    // Try to find and fill email input
-    let emailFound = false
-    emailSelectors.forEach(selector => {
-      cy.get('body').then(($body) => {
-        if ($body.find(selector).length > 0 && !emailFound) {
-          cy.get(selector).type(testEmail)
-          emailFound = true
-        }
-      })
-    })
-
-    // Try to find and fill password input
-    let passwordFound = false
-    passwordSelectors.forEach(selector => {
-      cy.get('body').then(($body) => {
-        if ($body.find(selector).length > 0 && !passwordFound) {
-          cy.get(selector).type(testPassword)
-          passwordFound = true
-        }
-      })
-    })
-
-    // Try to submit the form
     const submitSelectors = [
       '[data-testid="register-button"]',
       'button[type="submit"]',
       'input[type="submit"]',
-      'button:contains("Register")',
-      'button:contains("Sign Up")'
+      'button'
     ]
 
-    let submitted = false
-    submitSelectors.forEach(selector => {
-      cy.get('body').then(($body) => {
-        if ($body.find(selector).length > 0 && !submitted) {
-          cy.get(selector).click()
-          submitted = true
-        }
-      })
+    cy.get('body').then(($body) => {
+      const selector = pickSelector($body, emailSelectors)
+      expect(selector, 'email selector').to.not.equal(undefined)
+      if (!selector) return
+      cy.get(selector).first().clear({ force: true }).type(testEmail, { force: true })
+    })
+
+    cy.get('body').then(($body) => {
+      const selector = pickSelector($body, passwordSelectors)
+      expect(selector, 'password selector').to.not.equal(undefined)
+      if (!selector) return
+      cy.get(selector).first().clear({ force: true }).type(testPassword, { force: true })
+    })
+
+    cy.get('body').then(($body) => {
+      const selector = pickSelector($body, submitSelectors)
+      expect(selector, 'submit selector').to.not.equal(undefined)
+      if (!selector) return
+      if (selector === 'button') {
+        cy.contains('button', /Register|Sign Up|Continue|Create/i).first().click({ force: true })
+        return
+      }
+      cy.get(selector).first().click({ force: true })
     })
 
     // Wait for response

@@ -47,7 +47,18 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const userId = user.id;
+  try {
+    return await getPageData(user.id);
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : String(err);
+    if (message.includes("Can't reach database server") || message.includes("PrismaClient")) {
+      return NextResponse.json({ error: "Database unavailable" }, { status: 503 });
+    }
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+  }
+}
+
+async function getPageData(userId: string) {
   const oneWeekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
 
   const profileRows = await prisma.$queryRaw<

@@ -3,29 +3,6 @@ const withPWA = require('next-pwa')({
   register: true,
   skipWaiting: true,
   disable: process.env.NODE_ENV === 'development',
-  // Avoid precaching massive static folders by default.
-  // Assets are still fetched normally and runtime-cached when requested.
-  publicExcludes: ['assets/**/*', 'favicon.ico'],
-  // Aggressive caching for offline support
-  runtimeCaching: [
-    {
-      urlPattern: /^https?.*/,
-      handler: 'NetworkFirst',
-      options: {
-        cacheName: 'offlineCache',
-        expiration: {
-          maxEntries: 200,
-          maxAgeSeconds: 30 * 24 * 60 * 60 // 30 days
-        },
-        networkTimeoutSeconds: 10
-      }
-    }
-  ],
-  buildExcludes: [/middleware-manifest\.json$/],
-  fallbacks: {
-    // Fallback for document (HTML pages)
-    document: '/offline',
-  }
 });
 
 const configuredPosthogRegion = (process.env.posthog_region || process.env.POSTHOG_REGION || 'US Cloud').toLowerCase();

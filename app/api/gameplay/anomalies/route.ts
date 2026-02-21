@@ -58,15 +58,23 @@ export async function GET(request: NextRequest) {
     conditions.push(Prisma.sql`content = ${content}`);
   }
 
-  const rows = await prisma.$queryRaw<Array<Record<string, unknown>>>(Prisma.sql`
-    SELECT *
-    FROM anomalies
-    WHERE ${Prisma.join(conditions, " AND ")}
-    ORDER BY id DESC
-    LIMIT ${Math.max(1, Math.min(limit, 2000))}
-  `);
+  try {
+    const rows = await prisma.$queryRaw<Array<Record<string, unknown>>>(Prisma.sql`
+      SELECT *
+      FROM anomalies
+      WHERE ${Prisma.join(conditions, " AND ")}
+      ORDER BY id DESC
+      LIMIT ${Math.max(1, Math.min(limit, 2000))}
+    `);
 
-  return NextResponse.json({ anomalies: rows });
+    return NextResponse.json({ anomalies: rows });
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : String(err);
+    if (message.includes("Can't reach database server") || message.includes("PrismaClient")) {
+      return NextResponse.json({ error: "Database unavailable" }, { status: 503 });
+    }
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+  }
 }
 
 export async function POST(request: NextRequest) {
@@ -86,15 +94,23 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "No anomalies provided" }, { status: 400 });
   }
 
-  const data = await prisma.$queryRaw<Array<{ id: number; avatar_url: string | null }>>`
-    INSERT INTO anomalies
-    SELECT *
-    FROM jsonb_populate_recordset(NULL::anomalies, ${JSON.stringify(rows)}::jsonb)
-    RETURNING id, avatar_url
-  `;
+  try {
+    const data = await prisma.$queryRaw<Array<{ id: number; avatar_url: string | null }>>`
+      INSERT INTO anomalies
+      SELECT *
+      FROM jsonb_populate_recordset(NULL::anomalies, ${JSON.stringify(rows)}::jsonb)
+      RETURNING id, avatar_url
+    `;
 
-  revalidatePath("/game");
-  revalidatePath("/viewports/roover");
+    revalidatePath("/game");
+    revalidatePath("/viewports/roover");
 
-  return NextResponse.json(data);
+    return NextResponse.json(data);
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : String(err);
+    if (message.includes("Can't reach database server") || message.includes("PrismaClient")) {
+      return NextResponse.json({ error: "Database unavailable" }, { status: 503 });
+    }
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+  }
 }

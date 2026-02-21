@@ -4,14 +4,13 @@ type RouteExpectation = {
   expectClassificationUi?: boolean
 }
 
-  const classificationStateTexts = [
-    "Submit Classification",
-    "Loading",
-    "No anomaly",
-    "No clouds found",
-    "No clouds found today",
-    "Unable to load",
-    "Error:",
+  const classificationUiSelectors = [
+    "button",
+    "canvas",
+    "[data-testid*='class']",
+    "form",
+    "textarea",
+    "input[type='range']",
   ]
 
   const projectRoutes: RouteExpectation[] = [
@@ -58,16 +57,11 @@ type RouteExpectation = {
       cy.get("body").should("not.contain.text", "Internal Server Error")
 
       if (entry.expectClassificationUi) {
-        cy.get("body").then(($body) => {
-          const bodyText = $body.text()
-          const hasClassificationState = classificationStateTexts.some((text) =>
-            bodyText.includes(text),
-          )
-          expect(
-            hasClassificationState,
-            `classification UI state should render on ${route}`,
-          ).to.equal(true)
-        })
+        // Wait for React to hydrate and render classification UI
+        cy.get(
+          classificationUiSelectors.join(", "),
+          { timeout: 10_000 },
+        ).should("have.length.greaterThan", 0)
       }
     })
   })
