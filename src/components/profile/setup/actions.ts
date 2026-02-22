@@ -25,7 +25,7 @@ export async function getCurrentProfileAction() {
   const rows = await prisma.$queryRaw<Array<{ username: string | null; full_name: string | null; avatar_url: string | null }>>`
     SELECT username, full_name, avatar_url
     FROM profiles
-    WHERE id = ${user.id}
+    WHERE id::text = ${user.id}
     LIMIT 1
   `;
 
@@ -63,7 +63,7 @@ export async function updateProfileSetupAction(formData: FormData) {
   try {
     await prisma.$executeRaw`
       INSERT INTO profiles (id, username, full_name, avatar_url, updated_at)
-      VALUES (${user.id}, ${username}, ${firstName}, ${avatar_url}, ${new Date().toISOString()})
+      VALUES (${user.id}::uuid, ${username}, ${firstName}, ${avatar_url}, NOW())
       ON CONFLICT (id)
       DO UPDATE SET
         username = EXCLUDED.username,
@@ -103,7 +103,7 @@ export async function completeProfileAction(input: {
   try {
     await prisma.$executeRaw`
       INSERT INTO profiles (id, username, full_name, referral_code, updated_at)
-      VALUES (${user.id}, ${username}, ${input.fullName.trim()}, ${ownReferralCode}, ${new Date().toISOString()})
+      VALUES (${user.id}::uuid, ${username}, ${input.fullName.trim()}, ${ownReferralCode}, NOW())
       ON CONFLICT (id)
       DO UPDATE SET
         username = EXCLUDED.username,
@@ -126,10 +126,10 @@ export async function completeProfileAction(input: {
   if (referrerCode) {
     const existingReferral = (
       await prisma.$queryRaw<Array<{ id: number }>>`
-        SELECT id
-        FROM referrals
-        WHERE referree_id = ${user.id}
-        LIMIT 1
+      SELECT id
+      FROM referrals
+      WHERE referree_id::text = ${user.id}
+      LIMIT 1
       `
     )[0];
     const referralCheckError = null;
@@ -147,14 +147,14 @@ export async function completeProfileAction(input: {
       if (referrerProfile) {
         await prisma.$executeRaw`
           INSERT INTO referrals (referree_id, referral_code)
-          VALUES (${user.id}, ${referrerCode})
+          VALUES (${user.id}::uuid, ${referrerCode})
         `;
 
         const referrersReferral = (
           await prisma.$queryRaw<Array<{ referral_code: string }>>`
             SELECT referral_code
             FROM referrals
-            WHERE referree_id = ${referrerProfile.id}
+            WHERE referree_id::text = ${referrerProfile.id}
             LIMIT 1
           `
         )[0];
@@ -162,7 +162,7 @@ export async function completeProfileAction(input: {
         if (referrersReferral?.referral_code) {
           await prisma.$executeRaw`
             INSERT INTO referrals (referree_id, referral_code)
-            VALUES (${user.id}, ${referrersReferral.referral_code})
+            VALUES (${user.id}::uuid, ${referrersReferral.referral_code})
           `;
         }
       }
@@ -186,7 +186,7 @@ export async function getReferralPanelDataAction() {
     await prisma.$queryRaw<Array<{ referral_code: string | null }>>`
       SELECT referral_code
       FROM profiles
-      WHERE id = ${user.id}
+      WHERE id::text = ${user.id}
       LIMIT 1
     `
   )[0];
@@ -213,7 +213,7 @@ export async function getReferralPanelDataAction() {
   const usersData = await prisma.$queryRaw<Array<{ id: string; username: string | null }>>`
     SELECT id, username
     FROM profiles
-    WHERE id = ANY(${referredUserIds}::text[])
+    WHERE id::text = ANY(${referredUserIds}::text[])
   `;
   const usersError = null;
 
@@ -246,7 +246,7 @@ export async function submitReferralCodeAction(referralCode: string) {
   try {
     await prisma.$executeRaw`
       INSERT INTO referrals (referree_id, referral_code)
-      VALUES (${user.id}, ${code})
+      VALUES (${user.id}::uuid, ${code})
     `;
   } catch {
     return { ok: false as const, error: "Failed to submit referral code. Please try again." };

@@ -5,7 +5,8 @@ describe('Navigation', () => {
   })
 
   it('should load the home page', () => {
-    cy.url().should('eq', `${Cypress.config().baseUrl}/`)
+    // Root page shows Landing component which uses /apt route when not authenticated
+    cy.url().should('include', '/apt')
     cy.get('body').should('be.visible')
   })
 

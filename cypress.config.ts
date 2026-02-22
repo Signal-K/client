@@ -1,6 +1,7 @@
 import { defineConfig } from 'cypress'
 import dotenv from 'dotenv'
 import { execSync } from 'node:child_process'
+// import codeCoverageTask from '@cypress/code-coverage/task'
 
 dotenv.config({ path: '.env.local' })
 dotenv.config()
@@ -91,6 +92,37 @@ export default defineConfig({
                 if (!userId || !resolvedServiceRoleKey) return
 
                 const restBase = `${supabaseUrl}/rest/v1`
+                const profilesResponse = await fetch(
+                    `${restBase}/profiles?select=avatar_url&id=eq.${encodeURIComponent(userId)}&limit=1`,
+                    {
+                        method: 'GET',
+                        headers: restAuthHeaders,
+                    },
+                )
+                if (profilesResponse.ok) {
+                    const profiles = (await profilesResponse.json()) as Array<{ avatar_url?: string | null }>
+                    const avatarUrl = profiles[0]?.avatar_url
+                    const marker = '/storage/v1/object/public/avatars/'
+                    const objectPath = avatarUrl?.includes(marker) ? avatarUrl.split(marker)[1] : ''
+                    if (objectPath) {
+                        const encodedPath = objectPath
+                            .split('/')
+                            .filter(Boolean)
+                            .map((part) => encodeURIComponent(part))
+                            .join('/')
+                        await fetch(
+                            `${supabaseUrl}/storage/v1/object/avatars/${encodedPath}`,
+                            {
+                                method: 'DELETE',
+                                headers: {
+                                    apikey: resolvedServiceRoleKey,
+                                    Authorization: `Bearer ${resolvedServiceRoleKey}`,
+                                },
+                            },
+                        )
+                    }
+                }
+
                 const tablesWithUserId = [
                     'nps_surveys',
                 ]
@@ -151,17 +183,20 @@ export default defineConfig({
                     email: string
                     password: string
                 }) {
-                    if (!resolvedServiceRoleKey) {
-                        throw new Error('SUPABASE_SERVICE_ROLE_KEY is required for Cypress user creation')
+                    if (!resolvedAnonKey) {
+                        throw new Error('SUPABASE_ANON_KEY is required for Cypress user creation')
                     }
 
-                    const response = await fetch(`${supabaseUrl}/auth/v1/admin/users`, {
+                    const response = await fetch(`${supabaseUrl}/auth/v1/signup`, {
                         method: 'POST',
-                        headers: adminAuthHeaders,
+                        headers: {
+                            apikey: resolvedAnonKey,
+                            Authorization: `Bearer ${resolvedAnonKey}`,
+                            'Content-Type': 'application/json',
+                        },
                         body: JSON.stringify({
                             email,
                             password,
-                            email_confirm: true,
                         }),
                     })
 
@@ -170,7 +205,12 @@ export default defineConfig({
                         throw new Error(`Failed to create test user: ${message}`)
                     }
 
-                    const user = await response.json()
+                    const payload = await response.json()
+                    const user = payload?.user
+                    if (!user?.id) {
+                        throw new Error(`Unexpected signup response: ${JSON.stringify(payload)}`)
+                    }
+
                     return {
                         id: user.id,
                         email: user.email,
@@ -236,6 +276,69 @@ export default defineConfig({
                     const rows = (await response.json()) as Array<{ id: number }>
                     return Array.isArray(rows) ? rows.length : 0
                 },
+                async getSupabaseProfileById({ userId }: { userId: string }) {
+                    if (!resolvedServiceRoleKey) {
+                        throw new Error('SUPABASE_SERVICE_ROLE_KEY is required for profile checks')
+                    }
+
+                    const params = new URLSearchParams()
+                    params.set('select', 'id,username,full_name,avatar_url,updated_at')
+                    params.set('id', `eq.${encodeURIComponent(userId)}`)
+                    params.set('limit', '1')
+
+                    const response = await fetch(`${supabaseUrl}/rest/v1/profiles?${params.toString()}`, {
+                        method: 'GET',
+                        headers: restAuthHeaders,
+                    })
+
+                    if (!response.ok) {
+                        const message = await response.text()
+                        throw new Error(`Failed to fetch profile row: ${message}`)
+                    }
+
+                    const rows = (await response.json()) as Array<{
+                        id: string
+                        username: string | null
+                        full_name: string | null
+                        avatar_url: string | null
+                        updated_at: string | null
+                    }>
+
+                    return rows[0] ?? null
+                },
+                async checkStorageObjectExists({
+                    bucket,
+                    objectPath,
+                }: {
+                    bucket: string
+                    objectPath: string
+                }) {
+                    if (!resolvedServiceRoleKey) {
+                        throw new Error('SUPABASE_SERVICE_ROLE_KEY is required for storage checks')
+                    }
+
+                    const slashIndex = objectPath.lastIndexOf('/')
+                    const prefix = slashIndex >= 0 ? objectPath.slice(0, slashIndex + 1) : ''
+                    const name = slashIndex >= 0 ? objectPath.slice(slashIndex + 1) : objectPath
+
+                    const response = await fetch(`${supabaseUrl}/storage/v1/object/list/${bucket}`, {
+                        method: 'POST',
+                        headers: restAuthHeaders,
+                        body: JSON.stringify({
+                            prefix,
+                            limit: 100,
+                            offset: 0,
+                        }),
+                    })
+
+                    if (!response.ok) {
+                        const message = await response.text()
+                        throw new Error(`Failed to list storage objects: ${message}`)
+                    }
+
+                    const rows = (await response.json()) as Array<{ name: string }>
+                    return rows.some((row) => row.name === name)
+                },
                 async fetchAnomalies({
                     deploymentType,
                 }: {
@@ -297,6 +400,9 @@ export default defineConfig({
                     return fallbackRows
                 },
             })
+
+            // Code coverage plugin disabled - @cypress/code-coverage is incompatible with Cypress 14
+            // (Cypress.expose is not a function)
 
             return config
         },

@@ -17,6 +17,7 @@
     "incremental": true,
     "paths": {
       "@/*": [
+        "./src/*",
         "./*"
       ],
       "react": [ "./node_modules/@types/react" ]
@@ -36,13 +37,13 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "app/components/_[archive]/Classifications/Zoodex/CapturePage.jsx",
-    "app/components/_[archive]/Classifications/Zoodex/Mobx.jsx",
+    "src/app/components/_[archive]/Classifications/Zoodex/CapturePage.jsx",
+    "src/app/components/_[archive]/Classifications/Zoodex/Mobx.jsx",
     "components/topographic-map.jsx",
     "components/enhanced-weather-events.jsx", "content/Comments/SurveyorForm.tsx.tst",
   ],
   "exclude": [
     "node_modules",
-    "app/components/Data/Generator/Astronomer/DailyMinorPlanet.tsx"
+    "src/app/components/Data/Generator/Astronomer/DailyMinorPlanet.tsx"
   ]
 }

@@ -5,6 +5,8 @@ import { SessionContextProvider } from "@/src/lib/auth/session-context";
 import { useEffect, ReactNode } from "react";
 import { ActivePlanetProvider, useActivePlanet } from "@/src/core/context/ActivePlanet";
 import { Analytics } from "@vercel/analytics/react";
+import { usePostHog } from "posthog-js/react";
+import { useAuthUser } from "@/src/hooks/useAuthUser";
 // import Sidebar from "../ui/Panels/Sidebar";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 // import { PostHogProvider } from "@/components/PostHogProvider";
@@ -22,46 +24,38 @@ function LayoutContent({ children }: { children: ReactNode }) {
 }
 
 export default function RootLayoutClient({ children }: { children: ReactNode }) {
-  // Register service worker for offline access
-  useEffect(() => {
-    if (typeof window !== "undefined" && "serviceWorker" in navigator) {
-      // Keep service workers out of Cypress/test runs; they interfere with HMR/chunk loading.
-      if ((window as any).Cypress || process.env.NODE_ENV === "test") {
-        return;
-      }
+  const posthog = usePostHog();
+  const { user } = useAuthUser();
 
-      // First, try to register our custom service worker
-      navigator.serviceWorker
-        .register("/service-worker.js", { scope: "/" })
-        .then((registration) => {
-          // Custom Service Worker registered
-          
-          // Check for updates
-          registration.addEventListener('updatefound', () => {
-            const newWorker = registration.installing;
-            if (newWorker) {
-              newWorker.addEventListener('statechange', () => {
-                  if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                    // New service worker available
-                  }
-              });
-            }
-          });
-        })
-        .catch((error) => {
-          console.error("Service Worker registration failed:", error);
-          
-          // Fallback to next-pwa generated service worker
-          navigator.serviceWorker
-            .register("/sw.js", { scope: "/" })
-            .then((registration) => {
-              // Fallback Service Worker registered
-            })
-            .catch((error) => {
-              console.error("Fallback Service Worker also failed:", error);
-            });
-        });
+  useEffect(() => {
+    if (!posthog) return;
+
+    if (!user) {
+      posthog.reset();
+      return;
     }
+
+    posthog.identify(user.id, {
+      email: user.email ?? undefined,
+      supabase_uuid: user.id,
+    });
+  }, [posthog, user]);
+
+  // Register service worker only in production to avoid stale chunk/HMR issues in dev.
+  useEffect(() => {
+    if (typeof window === "undefined" || !("serviceWorker" in navigator)) return;
+    if ((window as any).Cypress || process.env.NODE_ENV === "test") return;
+
+    if (process.env.NODE_ENV !== "production") {
+      navigator.serviceWorker.getRegistrations().then((registrations) => {
+        registrations.forEach((registration) => registration.unregister());
+      });
+      return;
+    }
+
+    navigator.serviceWorker.register("/service-worker.js", { scope: "/" }).catch((error) => {
+      console.error("Service Worker registration failed:", error);
+    });
   }, []);
 
   return (

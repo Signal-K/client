@@ -6,6 +6,15 @@ priority: medium
 labels:
   - architecture
   - cleanup
+specRefs:
+  - "specs/mechanics/classification-spec"
+spec: "specs/mechanics/classification-spec"
+specPath: ".knowns/docs/specs/mechanics/classification-spec.md"
+specs:
+  - "specs/mechanics/classification-spec"
+references:
+  - "specs/mechanics/classification-spec"
+  - ".knowns/docs/specs/mechanics/classification-spec.md"
 createdAt: '2026-02-19T08:12:40.078Z'
 updatedAt: '2026-02-19T09:58:19Z'
 timeSpent: 0
@@ -16,6 +25,8 @@ timeSpent: 0
 
 <!-- SECTION:DESCRIPTION:BEGIN -->
 Audit migrated mechanic surfaces for unnecessary use client and push server fetch by default.
+Primary spec: specs/mechanics/classification-spec
+Primary spec path: .knowns/docs/specs/mechanics/classification-spec.md
 <!-- SECTION:DESCRIPTION:END -->
 
 ## Acceptance Criteria
@@ -27,6 +38,7 @@ Audit migrated mechanic surfaces for unnecessary use client and push server fetc
 ## Implementation Notes
 
 <!-- SECTION:NOTES:BEGIN -->
+- Spec reference: specs/mechanics/classification-spec
 Audit started. Current hotspot list for client-first mutation/fetch cleanup:
 - `src/core/context/ActivePlanet.tsx` still performs direct client updates.
 - `src/utils/mineralDepositCreation.ts` still performs direct insert path.
@@ -44,3 +56,8 @@ Audit outcome on `use client`:
 - Active migration targets remain client components due interactive state/context needs.
 - Unnecessary client-side Supabase mutation/fetch paths in audited hotspots were removed in favor of authenticated API routes.
 <!-- SECTION:NOTES:END -->
+
+
+## Spec References
+
+- specs/mechanics/classification-spec

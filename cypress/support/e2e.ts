@@ -13,11 +13,23 @@
 // https://on.cypress.io/configuration
 // ***********************************************************
 
+// Import code coverage support (disabled - incompatible with Cypress 14)
+// import '@cypress/code-coverage/support';
+
 // Import commands.ts using ES2015 syntax:
 import './commands'
 
 // Alternatively you can use CommonJS syntax:
 // require('./commands')
+
+// Ignore Next.js internal errors that are not real failures
+Cypress.on('uncaught:exception', (err) => {
+  // Next.js throws NEXT_REDIRECT internally when redirect() is called in a
+  // server component — this is expected behaviour, not a bug.
+  if (err.message.includes('NEXT_REDIRECT')) {
+    return false
+  }
+})
 
 // Add custom assertions
 declare global {

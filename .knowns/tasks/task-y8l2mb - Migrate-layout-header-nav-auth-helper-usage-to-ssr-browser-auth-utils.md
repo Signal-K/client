@@ -7,6 +7,15 @@ labels:
   - architecture
   - auth
   - ssr
+specRefs:
+  - "specs/mechanics/deployment-spec"
+spec: "specs/mechanics/deployment-spec"
+specPath: ".knowns/docs/specs/mechanics/deployment-spec.md"
+specs:
+  - "specs/mechanics/deployment-spec"
+references:
+  - "specs/mechanics/deployment-spec"
+  - ".knowns/docs/specs/mechanics/deployment-spec.md"
 createdAt: '2026-02-19T09:32:00.000Z'
 updatedAt: '2026-02-19T10:12:00.000Z'
 timeSpent: 45
@@ -17,6 +26,8 @@ timeSpent: 45
 
 <!-- SECTION:DESCRIPTION:BEGIN -->
 Reduce dependency on @supabase/auth-helpers-react in shared layout/header/nav surfaces by using browser auth utilities and server API routes for data reads.
+Primary spec: specs/mechanics/deployment-spec
+Primary spec path: .knowns/docs/specs/mechanics/deployment-spec.md
 <!-- SECTION:DESCRIPTION:END -->
 
 ## Acceptance Criteria
@@ -30,6 +41,7 @@ Reduce dependency on @supabase/auth-helpers-react in shared layout/header/nav su
 ## Implementation Notes
 
 <!-- SECTION:NOTES:BEGIN -->
+- Spec reference: specs/mechanics/deployment-spec
 Added lib/supabase/browser.ts and src/hooks/useAuthUser.ts. Added auth utility routes app/api/auth/me/route.ts and app/api/auth/logout/route.ts. Added app/api/gameplay/alerts/route.ts and app/api/gameplay/profile/code/route.ts. Updated src/components/layout/Header/MainHeader.tsx, src/components/layout/Tes.tsx, src/components/layout/Navigation/AlertsDropdown.tsx, and src/components/profile/auth/AnonymousUserPrompt.tsx to remove useSession/useSupabaseClient from auth-helpers-react in those surfaces.
 
 Extended migration: updated src/components/layout/Navigation/MissionDropdown.tsx to use server API progress aggregation via app/api/gameplay/milestones/weekly-progress/route.ts. Updated auth surfaces src/components/profile/auth/LoginModal.tsx, src/components/profile/auth/EnhancedAuth.tsx, and src/components/profile/auth/ConvertAnonymousAccount.tsx to use browser Supabase auth utilities rather than auth-helper hooks. Updated top-level routing pages app/page.tsx and app/game/page.tsx to use useAuthUser instead of useSession/useSessionContext.
@@ -38,3 +50,8 @@ Additional modernization in auth-gate and deploy entry pages: app/auth/page.tsx,
 
 Completed full import-level migration in app/src: replaced all remaining @supabase/auth-helpers-react usages with local browser auth compatibility module at src/lib/auth/session-context.tsx. Updated layout providers (src/components/layout/RootLayoutClient.tsx, app/layouts/activity/activity-layout.tsx) to remove auth-helpers-nextjs createPagesBrowserClient usage and rely on local SessionContextProvider + useAuthUser patterns.
 <!-- SECTION:NOTES:END -->
+
+
+## Spec References
+
+- specs/mechanics/deployment-spec

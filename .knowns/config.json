@@ -1,5 +1,24 @@
 {
   "settings": {
+    "defaultPriority": "medium",
+    "defaultLabels": [],
+    "statuses": [
+      "todo",
+      "in-progress",
+      "in-review",
+      "done",
+      "blocked",
+      "on-hold",
+      "urgent"
+    ],
+    "visibleColumns": [
+      "todo",
+      "in-progress",
+      "done",
+      "in-review"
+    ],
+    "statusColors": {},
     "serverPort": 6420
-  }
+  },
+  "name": "Knowns"
 }

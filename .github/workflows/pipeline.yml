@@ -29,6 +29,31 @@ on:
         required: false
         default: false
         type: boolean
+      run_community_event_notify:
+        description: "Run community event push notification job"
+        required: false
+        default: false
+        type: boolean
+      community_event_title:
+        description: "Community event notification title"
+        required: false
+        default: "Community event"
+        type: string
+      community_event_message:
+        description: "Community event notification message"
+        required: false
+        default: "A new community event is live."
+        type: string
+      community_event_url:
+        description: "URL to open from notification"
+        required: false
+        default: "/game"
+        type: string
+      community_event_dry_run:
+        description: "If true, do not send notifications; only produce a report."
+        required: false
+        default: true
+        type: boolean
 
 permissions:
   contents: read
@@ -114,14 +139,32 @@ jobs:
       - name: Run unit tests
         run: yarn test:unit
 
+      - name: Run unit tests with coverage
+        run: yarn test:unit --coverage
+
+      - name: Run lint
+        run: yarn lint
+
       - name: Run Cypress smoke (minimal)
         if: github.event_name == 'push' && github.ref_name == 'main'
         run: env -u ELECTRON_RUN_AS_NODE yarn start-server-and-test "yarn dev" http://localhost:3000 "yarn test:e2e:smoke:minimal"
 
-      - name: Run Cypress smoke (full for PR to main)
+      - name: Run Cypress smoke (full for PR to main) with coverage
         if: >
           github.event_name == 'pull_request' && github.base_ref == 'main'
-        run: env -u ELECTRON_RUN_AS_NODE yarn start-server-and-test "yarn dev" http://localhost:3000 "yarn test:e2e:smoke:full"
+        run: env -u ELECTRON_RUN_AS_NODE yarn start-server-and-test "yarn dev" http://localhost:3000 "CYPRESS_COVERAGE=true yarn test:e2e:smoke:full"
+
+      - name: Upload e2e coverage
+        if: >
+          always() && (
+            (github.event_name == 'pull_request' && github.base_ref == 'main')
+          )
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-coverage
+          path: |
+            coverage-e2e
+            .nyc_output
 
       - name: Upload Cypress artifacts
         if: >
@@ -161,7 +204,9 @@ jobs:
           yarn install --frozen-lockfile
 
       - name: Build app
-        run: yarn build
+        run: |
+          rm -rf .next
+          yarn build
 
       - name: Check bundle budgets
         run: yarn bundle:check
@@ -224,7 +269,7 @@ jobs:
           NEXT_PUBLIC_VAPID_PUBLIC_KEY: ${{ secrets.VAPID_PUBLIC_KEY }}
           VAPID_PRIVATE_KEY: ${{ secrets.VAPID_PRIVATE_KEY }}
           SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
-        run: node scripts/notify-unclassified-discoveries.js
+        run: node --experimental-strip-types scripts/notify-unclassified-discoveries.ts
 
   unlock_solarhealth_anomalies:
     if: >
@@ -248,7 +293,7 @@ jobs:
         env:
           SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-        run: node scripts/unlock-solarhealth-anomalies.js
+        run: node --experimental-strip-types scripts/unlock-solarhealth-anomalies.ts
 
   delete_push_anomaly_log:
     if: >
@@ -269,3 +314,41 @@ jobs:
           SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         run: go run scripts/delete_push_anomaly_log.go
+
+  community_event_notify:
+    if: github.event_name == 'workflow_dispatch' && inputs.run_community_event_notify == true
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "yarn"
+
+      - name: Install dependencies
+        run: |
+          yarn lock:check
+          yarn install --frozen-lockfile
+
+      - name: Send community event push notification (or dry run)
+        env:
+          SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          NEXT_PUBLIC_VAPID_PUBLIC_KEY: ${{ secrets.VAPID_PUBLIC_KEY }}
+          VAPID_PRIVATE_KEY: ${{ secrets.VAPID_PRIVATE_KEY }}
+          COMMUNITY_EVENT_TITLE: ${{ inputs.community_event_title }}
+          COMMUNITY_EVENT_MESSAGE: ${{ inputs.community_event_message }}
+          COMMUNITY_EVENT_URL: ${{ inputs.community_event_url }}
+          DRY_RUN: ${{ inputs.community_event_dry_run }}
+          REPORT_PATH: community-event-report.json
+        run: node --experimental-strip-types scripts/notify-community-event.ts
+
+      - name: Upload community event report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: community-event-report
+          path: community-event-report.json
