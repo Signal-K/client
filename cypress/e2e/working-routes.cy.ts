@@ -59,14 +59,18 @@ describe('Working Routes Test', () => {
     cy.get('body').should('be.visible')
   })
 
-  it('should handle API routes', () => {
-    // Test API endpoint
-    cy.request({
-      url: '/api/gameplay/milestones',
-      failOnStatusCode: false
-    }).then((response) => {
-      // API should respond (even if with error, it should not timeout)
-      expect([200, 401, 404, 500]).to.include(response.status)
+  it('should navigate key gameplay surfaces through UI routes', () => {
+    const gameplayRoutes = [
+      '/game',
+      '/structures/telescope',
+      '/structures/balloon',
+      '/research',
+    ]
+
+    gameplayRoutes.forEach((route) => {
+      cy.visit(route, { failOnStatusCode: false })
+      cy.get('body').should('be.visible')
+      cy.get('body').should('not.contain.text', 'Internal Server Error')
     })
   })
 })

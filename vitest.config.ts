@@ -10,18 +10,25 @@ export default defineConfig({
     coverage: {
       provider: "v8",
       reporter: ["text-summary", "json-summary", "lcov"],
+      all: true,
       include: [
-        "src/lib/gameplay/**/*.ts",
-        "src/utils/mineralAnalysis.ts",
-        "src/utils/solarEventUtils.ts",
-        "hooks/useNPSManagement.ts",
+        "src/**/*.{ts,tsx}",
       ],
-      exclude: ["**/*.d.ts", "tests/**", "node_modules/**"],
+      exclude: [
+        "**/*.d.ts",
+        "tests/**",
+        "node_modules/**",
+        ".next/**",
+        "src/**/*.test.{ts,tsx}",
+        "src/**/__tests__/**",
+        "src/**/types/**",
+      ],
     },
   },
   resolve: {
-    alias: {
-      "@": path.resolve(__dirname, "."),
-    },
+    alias: [
+      { find: "@/src", replacement: path.resolve(__dirname, "src") },
+      { find: "@", replacement: path.resolve(__dirname, "src") },
+    ],
   },
 })

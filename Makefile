@@ -46,7 +46,7 @@ supabase-stop:
 
 # Database type generation (if using Supabase CLI)
 db-types:
-	supabase gen types typescript --project-id your-project-id --schema public > types/supabase.ts
+	supabase gen types typescript --project-id your-project-id --schema public > src/types/supabase.ts
 
 # Prisma commands (connected to Supabase Postgres)
 db-studio:

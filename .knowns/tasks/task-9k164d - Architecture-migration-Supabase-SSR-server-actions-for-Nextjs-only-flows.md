@@ -7,6 +7,15 @@ labels:
   - architecture
   - ssr
   - server-actions
+specRefs:
+  - "specs/migration/two-two-migration"
+spec: "specs/migration/two-two-migration"
+specPath: ".knowns/docs/specs/migration/two-two-migration.md"
+specs:
+  - "specs/migration/two-two-migration"
+references:
+  - "specs/migration/two-two-migration"
+  - ".knowns/docs/specs/migration/two-two-migration.md"
 createdAt: '2026-02-19T08:12:39.891Z'
 updatedAt: '2026-02-19T09:58:19Z'
 timeSpent: 286
@@ -17,6 +26,8 @@ timeSpent: 286
 
 <!-- SECTION:DESCRIPTION:BEGIN -->
 Replace auth-helpers-react session usage in migrated Next.js app-only flows with server-side Supabase + server actions using HTTP-only cookies.
+Primary spec: specs/migration/two-two-migration
+Primary spec path: .knowns/docs/specs/migration/two-two-migration.md
 <!-- SECTION:DESCRIPTION:END -->
 
 ## Acceptance Criteria
@@ -33,7 +44,7 @@ Added Supabase SSR server client utility via @supabase/ssr and replaced route he
 
 Blocking step added: create compatibility specsheet before further migration changes.
 
-Added specsheet: @doc/specs/migration/minigame-compatibility-matrix-and-parity-contract. Migrated primary social writes to server actions in src/components/social/actions.ts and removed useSession/useSupabaseClient from SimplePostSingle and CommentForm.
+Added specsheet: specs/migration/minigame-compatibility-matrix-and-parity-contract. Migrated primary social writes to server actions in src/components/social/actions.ts and removed useSession/useSupabaseClient from SimplePostSingle and CommentForm.
 
 Profile/setup batch migrated from auth-helpers to SSR/server actions: src/components/profile/setup/ProfileSetup.tsx, src/components/profile/setup/FinishProfile.tsx, src/components/profile/setup/Referrals.tsx, src/components/profile/setup/GettingStartedViewport.tsx, app/research/page.tsx. Added server actions file src/components/profile/setup/actions.ts and API routes app/api/gameplay/profile/getting-started/route.ts + app/api/gameplay/profile/referral-status/route.ts. Writes now server-side with revalidation.
 
@@ -63,3 +74,8 @@ Next migration wave completed for remaining direct client mutations in active co
 
 Stability/testing closure: disabled service worker registration in Cypress/test runs within RootLayoutClient, added explicit `/planets/edit` route to avoid dynamic-id fallback instability, cleaned leftover migration artifacts (`DMPVote` stray literals and ProfileSetup commented insert block), and re-ran full validation. Final status: `npx tsc --noEmit`, `npm run test:unit`, and full Cypress headless suite all pass.
 <!-- SECTION:NOTES:END -->
+
+
+## Spec References
+
+- specs/migration/two-two-migration

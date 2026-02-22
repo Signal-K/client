@@ -1,0 +1,13 @@
+{
+  "generatedAt": "2026-02-22T06:25:57.556Z",
+  "codeCoverage": {
+    "percent": 0.69,
+    "source": "coverage/coverage-summary.json"
+  },
+  "sddCoverage": {
+    "percent": 100,
+    "linked": 45,
+    "total": 45,
+    "source": "knowns-cli"
+  }
+}

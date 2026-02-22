@@ -2,6 +2,10 @@
 
 A Next.js application for space exploration, citizen science, and data classification.
 
+[![Coverage Badges Workflow](https://github.com/signal-k/client/actions/workflows/coverage-badges.yml/badge.svg)](https://github.com/signal-k/client/actions/workflows/coverage-badges.yml)
+[![Code Coverage](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/signal-k/client/main/.github/badges/code-coverage.json)](https://github.com/signal-k/client/actions/workflows/coverage-badges.yml)
+[![SDD Coverage](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/signal-k/client/main/.github/badges/sdd-coverage.json)](https://github.com/signal-k/client/actions/workflows/coverage-badges.yml)
+
 ## 🚀 Quick Start
 
 ### Setup:

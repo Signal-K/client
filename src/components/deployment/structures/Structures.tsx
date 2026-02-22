@@ -7,8 +7,6 @@ import { InventoryStructureItem, StructureItemDetail } from "@/types/Items";
 // import IndividualStructure, { IndividualStructureProps } from "./IndividualStructure";
 // import { StructuresConfig } from "@/src/features/structures/constants/Properties";
 
-import "../../../../styles/Anims/StarterStructureAnimations.css";
-
 // import { UnownedSurfaceStructures } from "./Build/EditMode";
 import { useRouter } from "next/navigation";
 

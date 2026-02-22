@@ -12,7 +12,8 @@ export default function ProfileSetupForm({ onProfileUpdate }: ProfileSetupFormPr
   const { activePlanet } = useActivePlanet();
   const router = useRouter();
 
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [initialLoaded, setInitialLoaded] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const [username, setUsername] = useState("");
@@ -37,6 +38,7 @@ export default function ProfileSetupForm({ onProfileUpdate }: ProfileSetupFormPr
       }
 
       setLoading(false);
+      setInitialLoaded(true);
     }
 
     getProfile();
@@ -108,6 +110,16 @@ export default function ProfileSetupForm({ onProfileUpdate }: ProfileSetupFormPr
     setLoading(false);
   }
 
+  if (!initialLoaded) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#1D2833] p-4 bg-[url('/game-background.jpg')] bg-cover bg-center">
+        <div className="bg-[#2C4F64]/90 p-8 rounded-3xl shadow-2xl max-w-md w-full backdrop-blur-sm border border-[#5FCBC3]/30">
+          <p className="text-[#FFE3BA] text-center">Loading profile…</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#1D2833] p-4 bg-[url('/game-background.jpg')] bg-cover bg-center">
       <div className="bg-[#2C4F64]/90 p-8 rounded-3xl shadow-2xl max-w-md w-full backdrop-blur-sm border border-[#5FCBC3]/30 transform hover:scale-105 transition-all duration-300">
@@ -122,6 +134,7 @@ export default function ProfileSetupForm({ onProfileUpdate }: ProfileSetupFormPr
             <input
               type="text"
               id="username"
+              data-testid="profile-username-input"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               className="w-full px-4 py-3 bg-[#74859A]/50 text-[#FFE3BA] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF695D] placeholder-[#FFE3BA]/50"
@@ -136,6 +149,7 @@ export default function ProfileSetupForm({ onProfileUpdate }: ProfileSetupFormPr
             <input
               type="text"
               id="firstName"
+              data-testid="profile-firstname-input"
               value={firstName}
               onChange={(e) => setFirstName(e.target.value)}
               className="w-full px-4 py-3 bg-[#74859A]/50 text-[#FFE3BA] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FF695D] placeholder-[#FFE3BA]/50"
@@ -153,21 +167,22 @@ export default function ProfileSetupForm({ onProfileUpdate }: ProfileSetupFormPr
                   <Image
                     src={avatarPreview}
                     alt="Avatar preview"
-                    layout="fill"
-                    objectFit="cover"
+                    fill
+                    style={{ objectFit: "cover" }}
                   />
                 ) : (
                   <Image
                     src="/placeholder.svg"
                     alt="Default avatar"
-                    layout="fill"
-                    objectFit="cover"
+                    fill
+                    style={{ objectFit: "cover" }}
                   />
                 )}
               </div>
               <input
                 type="file"
                 id="avatar"
+                data-testid="profile-avatar-input"
                 accept="image/*"
                 onChange={handleAvatarChange}
                 className="hidden"
@@ -182,6 +197,7 @@ export default function ProfileSetupForm({ onProfileUpdate }: ProfileSetupFormPr
           </div>
           <button
             type="submit"
+            data-testid="profile-save-button"
             disabled={loading}
             className="w-full py-4 bg-[#FF695D] text-[#FFE3BA] rounded-xl font-bold hover:bg-[#5FCBC3] transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
           >

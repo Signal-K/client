@@ -7,6 +7,15 @@ labels:
   - architecture
   - api
   - social
+specRefs:
+  - "specs/migration/two-two-migration"
+spec: "specs/migration/two-two-migration"
+specPath: ".knowns/docs/specs/migration/two-two-migration.md"
+specs:
+  - "specs/migration/two-two-migration"
+references:
+  - "specs/migration/two-two-migration"
+  - ".knowns/docs/specs/migration/two-two-migration.md"
 createdAt: '2026-02-19T10:36:00.000Z'
 updatedAt: '2026-02-19T10:36:00.000Z'
 timeSpent: 9
@@ -17,6 +26,8 @@ timeSpent: 9
 
 <!-- SECTION:DESCRIPTION:BEGIN -->
 Move remaining client-side write operations in deploy helper flows and surveyor comments to authenticated API routes.
+Primary spec: specs/migration/two-two-migration
+Primary spec path: .knowns/docs/specs/migration/two-two-migration.md
 <!-- SECTION:DESCRIPTION:END -->
 
 ## Acceptance Criteria
@@ -30,5 +41,11 @@ Move remaining client-side write operations in deploy helper flows and surveyor 
 ## Implementation Notes
 
 <!-- SECTION:NOTES:BEGIN -->
+- Spec reference: specs/migration/two-two-migration
 Added app/api/gameplay/deploy/satellite/quick/route.ts, app/api/gameplay/deploy/solar/route.ts, and app/api/gameplay/surveyor/comments/route.ts. Updated src/components/scenes/deploy/ActivityHeader.tsx, src/components/scenes/deploy/solar/SolarHealth.tsx, src/components/social/posts/Surveyor/SurveyorPostCard.tsx, and src/components/social/posts/Surveyor/CalculatorSurveyor.tsx to use server-authenticated routes for write paths.
 <!-- SECTION:NOTES:END -->
+
+
+## Spec References
+
+- specs/migration/two-two-migration

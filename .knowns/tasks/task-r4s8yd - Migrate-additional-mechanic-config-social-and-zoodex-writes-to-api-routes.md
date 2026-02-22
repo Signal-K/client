@@ -7,6 +7,15 @@ labels:
   - architecture
   - api
   - migration
+specRefs:
+  - "specs/mechanics/classification-spec"
+spec: "specs/mechanics/classification-spec"
+specPath: ".knowns/docs/specs/mechanics/classification-spec.md"
+specs:
+  - "specs/mechanics/classification-spec"
+references:
+  - "specs/mechanics/classification-spec"
+  - ".knowns/docs/specs/mechanics/classification-spec.md"
 createdAt: '2026-02-19T11:10:00.000Z'
 updatedAt: '2026-02-19T11:14:00.000Z'
 timeSpent: 34
@@ -17,6 +26,8 @@ timeSpent: 34
 
 <!-- SECTION:DESCRIPTION:BEGIN -->
 Continue eliminating direct client-side Supabase mutations for mechanic-critical gameplay paths by moving writes to authenticated API routes while preserving existing UI behavior and Supabase persistence.
+Primary spec: specs/mechanics/classification-spec
+Primary spec path: .knowns/docs/specs/mechanics/classification-spec.md
 <!-- SECTION:DESCRIPTION:END -->
 
 ## Acceptance Criteria
@@ -30,6 +41,7 @@ Continue eliminating direct client-side Supabase mutations for mechanic-critical
 ## Implementation Notes
 
 <!-- SECTION:NOTES:BEGIN -->
+- Spec reference: specs/mechanics/classification-spec
 Added API routes:
 - app/api/gameplay/social/comments/route.ts
 - app/api/gameplay/social/votes/route.ts (POST added)
@@ -56,3 +68,8 @@ Updated client components to call API routes for writes:
 - src/components/discovery/data-sources/Astronomers/PlanetHunters/SettingsPanel.tsx
 - src/components/discovery/data-sources/Astronomers/PlanetHunters/PlanetGenerator.tsx
 <!-- SECTION:NOTES:END -->
+
+
+## Spec References
+
+- specs/mechanics/classification-spec

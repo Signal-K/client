@@ -1,0 +1,21 @@
+{
+  "extends": "@cypress/code-coverage/use-babelrc",
+  "excludeAfterRemap": true,
+  "include": [
+    "src/**/*.{js,jsx,ts,tsx}",
+    "app/**/*.{js,jsx,ts,tsx}"
+  ],
+  "exclude": [
+    "**/*.d.ts",
+    "**/*.config.{js,ts}",
+    "**/*.test.{js,jsx,ts,tsx}",
+    "**/*.spec.{js,jsx,ts,tsx}",
+    "**/cypress/**",
+    "**/tests/**",
+    "**/coverage/**",
+    "**/.next/**",
+    "**/node_modules/**"
+  ],
+  "reporter": ["lcov", "json", "text-summary"],
+  "report-dir": "coverage-e2e"
+}

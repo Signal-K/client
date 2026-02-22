@@ -9,6 +9,15 @@ labels:
   - posthog
   - testing
   - knowns
+specRefs:
+  - "specs/migration/two-two-survey-audit-and-ops"
+spec: "specs/migration/two-two-survey-audit-and-ops"
+specPath: ".knowns/docs/specs/migration/two-two-survey-audit-and-ops.md"
+specs:
+  - "specs/migration/two-two-survey-audit-and-ops"
+references:
+  - "specs/migration/two-two-survey-audit-and-ops"
+  - ".knowns/docs/specs/migration/two-two-survey-audit-and-ops.md"
 createdAt: '2026-02-19T23:28:00Z'
 updatedAt: '2026-02-20T13:36:00Z'
 timeSpent: 0
@@ -20,11 +29,14 @@ timeSpent: 0
 
 <!-- SECTION:DESCRIPTION:BEGIN -->
 Prevent accidental cleanup of annotation and PostHog packages by introducing explicit dependency guardrails, then run unit and smoke tests to verify behavior.
+Primary spec: specs/migration/two-two-survey-audit-and-ops
+Primary spec path: .knowns/docs/specs/migration/two-two-survey-audit-and-ops.md
 <!-- SECTION:DESCRIPTION:END -->
 
 ## Implementation Notes
 
 <!-- SECTION:NOTES:BEGIN -->
+- Spec reference: specs/migration/two-two-survey-audit-and-ops
 - Restored required packages in `package.json`: `d3`, `markerjs2`, `posthog-node`.
 - Added explicit protected dependency metadata:
   - `package.json` -> `dependencyPolicy.protected`
@@ -43,3 +55,8 @@ Prevent accidental cleanup of annotation and PostHog packages by introducing exp
   - `npm run test:unit`
   - smoke run via `start-server-and-test` against `npm run test:e2e:smoke:minimal`
 <!-- SECTION:NOTES:END -->
+
+
+## Spec References
+
+- specs/migration/two-two-survey-audit-and-ops

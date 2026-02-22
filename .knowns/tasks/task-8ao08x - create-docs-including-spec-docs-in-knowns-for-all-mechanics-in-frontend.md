@@ -5,6 +5,15 @@ status: completed
 priority: low
 labels:
   - dx
+specRefs:
+  - "specs/mechanics/onboarding-spec"
+spec: "specs/mechanics/onboarding-spec"
+specPath: ".knowns/docs/specs/mechanics/onboarding-spec.md"
+specs:
+  - "specs/mechanics/onboarding-spec"
+references:
+  - "specs/mechanics/onboarding-spec"
+  - ".knowns/docs/specs/mechanics/onboarding-spec.md"
 createdAt: '2026-02-19T15:46:21.000Z'
 updatedAt: '2026-02-19T08:08:08.573Z'
 timeSpent: 1152
@@ -28,5 +37,19 @@ timeSpent: 1152
   - user stories
   - acceptance criteria
 - Add index/readme files to both doc/spec folders for discoverability.
+Primary spec: specs/mechanics/onboarding-spec
+Primary spec path: .knowns/docs/specs/mechanics/onboarding-spec.md
 <!-- SECTION:DESCRIPTION:END -->
 
+
+
+## Implementation Notes
+
+<!-- SECTION:NOTES:BEGIN -->
+- Spec reference: specs/mechanics/onboarding-spec
+<!-- SECTION:NOTES:END -->
+
+
+## Spec References
+
+- specs/mechanics/onboarding-spec

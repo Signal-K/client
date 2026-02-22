@@ -7,6 +7,15 @@ labels:
   - architecture
   - api
   - migration
+specRefs:
+  - "specs/migration/community-event-notify-runbook"
+spec: "specs/migration/community-event-notify-runbook"
+specPath: ".knowns/docs/specs/migration/community-event-notify-runbook.md"
+specs:
+  - "specs/migration/community-event-notify-runbook"
+references:
+  - "specs/migration/community-event-notify-runbook"
+  - ".knowns/docs/specs/migration/community-event-notify-runbook.md"
 createdAt: '2026-02-19T11:35:00.000Z'
 updatedAt: '2026-02-19T12:45:00.000Z'
 timeSpent: 61
@@ -17,6 +26,8 @@ timeSpent: 61
 
 <!-- SECTION:DESCRIPTION:BEGIN -->
 Remove all active direct Supabase write mutations from TSX components by routing writes through authenticated API endpoints while preserving behavior and avoiding schema migrations.
+Primary spec: specs/migration/community-event-notify-runbook
+Primary spec path: .knowns/docs/specs/migration/community-event-notify-runbook.md
 <!-- SECTION:DESCRIPTION:END -->
 
 ## Acceptance Criteria
@@ -30,6 +41,7 @@ Remove all active direct Supabase write mutations from TSX components by routing
 ## Implementation Notes
 
 <!-- SECTION:NOTES:BEGIN -->
+- Spec reference: specs/migration/community-event-notify-runbook
 Added API routes:
 - app/api/gameplay/linked-anomalies/route.ts
 - app/api/gameplay/mineral-deposits/route.ts
@@ -61,3 +73,8 @@ Audit result:
 - `npm run test:unit` passes.
 - Full Cypress headless suite passes (`auth`, `navigation`, `planets`, `research`, `smoke-critical`, `user-flows`, `working-routes`).
 <!-- SECTION:NOTES:END -->
+
+
+## Spec References
+
+- specs/migration/community-event-notify-runbook
