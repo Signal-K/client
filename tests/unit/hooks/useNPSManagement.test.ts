@@ -36,4 +36,38 @@ describe("useNPSManagement", () => {
     expect(result.current.showNpsModal).toBe(true)
     expect(result.current.handleCloseNps).toBeTypeOf("function")
   })
+
+  it("handleCloseNps closes the NPS modal", async () => {
+    vi.spyOn(globalThis, "fetch").mockResolvedValue({
+      ok: true,
+      json: async () => ({ shouldShowNps: true }),
+    } as Response)
+    vi.mocked(useSession).mockReturnValue({ user: { id: "user-1" } } as any)
+
+    const { result } = renderHook(() => useNPSManagement())
+
+    await act(async () => {
+      await vi.runOnlyPendingTimersAsync()
+    })
+
+    expect(result.current.showNpsModal).toBe(true)
+
+    await act(async () => {
+      result.current.handleCloseNps()
+    })
+
+    expect(result.current.showNpsModal).toBe(false)
+  })
+
+  it("does not show NPS modal when session is null", async () => {
+    vi.mocked(useSession).mockReturnValue(null)
+
+    const { result } = renderHook(() => useNPSManagement())
+
+    await act(async () => {
+      await vi.runOnlyPendingTimersAsync()
+    })
+
+    expect(result.current.showNpsModal).toBe(false)
+  })
 })

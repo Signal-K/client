@@ -29,17 +29,19 @@ describe('Authentication', () => {
   })
 
   it('should create a new user account', () => {
-    // Only run if user creation tests are enabled
-    if (!Cypress.env('SKIP_USER_CREATION_TESTS')) {
-      cy.createTestUser()
-      cy.get('@testUser').then((user: any) => {
-        cy.login(user.email, user.password)
-        // Verify successful login
-        cy.url().should('not.include', '/auth')
-      })
-    } else {
+    if (Cypress.env('SKIP_USER_CREATION_TESTS')) {
       cy.log('User creation tests are skipped')
+      return
     }
+
+    const testEmail = `test-${Date.now()}@example.com`
+    const testPassword = 'testpassword123'
+
+    cy.task('createSupabaseTestUser', { email: testEmail, password: testPassword }).then((user: any) => {
+      Cypress.env('TEST_USER_ID', user.id)
+      cy.login(testEmail, testPassword)
+      cy.url({ timeout: 15000 }).should('not.include', '/auth')
+    })
   })
 
   afterEach(() => {

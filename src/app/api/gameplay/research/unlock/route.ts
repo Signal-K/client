@@ -57,7 +57,7 @@ export async function POST(request: NextRequest) {
   }
 
   const userId = user.id;
-  const [researched, classificationCountRows] = await Promise.all([
+  const [researched, classificationCountRows, surveyRewards] = await Promise.all([
     prisma.$queryRaw<Array<{ tech_type: string }>>`
       SELECT tech_type FROM researched WHERE user_id = ${userId}
     `,
@@ -66,8 +66,12 @@ export async function POST(request: NextRequest) {
       FROM classifications
       WHERE author = ${userId}
     `,
+    prisma.$queryRaw<Array<{ stardust_granted: number }>>`
+      SELECT stardust_granted FROM survey_rewards WHERE user_id = ${userId}::uuid
+    `,
   ]);
   const classificationCount = Number(classificationCountRows[0]?.count ?? 0);
+  const surveyBonus = surveyRewards.reduce((sum, r) => sum + (r.stardust_granted ?? 0), 0);
 
   const researchedRows = researched;
   const researchedSet = new Set(researchedRows.map((r) => r.tech_type));
@@ -100,7 +104,7 @@ export async function POST(request: NextRequest) {
   }
 
   const spent = researchedRows.reduce((total, row) => total + techCost(row.tech_type), 0);
-  const availableStardust = Math.max(0, classificationCount - spent);
+  const availableStardust = Math.max(0, classificationCount + surveyBonus - spent);
   const cost = techCost(techType);
 
   if (availableStardust < cost) {

@@ -93,7 +93,10 @@ export default function ProfileSetupForm({ onProfileUpdate }: ProfileSetupFormPr
     const formData = new FormData();
     formData.set("username", username);
     formData.set("firstName", firstName);
-    formData.set("existingAvatarPreview", avatarPreview || "");
+    // Only send existingAvatarPreview if it's a real storage URL (not a data URL)
+    if (avatarPreview && !avatarPreview.startsWith('data:')) {
+      formData.set("existingAvatarPreview", avatarPreview);
+    }
     if (avatar) {
       formData.set("avatar", avatar);
     }
@@ -182,6 +185,7 @@ export default function ProfileSetupForm({ onProfileUpdate }: ProfileSetupFormPr
               <input
                 type="file"
                 id="avatar"
+                name="avatar"
                 data-testid="profile-avatar-input"
                 accept="image/*"
                 onChange={handleAvatarChange}

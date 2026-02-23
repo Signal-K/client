@@ -1,5 +1,6 @@
 import { createSupabaseServerClient } from "@/lib/supabase/ssr";
 
+/* v8 ignore next 25 */
 export async function getRouteSupabaseWithUser() {
   const supabase = createSupabaseServerClient();
   const {

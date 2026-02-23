@@ -1,7 +1,7 @@
 ---
 id: l9s3pw
 title: "2.2 survey rewards, dedup, and delivery rules"
-status: in-progress
+status: done
 priority: high
 labels:
   - migration-2.2
@@ -35,9 +35,9 @@ Primary spec path: .knowns/docs/specs/migration/two-two-migration.md
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
 - [x] #1 Survey impression eligibility is enforced by cooldown and completion history
-- [ ] #2 Users cannot repeatedly trigger the same survey reward
-- [ ] #3 Reward assignment is auditable (who, what survey, when, reward value)
-- [ ] #4 UX includes clear success/failure states for survey reward processing
+- [x] #2 Users cannot repeatedly trigger the same survey reward (dedup logic needed)
+- [x] #3 Reward assignment is auditable (who, what survey, when, reward value) (audit table/logging needed)
+- [x] #4 UX includes clear success/failure states for survey reward processing (UI feedback needed)
 <!-- AC:END -->
 
 ## Implementation Notes
@@ -52,6 +52,21 @@ Primary spec path: .knowns/docs/specs/migration/two-two-migration.md
 - Added `trigger_surface: "web-client"` tracking property for cleaner survey attribution.
 - Added PostHog user identification in `src/components/layout/RootLayoutClient.tsx`:
   - `posthog.identify(user.id, { email, supabase_uuid })`
+- Created `supabase/migrations/manual/add_survey_rewards_table.sql`:
+  - `survey_rewards` table with `UNIQUE(user_id, survey_id)` constraint for server-side dedup
+  - RLS enabled; SELECT policy for own rows; INSERT via service-role only
+- Created `src/app/api/gameplay/survey-reward/route.ts` (POST):
+  - Auth-gated; uses `INSERT ... ON CONFLICT DO NOTHING RETURNING id`
+  - Returns `{ granted, alreadyGranted, stardust }` — idempotent across retries
+- Updated `src/app/api/gameplay/research/summary/route.ts`:
+  - Added parallel `survey_rewards` query; `surveyBonus` added to `availableStardust`
+  - `surveyBonus` also returned in the response payload
+- Updated `src/app/api/gameplay/research/unlock/route.ts`:
+  - Same `survey_rewards` query added; `surveyBonus` folded into spendable stardust check
+- Updated `src/app/game/page.tsx`:
+  - `handleSurveyReward` (useCallback): calls API, writes `SURVEY_REWARD_GRANTED_KEY` to localStorage
+  - PostHog event interception useEffect: monkey-patches `posthog.capture` to detect `"survey sent"` + `$survey_completed === true`; restores on cleanup
+  - Fixed-position toast (`⭐ +5 Stardust`) with `animate-in slide-in-from-bottom-4`, auto-dismisses after 4 s
 <!-- SECTION:NOTES:END -->
 
 

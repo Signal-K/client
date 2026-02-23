@@ -1,8 +1,9 @@
 ---
 id: 1jurpa
 title: "Create workflow for organising & setting up anomalies (essentially superseding sytizen repo)"
-status: in-review
+status: todo
 priority: medium
+blockerNotes: "Task lacks acceptance criteria; needs clarification on anomaly workflow scope and definition"
 labels:
   - anomalies
   - data

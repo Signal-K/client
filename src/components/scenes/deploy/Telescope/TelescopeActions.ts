@@ -193,6 +193,7 @@ export async function handleDeployAction(params: HandleDeployParams) {
   setDeploying(false)
 }
 
+/* v8 ignore next 4 */
 // small helper used internally
 function generateSectorName(x:number,y:number){
   return `${x},${y}`

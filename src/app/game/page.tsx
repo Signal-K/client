@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useState, useEffect, useMemo } from "react";
+import { Suspense, useState, useEffect, useMemo, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import dynamic from "next/dynamic";
 import { usePostHog } from "posthog-js/react";
@@ -91,6 +91,9 @@ import PushNotificationPrompt from "@/src/features/notifications/components/Push
 import ProjectPreferencesModal from "@/src/components/onboarding/ProjectPreferencesModal";
 import { ProjectType } from "@/src/hooks/useUserPreferences";
 
+// Utils
+import { cn } from "@/src/shared/utils";
+
 // Icons
 import {
   Telescope,
@@ -111,6 +114,8 @@ const POSTHOG_SURVEY_ID = "019c83d3-d0a5-0000-4e8f-5b7fd8794666";
 const POSTHOG_SURVEY_SHOWN_KEY = "posthog_survey_webapp_22_shown_v1";
 const POSTHOG_SURVEY_LAST_SHOWN_AT_KEY = "posthog_survey_webapp_22_last_shown_at_v1";
 const POSTHOG_SURVEY_COOLDOWN_MS = 14 * 24 * 60 * 60 * 1000;
+const SURVEY_REWARD_GRANTED_KEY = "posthog_survey_webapp_22_reward_granted_v1";
+const SURVEY_REWARD_STARDUST = 5;
 
 // Create a separate component for the search params logic
 function GamePageContent() {
@@ -126,6 +131,11 @@ function GamePageContent() {
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [showPreferencesModal, setShowPreferencesModal] = useState(false);
   const [openedViewports, setOpenedViewports] = useState<Set<ViewMode>>(new Set());
+  const [surveyRewardToast, setSurveyRewardToast] = useState<{
+    variant: "success" | "error" | "info";
+    title: string;
+    description: string;
+  } | null>(null);
 
   // Hooks
   const {
@@ -145,6 +155,86 @@ function GamePageContent() {
     needsPreferencesPrompt,
     setProjectInterests,
   } = useUserPreferences();
+
+  // Grant stardust reward when the user completes the PostHog survey.
+  // Intercepts posthog.capture to detect the "survey sent" completion event.
+  const handleSurveyReward = useCallback(async () => {
+    if (!user || typeof window === "undefined") return;
+    try {
+      const alreadyRewarded = window.localStorage.getItem(SURVEY_REWARD_GRANTED_KEY) === "1";
+      if (alreadyRewarded) return; // Silent — already handled
+
+      const res = await fetch("/api/gameplay/survey-reward", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          surveyId: POSTHOG_SURVEY_ID,
+          surveyName: "Star Sailors Webapp Loop Survey 2.2",
+        }),
+      });
+      const data = (await res.json()) as {
+        granted?: boolean;
+        alreadyGranted?: boolean;
+        stardust?: number;
+      };
+
+      if (data.alreadyGranted) {
+        window.localStorage.setItem(SURVEY_REWARD_GRANTED_KEY, "1");
+        // No toast — silently dedup server-side (client missed the key)
+        return;
+      }
+
+      if (data.granted) {
+        window.localStorage.setItem(SURVEY_REWARD_GRANTED_KEY, "1");
+        setSurveyRewardToast({
+          variant: "success",
+          title: `⭐ +${data.stardust ?? SURVEY_REWARD_STARDUST} Stardust`,
+          description: "Thanks for your feedback!",
+        });
+      } else {
+        setSurveyRewardToast({
+          variant: "error",
+          title: "Reward unavailable",
+          description: "Couldn't grant reward — try refreshing.",
+        });
+      }
+    } catch {
+      setSurveyRewardToast({
+        variant: "error",
+        title: "Reward unavailable",
+        description: "Couldn't grant reward — try refreshing.",
+      });
+    }
+    setTimeout(() => setSurveyRewardToast(null), 4000);
+  }, [user]);
+
+  // Intercept posthog.capture to detect survey completion and trigger reward.
+  useEffect(() => {
+    if (!posthog || !user || typeof window === "undefined") return;
+
+    const phAny = posthog as unknown as Record<string, unknown>;
+    const originalCapture = phAny["capture"] as
+      | ((this: unknown, ...args: unknown[]) => unknown)
+      | undefined;
+    if (typeof originalCapture !== "function") return;
+
+    phAny["capture"] = function (this: unknown, eventName: unknown, ...rest: unknown[]) {
+      if (eventName === "survey sent") {
+        const props = rest[0] as Record<string, unknown> | undefined;
+        if (
+          props?.["$survey_id"] === POSTHOG_SURVEY_ID &&
+          props?.["$survey_completed"] === true
+        ) {
+          void handleSurveyReward();
+        }
+      }
+      return originalCapture.call(this, eventName, ...rest);
+    };
+
+    return () => {
+      phAny["capture"] = originalCapture;
+    };
+  }, [posthog, user, handleSurveyReward]);
 
   // Show preferences modal on first visit or new device
   useEffect(() => {
@@ -678,6 +768,28 @@ function GamePageContent() {
               />
 
               <PWAPrompt />
+
+              {/* Survey Reward Toast */}
+              {surveyRewardToast && (
+                <div
+                  className={cn(
+                    "fixed bottom-20 md:bottom-6 left-1/2 -translate-x-1/2 z-[200]",
+                    "flex items-start gap-3 px-4 py-3 rounded-xl shadow-xl border",
+                    "animate-in slide-in-from-bottom-4 fade-in duration-300 whitespace-nowrap",
+                    surveyRewardToast.variant === "success" &&
+                      "bg-emerald-950/90 border-emerald-500/40 text-emerald-100",
+                    surveyRewardToast.variant === "error" &&
+                      "bg-red-950/90 border-red-500/40 text-red-100",
+                    surveyRewardToast.variant === "info" &&
+                      "bg-card/90 border-border/60 text-foreground"
+                  )}
+                >
+                  <div>
+                    <p className="text-sm font-semibold leading-none mb-1">{surveyRewardToast.title}</p>
+                    <p className="text-xs opacity-80">{surveyRewardToast.description}</p>
+                  </div>
+                </div>
+              )}
             </div>
           </Suspense>
         );

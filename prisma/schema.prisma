@@ -6,3 +6,357 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+// ─────────────────────────────────────────────────────
+// CORE GAME ENTITIES
+// ─────────────────────────────────────────────────────
+
+model Anomaly {
+  id                   BigInt    @id @default(autoincrement())
+  content              String?
+  ticId                String?   @map("ticId")
+  anomalytype          String?
+  type                 String?
+  radius               Float?
+  mass                 Float?
+  density              Float?
+  gravity              Float?
+  temperatureEq        Float?    @map("temperatureEq")
+  temperature          Float?
+  smaxis               Float?
+  orbitalPeriod        Float?    @map("orbital_period")
+  classificationStatus String?   @map("classification_status")
+  avatarUrl            String?   @map("avatar_url")
+  createdAt            DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  deepnote             String?
+  lightkurve           String?
+  configuration        Json?
+  parentAnomaly        BigInt?   @map("parentAnomaly")
+  anomalySet           String?   @map("anomalySet")
+  anomalyConfiguration Json?     @map("anomalyConfiguration")
+
+  @@map("anomalies")
+}
+
+model Classification {
+  id                        BigInt    @id @default(autoincrement())
+  createdAt                 DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  content                   String?
+  author                    String?   @db.Uuid
+  anomaly                   BigInt?
+  media                     Json?
+  classificationtype        String?
+  classificationConfiguration Json?  @map("classificationConfiguration")
+
+  @@map("classifications")
+}
+
+model Comment {
+  id               BigInt    @id @default(autoincrement())
+  createdAt        DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  content          String
+  author           String    @db.Uuid
+  classificationId BigInt?   @map("classification_id")
+  parentCommentId  BigInt?   @map("parent_comment_id")
+  configuration    Json?
+  uploads          BigInt?
+  surveyor         Boolean?
+  confirmed        Boolean?
+  value            String?
+  category         String?
+
+  @@map("comments")
+}
+
+model Upload {
+  id                  BigInt    @id @default(autoincrement())
+  author              String    @db.Uuid
+  location            BigInt
+  configuration       Json?
+  source              String
+  fileUrl             String    @map("file_url")
+  createdAt           DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  content             String?
+  name                String?
+  originatingLocation String?   @map("originating_location")
+
+  @@map("uploads")
+}
+
+model Vote {
+  id               BigInt    @id @default(autoincrement())
+  userId           String    @db.Uuid @map("user_id")
+  classificationId BigInt?   @map("classification_id")
+  anomalyId        BigInt?   @map("anomaly_id")
+  createdAt        DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  upload           BigInt?
+  voteType         String?   @map("vote_type")
+
+  @@map("votes")
+}
+
+// ─────────────────────────────────────────────────────
+// PLAYER PROFILE & PROGRESSION
+// ─────────────────────────────────────────────────────
+
+model Profile {
+  id                   String    @id @db.Uuid
+  updatedAt            DateTime? @map("updated_at") @db.Timestamptz(6)
+  username             String?
+  fullName             String?   @map("full_name")
+  avatarUrl            String?   @map("avatar_url")
+  website              String?
+  location             BigInt?
+  activemission        BigInt?
+  classificationPoints BigInt?   @map("classificationPoints")
+  pushSubscription     Json?     @map("push_subscription")
+  referralCode         String?   @map("referral_code")
+
+  @@map("profiles")
+}
+
+model Referral {
+  id           String    @id @default(uuid()) @db.Uuid
+  referreeId   String    @db.Uuid @map("referree_id")
+  referralCode String    @map("referral_code")
+  referredAt   DateTime  @default(now()) @map("referred_at") @db.Timestamptz(6)
+
+  @@map("referrals")
+}
+
+// ─────────────────────────────────────────────────────
+// RESEARCH & SKILLS (STARDUST ECONOMY)
+// ─────────────────────────────────────────────────────
+
+/// Active research/unlock log. One row per tech purchased.
+/// Supersedes the legacy `unlocked_technologies` table.
+model Researched {
+  id        Int       @id @default(autoincrement())
+  techType  String    @map("tech_type") @db.VarChar(50)
+  techId    Int?      @map("tech_id")
+  createdAt DateTime? @default(now()) @map("created_at") @db.Timestamp(6)
+  userId    String?   @db.Uuid @map("user_id")
+
+  @@map("researched")
+}
+
+/// Survey completion rewards.
+/// UNIQUE (user_id, survey_id) enforces server-side deduplication.
+model SurveyReward {
+  id              String    @id @default(uuid()) @db.Uuid
+  createdAt       DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  userId          String    @db.Uuid @map("user_id")
+  surveyId        String    @map("survey_id")
+  surveyName      String?   @map("survey_name")
+  stardustGranted Int       @default(5) @map("stardust_granted")
+
+  @@unique([userId, surveyId], name: "survey_rewards_user_survey_unique")
+  @@map("survey_rewards")
+}
+
+// ─────────────────────────────────────────────────────
+// ANOMALIES / DISCOVERIES
+// ─────────────────────────────────────────────────────
+
+model LinkedAnomaly {
+  id               BigInt    @id @default(autoincrement())
+  author           String    @db.Uuid
+  anomalyId        BigInt    @map("anomaly_id")
+  classificationId BigInt?   @map("classification_id")
+  date             DateTime  @default(now()) @db.Timestamptz(6)
+  automaton        String?
+  unlocked         Boolean?
+  unlockTime       DateTime? @map("unlock_time") @db.Timestamptz(6)
+
+  @@map("linked_anomalies")
+}
+
+// ─────────────────────────────────────────────────────
+// STRUCTURES & MISSIONS (DEPLOYMENT SYSTEM)
+// ─────────────────────────────────────────────────────
+
+model Inventory {
+  id           BigInt    @id @default(autoincrement())
+  item         BigInt?
+  owner        String?   @db.Uuid
+  quantity     Float?
+  notes        String?
+  timeOfDeploy DateTime? @map("time_of_deploy") @db.Timestamptz(6)
+  anomaly      BigInt?
+  parentItem   BigInt?   @map("parentItem")
+  configuration Json?
+  terrarium    BigInt?
+
+  @@map("inventory")
+}
+
+model Mission {
+  id                BigInt    @id @default(autoincrement())
+  /// Maps to the `user` column (reserved word in SQL — kept as-is in DB)
+  userId            String?   @db.Uuid @map("user")
+  timeOfCompletion  DateTime? @map("time_of_completion") @db.Timestamptz(6)
+  mission           BigInt?
+  configuration     Json?
+  rewardedItems     BigInt[]  @map("rewarded_items")
+
+  @@map("missions")
+}
+
+model Route {
+  id                  BigInt    @id @default(autoincrement())
+  author              String    @db.Uuid
+  routeConfiguration  Json?     @map("routeConfiguration")
+  timestamp           DateTime  @default(now()) @db.Timestamptz(6)
+  location            BigInt
+
+  @@map("routes")
+}
+
+// ─────────────────────────────────────────────────────
+// MINERALS
+// ─────────────────────────────────────────────────────
+
+/// Mineral deposits discovered on anomalies.
+/// NOTE: Table name uses camelCase in DB (legacy). Tracked in ticket sdd-7a3f1c.
+model MineralDeposit {
+  id                   BigInt    @id @default(autoincrement())
+  anomaly              BigInt?
+  owner                String?   @db.Uuid
+  mineralConfiguration Json?     @map("mineral_configuration")
+  location             String?
+  discovery            BigInt?
+  createdAt            DateTime? @map("created_at") @db.Timestamptz(6)
+  roverName            String?   @map("rover_name")
+
+  @@map("mineral_deposits")
+}
+
+model UserMineralInventory {
+  id               BigInt    @id @default(autoincrement())
+  userId           String    @db.Uuid @map("user_id")
+  mineralDepositId BigInt    @map("mineral_deposit_id")
+  mineralType      String    @map("mineral_type")
+  quantity         Decimal   @db.Decimal
+  purity           Decimal   @db.Decimal
+  extractedAt      DateTime  @default(now()) @map("extracted_at") @db.Timestamptz(6)
+  createdAt        DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@map("user_mineral_inventory")
+}
+
+// ─────────────────────────────────────────────────────
+// EVENTS & SOLAR SYSTEM
+// ─────────────────────────────────────────────────────
+
+model Event {
+  id                     BigInt    @id @default(autoincrement())
+  location               BigInt
+  classificationLocation BigInt    @map("classification_location")
+  type                   String
+  configuration          Json
+  time                   DateTime  @default(now()) @db.Timestamptz(6)
+  completed              Boolean   @default(false)
+
+  @@map("events")
+}
+
+model DefensiveProbe {
+  id         String    @id @default(uuid()) @db.Uuid
+  eventId    String?   @db.Uuid @map("event_id")
+  userId     String?   @db.Uuid @map("user_id")
+  count      Int       @default(1)
+  launchedAt DateTime? @default(now()) @map("launched_at") @db.Timestamptz(6)
+
+  @@map("defensive_probes")
+}
+
+model SolarEvent {
+  id          String    @id @default(uuid()) @db.Uuid
+  weekStart   DateTime  @map("week_start") @db.Date
+  weekEnd     DateTime  @map("week_end") @db.Date
+  wasDefended Boolean?  @default(false) @map("was_defended")
+  createdAt   DateTime? @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime? @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  @@map("solar_events")
+}
+
+// ─────────────────────────────────────────────────────
+// NOTIFICATIONS & PUSH
+// ─────────────────────────────────────────────────────
+
+model PushSubscription {
+  id        String    @id @default(uuid()) @db.Uuid
+  profileId String    @db.Uuid @map("profile_id")
+  endpoint  String
+  p256dh    String
+  auth      String
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@map("push_subscriptions")
+}
+
+model NotificationRejection {
+  id        String    @id @default(uuid()) @db.Uuid
+  profileId String    @db.Uuid @map("profile_id")
+  createdAt DateTime? @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@map("notification_rejections")
+}
+
+/// Tracks which anomaly push notifications have been sent to avoid duplicates.
+/// Only used by scripts (notify-unclassified-discoveries.ts), not the web app.
+model PushAnomalyLog {
+  id        String    @id @default(uuid()) @db.Uuid
+  anomalyId BigInt    @map("anomaly_id")
+  sentAt    DateTime? @default(now()) @map("sent_at") @db.Timestamptz(6)
+
+  @@map("push_anomaly_log")
+}
+
+// ─────────────────────────────────────────────────────
+// FEEDBACK
+// ─────────────────────────────────────────────────────
+
+/// Legacy NPS survey responses (pre-PostHog migration).
+/// PostHog now handles surveys; this table retained for historical data.
+model NpsSurvey {
+  id               String    @id @default(uuid()) @db.Uuid
+  createdAt        DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt        DateTime? @default(now()) @map("updated_at") @db.Timestamptz(6)
+  npsScore         Int       @map("nps_score")
+  projectInterests String?   @map("project_interests")
+  userId           String?   @db.Uuid @map("user_id")
+  userAgent        String?   @map("user_agent")
+  ipAddress        String?   @map("ip_address")
+  sessionId        String?   @map("session_id")
+
+  @@map("nps_surveys")
+}
+
+// ─────────────────────────────────────────────────────
+// LEGACY / DEPRECATED — do not use in new code
+// ─────────────────────────────────────────────────────
+
+// NOTE: UserAnomaly (user_anomalies) — DROPPED in migration 20260223000003.
+//   Data migrated to linked_anomalies with automaton='historical'.
+// NOTE: UnlockedTechnology (unlocked_technologies) — DROPPED in migration 20260223000004.
+//   Was 0 rows. Superseded by researched.
+// NOTE: Sector (sectors) — DROPPED in migration 20260223000004. Was 0 rows.
+
+/// @deprecated Zoo was an early feature for user-captured specimen storage.
+/// 1 reference in codebase (read-only list). No writes. Evaluate for removal.
+model Zoo {
+  id            BigInt    @id @default(autoincrement())
+  author        String    @db.Uuid
+  owner         String    @db.Uuid
+  location      BigInt?
+  configuration Json?
+  uploaded      BigInt?
+  content       String?
+  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  fileUrl       String    @map("file_url")
+
+  @@map("zoo")
+}
+

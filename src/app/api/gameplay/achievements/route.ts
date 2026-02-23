@@ -32,7 +32,7 @@ export async function GET() {
         .select("id, anomaly, classificationtype")
         .eq("author", userId),
       supabase
-        .from("mineralDeposits")
+        .from("mineral_deposits")
         .select("id", { count: "exact", head: true })
         .eq("owner", userId),
     ]);
@@ -98,8 +98,8 @@ export async function GET() {
         .eq("classificationtype", "cloud")
         .in("anomaly", anomalyIds),
       supabase
-        .from("mineralDeposits")
-        .select("anomaly, mineralconfiguration")
+        .from("mineral_deposits")
+        .select("anomaly, mineral_configuration")
         .in("anomaly", anomalyIds),
     ]);
 
@@ -152,7 +152,7 @@ export async function GET() {
       let hasWater = false;
       if (requiresWater) {
         hasWater = deposits.some((deposit) => {
-          const config = deposit.mineralconfiguration;
+          const config = deposit.mineral_configuration;
           const type = config?.type?.toLowerCase?.() || "";
           return type.includes("water") || type.includes("ice") || type.includes("h2o");
         });

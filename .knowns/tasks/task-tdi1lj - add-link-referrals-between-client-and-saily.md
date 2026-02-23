@@ -1,7 +1,7 @@
 ---
 id: tdi1lj
 title: "Add link/referrals between client and saily"
-status: in-progress
+status: blocked
 priority: high
 labels:
   - refs
@@ -9,6 +9,7 @@ labels:
   - invites
   - saily
   - client
+blockerNotes: "Saily team must define referral URL contract and SDK configuration before link-builder can be implemented"
 specRefs:
   - "specs/migration/two-two-migration"
 spec: "specs/migration/two-two-migration"

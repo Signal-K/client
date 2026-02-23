@@ -44,4 +44,16 @@ describe("classification-list helper", () => {
       })
     ).rejects.toThrow("db failed");
   });
+
+  it("returns empty array when data is null and no error", async () => {
+    const supabase = createSupabaseResult(null, null);
+
+    const rows = await fetchClassificationsForVoting({
+      supabase,
+      classificationType: "cloud",
+      getImages: () => [],
+    });
+
+    expect(rows).toEqual([]);
+  });
 });

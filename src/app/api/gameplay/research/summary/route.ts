@@ -16,7 +16,7 @@ export async function GET() {
 
   const userId = user.id;
 
-  const [researched, classifications] = await Promise.all([
+  const [researched, classifications, surveyRewards] = await Promise.all([
     prisma.$queryRaw<Array<{ tech_type: string; created_at: string }>>`
       SELECT tech_type, created_at
       FROM researched
@@ -26,6 +26,11 @@ export async function GET() {
       SELECT classificationtype
       FROM classifications
       WHERE author = ${userId}
+    `,
+    prisma.$queryRaw<Array<{ stardust_granted: number }>>`
+      SELECT stardust_granted
+      FROM survey_rewards
+      WHERE user_id = ${userId}::uuid
     `,
   ]);
 
@@ -75,7 +80,8 @@ export async function GET() {
     return total + (QUANTITY_UPGRADES.includes(tech) ? 10 : 2);
   }, 0);
 
-  const availableStardust = Math.max(0, counts.all - researchPenalty);
+  const surveyBonus = surveyRewards.reduce((sum, r) => sum + (r.stardust_granted ?? 0), 0);
+  const availableStardust = Math.max(0, counts.all + surveyBonus - researchPenalty);
 
   return NextResponse.json({
     userId,
@@ -84,6 +90,7 @@ export async function GET() {
     referralCode,
     referralCount,
     referralBonus,
+    surveyBonus,
     counts,
     availableStardust,
     upgrades: {

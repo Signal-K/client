@@ -145,14 +145,18 @@ jobs:
       - name: Run lint
         run: yarn lint
 
-      - name: Run Cypress smoke (minimal)
-        if: github.event_name == 'push' && github.ref_name == 'main'
-        run: env -u ELECTRON_RUN_AS_NODE yarn start-server-and-test "yarn dev" http://localhost:3000 "yarn test:e2e:smoke:minimal"
+      - name: Run E2E tests (minimal smoke for regular pushes)
+        if: github.event_name == 'push' && github.ref_name != 'main'
+        run: yarn test:e2e:smoke:minimal
 
-      - name: Run Cypress smoke (full for PR to main) with coverage
+      - name: Run E2E tests (full suite for main branch pushes)
+        if: github.event_name == 'push' && github.ref_name == 'main'
+        run: yarn test:e2e
+
+      - name: Run E2E tests (full suite for PR to main)
         if: >
           github.event_name == 'pull_request' && github.base_ref == 'main'
-        run: env -u ELECTRON_RUN_AS_NODE yarn start-server-and-test "yarn dev" http://localhost:3000 "CYPRESS_COVERAGE=true yarn test:e2e:smoke:full"
+        run: yarn test:e2e
 
       - name: Upload e2e coverage
         if: >

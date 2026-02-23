@@ -131,5 +131,6 @@ export {
   SheetTrigger,
   SheetContent,
   SheetHeader,
+  SheetFooter,
   SheetTitle,
 }

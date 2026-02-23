@@ -48,7 +48,7 @@ export async function fetchUserUpgrades(
     (data as any[]).forEach((row) => {
       const t = (row.tech_type || "").toString().toLowerCase();
 
-      if (t.includes("probereceptor") || t.includes("probereceptors")) {
+      if (t.includes("probereceptor")) {
         hasTelescopeUpgrade = true;
         telescopeReceptorUpgrades += 1;
       }
@@ -58,11 +58,11 @@ export async function fetchUserUpgrades(
         satelliteExtras += 1;
       }
 
-      if (t.includes("findmineral") || t.includes("findminerals")) {
+      if (t.includes("findmineral")) {
         hasFindMinerals = true;
       }
 
-      if (t.includes("p4mineral") || t.includes("p4minerals")) {
+      if (t.includes("p4mineral")) {
         hasP4FindMinerals = true;
       }
 
@@ -70,7 +70,7 @@ export async function fetchUserUpgrades(
         hasSpectroscopy = true;
       }
 
-      if (t.includes("roverwaypoint") || t.includes("roverwaypoints")) {
+      if (t.includes("roverwaypoint")) {
         // rover waypoint research unlocks level 2 rover capabilities
         derivedRoverLevel = Math.max(derivedRoverLevel, 2);
         roverWaypointUpgrades += 1;
@@ -90,37 +90,6 @@ export async function fetchUserUpgrades(
   } catch (error) {
     console.error('Error in fetchUserUpgrades:', error);
     return getDefaultUpgrades();
-  }
-}
-
-/**
- * Get satellite count for a user
- * @param supabase - Supabase client instance
- * @param userId - User ID to fetch satellite count for
- * @returns Number of satellites available (1 base + upgrades)
- */
-async function getSatelliteCount(
-  supabase: SupabaseClient,
-  userId: string
-): Promise<number> {
-  try {
-    const { data, error } = await supabase
-      .from("researched")
-      .select("tech_type")
-      .eq("user_id", userId)
-      .ilike("tech_type", "%satellite%");
-
-    if (error) {
-      console.error("Error fetching satellite count:", error);
-      return 1; // Default to 1 satellite
-    }
-
-    // Count all satellite upgrades
-    const satelliteUpgrades = data?.length || 0;
-    return 1 + satelliteUpgrades;
-  } catch (error) {
-    console.error('Error in getSatelliteCount:', error);
-    return 1; // Default to 1 satellite
   }
 }
 
@@ -145,7 +114,7 @@ export async function hasUpgrade(
       .limit(1);
 
     if (error) {
-      console.error(`Error checking for ${techType} upgrade:`, error);
+      // Silently return false if upgrade check fails
       return false;
     }
 

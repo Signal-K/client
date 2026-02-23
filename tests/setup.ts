@@ -38,3 +38,12 @@ vi.mock('next/navigation', () => ({
 afterEach(() => {
   cleanup()
 })
+
+// Polyfill ResizeObserver for Radix UI components that depend on it
+if (typeof global.ResizeObserver === "undefined") {
+  global.ResizeObserver = class ResizeObserver {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  };
+}

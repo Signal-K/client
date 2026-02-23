@@ -49,7 +49,7 @@ export async function updateProfileSetupAction(formData: FormData) {
     return { ok: false as const, error: "Username is required." };
   }
 
-  let avatar_url = existingAvatarPreview || null;
+  let avatar_url: string | null = existingAvatarPreview && existingAvatarPreview.trim() ? existingAvatarPreview : null;
   if (avatar && avatar instanceof File && avatar.size > 0) {
     const fileName = `${Date.now()}-${user.id}-avatar.png`;
     const { data, error } = await supabase.storage

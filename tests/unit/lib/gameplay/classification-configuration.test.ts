@@ -64,4 +64,33 @@ describe("classification-configuration helper", () => {
     expect(result.ok).toBe(false);
     expect(result.error).toContain("network down");
   });
+
+  it("uses fallback message when error response has no error field", async () => {
+    const fetchMock = vi.mocked(fetch);
+    fetchMock.mockResolvedValue({
+      ok: false,
+      json: async () => ({}),
+    } as Response);
+
+    const result = await updateClassificationConfiguration({
+      classificationId: 5,
+      action: "increment_vote",
+    });
+
+    expect(result.ok).toBe(false);
+    expect(result.error).toBe("Failed to update classification configuration");
+  });
+
+  it("uses fallback message when thrown error has no message", async () => {
+    const fetchMock = vi.mocked(fetch);
+    fetchMock.mockRejectedValue({ code: 42 }); // error object with no .message
+
+    const result = await updateClassificationConfiguration({
+      classificationId: 6,
+      action: "merge",
+    });
+
+    expect(result.ok).toBe(false);
+    expect(result.error).toBe("Failed to update classification configuration");
+  });
 });

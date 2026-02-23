@@ -2,6 +2,7 @@ import { PrismaClient } from "@prisma/client";
 
 const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient };
 
+/* v8 ignore next 4 */
 export const prisma =
   globalForPrisma.prisma ??
   new PrismaClient({

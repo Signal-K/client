@@ -524,29 +524,29 @@ export default function ClientClassificationPage({ id }: Props) {
                 <div className="font-medium text-amber-700 dark:text-amber-300">
                   Type:{" "}
                   <span className="font-bold text-amber-900 dark:text-amber-100">
-                    {mineralDeposit.mineralconfiguration?.type || 'Unknown'}
+                    {mineralDeposit.mineral_configuration?.type || 'Unknown'}
                   </span>
                 </div>
                 <div className="font-medium text-amber-700 dark:text-amber-300">
                   Purity:{" "}
                   <span className="font-bold text-amber-900 dark:text-amber-100">
-                    {mineralDeposit.mineralconfiguration?.purity 
-                      ? `${(mineralDeposit.mineralconfiguration.purity * 100).toFixed(1)}%`
+                    {mineralDeposit.mineral_configuration?.purity 
+                      ? `${(mineralDeposit.mineral_configuration.purity * 100).toFixed(1)}%`
                       : 'N/A'}
                   </span>
                 </div>
                 <div className="font-medium text-amber-700 dark:text-amber-300">
                   Amount:{" "}
                   <span className="font-bold text-amber-900 dark:text-amber-100">
-                    {mineralDeposit.mineralconfiguration?.amount 
-                      ? `${Math.round(mineralDeposit.mineralconfiguration.amount)} units`
+                    {mineralDeposit.mineral_configuration?.amount 
+                      ? `${Math.round(mineralDeposit.mineral_configuration.amount)} units`
                       : 'N/A'}
                   </span>
                 </div>
                 <div className="font-medium text-amber-700 dark:text-amber-300">
                   Source:{" "}
                   <span className="font-bold text-amber-900 dark:text-amber-100">
-                    {mineralDeposit.mineralconfiguration?.metadata?.source || 'Unknown'}
+                    {mineralDeposit.mineral_configuration?.metadata?.source || 'Unknown'}
                   </span>
                 </div>
               </div>

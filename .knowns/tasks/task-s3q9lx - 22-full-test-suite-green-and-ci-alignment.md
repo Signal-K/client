@@ -1,13 +1,14 @@
 ---
 id: s3q9lx
 title: "2.2 full test suite green and CI alignment"
-status: in-progress
+status: blocked
 priority: high
 labels:
   - migration-2.2
   - testing
   - ci
   - reliability
+blockerNotes: "npm run build fails due to Next.js app-router manifest issues during prerender phase; blocks completion of AC#4 (final run evidence)"
 specRefs:
   - "specs/migration/two-two-migration"
 spec: "specs/migration/two-two-migration"
