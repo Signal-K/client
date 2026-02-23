@@ -418,6 +418,9 @@ export default defineConfig({
         requestTimeout: 60000,
         responseTimeout: 60000,
         pageLoadTimeout: 120000,
+        // Reduce memory pressure in long CI runs to avoid Electron renderer crashes.
+        numTestsKeptInMemory: 0,
+        experimentalMemoryManagement: true,
         // Docker-specific settings
         chromeWebSecurity: false,
         retries: {

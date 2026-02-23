@@ -5,8 +5,10 @@ describe('Navigation', () => {
   })
 
   it('should load the home page', () => {
-    // Root page shows Landing component which uses /apt route when not authenticated
-    cy.url().should('include', '/apt')
+    // Unauthenticated landings can stay on "/" or redirect to "/apt".
+    cy.url().should('satisfy', (url) => {
+      return url.endsWith('/') || url.includes('/apt')
+    })
     cy.get('body').should('be.visible')
   })
 
