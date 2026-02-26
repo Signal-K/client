@@ -38,6 +38,7 @@
     "test:e2e:headless": "SKIP_USER_CREATION_TESTS=true npx start-server-and-test 'yarn dev' 3000 'env -u ELECTRON_RUN_AS_NODE cypress run --headless'",
     "test:e2e:frontend-persistence": "scripts/tests/run-e2e-frontend-persistence.sh",
     "test:suite:local": "scripts/tests/run-local-suite.sh",
+    "coverage:e2e": "npm run test:e2e:coverage",
     "coverage:all": "npm run coverage:unit && npm run test:e2e:coverage",
     "test:all": "npm run test:unit && npm run test:e2e",
     "docker:test:unit": "docker-compose -f ops/compose/docker-compose.test.yml --profile unit up --build --abort-on-container-exit",

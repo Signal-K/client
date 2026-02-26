@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import EnhancedAuthPage from "@/src/components/profile/auth/EnhancedAuth";
 import { useAuthUser } from "@/src/hooks/useAuthUser";
 
-const Login = () => {
+function LoginContent() {
     const { user, isLoading } = useAuthUser();
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -21,6 +21,12 @@ const Login = () => {
     }, [isLoading, user, router, searchParams]);
 
     return <EnhancedAuthPage />;
-};
+}
 
-export default Login;
+export default function Login() {
+  return (
+    <Suspense fallback={<EnhancedAuthPage />}>
+      <LoginContent />
+    </Suspense>
+  );
+}

@@ -1,11 +1,12 @@
 "use client";
 
+import { Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 import EnhancedAuthPage from "@/src/components/profile/auth/EnhancedAuth";
 import { useAuthUser } from "@/src/hooks/useAuthUser";
 
-const Register = () => {
+function RegisterContent() {
     const { user, isLoading } = useAuthUser();
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -21,6 +22,12 @@ const Register = () => {
     }, [isLoading, user, router, searchParams]);
 
     return <EnhancedAuthPage />;
-};
+}
 
-export default Register;
+export default function Register() {
+  return (
+    <Suspense fallback={<EnhancedAuthPage />}>
+      <RegisterContent />
+    </Suspense>
+  );
+}
