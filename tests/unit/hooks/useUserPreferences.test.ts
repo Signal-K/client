@@ -1,5 +1,5 @@
 import { renderHook, act, waitFor } from "@testing-library/react";
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach, vi } from "vitest";
 import { useUserPreferences } from "@/src/hooks/useUserPreferences";
 
 const STORAGE_KEY = "star-sailors-preferences";
@@ -167,5 +167,42 @@ describe("useUserPreferences", () => {
     const { result } = renderHook(() => useUserPreferences());
     await waitFor(() => expect(result.current.isLoading).toBe(false));
     expect(result.current.isProjectInterested("planet-hunting")).toBe(true);
+  });
+
+  it("does not crash when localStorage access throws during initialization", async () => {
+    const getItemSpy = vi
+      .spyOn(Storage.prototype, "getItem")
+      .mockImplementation(() => {
+        throw new Error("storage blocked");
+      });
+
+    const { result } = renderHook(() => useUserPreferences());
+
+    await waitFor(() => {
+      expect(result.current.isLoading).toBe(false);
+    });
+    expect(result.current.preferences.hasCompletedOnboarding).toBe(false);
+    expect(result.current.needsPreferencesPrompt).toBe(true);
+
+    getItemSpy.mockRestore();
+  });
+
+  it("does not crash when localStorage write throws while saving preferences", async () => {
+    const setItemSpy = vi
+      .spyOn(Storage.prototype, "setItem")
+      .mockImplementation(() => {
+        throw new Error("quota exceeded");
+      });
+
+    const { result } = renderHook(() => useUserPreferences());
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+    act(() => {
+      result.current.completeOnboarding();
+    });
+
+    expect(result.current.preferences.hasCompletedOnboarding).toBe(true);
+
+    setItemSpy.mockRestore();
   });
 });

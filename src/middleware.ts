@@ -24,22 +24,30 @@ export async function middleware(req: NextRequest) {
     }
   );
 
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
-
-  if (session && req.nextUrl.pathname === "/") {
-    const redirectUrl = new URL("/game", req.url);
-    return NextResponse.redirect(redirectUrl);
+  let userId: string | null = null;
+  try {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    userId = user?.id ?? null;
+  } catch {
+    userId = null;
   }
 
-  if (!session && req.nextUrl.pathname.startsWith("/game")) {
-    return NextResponse.redirect(new URL("/", req.url));
+  if (!userId && req.nextUrl.pathname.startsWith("/game")) {
+    const loginUrl = new URL("/auth", req.url);
+    const nextPath = `${req.nextUrl.pathname}${req.nextUrl.search}`;
+    loginUrl.searchParams.set("next", nextPath);
+    return NextResponse.redirect(loginUrl);
+  }
+
+  if (userId && req.nextUrl.pathname.startsWith("/auth")) {
+    return NextResponse.redirect(new URL("/game", req.url));
   }
 
   return res;
 }
 
 export const config = {
-  matcher: ["/", "/game/:path*"],
+  matcher: ["/game/:path*", "/auth/:path*"],
 };

@@ -8,18 +8,22 @@ const CACHE_KEY = 'pageDataCache';
 
 const getCachedData = () => {
   if (typeof window === 'undefined') return null;
-  const cached = localStorage.getItem(CACHE_KEY);
-  if (cached) {
-    try {
-      // Basic validation
-      const data = JSON.parse(cached);
-      if (data && typeof data === 'object') {
-        return data;
+  try {
+    const cached = localStorage.getItem(CACHE_KEY);
+    if (cached) {
+      try {
+        // Basic validation
+        const data = JSON.parse(cached);
+        if (data && typeof data === 'object') {
+          return data;
+        }
+      } catch (e) {
+        console.error("Failed to parse cached data", e);
+        localStorage.removeItem(CACHE_KEY);
       }
-    } catch (e) {
-      console.error("Failed to parse cached data", e);
-      localStorage.removeItem(CACHE_KEY);
     }
+  } catch (e) {
+    console.error("Failed to read cached data", e);
   }
   return null;
 };

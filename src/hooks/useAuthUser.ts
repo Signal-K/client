@@ -13,15 +13,38 @@ export function useAuthUser() {
   useEffect(() => {
     let isMounted = true;
 
-    supabase.auth.getUser().then(({ data, error }) => {
-      if (!isMounted) return;
-      if (error) {
+    supabase.auth
+      .getSession()
+      .then(async ({ data }) => {
+        if (!isMounted) return;
+
+        const sessionUser = data.session?.user ?? null;
+        if (sessionUser) {
+          setUser(sessionUser);
+        }
+
+        try {
+          const { data: userData, error } = await supabase.auth.getUser();
+          if (!isMounted) return;
+          if (!error) {
+            setUser(userData.user ?? sessionUser);
+          } else if (!sessionUser) {
+            setUser(null);
+          }
+        } catch {
+          if (!isMounted || sessionUser) return;
+          setUser(null);
+        } finally {
+          if (isMounted) {
+            setIsLoading(false);
+          }
+        }
+      })
+      .catch(() => {
+        if (!isMounted) return;
         setUser(null);
-      } else {
-        setUser(data.user ?? null);
-      }
-      setIsLoading(false);
-    });
+        setIsLoading(false);
+      });
 
     const {
       data: { subscription },

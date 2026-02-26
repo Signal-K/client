@@ -117,6 +117,24 @@ const POSTHOG_SURVEY_COOLDOWN_MS = 14 * 24 * 60 * 60 * 1000;
 const SURVEY_REWARD_GRANTED_KEY = "posthog_survey_webapp_22_reward_granted_v1";
 const SURVEY_REWARD_STARDUST = 5;
 
+function safeStorageGet(key: string): string | null {
+  if (typeof window === "undefined") return null;
+  try {
+    return window.localStorage.getItem(key);
+  } catch {
+    return null;
+  }
+}
+
+function safeStorageSet(key: string, value: string) {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(key, value);
+  } catch {
+    // Ignore storage write failures (private mode/storage restrictions).
+  }
+}
+
 // Create a separate component for the search params logic
 function GamePageContent() {
   const { user, isLoading: isAuthLoading } = useAuthUser();
@@ -161,7 +179,7 @@ function GamePageContent() {
   const handleSurveyReward = useCallback(async () => {
     if (!user || typeof window === "undefined") return;
     try {
-      const alreadyRewarded = window.localStorage.getItem(SURVEY_REWARD_GRANTED_KEY) === "1";
+      const alreadyRewarded = safeStorageGet(SURVEY_REWARD_GRANTED_KEY) === "1";
       if (alreadyRewarded) return; // Silent — already handled
 
       const res = await fetch("/api/gameplay/survey-reward", {
@@ -179,13 +197,13 @@ function GamePageContent() {
       };
 
       if (data.alreadyGranted) {
-        window.localStorage.setItem(SURVEY_REWARD_GRANTED_KEY, "1");
+        safeStorageSet(SURVEY_REWARD_GRANTED_KEY, "1");
         // No toast — silently dedup server-side (client missed the key)
         return;
       }
 
       if (data.granted) {
-        window.localStorage.setItem(SURVEY_REWARD_GRANTED_KEY, "1");
+        safeStorageSet(SURVEY_REWARD_GRANTED_KEY, "1");
         setSurveyRewardToast({
           variant: "success",
           title: `⭐ +${data.stardust ?? SURVEY_REWARD_STARDUST} Stardust`,
@@ -384,8 +402,8 @@ function GamePageContent() {
             return;
           }
 
-          const alreadyShown = window.localStorage.getItem(POSTHOG_SURVEY_SHOWN_KEY) === "1";
-          const lastShownRaw = window.localStorage.getItem(POSTHOG_SURVEY_LAST_SHOWN_AT_KEY);
+      const alreadyShown = safeStorageGet(POSTHOG_SURVEY_SHOWN_KEY) === "1";
+      const lastShownRaw = safeStorageGet(POSTHOG_SURVEY_LAST_SHOWN_AT_KEY);
           const lastShown = lastShownRaw ? Number(lastShownRaw) : 0;
           const inCooldown = Number.isFinite(lastShown) && Date.now() - lastShown < POSTHOG_SURVEY_COOLDOWN_MS;
 
@@ -415,9 +433,9 @@ function GamePageContent() {
               linked_anomalies: linkedAnomalies.length,
               meaningful_viewports: meaningfulViewports,
             });
-            window.localStorage.setItem(POSTHOG_SURVEY_SHOWN_KEY, "1");
-            window.localStorage.setItem(POSTHOG_SURVEY_LAST_SHOWN_AT_KEY, String(Date.now()));
-          }, 12000);
+        safeStorageSet(POSTHOG_SURVEY_SHOWN_KEY, "1");
+        safeStorageSet(POSTHOG_SURVEY_LAST_SHOWN_AT_KEY, String(Date.now()));
+      }, 12000);
 
           return () => window.clearTimeout(timeout);
         }, [
@@ -435,7 +453,7 @@ function GamePageContent() {
         // Redirect unauthenticated users
         useEffect(() => {
           if (!isAuthLoading && !user) {
-            router.push("/");
+            router.replace("/auth?next=/game");
           }
         }, [isAuthLoading, user, router]);
 

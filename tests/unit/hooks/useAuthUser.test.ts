@@ -2,11 +2,13 @@ import { renderHook, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
 const mockGetUser = vi.hoisted(() => vi.fn());
+const mockGetSession = vi.hoisted(() => vi.fn());
 const mockOnAuthStateChange = vi.hoisted(() => vi.fn());
 
 vi.mock("@/lib/supabase/browser", () => {
   const client = {
     auth: {
+      getSession: mockGetSession,
       getUser: mockGetUser,
       onAuthStateChange: mockOnAuthStateChange,
     },
@@ -19,6 +21,7 @@ import { useAuthUser } from "@/src/hooks/useAuthUser";
 describe("useAuthUser", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockGetSession.mockResolvedValue({ data: { session: null }, error: null });
     mockGetUser.mockResolvedValue({ data: { user: null }, error: null });
     mockOnAuthStateChange.mockReturnValue({
       data: { subscription: { unsubscribe: vi.fn() } },
@@ -26,13 +29,13 @@ describe("useAuthUser", () => {
   });
 
   it("starts with isLoading=true", () => {
-    mockGetUser.mockReturnValue(new Promise(() => {})); // never resolves
+    mockGetSession.mockReturnValue(new Promise(() => {})); // never resolves
     const { result } = renderHook(() => useAuthUser());
     expect(result.current.isLoading).toBe(true);
   });
 
   it("starts with user=null", () => {
-    mockGetUser.mockReturnValue(new Promise(() => {}));
+    mockGetSession.mockReturnValue(new Promise(() => {}));
     const { result } = renderHook(() => useAuthUser());
     expect(result.current.user).toBeNull();
   });
@@ -111,5 +114,29 @@ describe("useAuthUser", () => {
     });
 
     expect(result.current.user).toBeNull();
+  });
+
+  it("recovers when getSession rejects", async () => {
+    mockGetSession.mockRejectedValue(new Error("session bootstrap failed"));
+
+    const { result } = renderHook(() => useAuthUser());
+
+    await waitFor(() => {
+      expect(result.current.isLoading).toBe(false);
+      expect(result.current.user).toBeNull();
+    });
+  });
+
+  it("keeps session user when getUser throws after getSession success", async () => {
+    const sessionUser = { id: "session-user", email: "session@example.com" } as any;
+    mockGetSession.mockResolvedValue({ data: { session: { user: sessionUser } }, error: null });
+    mockGetUser.mockRejectedValue(new Error("user endpoint failed"));
+
+    const { result } = renderHook(() => useAuthUser());
+
+    await waitFor(() => {
+      expect(result.current.isLoading).toBe(false);
+      expect(result.current.user).toEqual(sessionUser);
+    });
   });
 });

@@ -129,4 +129,24 @@ describe("usePageData", () => {
     expect(consoleSpy).toHaveBeenCalled()
     consoleSpy.mockRestore()
   })
+
+  it("does not crash when localStorage getItem throws while loading cache", async () => {
+    mockUseSession.mockReturnValue(null)
+    const getItemSpy = vi
+      .spyOn(Storage.prototype, "getItem")
+      .mockImplementation(() => {
+        throw new Error("storage unavailable")
+      })
+
+    const { result } = renderHook(() => usePageData())
+
+    await waitFor(() => {
+      expect(result.current.refetchData).toBeTypeOf("function")
+    })
+
+    expect(result.current.loading).toBe(true)
+    expect(result.current.profile).toBeNull()
+
+    getItemSpy.mockRestore()
+  })
 })

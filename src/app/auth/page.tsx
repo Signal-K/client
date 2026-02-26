@@ -1,19 +1,24 @@
 "use client";
 
 import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import EnhancedAuthPage from "@/src/components/profile/auth/EnhancedAuth";
 import { useAuthUser } from "@/src/hooks/useAuthUser";
 
 const Login = () => {
-    const { user } = useAuthUser();
+    const { user, isLoading } = useAuthUser();
     const router = useRouter();
+    const searchParams = useSearchParams();
 
     useEffect(() => {
-        if (user) {
-            router.push('/game');
-        }
-    }, [user, router]);
+      if (isLoading || !user) return;
+      const nextPath = searchParams.get("next");
+      const destination =
+        nextPath && nextPath.startsWith("/") && !nextPath.startsWith("//")
+          ? nextPath
+          : "/game";
+      router.replace(destination);
+    }, [isLoading, user, router, searchParams]);
 
     return <EnhancedAuthPage />;
 };

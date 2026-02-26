@@ -1,15 +1,15 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
-const { mockGetSession, mockRedirect, mockNext } = vi.hoisted(() => {
-  const mockGetSession = vi.fn();
+const { mockGetUser, mockRedirect, mockNext } = vi.hoisted(() => {
+  const mockGetUser = vi.fn();
   const mockRedirect = vi.fn((url: URL) => ({ status: 302, headers: { location: url.toString() } }));
   const mockNext = vi.fn(() => ({ cookies: { set: vi.fn() } }));
-  return { mockGetSession, mockRedirect, mockNext };
+  return { mockGetUser, mockRedirect, mockNext };
 });
 
 vi.mock("@supabase/ssr", () => ({
   createServerClient: vi.fn(() => ({
-    auth: { getSession: mockGetSession },
+    auth: { getUser: mockGetUser },
   })),
 }));
 
@@ -43,37 +43,44 @@ describe("middleware", () => {
     vi.stubEnv("NEXT_PUBLIC_SUPABASE_ANON_KEY", "anon-key");
   });
 
-  it("redirects authenticated user from '/' to '/game'", async () => {
-    mockGetSession.mockResolvedValue({ data: { session: { user: { id: "1" } } } });
-    const req = makeRequest("/");
+  it("redirects unauthenticated user from '/game/something' to '/auth?next=...'", async () => {
+    mockGetUser.mockResolvedValue({ data: { user: null } });
+    const req = makeRequest("/game/something?view=telescope");
+    await middleware(req);
+    expect(mockRedirect).toHaveBeenCalledWith(
+      expect.objectContaining({
+        pathname: "/auth",
+        search: "?next=%2Fgame%2Fsomething%3Fview%3Dtelescope",
+      })
+    );
+  });
+
+  it("redirects unauthenticated user from '/game' to '/auth?next=/game'", async () => {
+    mockGetUser.mockResolvedValue({ data: { user: null } });
+    const req = makeRequest("/game");
+    await middleware(req);
+    expect(mockRedirect).toHaveBeenCalledWith(
+      expect.objectContaining({ pathname: "/auth", search: "?next=%2Fgame" })
+    );
+  });
+
+  it("redirects authenticated user from '/auth' to '/game'", async () => {
+    mockGetUser.mockResolvedValue({ data: { user: { id: "1" } } });
+    const req = makeRequest("/auth");
     await middleware(req);
     expect(mockRedirect).toHaveBeenCalledWith(expect.objectContaining({ pathname: "/game" }));
   });
 
-  it("redirects unauthenticated user from '/game/something' to '/'", async () => {
-    mockGetSession.mockResolvedValue({ data: { session: null } });
-    const req = makeRequest("/game/something");
-    await middleware(req);
-    expect(mockRedirect).toHaveBeenCalledWith(expect.objectContaining({ pathname: "/" }));
-  });
-
-  it("redirects unauthenticated user from '/game' to '/'", async () => {
-    mockGetSession.mockResolvedValue({ data: { session: null } });
-    const req = makeRequest("/game");
-    await middleware(req);
-    expect(mockRedirect).toHaveBeenCalledWith(expect.objectContaining({ pathname: "/" }));
-  });
-
-  it("passes through unauthenticated user on non-game path", async () => {
-    mockGetSession.mockResolvedValue({ data: { session: null } });
-    const req = makeRequest("/about");
+  it("passes through unauthenticated user on '/auth'", async () => {
+    mockGetUser.mockResolvedValue({ data: { user: null } });
+    const req = makeRequest("/auth");
     await middleware(req);
     expect(mockRedirect).not.toHaveBeenCalled();
     expect(mockNext).toHaveBeenCalled();
   });
 
-  it("passes through authenticated user on non-root path", async () => {
-    mockGetSession.mockResolvedValue({ data: { session: { user: { id: "1" } } } });
+  it("passes through authenticated user on '/game/missions'", async () => {
+    mockGetUser.mockResolvedValue({ data: { user: { id: "1" } } });
     const req = makeRequest("/game/missions");
     await middleware(req);
     expect(mockRedirect).not.toHaveBeenCalled();
