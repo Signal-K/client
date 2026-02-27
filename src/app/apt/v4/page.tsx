@@ -79,7 +79,7 @@ export default function V4Page() {
           key={s.key}
           id={s.key}
           className="relative flex h-screen min-h-[600px] snap-start overflow-hidden"
-          aria-label={s.headline.replace("\n", " ")}
+          aria-label={s.headline.replace(/\n/g, " ")}
         >
           <Image
             src={s.image}
