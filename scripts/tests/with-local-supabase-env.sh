@@ -1,8 +1,17 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+have_required_env() {
+  [[ -n "${DATABASE_URL:-}" && -n "${NEXT_PUBLIC_SUPABASE_URL:-}" && -n "${NEXT_PUBLIC_SUPABASE_ANON_KEY:-}" ]]
+}
+
+if have_required_env; then
+  export SUPABASE_URL="${SUPABASE_URL:-${NEXT_PUBLIC_SUPABASE_URL}}"
+  exec "$@"
+fi
+
 if ! command -v supabase >/dev/null 2>&1; then
-  echo "Supabase CLI is required for local e2e env bootstrap." >&2
+  echo "Supabase CLI is required for local e2e env bootstrap unless DATABASE_URL/NEXT_PUBLIC_SUPABASE_URL/NEXT_PUBLIC_SUPABASE_ANON_KEY are already set." >&2
   exit 1
 fi
 

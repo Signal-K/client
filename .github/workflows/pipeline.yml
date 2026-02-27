@@ -86,17 +86,14 @@ jobs:
           yarn install --frozen-lockfile
 
       - name: Setup Supabase CLI
-        if: github.event_name != 'push' || github.ref_name == 'main'
         uses: supabase/setup-cli@v1
         with:
           version: latest
 
       - name: Start local Supabase
-        if: github.event_name != 'push' || github.ref_name == 'main'
         run: supabase start
 
       - name: Normalize local test env defaults
-        if: github.event_name != 'push' || github.ref_name == 'main'
         run: |
           SUPABASE_URL="${SUPABASE_URL:-${{ vars.SUPABASE_URL }}}"
           NEXT_PUBLIC_SUPABASE_URL="${NEXT_PUBLIC_SUPABASE_URL:-${{ vars.NEXT_PUBLIC_SUPABASE_URL }}}"
