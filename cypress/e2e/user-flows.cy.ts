@@ -121,7 +121,7 @@ describe('User Flows', () => {
 
   it('should handle data persistence', () => {
     // Test that data persists across page reloads
-    cy.visit('/')
+    cy.visit('/apt')
     cy.wait(2000)
     
     // Reload the page

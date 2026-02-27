@@ -485,11 +485,11 @@ export default function CompactResearchPanel() {
   return (
     <div className="space-y-6">
       {/* Stardust Display */}
-      <div className="flex items-center justify-between p-4 bg-card rounded-lg border">
-        <div>
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between p-4 bg-card rounded-lg border">
+        <div className="min-w-0">
           <h2 className="text-lg font-semibold">Research Lab</h2>
           <p className="text-sm text-muted-foreground">Enhance your equipment with stardust</p>
-          <div className="mt-2 flex gap-4 text-xs text-muted-foreground">
+          <div className="mt-2 flex flex-wrap gap-3 text-xs text-muted-foreground">
             <div className="flex items-center gap-1">
               <span className="w-2 h-2 rounded-full bg-blue-500"></span>
               <span>Quantity upgrades: 10⭐</span>
@@ -500,8 +500,8 @@ export default function CompactResearchPanel() {
             </div>
           </div>
         </div>
-        <div className="text-right">
-          <div className="text-2xl font-bold">{upgradeData.availableStardust} ⭐</div>
+        <div className="text-left sm:text-right">
+          <div className="text-xl sm:text-2xl font-bold">{upgradeData.availableStardust} ⭐</div>
           <p className="text-xs text-muted-foreground">Available Stardust</p>
         </div>
       </div>
@@ -511,8 +511,8 @@ export default function CompactResearchPanel() {
         <div className="text-center py-8 text-muted-foreground">Loading upgrades...</div>
       ) : (
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="available" className="flex items-center gap-2">
+        <TabsList className="grid w-full h-auto grid-cols-2 p-1">
+          <TabsTrigger value="available" className="flex items-center justify-center gap-1.5 text-xs sm:text-sm py-1.5 sm:py-2 px-2">
             Available
             {availableUpgrades.length > 0 && (
               <Badge variant="default" className="text-xs">
@@ -520,7 +520,7 @@ export default function CompactResearchPanel() {
               </Badge>
             )}
           </TabsTrigger>
-          <TabsTrigger value="researched" className="flex items-center gap-2">
+          <TabsTrigger value="researched" className="flex items-center justify-center gap-1.5 text-xs sm:text-sm py-1.5 sm:py-2 px-2">
             Researched
             {researchedUpgrades.length > 0 && (
               <Badge variant="secondary" className="text-xs">
@@ -536,11 +536,11 @@ export default function CompactResearchPanel() {
               {/* Equipment Section */}
               {availableGrouped.equipment.length > 0 && (
                 <div>
-                  <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+                  <h3 className="text-base sm:text-lg font-semibold mb-3 flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full bg-blue-500"></span>
                     Equipment Upgrades
                   </h3>
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
                     {availableGrouped.equipment.map((upgrade) => (
                       <CompactUpgradeCard key={upgrade.id} {...upgrade} />
                     ))}
@@ -551,11 +551,11 @@ export default function CompactResearchPanel() {
               {/* Project/Data Section */}
               {availableGrouped.project.length > 0 && (
                 <div>
-                  <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+                  <h3 className="text-base sm:text-lg font-semibold mb-3 flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full bg-purple-500"></span>
                     Project & Data Unlocks
                   </h3>
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
                     {availableGrouped.project.map((upgrade) => (
                       <CompactUpgradeCard key={upgrade.id} {...upgrade} />
                     ))}
@@ -566,11 +566,11 @@ export default function CompactResearchPanel() {
               {/* Mining Section */}
               {availableGrouped.mining.length > 0 && (
                 <div>
-                  <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+                  <h3 className="text-base sm:text-lg font-semibold mb-3 flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full bg-amber-500"></span>
                     Mining & Extraction
                   </h3>
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
                     {availableGrouped.mining.map((upgrade) => (
                       <CompactUpgradeCard key={upgrade.id} {...upgrade} />
                     ))}
@@ -592,11 +592,11 @@ export default function CompactResearchPanel() {
               {/* Equipment Section */}
               {researchedGrouped.equipment.length > 0 && (
                 <div>
-                  <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+                  <h3 className="text-base sm:text-lg font-semibold mb-3 flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full bg-blue-500"></span>
                     Equipment Upgrades
                   </h3>
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
                     {researchedGrouped.equipment.map((upgrade) => (
                       <CompactUpgradeCard key={upgrade.id} {...upgrade} />
                     ))}
@@ -607,11 +607,11 @@ export default function CompactResearchPanel() {
               {/* Project/Data Section */}
               {researchedGrouped.project.length > 0 && (
                 <div>
-                  <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+                  <h3 className="text-base sm:text-lg font-semibold mb-3 flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full bg-purple-500"></span>
                     Project & Data Unlocks
                   </h3>
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
                     {researchedGrouped.project.map((upgrade) => (
                       <CompactUpgradeCard key={upgrade.id} {...upgrade} />
                     ))}
@@ -622,11 +622,11 @@ export default function CompactResearchPanel() {
               {/* Mining Section */}
               {researchedGrouped.mining.length > 0 && (
                 <div>
-                  <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+                  <h3 className="text-base sm:text-lg font-semibold mb-3 flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full bg-amber-500"></span>
                     Mining & Extraction
                   </h3>
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
                     {researchedGrouped.mining.map((upgrade) => (
                       <CompactUpgradeCard key={upgrade.id} {...upgrade} />
                     ))}

@@ -1,8 +1,10 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import GameNavbar from "@/src/components/layout/Tes";
 import { usePageData } from "@/hooks/usePageData";
+import MainHeader from "@/src/components/layout/Header/MainHeader";
+import { TelescopeBackground } from "@/src/components/classification/telescope/telescope-background";
+import UseDarkMode from "@/src/shared/hooks/useDarkMode";
 
 const SatellitePosition = dynamic(
   () => import("@/src/components/scenes/deploy/satellite/SatellitePosition"),
@@ -26,6 +28,7 @@ type PageSatellite = {
 
 export default function SatelliteViewportExpandedPage() {
   const { linkedAnomalies } = usePageData();
+  const { isDark, toggleDarkMode } = UseDarkMode();
 
   // Calculate start of week (Sunday 00:01 AEST)
   function getStartOfWeekAEST() {
@@ -68,16 +71,32 @@ export default function SatelliteViewportExpandedPage() {
   })();
 
   return (
-    <div className="h-screen w-full flex flex-col overflow-hidden">
-      <div className="w-full z-50 flex-shrink-0">
-        <GameNavbar />
-      </div>
-
-      <div className="flex-1 z-10 min-h-0 pt-12">
-        <SatellitePosition
-          satellites={satelliteData ? [satelliteData] : []}
-          flashingIndicator={satelliteData?.hasUnclassifiedAnomaly}
+    <div className="min-h-screen w-full relative overflow-hidden">
+      <div className="fixed inset-0 -z-10">
+        <TelescopeBackground
+          sectorX={0}
+          sectorY={0}
+          showAllAnomalies={false}
+          isDarkTheme={isDark}
+          variant="stars-only"
+          onAnomalyClick={() => {}}
         />
+      </div>
+      <MainHeader
+        isDark={isDark}
+        onThemeToggle={toggleDarkMode}
+        notificationsOpen={false}
+        onToggleNotifications={() => {}}
+        activityFeed={[]}
+        otherClassifications={[]}
+      />
+      <div className="pt-20 h-screen">
+        <div className="h-[calc(100vh-80px)] min-h-0 overflow-hidden">
+          <SatellitePosition
+            satellites={satelliteData ? [satelliteData] : []}
+            flashingIndicator={satelliteData?.hasUnclassifiedAnomaly}
+          />
+        </div>
       </div>
     </div>
   );

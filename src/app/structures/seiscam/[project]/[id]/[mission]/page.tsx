@@ -2,12 +2,13 @@
 
 import { useRouter, useParams } from "next/navigation";
 import { useSession, useSessionContext } from "@/src/lib/auth/session-context";
-import GameNavbar from "@/src/components/layout/Tes";
 import AI4M from "@/src/components/deployment/missions/structures/Astronomers/SatellitePhotos/AI4M/AIForMars";
 import PlanetFour from "@/src/components/deployment/missions/structures/Astronomers/SatellitePhotos/P4/PlanetFour";
 import React, { useEffect, useState } from "react";
 import { AiForMarsProjectWithID } from "@/src/components/projects/Auto/AI4Mars";
 import { RoverBackground } from "@/src/components/classification/telescope/rover-background";
+import MainHeader from "@/src/components/layout/Header/MainHeader";
+import UseDarkMode from "@/src/shared/hooks/useDarkMode";
 
 export default function SeiscamProjectRoute() {
   const params = useParams();
@@ -16,6 +17,7 @@ export default function SeiscamProjectRoute() {
   const router = useRouter();
 
   const { session, isLoading } = useSessionContext();
+  const { isDark, toggleDarkMode } = UseDarkMode();
 
   if (!isLoading && !session) {
     router.push("/");
@@ -54,11 +56,18 @@ export default function SeiscamProjectRoute() {
 
   return (
     <div className="relative min-h-screen w-full flex flex-col">
-        <GameNavbar />
+      <MainHeader
+        isDark={isDark}
+        onThemeToggle={toggleDarkMode}
+        notificationsOpen={false}
+        onToggleNotifications={() => {}}
+        activityFeed={[]}
+        otherClassifications={[]}
+      />
       <div className="fixed inset-0 z-10">
         <RoverBackground />
       </div>
-      <main className="relative z-20 py-8 pb-24 flex justify-center">
+      <main className="relative z-20 py-8 pb-24 pt-24 flex justify-center">
         <div className="w-full max-w-6xl px-4 bg-black/20 rounded-lg border border-[#78cc32]/30">
           {ProjectComponent}
         </div>

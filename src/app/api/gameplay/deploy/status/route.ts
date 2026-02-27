@@ -5,10 +5,29 @@ import { getRouteUser } from "@/lib/server/supabaseRoute";
 
 export const dynamic = "force-dynamic";
 
+const EMPTY_DEPLOYMENT_STATUS = {
+  deploymentStatus: {
+    telescope: {
+      deployed: false,
+      unclassifiedCount: 0,
+    },
+    satellites: {
+      deployed: false,
+      unclassifiedCount: 0,
+      available: false,
+    },
+    rover: {
+      deployed: false,
+      unclassifiedCount: 0,
+    },
+  },
+  planetTargets: [],
+};
+
 export async function GET() {
   const { user, authError } = await getRouteUser();
   if (authError || !user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return NextResponse.json(EMPTY_DEPLOYMENT_STATUS);
   }
 
   const oneWeekAgo = new Date();
@@ -20,32 +39,32 @@ export async function GET() {
         SELECT c.anomaly, a.content
         FROM classifications c
         LEFT JOIN anomalies a ON a.id = c.anomaly
-        WHERE c.author = ${user.id}
+        WHERE c.author = ${user.id}::uuid
           AND c.classificationtype = 'planet'
       `,
       prisma.$queryRaw<Array<{ anomaly_id: number }>>`
         SELECT anomaly_id
         FROM linked_anomalies
-        WHERE author = ${user.id}
+        WHERE author = ${user.id}::uuid
           AND automaton = 'Telescope'
           AND date >= ${oneWeekAgo.toISOString()}
       `,
       prisma.$queryRaw<Array<{ anomaly_id: number }>>`
         SELECT anomaly_id
         FROM linked_anomalies
-        WHERE author = ${user.id}
+        WHERE author = ${user.id}::uuid
           AND automaton = 'WeatherSatellite'
       `,
       prisma.$queryRaw<Array<{ anomaly_id: number }>>`
         SELECT anomaly_id
         FROM linked_anomalies
-        WHERE author = ${user.id}
+        WHERE author = ${user.id}::uuid
           AND automaton = 'Rover'
       `,
       prisma.$queryRaw<Array<{ anomaly: number }>>`
         SELECT anomaly
         FROM classifications
-        WHERE author = ${user.id}
+        WHERE author = ${user.id}::uuid
       `,
     ]);
 

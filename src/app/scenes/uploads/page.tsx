@@ -2,11 +2,14 @@
 
 import React, { useState, useEffect } from "react";
 import { useSession } from "@/src/lib/auth/session-context";
-import Navbar from "@/src/components/layout/Navbar";
 import Link from "next/link";
+import MainHeader from "@/src/components/layout/Header/MainHeader";
+import { TelescopeBackground } from "@/src/components/classification/telescope/telescope-background";
+import UseDarkMode from "@/src/shared/hooks/useDarkMode";
 
 const BiodomeStructureBase = () => {
   const session = useSession();
+  const { isDark, toggleDarkMode } = UseDarkMode();
   const [uploads, setUploads] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -30,18 +33,42 @@ const BiodomeStructureBase = () => {
   }, [session]);
 
   if (!session) {
-    return <p>Please log in to view your uploads.</p>;
+    return (
+      <div className="min-h-screen flex items-center justify-center text-sm text-muted-foreground">
+        Please log in to view your uploads.
+      </div>
+    );
   };
 
   return (
-    <div className="p-6">
-      <Navbar />
-      <h2 className="text-3xl font-bold mb-6">Your Uploads</h2>
+    <div className="min-h-screen relative">
+      <div className="fixed inset-0 -z-10">
+        <TelescopeBackground
+          sectorX={0}
+          sectorY={0}
+          showAllAnomalies={false}
+          isDarkTheme={isDark}
+          variant="stars-only"
+          onAnomalyClick={() => {}}
+        />
+      </div>
 
-      {loading ? (
-        <p>Loading...</p>
+      <MainHeader
+        isDark={isDark}
+        onThemeToggle={toggleDarkMode}
+        notificationsOpen={false}
+        onToggleNotifications={() => {}}
+        activityFeed={[]}
+        otherClassifications={[]}
+      />
+
+      <main className="pt-24 p-6 max-w-7xl mx-auto">
+        <h2 className="text-3xl font-bold mb-6 text-white">Your Uploads</h2>
+
+        {loading ? (
+        <p className="text-cyan-100/90">Loading...</p>
       ) : uploads.length === 0 ? (
-        <p>No uploads found.</p>
+        <p className="text-cyan-100/90">No uploads found.</p>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {uploads.map((upload) => {
@@ -57,8 +84,7 @@ const BiodomeStructureBase = () => {
             return (
               <div
                 key={upload.id}
-                className="relative bg-gray-800 text-white rounded-xl p-6 shadow-lg flex flex-col"
-                style={{ background: "#2D2D2D" }}
+                className="relative rounded-xl p-6 shadow-lg flex flex-col border border-cyan-300/20 bg-slate-900/70 text-white backdrop-blur-sm"
               >
                 <div className="absolute top-4 right-4 text-gray-400 text-sm">
                   {new Date(upload.created_at).toLocaleDateString()}
@@ -131,6 +157,7 @@ const BiodomeStructureBase = () => {
           })}
         </div>
       )}
+      </main>
     </div>
   );
 };

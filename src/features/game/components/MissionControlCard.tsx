@@ -54,13 +54,30 @@ export default function MissionControlCard({
     }
   };
 
+  const getPanelStyle = () => {
+    switch (variant) {
+      case "action":
+        return "bg-[linear-gradient(90deg,rgba(245,158,11,0.10),rgba(15,23,42,0.70),rgba(15,23,42,0.50))] border-amber-300/20";
+      case "status":
+        return "bg-[linear-gradient(90deg,rgba(16,185,129,0.10),rgba(15,23,42,0.70),rgba(15,23,42,0.50))] border-emerald-300/20";
+      case "progress":
+        return "bg-[linear-gradient(90deg,rgba(6,182,212,0.10),rgba(15,23,42,0.70),rgba(15,23,42,0.50))] border-cyan-300/20";
+      default:
+        return "bg-card/50 border-border/50";
+    }
+  };
+
   return (
     <div
       className={cn(
-        "flex items-center gap-3 p-4 rounded-xl bg-card/50 backdrop-blur-sm border border-border/50 transition-all hover:bg-card/70",
+        "relative overflow-hidden flex items-center gap-3 p-4 rounded-xl backdrop-blur-sm border transition-all",
+        "hover:scale-[1.01] hover:shadow-[0_10px_30px_rgba(0,0,0,0.3)]",
+        getPanelStyle(),
         className
       )}
     >
+      <div className="absolute -right-8 -top-8 h-24 w-24 rounded-full bg-white/5 blur-2xl pointer-events-none" />
+
       {/* Icon */}
       <div
         className={cn(

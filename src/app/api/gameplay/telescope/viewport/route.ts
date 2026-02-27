@@ -7,7 +7,12 @@ export const dynamic = "force-dynamic";
 export async function GET() {
   const { supabase, user, authError } = await getRouteSupabaseWithUser();
   if (authError || !user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return NextResponse.json({
+      anomalies: [],
+      userClassifications: [],
+      allClassifications: [],
+      authenticated: false,
+    });
   }
 
   const userId = user.id;
@@ -81,6 +86,6 @@ export async function GET() {
     anomalies,
     userClassifications: userClassifications || [],
     allClassifications: allClassifications || [],
+    authenticated: true,
   });
 }
-

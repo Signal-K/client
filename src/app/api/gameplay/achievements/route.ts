@@ -17,10 +17,35 @@ const VALID_TYPES = new Set([
   "satellite-planetFour",
 ]);
 
+function createEmptyAchievements() {
+  return {
+    classifications: [],
+    mineralDeposits: {
+      type: "mineral-deposit" as const,
+      count: 0,
+      milestones: MILESTONE_TIERS.map((tier) => ({
+        tier,
+        isUnlocked: false,
+      })),
+    },
+    planetCompletions: {
+      type: "planet-completion" as const,
+      count: 0,
+      milestones: MILESTONE_TIERS.map((tier) => ({
+        tier,
+        isUnlocked: false,
+      })),
+    },
+    totalUnlocked: 0,
+    totalAchievements: MILESTONE_TIERS.length * 2,
+    authenticated: false,
+  };
+}
+
 export async function GET() {
   const { supabase, user, authError } = await getRouteSupabaseWithUser();
   if (authError || !user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return NextResponse.json(createEmptyAchievements());
   }
 
   const userId = user.id;
@@ -192,6 +217,6 @@ export async function GET() {
     planetCompletions,
     totalUnlocked,
     totalAchievements,
+    authenticated: true,
   });
 }
-

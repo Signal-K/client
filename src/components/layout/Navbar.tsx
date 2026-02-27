@@ -56,10 +56,8 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center space-x-3">
-            <Link href="/" legacyBehavior>
-              <a>
-                <img src="/planet.svg" alt="Logo" className="h-8 w-8 ml-1" />
-              </a>
+            <Link href="/">
+              <img src="/planet.svg" alt="Logo" className="h-8 w-8 ml-1" />
             </Link>
 
             <Menu as="div" className="relative inline-block text-left">
@@ -91,42 +89,34 @@ export default function Navbar() {
                 leaveTo="transform opacity-0 scale-95"
               >
                 <Menu.Items className="absolute left-0 mt-2 w-48 bg-white rounded-lg shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                  <Link href="/" passHref>
-                    <Menu.Item>
-                      {({ active }) => (
-                        <a className={`block px-4 py-2 text-sm text-gray-700 ${active ? "bg-gray-100" : ""}`}>
-                          My Settlements
-                        </a>
-                      )}
-                    </Menu.Item>
-                  </Link>
-                  <Link href="/scenes/desert" passHref>
-                    <Menu.Item>
-                      {({ active }) => (
-                        <a className={`block px-4 py-2 text-sm text-gray-700 ${active ? "bg-gray-100" : ""}`}>
-                          Desert Base
-                        </a>
-                      )}
-                    </Menu.Item>
-                  </Link>
-                  <Link href="/scenes/ocean" passHref>
-                    <Menu.Item>
-                      {({ active }) => (
-                        <a className={`block px-4 py-2 text-sm text-gray-700 ${active ? "bg-gray-100" : ""}`}>
-                          Ocean Base
-                        </a>
-                      )}
-                    </Menu.Item>
-                  </Link>
-                  <Link href="/scenes/uploads" passHref>
-                    <Menu.Item>
-                      {({ active }) => (
-                        <a className={`block px-4 py-2 text-sm text-gray-700 ${active ? "bg-gray-100" : ""}`}>
-                          Conservation
-                        </a>
-                      )}
-                    </Menu.Item>
-                  </Link>
+                  <Menu.Item>
+                    {({ active }) => (
+                      <Link href="/game" className={`block px-4 py-2 text-sm text-gray-700 ${active ? "bg-gray-100" : ""}`}>
+                        My Settlements
+                      </Link>
+                    )}
+                  </Menu.Item>
+                  <Menu.Item>
+                    {({ active }) => (
+                      <Link href="/setup/rover" className={`block px-4 py-2 text-sm text-gray-700 ${active ? "bg-gray-100" : ""}`}>
+                        Desert Base
+                      </Link>
+                    )}
+                  </Menu.Item>
+                  <Menu.Item>
+                    {({ active }) => (
+                      <Link href="/setup/satellite" className={`block px-4 py-2 text-sm text-gray-700 ${active ? "bg-gray-100" : ""}`}>
+                        Ocean Base
+                      </Link>
+                    )}
+                  </Menu.Item>
+                  <Menu.Item>
+                    {({ active }) => (
+                      <Link href="/scenes/uploads" className={`block px-4 py-2 text-sm text-gray-700 ${active ? "bg-gray-100" : ""}`}>
+                        Conservation
+                      </Link>
+                    )}
+                  </Menu.Item>
                 </Menu.Items>
               </Transition>
             </Menu>
@@ -233,30 +223,29 @@ export default function Navbar() {
               leaveTo="transform opacity-0 scale-95"
             >
               <Menu.Items className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                <Link href="/account" passHref>
-                  <Menu.Item>
-                    {({ active }) => (
-                      <a className={`block px-4 py-2 text-sm text-gray-700 ${active ? "bg-gray-100" : ""}`}>
-                        Edit Profile
-                      </a>
-                    )}
-                  </Menu.Item>
-                </Link>
                 <Menu.Item>
                   {({ active }) => (
-                    <a className={`block px-4 py-2 text-sm text-gray-700 ${active ? "bg-gray-100" : ""}`}>
-                      Settings
-                    </a>
+                    <Link href="/account" className={`block px-4 py-2 text-sm text-gray-700 ${active ? "bg-gray-100" : ""}`}>
+                      Edit Profile
+                    </Link>
                   )}
                 </Menu.Item>
                 <Menu.Item>
                   {({ active }) => (
-                    <a
-                      className={`block px-4 py-2 text-sm text-gray-700 ${active ? "bg-gray-100" : ""}`}
+                    <button type="button" className={`block w-full text-left px-4 py-2 text-sm text-gray-700 ${active ? "bg-gray-100" : ""}`}>
+                      Settings
+                    </button>
+                  )}
+                </Menu.Item>
+                <Menu.Item>
+                  {({ active }) => (
+                    <button
+                      type="button"
+                      className={`block w-full text-left px-4 py-2 text-sm text-gray-700 ${active ? "bg-gray-100" : ""}`}
                       onClick={signOut}
                     >
                       Logout
-                    </a>
+                    </button>
                   )}
                 </Menu.Item>
               </Menu.Items>

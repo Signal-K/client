@@ -42,10 +42,6 @@ export default function InventoryViewport() {
 
   const session = useSession();
 
-  if (!session) {
-    router.push("/auth");
-  };
-
   // State management
   const [state, setState] = useState<InventoryViewportInterface>({
     loading: true,
@@ -68,6 +64,12 @@ export default function InventoryViewport() {
   const setActiveTab = (tab: TabType) => {
     setState((prev) => ({ ...prev, activeTab: tab }));
   };
+
+  useEffect(() => {
+    if (!session) {
+      router.replace("/auth?next=/inventory");
+    }
+  }, [session, router]);
 
   // Fetch user upgrades and mineral deposits via server APIs
   useEffect(() => {
@@ -135,6 +137,20 @@ export default function InventoryViewport() {
 
     fetchUserData();
   }, [session]);
+
+  if (!session) {
+    return (
+      <Section
+        sectionId="inventory-viewport-auth"
+        variant="viewport"
+        backgroundType="none"
+        expandLink={"/inventory"}
+        hideInfoButton={true}
+      >
+        <div className="p-4 text-sm text-muted-foreground">Redirecting to sign in...</div>
+      </Section>
+    );
+  }
 
   return (
     <Section

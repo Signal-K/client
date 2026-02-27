@@ -4,13 +4,14 @@ import { useRouter } from "next/navigation"
 import DeployTelescopeViewport from "@/src/components/scenes/deploy/TelescopeViewportRange"
 import { useEffect, useState } from "react"
 import UseDarkMode from "@/src/shared/hooks/useDarkMode"
-import GameNavbar from "@/src/components/layout/Tes"
 import { useAuthUser } from "@/src/hooks/useAuthUser"
+import MainHeader from "@/src/components/layout/Header/MainHeader"
+import { TelescopeBackground } from "@/src/components/classification/telescope/telescope-background"
 
 export default function NewDeployPage() {
   const router = useRouter()
   const { user, isLoading: isAuthLoading } = useAuthUser()
-  const { isDark } = UseDarkMode()
+  const { isDark, toggleDarkMode } = UseDarkMode()
   const [profileChecked, setProfileChecked] = useState(false)
 
   useEffect(() => {
@@ -51,16 +52,29 @@ export default function NewDeployPage() {
   }
 
   return (
-    <div 
-      className={`w-full h-screen flex flex-col overflow-hidden ${
-        isDark 
-          ? "bg-gradient-to-b from-[#002439] to-[#001a2a]" 
-          : "bg-gradient-to-b from-[#004d6b] to-[#003a52]"
-      }`}
-    >
-      <GameNavbar />
-      <div className="flex-1 min-h-0 w-full overflow-hidden">
-        <DeployTelescopeViewport />
+    <div className="w-full min-h-screen relative overflow-hidden">
+      <div className="fixed inset-0 -z-10">
+        <TelescopeBackground
+          sectorX={0}
+          sectorY={0}
+          showAllAnomalies={false}
+          isDarkTheme={isDark}
+          variant="stars-only"
+          onAnomalyClick={() => {}}
+        />
+      </div>
+      <MainHeader
+        isDark={isDark}
+        onThemeToggle={toggleDarkMode}
+        notificationsOpen={false}
+        onToggleNotifications={() => {}}
+        activityFeed={[]}
+        otherClassifications={[]}
+      />
+      <div className="pt-20 h-screen">
+        <div className="h-[calc(100vh-80px)] w-full overflow-hidden">
+          <DeployTelescopeViewport />
+        </div>
       </div>
     </div>
   );

@@ -78,6 +78,10 @@ import PlanetHeroSection from "@/src/features/game/components/PlanetHeroSection"
 import MissionControlCard from "@/src/features/game/components/MissionControlCard";
 import StructureCard from "@/src/features/game/components/StructureCard";
 import BottomNavigation from "@/src/features/game/components/BottomNavigation";
+import ReferralBoostCard from "@/src/features/game/components/ReferralBoostCard";
+import ReferralMissionPrompt from "@/src/features/game/components/ReferralMissionPrompt";
+import EcosystemMissionsCard from "@/src/features/game/components/EcosystemMissionsCard";
+import MechanicPulseSurvey from "@/src/features/surveys/components/MechanicPulseSurvey";
 import RecentActivity from "@/src/components/social/activity/RecentActivity";
 
 // Hooks
@@ -93,6 +97,13 @@ import { ProjectType } from "@/src/hooks/useUserPreferences";
 
 // Utils
 import { cn } from "@/src/shared/utils";
+import { getOrCreateAnalyticsSessionToken } from "@/src/lib/analytics/session-token";
+import {
+  MECHANIC_SURVEYS,
+  SURVEY_DISPLAY_DELAY_MS,
+  surveyStorageKey,
+} from "@/src/features/surveys/mechanic-surveys";
+import type { MechanicMicroSurvey } from "@/src/features/surveys/types";
 
 // Icons
 import {
@@ -116,6 +127,7 @@ const POSTHOG_SURVEY_LAST_SHOWN_AT_KEY = "posthog_survey_webapp_22_last_shown_at
 const POSTHOG_SURVEY_COOLDOWN_MS = 14 * 24 * 60 * 60 * 1000;
 const SURVEY_REWARD_GRANTED_KEY = "posthog_survey_webapp_22_reward_granted_v1";
 const SURVEY_REWARD_STARDUST = 5;
+const REFERRAL_MISSION_DISMISSED_KEY = "referral_mission_prompt_dismissed_v1";
 
 function safeStorageGet(key: string): string | null {
   if (typeof window === "undefined") return null;
@@ -149,11 +161,17 @@ function GamePageContent() {
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [showPreferencesModal, setShowPreferencesModal] = useState(false);
   const [openedViewports, setOpenedViewports] = useState<Set<ViewMode>>(new Set());
+  const [referralCode, setReferralCode] = useState<string | null>(null);
+  const [referralCount, setReferralCount] = useState(0);
+  const [userHasReferral, setUserHasReferral] = useState<boolean | null>(null);
+  const [showReferralMission, setShowReferralMission] = useState(false);
   const [surveyRewardToast, setSurveyRewardToast] = useState<{
     variant: "success" | "error" | "info";
     title: string;
     description: string;
   } | null>(null);
+  const [activeMechanicSurvey, setActiveMechanicSurvey] = useState<MechanicMicroSurvey | null>(null);
+  const [analyticsSessionToken] = useState<string | null>(() => getOrCreateAnalyticsSessionToken());
 
   // Hooks
   const {
@@ -173,6 +191,133 @@ function GamePageContent() {
     needsPreferencesPrompt,
     setProjectInterests,
   } = useUserPreferences();
+
+  useEffect(() => {
+    let ignore = false;
+    const loadReferralSummary = async () => {
+      if (!user) return;
+      try {
+        const response = await fetch("/api/gameplay/research/summary", { cache: "no-store" });
+        const payload = await response.json().catch(() => null);
+        if (!response.ok || !payload || ignore) return;
+        setReferralCode(payload.referralCode ?? null);
+        setReferralCount(Number(payload.referralCount ?? 0));
+      } catch {
+        if (!ignore) {
+          setReferralCode(null);
+          setReferralCount(0);
+        }
+      }
+    };
+
+    void loadReferralSummary();
+    return () => {
+      ignore = true;
+    };
+  }, [user]);
+
+  useEffect(() => {
+    let ignore = false;
+    const loadReferralStatus = async () => {
+      if (!user) return;
+      try {
+        const response = await fetch("/api/gameplay/profile/referral-status", {
+          cache: "no-store",
+        });
+        const payload = await response.json().catch(() => null);
+        if (!response.ok || !payload || ignore) return;
+        const hasReferral = Boolean(payload.hasReferral);
+        setUserHasReferral(hasReferral);
+
+        const dismissed = safeStorageGet(REFERRAL_MISSION_DISMISSED_KEY) === "1";
+        const shouldShow = !hasReferral && !dismissed;
+        setShowReferralMission(shouldShow);
+        if (shouldShow) {
+          posthog?.capture("referral_mission_prompt_shown", {
+            trigger_surface: "game",
+            has_referral: false,
+          });
+        }
+      } catch {
+        if (!ignore) {
+          setUserHasReferral(null);
+          setShowReferralMission(false);
+        }
+      }
+    };
+
+    void loadReferralStatus();
+    return () => {
+      ignore = true;
+    };
+  }, [user, posthog]);
+
+  const handleDismissReferralMission = useCallback(() => {
+    safeStorageSet(REFERRAL_MISSION_DISMISSED_KEY, "1");
+    setShowReferralMission(false);
+    posthog?.capture("referral_mission_prompt_dismissed", {
+      trigger_surface: "game",
+    });
+  }, [posthog]);
+
+  const handleOpenReferralConsole = useCallback(() => {
+    posthog?.capture("referral_mission_open_clicked", {
+      trigger_surface: "game",
+    });
+    router.push("/referrals");
+  }, [posthog, router]);
+
+  const handleCopyReferralInvite = useCallback(async () => {
+    if (!referralCode || typeof window === "undefined") return;
+    const inviteUrl = `${window.location.origin}/auth?ref=${encodeURIComponent(referralCode)}`;
+    try {
+      await navigator.clipboard.writeText(inviteUrl);
+      posthog?.capture("referral_mission_copy_clicked", {
+        trigger_surface: "game",
+        has_referral_code: true,
+      });
+      setSurveyRewardToast({
+        variant: "info",
+        title: "Invite link copied",
+        description: "Share it with a crewmate to grow your network.",
+      });
+      setTimeout(() => setSurveyRewardToast(null), 3000);
+    } catch {
+      // Ignore clipboard write issues.
+    }
+  }, [posthog, referralCode]);
+
+  const completeMechanicSurvey = useCallback(
+    async (survey: MechanicMicroSurvey, answers: Record<string, string>) => {
+      if (!user) return;
+      safeStorageSet(surveyStorageKey(survey.id, user.id), "done");
+      posthog?.capture("mechanic_micro_survey_submitted", {
+        survey_id: survey.id,
+        survey_title: survey.title,
+        trigger_surface: "game",
+        response_count: Object.keys(answers).length,
+        q1: answers[survey.questions[0].id] ?? null,
+        q2: survey.questions[1] ? answers[survey.questions[1].id] ?? null : null,
+        starsailors_session_token: analyticsSessionToken,
+      });
+      setActiveMechanicSurvey(null);
+    },
+    [analyticsSessionToken, posthog, user]
+  );
+
+  const dismissMechanicSurvey = useCallback(
+    (survey: MechanicMicroSurvey) => {
+      if (!user) return;
+      safeStorageSet(surveyStorageKey(survey.id, user.id), "done");
+      posthog?.capture("mechanic_micro_survey_dismissed", {
+        survey_id: survey.id,
+        trigger_surface: "game",
+        starsailors_session_token: analyticsSessionToken,
+      });
+      setActiveMechanicSurvey(null);
+    },
+    [analyticsSessionToken, posthog, user]
+  );
 
   // Grant stardust reward when the user completes the PostHog survey.
   // Intercepts posthog.capture to detect the "survey sent" completion event.
@@ -450,6 +595,61 @@ function GamePageContent() {
           openedViewports,
         ]);
 
+        useEffect(() => {
+          if (!user || !posthog || activeView !== "base" || activeMechanicSurvey) return;
+          if (showNpsModal || showPreferencesModal || showProfileModal || showReferralMission) return;
+
+          const candidates = MECHANIC_SURVEYS.filter((survey) => survey.triggerSurface === "game");
+          const telescopeClassifications = classifications.filter((c) =>
+            (c.classificationtype || "").toLowerCase().includes("planet")
+          ).length;
+          const roverSignals = linkedAnomalies.filter(
+            (la) =>
+              (la.automaton || "").toLowerCase().includes("rover") ||
+              (la.anomaly?.anomalySet || "").toLowerCase().includes("automaton")
+          ).length;
+
+          const firstEligible = candidates.find((survey) => {
+            const alreadyDone = safeStorageGet(surveyStorageKey(survey.id, user.id)) === "done";
+            if (alreadyDone) return false;
+
+            if (survey.id === "mechanic_telescope_loop_v1") {
+              return openedViewports.has("telescope") && telescopeClassifications >= 2;
+            }
+            if (survey.id === "mechanic_rover_loop_v1") {
+              return openedViewports.has("rover") && roverSignals >= 1;
+            }
+            return false;
+          });
+
+          if (!firstEligible) return;
+
+          const timeout = window.setTimeout(() => {
+            setActiveMechanicSurvey(firstEligible);
+            posthog.capture("mechanic_micro_survey_shown", {
+              survey_id: firstEligible.id,
+              survey_title: firstEligible.title,
+              trigger_surface: "game",
+              starsailors_session_token: analyticsSessionToken,
+            });
+          }, SURVEY_DISPLAY_DELAY_MS);
+
+          return () => window.clearTimeout(timeout);
+        }, [
+          activeMechanicSurvey,
+          activeView,
+          analyticsSessionToken,
+          classifications,
+          linkedAnomalies,
+          openedViewports,
+          posthog,
+          showNpsModal,
+          showPreferencesModal,
+          showProfileModal,
+          showReferralMission,
+          user,
+        ]);
+
         // Redirect unauthenticated users
         useEffect(() => {
           if (!isAuthLoading && !user) {
@@ -599,6 +799,22 @@ function GamePageContent() {
                 {/* Content Container */}
                 <div className="px-4 py-6 max-w-screen-xl mx-auto space-y-6">
                   <PushNotificationPrompt />
+                  {showReferralMission && userHasReferral === false && (
+                    <ReferralMissionPrompt
+                      referralCode={referralCode}
+                      onOpenReferral={handleOpenReferralConsole}
+                      onDismiss={handleDismissReferralMission}
+                      onCopyInvite={handleCopyReferralInvite}
+                    />
+                  )}
+                  <ReferralBoostCard referralCode={referralCode} referralsCount={referralCount} />
+                  {activeMechanicSurvey && (
+                    <MechanicPulseSurvey
+                      survey={activeMechanicSurvey}
+                      onSubmit={(answers) => completeMechanicSurvey(activeMechanicSurvey, answers)}
+                      onDismiss={() => dismissMechanicSurvey(activeMechanicSurvey)}
+                    />
+                  )}
 
                   {/* Anonymous User Prompt */}
                   <AnonymousUserPrompt
@@ -733,6 +949,13 @@ function GamePageContent() {
                         onClick={() => handleViewChange("inventory")}
                       />
                     </div>
+                  </section>
+
+                  <section>
+                    <h2 className="text-xs uppercase tracking-wider text-muted-foreground mb-3 px-1">
+                      Ecosystem Expansion
+                    </h2>
+                    <EcosystemMissionsCard />
                   </section>
                 </div>
               </main>

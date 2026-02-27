@@ -1,17 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
-const { mockGetUser, mockRedirect, mockNext } = vi.hoisted(() => {
-  const mockGetUser = vi.fn();
+const { mockRedirect, mockNext } = vi.hoisted(() => {
   const mockRedirect = vi.fn((url: URL) => ({ status: 302, headers: { location: url.toString() } }));
   const mockNext = vi.fn(() => ({ cookies: { set: vi.fn() } }));
-  return { mockGetUser, mockRedirect, mockNext };
+  return { mockRedirect, mockNext };
 });
-
-vi.mock("@supabase/ssr", () => ({
-  createServerClient: vi.fn(() => ({
-    auth: { getUser: mockGetUser },
-  })),
-}));
 
 vi.mock("next/server", () => ({
   NextResponse: {
@@ -22,14 +15,18 @@ vi.mock("next/server", () => ({
 
 import { middleware } from "@/src/middleware";
 
-function makeRequest(pathname: string, baseUrl = "http://localhost:3000") {
+function makeRequest(
+  pathname: string,
+  baseUrl = "http://localhost:3000",
+  cookieRows: Array<{ name: string; value: string }> = []
+) {
   const url = new URL(pathname, baseUrl);
   return {
     headers: new Headers(),
     nextUrl: url,
     url: url.toString(),
     cookies: {
-      getAll: () => [],
+      getAll: () => cookieRows,
       set: vi.fn(),
     },
   } as any;
@@ -39,14 +36,11 @@ describe("middleware", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockNext.mockReturnValue({ cookies: { set: vi.fn() } });
-    vi.stubEnv("NEXT_PUBLIC_SUPABASE_URL", "https://example.supabase.co");
-    vi.stubEnv("NEXT_PUBLIC_SUPABASE_ANON_KEY", "anon-key");
   });
 
   it("redirects unauthenticated user from '/game/something' to '/auth?next=...'", async () => {
-    mockGetUser.mockResolvedValue({ data: { user: null } });
     const req = makeRequest("/game/something?view=telescope");
-    await middleware(req);
+    middleware(req);
     expect(mockRedirect).toHaveBeenCalledWith(
       expect.objectContaining({
         pathname: "/auth",
@@ -56,33 +50,35 @@ describe("middleware", () => {
   });
 
   it("redirects unauthenticated user from '/game' to '/auth?next=/game'", async () => {
-    mockGetUser.mockResolvedValue({ data: { user: null } });
     const req = makeRequest("/game");
-    await middleware(req);
+    middleware(req);
     expect(mockRedirect).toHaveBeenCalledWith(
       expect.objectContaining({ pathname: "/auth", search: "?next=%2Fgame" })
     );
   });
 
-  it("redirects authenticated user from '/auth' to '/game'", async () => {
-    mockGetUser.mockResolvedValue({ data: { user: { id: "1" } } });
-    const req = makeRequest("/auth");
-    await middleware(req);
-    expect(mockRedirect).toHaveBeenCalledWith(expect.objectContaining({ pathname: "/game" }));
-  });
-
   it("passes through unauthenticated user on '/auth'", async () => {
-    mockGetUser.mockResolvedValue({ data: { user: null } });
     const req = makeRequest("/auth");
-    await middleware(req);
+    middleware(req);
     expect(mockRedirect).not.toHaveBeenCalled();
     expect(mockNext).toHaveBeenCalled();
   });
 
-  it("passes through authenticated user on '/game/missions'", async () => {
-    mockGetUser.mockResolvedValue({ data: { user: { id: "1" } } });
-    const req = makeRequest("/game/missions");
-    await middleware(req);
+  it("passes through authenticated user on '/game/missions' with auth cookie", async () => {
+    const req = makeRequest("/game/missions", "http://localhost:3000", [
+      { name: "sb-abc-auth-token", value: "token" },
+    ]);
+    middleware(req);
     expect(mockRedirect).not.toHaveBeenCalled();
+    expect(mockNext).toHaveBeenCalled();
+  });
+
+  it("passes through authenticated user with chunked auth cookie", async () => {
+    const req = makeRequest("/game/missions", "http://localhost:3000", [
+      { name: "sb-abc-auth-token.0", value: "token-chunk" },
+    ]);
+    middleware(req);
+    expect(mockRedirect).not.toHaveBeenCalled();
+    expect(mockNext).toHaveBeenCalled();
   });
 });

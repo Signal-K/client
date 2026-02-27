@@ -2,10 +2,12 @@
 
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
-import GameNavbar from "@/src/components/layout/Tes";
 import { Dialog, DialogContent } from "@/src/components/ui/dialog";
 import { useSession } from "@/src/lib/auth/session-context";
 import { useState, useEffect } from "react";
+import MainHeader from "@/src/components/layout/Header/MainHeader";
+import UseDarkMode from "@/src/shared/hooks/useDarkMode";
+import { TelescopeBackground } from "@/src/components/classification/telescope/telescope-background";
 
 const TelescopeViewport = dynamic(
   () => import("@/src/components/classification/telescope/telescope-viewport"),
@@ -18,6 +20,7 @@ const TelescopeViewport = dynamic(
 export default function TelescopeOnEarthPage() {
   const router = useRouter();
   const session = useSession();
+  const { isDark, toggleDarkMode } = UseDarkMode();
   const [simpleMode, setSimpleMode] = useState(false); // default: viewport mode
   const [isChecking, setIsChecking] = useState(true);
 
@@ -58,16 +61,26 @@ export default function TelescopeOnEarthPage() {
   // Show loading state while checking access
   if (isChecking) {
     return (
-      <div className="relative min-h-screen w-full flex flex-col">
-        <img
-          className="absolute inset-0 w-full h-full object-cover"
-          src="/assets/Backdrops/Earth.png"
-          alt="Earth Background"
-        />
-        <div className="w-full z-10">
-          <GameNavbar />
+      <div className="relative min-h-screen w-full">
+        <div className="fixed inset-0 -z-10">
+          <TelescopeBackground
+            sectorX={0}
+            sectorY={0}
+            showAllAnomalies={false}
+            isDarkTheme={isDark}
+            variant="stars-only"
+            onAnomalyClick={() => {}}
+          />
         </div>
-        <div className="flex justify-center items-center flex-grow z-10">
+        <MainHeader
+          isDark={isDark}
+          onThemeToggle={toggleDarkMode}
+          notificationsOpen={false}
+          onToggleNotifications={() => {}}
+          activityFeed={[]}
+          otherClassifications={[]}
+        />
+        <div className="pt-20 flex justify-center items-center min-h-screen">
           <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 text-center">
             <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
             <p className="text-[#2E3440]">Checking telescope access...</p>
@@ -78,21 +91,28 @@ export default function TelescopeOnEarthPage() {
   }
 
   return (
-    <div className="relative min-h-screen w-full flex flex-col">
-      {/* Background Image */}
-      <img
-        className="absolute inset-0 w-full h-full object-cover"
-        src="/assets/Backdrops/Earth.png"
-        alt="Earth Background"
+    <div className="relative min-h-screen w-full">
+      <div className="fixed inset-0 -z-10">
+        <TelescopeBackground
+          sectorX={0}
+          sectorY={0}
+          showAllAnomalies={false}
+          isDarkTheme={isDark}
+          variant="stars-only"
+          onAnomalyClick={() => {}}
+        />
+      </div>
+      <MainHeader
+        isDark={isDark}
+        onThemeToggle={toggleDarkMode}
+        notificationsOpen={false}
+        onToggleNotifications={() => {}}
+        activityFeed={[]}
+        otherClassifications={[]}
       />
 
-      {/* Navbar */}
-      <div className="w-full z-10">
-        <GameNavbar />
-      </div>
-
       {/* Dialog Wrapper */}
-      <div className="flex justify-center items-center flex-grow z-10 px-4">
+      <div className="relative z-10 pt-20 flex justify-center items-center min-h-screen px-4">
         <Dialog
           defaultOpen
           onOpenChange={(open) => {

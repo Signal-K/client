@@ -1,15 +1,16 @@
 "use client"
 
 import { useRouter } from "next/navigation"
-import GameNavbar from "@/src/components/layout/Tes";
 import DeploySatelliteViewport from "@/src/components/scenes/deploy/satellite/DeploySatellite";
 import UseDarkMode from "@/src/shared/hooks/useDarkMode";
 import { useEffect, useState } from "react";
 import { useAuthUser } from "@/src/hooks/useAuthUser";
+import MainHeader from "@/src/components/layout/Header/MainHeader";
+import { TelescopeBackground } from "@/src/components/classification/telescope/telescope-background";
 
 export default function SatelliteDeployPage() {
     const router = useRouter();
-    const { isDark } = UseDarkMode();
+    const { isDark, toggleDarkMode } = UseDarkMode();
     const { user } = useAuthUser();
     const [hasSatelliteUpgrade, setHasSatelliteUpgrade] = useState(false);
 
@@ -35,23 +36,36 @@ export default function SatelliteDeployPage() {
     }, [user])
 
     return (
-        <div 
-            className={`w-full h-screen flex flex-col overflow-hidden ${
-                isDark 
-                    ? "bg-gradient-to-b from-[#002439] to-[#001a2a]" 
-                    : "bg-gradient-to-b from-[#004d6b] to-[#003a52]"
-            }`}
-        >
-                <GameNavbar />
-            {hasSatelliteUpgrade && (
-                <div className="mx-auto w-full max-w-4xl px-4 py-2 flex-shrink-0">
-                    <div className="rounded-md bg-emerald-700/10 border border-emerald-600/20 text-emerald-300 px-3 py-2 text-sm">
-                        Satellite capacity upgrade active — you can launch additional satellites.
+        <div className="w-full min-h-screen relative overflow-hidden">
+            <div className="fixed inset-0 -z-10">
+                <TelescopeBackground
+                    sectorX={0}
+                    sectorY={0}
+                    showAllAnomalies={false}
+                    isDarkTheme={isDark}
+                    variant="stars-only"
+                    onAnomalyClick={() => {}}
+                />
+            </div>
+            <MainHeader
+                isDark={isDark}
+                onThemeToggle={toggleDarkMode}
+                notificationsOpen={false}
+                onToggleNotifications={() => {}}
+                activityFeed={[]}
+                otherClassifications={[]}
+            />
+            <div className="pt-20 h-screen flex flex-col">
+                {hasSatelliteUpgrade && (
+                    <div className="mx-auto w-full max-w-4xl px-4 py-2 flex-shrink-0">
+                        <div className="rounded-md bg-emerald-700/10 border border-emerald-600/20 text-emerald-300 px-3 py-2 text-sm">
+                            Satellite capacity upgrade active — you can launch additional satellites.
+                        </div>
                     </div>
+                )}
+                <div className="flex-1 min-h-0 w-full overflow-hidden">
+                    <DeploySatelliteViewport />
                 </div>
-            )}
-            <div className="flex-1 min-h-0 w-full">
-                <DeploySatelliteViewport />
             </div>
         </div>
     );

@@ -12,7 +12,7 @@ export async function GET() {
   }
 
   const data = await prisma.$queryRaw<Array<{ id: number }>>`
-    SELECT id FROM referrals WHERE referree_id = ${user.id} LIMIT 1
+    SELECT id FROM referrals WHERE referree_id = ${user.id}::uuid LIMIT 1
   `;
 
   return NextResponse.json({ authenticated: true, hasReferral: data.length > 0 });

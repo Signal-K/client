@@ -10,7 +10,7 @@ describe('Working Routes Test', () => {
 
   it('should test all confirmed working routes', () => {
     const alwaysAvailableRoutes = [
-      '/',
+      '/apt',
       '/auth',
       '/auth/register',
       '/research',

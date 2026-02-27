@@ -11,13 +11,16 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React, { useEffect } from "react";
-import GameNavbar from "@/src/components/layout/Tes";
 import { Dialog, DialogContent } from "@/src/components/ui/dialog";
+import MainHeader from "@/src/components/layout/Header/MainHeader";
+import UseDarkMode from "@/src/shared/hooks/useDarkMode";
+import { TelescopeBackground } from "@/src/components/classification/telescope/telescope-background";
 
 export default function WeatherBalloonOnEarthPage() {
   const session = useSession();
 
   const router = useRouter();
+  const { isDark, toggleDarkMode } = UseDarkMode();
 
   useEffect(() => {
     if (!session) {
@@ -33,7 +36,7 @@ export default function WeatherBalloonOnEarthPage() {
     {
       icon: <MicroscopeIcon className="w-6 h-6 text-[#B48EAD]" />,
       text: "Research",
-      route: "research",
+      href: "/research",
     },
   ];
 
@@ -61,18 +64,27 @@ export default function WeatherBalloonOnEarthPage() {
   ];
 
   return (
-    <div className="relative min-h-screen w-full flex flex-col">
-      <img
-        className="absolute inset-0 w-full h-full object-cover"
-        src="/assets/Backdrops/Earth.png"
-        alt="Earth Background"
+    <div className="relative min-h-screen w-full">
+      <div className="fixed inset-0 -z-10">
+        <TelescopeBackground
+          sectorX={0}
+          sectorY={0}
+          showAllAnomalies={false}
+          isDarkTheme={isDark}
+          variant="stars-only"
+          onAnomalyClick={() => {}}
+        />
+      </div>
+      <MainHeader
+        isDark={isDark}
+        onThemeToggle={toggleDarkMode}
+        notificationsOpen={false}
+        onToggleNotifications={() => {}}
+        activityFeed={[]}
+        otherClassifications={[]}
       />
 
-      <div className="w-full">
-        <GameNavbar />
-      </div>
-
-      <div className="flex flex-row space-y-4">
+      <div className="pt-20 flex flex-row space-y-4">
         <Dialog
           defaultOpen
           onOpenChange={(open) => {
@@ -112,7 +124,7 @@ export default function WeatherBalloonOnEarthPage() {
                   <div
                     key={index}
                     className="flex flex-col items-center cursor-pointer"
-                    onClick={() => router.push(`/structures/balloon/${action.route}`)}
+                    onClick={() => router.push(action.href)}
                   >
                     {action.icon}
                     <p className="text-xs text-[#4C566A]">{action.text}</p>

@@ -4,6 +4,15 @@ import { describe, it, expect, vi } from "vitest";
 vi.mock("@/src/components/layout/Tes", () => ({
   default: () => <nav data-testid="game-navbar">Navbar</nav>,
 }));
+vi.mock("@/src/components/layout/Header/MainHeader", () => ({
+  default: () => <nav data-testid="game-navbar">Navbar</nav>,
+}));
+vi.mock("@/src/components/classification/telescope/telescope-background", () => ({
+  TelescopeBackground: () => <div data-testid="setup-background" />,
+}));
+vi.mock("@/src/shared/hooks/useDarkMode", () => ({
+  default: () => ({ isDark: true, toggleDarkMode: vi.fn() }),
+}));
 
 import { SetupScaffold, SetupCard } from "@/src/features/setup/components/SetupScaffold";
 

@@ -2,12 +2,11 @@
 
 import React, { useEffect, useState } from "react";
 import { SimplePostSingle } from "@/src/components/social/posts/SimplePostSingle";
-import StructuresOnPlanet from "@/src/components/deployment/structures/Structures";
-import Navbar from "@/src/components/layout/Navbar";
-import GameNavbar from "@/src/components/layout/Tes";
-import { Button } from "@/src/components/ui/button";
 import { useRouter } from "next/navigation";
 import { SourceClassificationCallout } from "@/src/components/classifications/SourceClassificationCallout";
+import MainHeader from "@/src/components/layout/Header/MainHeader";
+import { TelescopeBackground } from "@/src/components/classification/telescope/telescope-background";
+import UseDarkMode from "@/src/shared/hooks/useDarkMode";
 
 interface Classification {
   id: number;
@@ -22,6 +21,7 @@ interface Classification {
 
 export default function SinglePostPage({ params }: { params: { id: string } }) {
   const router = useRouter();
+  const { isDark, toggleDarkMode } = UseDarkMode();
 
   const [classification, setClassification] = useState<Classification | null>(null);
   const [loading, setLoading] = useState(true);
@@ -78,13 +78,28 @@ export default function SinglePostPage({ params }: { params: { id: string } }) {
 
   if (loading)
     return (
-      <div className="min-h-screen flex items-center justify-center bg-black">
-        <img
-          className="absolute inset-0 w-full h-full object-cover z-0"
-          src="/assets/Backdrops/Earth.png"
-          alt="Backdrop"
+      <div className="min-h-screen relative">
+        <div className="fixed inset-0 -z-10">
+          <TelescopeBackground
+            sectorX={0}
+            sectorY={0}
+            showAllAnomalies={false}
+            isDarkTheme={isDark}
+            variant="stars-only"
+            onAnomalyClick={() => {}}
+          />
+        </div>
+        <MainHeader
+          isDark={isDark}
+          onThemeToggle={toggleDarkMode}
+          notificationsOpen={false}
+          onToggleNotifications={() => {}}
+          activityFeed={[]}
+          otherClassifications={[]}
         />
-        <div className="relative z-10 text-white text-lg">Loading classification...</div>
+        <div className="pt-20 min-h-screen flex items-center justify-center">
+          <div className="relative z-10 text-white text-lg">Loading classification...</div>
+        </div>
       </div>
     );
 
@@ -93,15 +108,25 @@ export default function SinglePostPage({ params }: { params: { id: string } }) {
 
   return (
     <div className="relative min-h-screen w-full overflow-hidden">
-      <img
-        className="absolute inset-0 w-full h-full object-cover z-0"
-        src="/assets/Backdrops/Earth.png"
-        alt="Backdrop"
-      />
-      <div className="w-full z-10">
-        <GameNavbar />
+      <div className="fixed inset-0 -z-10">
+        <TelescopeBackground
+          sectorX={0}
+          sectorY={0}
+          showAllAnomalies={false}
+          isDarkTheme={isDark}
+          variant="stars-only"
+          onAnomalyClick={() => {}}
+        />
       </div>
-      <div className="relative z-10 flex items-center justify-center px-4 py-12 min-h-screen">
+      <MainHeader
+        isDark={isDark}
+        onThemeToggle={toggleDarkMode}
+        notificationsOpen={false}
+        onToggleNotifications={() => {}}
+        activityFeed={[]}
+        otherClassifications={[]}
+      />
+      <div className="relative z-10 pt-20 flex items-center justify-center px-4 py-12 min-h-screen">
         {classification.author && (
           <div className="w-full max-w-3xl space-y-4">
             {/* Source Classification Callout */}

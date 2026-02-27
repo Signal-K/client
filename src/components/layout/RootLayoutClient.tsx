@@ -2,11 +2,12 @@
 
 import "@/styles/globals.css";
 import { SessionContextProvider } from "@/src/lib/auth/session-context";
-import { useEffect, ReactNode } from "react";
+import { useEffect, ReactNode, useState } from "react";
 import { ActivePlanetProvider, useActivePlanet } from "@/src/core/context/ActivePlanet";
 import { Analytics } from "@vercel/analytics/react";
 import { usePostHog } from "posthog-js/react";
 import { useAuthUser } from "@/src/hooks/useAuthUser";
+import { getOrCreateAnalyticsSessionToken } from "@/src/lib/analytics/session-token";
 // import Sidebar from "../ui/Panels/Sidebar";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 // import { PostHogProvider } from "@/components/PostHogProvider";
@@ -26,6 +27,7 @@ function LayoutContent({ children }: { children: ReactNode }) {
 export default function RootLayoutClient({ children }: { children: ReactNode }) {
   const posthog = usePostHog();
   const { user } = useAuthUser();
+  const [sessionToken] = useState<string | null>(() => getOrCreateAnalyticsSessionToken());
 
   useEffect(() => {
     if (!posthog) return;
@@ -40,6 +42,13 @@ export default function RootLayoutClient({ children }: { children: ReactNode }) 
       supabase_uuid: user.id,
     });
   }, [posthog, user]);
+
+  useEffect(() => {
+    if (!posthog || !sessionToken) return;
+    posthog.register({
+      starsailors_session_token: sessionToken,
+    });
+  }, [posthog, sessionToken]);
 
   // Register service worker only in production to avoid stale chunk/HMR issues in dev.
   useEffect(() => {

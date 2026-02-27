@@ -65,7 +65,7 @@ export default function TelescopeViewportSection() {
 
   // Deploy handler (stub)
   const handleDeployTelescope = async () => {
-    router.push("/activity/deploy/");
+    router.push("/activity/deploy");
   };
 
   const [state, setState] = useState<TelescopeViewportState>({

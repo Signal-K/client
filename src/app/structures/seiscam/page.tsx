@@ -1,9 +1,8 @@
 'use client'
 
 import React, { useEffect } from "react"
-import { useSession, useSupabaseClient } from "@/src/lib/auth/session-context"
+import { useSession } from "@/src/lib/auth/session-context"
 import { useRouter } from "next/navigation"
-import GameNavbar from "@/src/components/layout/Tes"
 import { Dialog, DialogContent } from "@/src/components/ui/dialog"
 import {
   BuildingIcon,
@@ -11,10 +10,14 @@ import {
   MicroscopeIcon,
   RssIcon,
 } from "lucide-react"
+import MainHeader from "@/src/components/layout/Header/MainHeader"
+import UseDarkMode from "@/src/shared/hooks/useDarkMode"
+import { TelescopeBackground } from "@/src/components/classification/telescope/telescope-background"
 
 export default function SeiscamOnEarthPage() {
   const router = useRouter()
   const session = useSession()
+  const { isDark, toggleDarkMode } = UseDarkMode()
 
   // useEffect(() => {
   //   if (!session) {
@@ -26,7 +29,7 @@ export default function SeiscamOnEarthPage() {
     {
       icon: <MicroscopeIcon className="w-6 h-6 text-[#B48EAD]" />,
       text: "Research",
-      route: "research",
+      href: "/research",
     },
   ]
 
@@ -34,28 +37,37 @@ export default function SeiscamOnEarthPage() {
     {
       icon: <RssIcon className="w-6 h-6 text-[#D08770]" />,
       text: "Identify landmarks on terrestrial planets",
-      route: "landmarks",
+      href: "/structures/balloon/landmarks",
     },
     {
       icon: <CameraOffIcon className="w-6 h-6 text-[#EBCB8B]" />,
       text: "Map the surface of planets",
-      route: "surface",
+      href: "/structures/balloon/surface",
     },
   ]
 
   return (
-    <div className="relative min-h-screen w-full flex flex-col">
-      <img
-        className="absolute inset-0 w-full h-full object-cover"
-        src="/assets/Backdrops/Earth.png"
-        alt="Earth Background"
+    <div className="relative min-h-screen w-full">
+      <div className="fixed inset-0 -z-10">
+        <TelescopeBackground
+          sectorX={0}
+          sectorY={0}
+          showAllAnomalies={false}
+          isDarkTheme={isDark}
+          variant="stars-only"
+          onAnomalyClick={() => {}}
+        />
+      </div>
+      <MainHeader
+        isDark={isDark}
+        onThemeToggle={toggleDarkMode}
+        notificationsOpen={false}
+        onToggleNotifications={() => {}}
+        activityFeed={[]}
+        otherClassifications={[]}
       />
 
-      <div className="w-full">
-        <GameNavbar />
-      </div>
-
-      <div className="flex flex-row space-y-4">
+      <div className="pt-20 flex flex-row space-y-4">
         <Dialog
           defaultOpen
           onOpenChange={(open) => {
@@ -96,9 +108,7 @@ export default function SeiscamOnEarthPage() {
                   <div
                     key={index}
                     className="flex flex-col items-center cursor-pointer"
-                    onClick={() =>
-                      router.push(`/structures/seiscam/${action.route}`)
-                    }
+                    onClick={() => router.push(action.href)}
                   >
                     {action.icon}
                     <p className="text-xs text-[#4C566A]">{action.text}</p>
@@ -112,9 +122,7 @@ export default function SeiscamOnEarthPage() {
                   <div
                     key={index}
                     className="flex items-center justify-center bg-[#D8DEE9]/60 text-[#2E3440] font-bold py-2 px-4 rounded-md shadow-sm hover:bg-[#E5E9F0] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#81A1C1] cursor-pointer"
-                    onClick={() =>
-                      router.push(`/structures/seiscam/${button.route}`)
-                    }
+                    onClick={() => router.push(button.href)}
                     style={{ width: "100%", maxWidth: "240px" }}
                   >
                     <div className="flex items-center justify-center">

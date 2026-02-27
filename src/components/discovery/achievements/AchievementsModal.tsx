@@ -74,6 +74,21 @@ export const AchievementsModal: React.FC<AchievementsModalProps> = ({
     };
   }, [isOpen]);
 
+  useEffect(() => {
+    if (!isOpen) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        if (selectedAchievement) {
+          setSelectedAchievement(null);
+          return;
+        }
+        onClose();
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [isOpen, onClose, selectedAchievement]);
+
   const handleBadgeClick = (detail: AchievementDetail) => {
     setSelectedAchievement(detail);
   };
@@ -86,12 +101,16 @@ export const AchievementsModal: React.FC<AchievementsModalProps> = ({
 
   const modalContent = (
     <div 
-      className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
+      className="fixed inset-0 z-[99999] flex items-start sm:items-center justify-center bg-black/70 backdrop-blur-sm p-2 sm:p-4 overflow-y-auto"
       onClick={onClose}
+      role="presentation"
     >
       <div 
-        className="relative w-full max-w-6xl max-h-[90vh] bg-[#1e2a3a] rounded-lg shadow-2xl overflow-hidden"
+        className="relative my-2 sm:my-6 w-full max-w-6xl max-h-[96dvh] bg-[#1e2a3a] rounded-lg shadow-2xl overflow-hidden"
         onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Achievements"
       >
         {/* Header */}
         <div className="sticky top-0 z-10 bg-gradient-to-r from-[#2c4f64] to-[#1e2a3a] p-4 sm:p-6 border-b border-[#5fcbc3]/30">
@@ -109,6 +128,7 @@ export const AchievementsModal: React.FC<AchievementsModalProps> = ({
             </div>
             <button
               onClick={onClose}
+              aria-label="Close achievements"
               className="text-white hover:text-[#5fcbc3] transition-colors p-2 rounded-full hover:bg-white/10 flex-shrink-0"
             >
               <svg
@@ -129,7 +149,7 @@ export const AchievementsModal: React.FC<AchievementsModalProps> = ({
         </div>
 
         {/* Content */}
-        <div className="overflow-y-auto max-h-[calc(90vh-100px)] sm:max-h-[calc(90vh-120px)] p-4 sm:p-6">
+        <div className="overflow-y-auto max-h-[calc(96dvh-92px)] sm:max-h-[calc(96dvh-112px)] p-3 sm:p-6">
           {loading && (
             <div className="flex items-center justify-center py-12">
               <div className="text-white text-lg">Loading achievements...</div>
@@ -144,12 +164,18 @@ export const AchievementsModal: React.FC<AchievementsModalProps> = ({
 
           {achievements && (
             <div className="space-y-8">
+              <div className="rounded-lg border border-[#5fcbc3]/25 bg-[#2c4f64]/25 p-3">
+                <p className="text-xs text-[#b9f2ff]">
+                  Tap an achievement badge to view milestone details and progression.
+                </p>
+              </div>
+
               {/* Classification Achievements */}
               <section>
                 <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-white mb-3 sm:mb-4 pb-2 border-b border-[#5fcbc3]/30">
                   Classification Achievements
                 </h3>
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
+                <div className="grid grid-cols-1 min-[420px]:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
                   {(() => {
                     const badges = achievements.classifications
                       .map((achievement: ClassificationAchievement) => {
@@ -212,7 +238,7 @@ export const AchievementsModal: React.FC<AchievementsModalProps> = ({
                 <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-white mb-3 sm:mb-4 pb-2 border-b border-[#5fcbc3]/30">
                   Mineral Deposit Achievements
                 </h3>
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
+                <div className="grid grid-cols-1 min-[420px]:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
                   {(() => {
                     // Find the highest unlocked milestone
                     const unlockedMilestones = achievements.mineralDeposits.milestones.filter((m: any) => m.isUnlocked);
@@ -256,7 +282,7 @@ export const AchievementsModal: React.FC<AchievementsModalProps> = ({
                 <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-white mb-3 sm:mb-4 pb-2 border-b border-[#5fcbc3]/30">
                   Planet Completion Achievements
                 </h3>
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
+                <div className="grid grid-cols-1 min-[420px]:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
                   {(() => {
                     // Find the highest unlocked milestone
                     const unlockedMilestones = achievements.planetCompletions.milestones.filter((m: any) => m.isUnlocked);
@@ -303,10 +329,14 @@ export const AchievementsModal: React.FC<AchievementsModalProps> = ({
           <div 
             className="absolute inset-0 z-10 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4"
             onClick={closeDetailView}
+            role="presentation"
           >
             <div 
-              className="bg-[#1e2a3a] rounded-lg p-4 sm:p-6 max-w-md w-full border-2 border-[#5fcbc3]/50 max-h-[80vh] overflow-y-auto"
+              className="bg-[#1e2a3a] rounded-lg p-4 sm:p-6 max-w-md w-full border-2 border-[#5fcbc3]/50 max-h-[85dvh] overflow-y-auto"
               onClick={(e) => e.stopPropagation()}
+              role="dialog"
+              aria-modal="true"
+              aria-label={`${selectedAchievement.name} details`}
             >
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-xl sm:text-2xl font-bold text-white">
@@ -314,6 +344,7 @@ export const AchievementsModal: React.FC<AchievementsModalProps> = ({
                 </h3>
                 <button
                   onClick={closeDetailView}
+                  aria-label="Close achievement details"
                   className="text-gray-400 hover:text-white transition-colors flex-shrink-0"
                 >
                   <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">

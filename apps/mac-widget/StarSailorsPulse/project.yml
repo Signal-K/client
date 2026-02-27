@@ -1,0 +1,60 @@
+name: StarSailorsPulse
+options:
+  bundleIdPrefix: com.starsailors
+  deploymentTarget:
+    macOS: "13.0"
+settings:
+  base:
+    SWIFT_VERSION: "5.9"
+    PRODUCT_BUNDLE_IDENTIFIER: com.starsailors.pulse
+    CURRENT_PROJECT_VERSION: 1
+    MARKETING_VERSION: 0.1.0
+    GENERATE_INFOPLIST_FILE: YES
+    CODE_SIGN_STYLE: Automatic
+    DEVELOPMENT_TEAM: 7GDC42L522
+targets:
+  StarSailorsPulse:
+    type: application
+    platform: macOS
+    configFiles:
+      Debug: Config/Secrets.xcconfig
+      Release: Config/Secrets.xcconfig
+    sources:
+      - Sources/App
+      - Sources/Shared
+    resources:
+      - Resources
+    dependencies:
+      - target: StarSailorsPulseWidget
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: NO
+        INFOPLIST_FILE: Config/App-Info.plist
+        INFOPLIST_KEY_CFBundleDisplayName: Star Sailors Pulse
+        INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.utilities
+        INFOPLIST_KEY_NSAppTransportSecurity_NSAllowsArbitraryLoads: true
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        CODE_SIGN_STYLE: Automatic
+        CODE_SIGN_IDENTITY: Apple Development
+        DEVELOPMENT_TEAM: 7GDC42L522
+        CODE_SIGN_ENTITLEMENTS: Config/StarSailorsPulse.entitlements
+    scheme:
+      testTargets: []
+  StarSailorsPulseWidget:
+    type: app-extension
+    platform: macOS
+    configFiles:
+      Debug: Config/Secrets.xcconfig
+      Release: Config/Secrets.xcconfig
+    sources:
+      - Sources/Widget
+      - Sources/Shared
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.starsailors.pulse.widget
+        GENERATE_INFOPLIST_FILE: NO
+        INFOPLIST_FILE: Config/Widget-Info.plist
+        CODE_SIGN_STYLE: Automatic
+        CODE_SIGN_IDENTITY: Apple Development
+        DEVELOPMENT_TEAM: 7GDC42L522
+        CODE_SIGN_ENTITLEMENTS: Config/StarSailorsPulseWidget.entitlements
