@@ -20,8 +20,8 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Invalid discovery" }, { status: 400 });
     }
     rows = await prisma.$queryRaw<Array<Record<string, unknown>>>`
-      SELECT id, mineralconfiguration, location, "roverName", created_at, discovery
-      FROM "mineralDeposits"
+      SELECT id, mineral_configuration, location, rover_name, created_at, discovery
+      FROM mineral_deposits
       WHERE owner = ${user.id}
         AND discovery = ${discovery}
         AND location IS NOT NULL
@@ -29,8 +29,8 @@ export async function GET(request: NextRequest) {
     `;
   } else {
     rows = await prisma.$queryRaw<Array<Record<string, unknown>>>`
-      SELECT id, mineralconfiguration, location, "roverName", created_at, discovery
-      FROM "mineralDeposits"
+      SELECT id, mineral_configuration, location, rover_name, created_at, discovery
+      FROM mineral_deposits
       WHERE owner = ${user.id}
         AND location IS NOT NULL
       ORDER BY created_at DESC
@@ -81,7 +81,7 @@ export async function POST(request: NextRequest) {
   };
 
   const rows = await prisma.$queryRaw<Array<Record<string, unknown>>>`
-    INSERT INTO "mineralDeposits" (anomaly, discovery, owner, mineralconfiguration, location, "roverName", created_at)
+    INSERT INTO mineral_deposits (anomaly, discovery, owner, mineral_configuration, location, rover_name, created_at)
     VALUES (
       ${payload.anomaly},
       ${payload.discovery},

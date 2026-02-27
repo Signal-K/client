@@ -1,7 +1,7 @@
 ---
 id: tdi1lj
 title: Add link/referrals between client and saily
-status: todo
+status: blocked
 priority: high
 labels:
   - refs

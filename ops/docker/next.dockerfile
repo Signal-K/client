@@ -7,19 +7,29 @@ WORKDIR /app
 # Copy the package.json and yarn.lock
 COPY package.json yarn.lock ./
 
-# Install dependencies deterministically
-RUN yarn install --frozen-lockfile
+# Install dependencies with retries to handle transient registry/cache failures
+RUN set -eux; \
+  for attempt in 1 2 3; do \
+    yarn cache clean || true; \
+    if yarn install --frozen-lockfile; then \
+      exit 0; \
+    fi; \
+    echo "yarn install failed (attempt ${attempt}); retrying..."; \
+    sleep $((attempt * 5)); \
+  done; \
+  echo "yarn install failed after retries"; \
+  exit 1
 
 # Copy the rest of the application code
 COPY . .
 
-# Build the application for production (optional - commented for development)
-# RUN yarn build
+# Generate Prisma client in image so fresh CI-like containers have it available.
+RUN yarn prisma:generate
 
 # Expose the port the app runs on
 EXPOSE 3000
 
 ENV NEXT_TELEMETRY_DISABLED=1
 
-# For development with hot-reloading
-CMD ["yarn", "dev"]
+# Run production server; compose overrides this to include build step.
+CMD ["yarn", "start"]

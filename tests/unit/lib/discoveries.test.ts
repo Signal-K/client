@@ -1,4 +1,8 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vitest";
+
+const { mockLimit } = vi.hoisted(() => ({
+  mockLimit: vi.fn().mockResolvedValue({ data: [], error: null }),
+}));
 
 // Mock supabase before importing discoveries
 vi.mock("@/lib/supabase", () => ({
@@ -7,10 +11,7 @@ vi.mock("@/lib/supabase", () => ({
       select: vi.fn(() => ({
         in: vi.fn(() => ({
           order: vi.fn(() => ({
-            limit: vi.fn(() => ({
-              data: [],
-              error: null,
-            })),
+            limit: mockLimit,
           })),
         })),
       })),
@@ -21,7 +22,49 @@ vi.mock("@/lib/supabase", () => ({
 import {
   getDiscoveryTypeLabel,
   getDiscoveryDescription,
+  getRecentDiscoveries,
 } from "@/lib/discoveries";
+
+describe("getRecentDiscoveries", () => {
+  beforeEach(() => {
+    mockLimit.mockReset();
+  });
+
+  it("returns empty array on success with no data", async () => {
+    mockLimit.mockResolvedValueOnce({ data: [], error: null });
+    const result = await getRecentDiscoveries();
+    expect(result).toEqual([]);
+  });
+
+  it("transforms supabase data correctly", async () => {
+    const raw = [
+      {
+        id: 1,
+        created_at: "2026-01-01T00:00:00Z",
+        content: "planet-x",
+        author: "user-123",
+        classificationtype: "planet",
+        profiles: [{ username: "astro", full_name: "Astro User" }],
+      },
+    ];
+    mockLimit.mockResolvedValueOnce({ data: raw, error: null });
+    const result = await getRecentDiscoveries();
+    expect(result).toHaveLength(1);
+    expect(result[0].profiles).toEqual({ username: "astro", full_name: "Astro User" });
+  });
+
+  it("returns empty array when supabase returns an error", async () => {
+    mockLimit.mockResolvedValueOnce({ data: null, error: { message: "DB error" } });
+    const result = await getRecentDiscoveries();
+    expect(result).toEqual([]);
+  });
+
+  it("returns empty array when supabase throws", async () => {
+    mockLimit.mockRejectedValueOnce(new Error("network failure"));
+    const result = await getRecentDiscoveries();
+    expect(result).toEqual([]);
+  });
+});
 
 describe("getDiscoveryTypeLabel", () => {
   it.each([

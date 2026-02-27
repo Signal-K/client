@@ -238,9 +238,9 @@ async function getPageData(userId: string) {
 
   const roverDeposits = await prisma.$queryRaw<Array<{ id: number }>>`
     SELECT id
-    FROM "mineralDeposits"
+    FROM mineral_deposits
     WHERE owner::text = ${userId}
-      AND "roverName" IS NOT NULL
+      AND rover_name IS NOT NULL
     LIMIT 1
   `;
   const hasRoverMineralDeposits = roverDeposits.length > 0;

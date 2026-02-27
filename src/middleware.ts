@@ -1,43 +1,26 @@
-import { createServerClient } from "@supabase/ssr";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-export async function middleware(req: NextRequest) {
-  let res = NextResponse.next({ request: { headers: req.headers } });
+function hasSupabaseAuthCookie(req: NextRequest) {
+  const cookies = req.cookies.getAll();
+  return cookies.some(({ name, value }) => {
+    if (!value) return false;
+    if (name === "supabase-auth-token") return true;
+    return /^sb-.*-auth-token(?:\.\d+)?$/.test(name);
+  });
+}
 
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return req.cookies.getAll();
-        },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) => req.cookies.set(name, value));
-          res = NextResponse.next({ request: { headers: req.headers } });
-          cookiesToSet.forEach(({ name, value, options }) => res.cookies.set(name, value, options));
-        },
-      },
-    }
-  );
-
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
-
-  if (session && req.nextUrl.pathname === "/") {
-    const redirectUrl = new URL("/game", req.url);
-    return NextResponse.redirect(redirectUrl);
+export function middleware(req: NextRequest) {
+  if (!hasSupabaseAuthCookie(req) && req.nextUrl.pathname.startsWith("/game")) {
+    const loginUrl = new URL("/auth", req.url);
+    const nextPath = `${req.nextUrl.pathname}${req.nextUrl.search}`;
+    loginUrl.searchParams.set("next", nextPath);
+    return NextResponse.redirect(loginUrl);
   }
 
-  if (!session && req.nextUrl.pathname.startsWith("/game")) {
-    return NextResponse.redirect(new URL("/", req.url));
-  }
-
-  return res;
+  return NextResponse.next({ request: { headers: req.headers } });
 }
 
 export const config = {
-  matcher: ["/", "/game/:path*"],
+  matcher: ["/game/:path*"],
 };

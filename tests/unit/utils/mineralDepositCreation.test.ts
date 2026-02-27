@@ -1,8 +1,9 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import {
   selectCloudMineral,
   selectJovianMineral,
   selectPlanetFourMineral,
+  attemptMineralDepositCreation,
 } from "@/utils/mineralDepositCreation";
 
 describe("selectCloudMineral", () => {
@@ -215,5 +216,126 @@ describe("selectPlanetFourMineral", () => {
     const result = selectPlanetFourMineral();
     expect(result.metadata?.annotations).toEqual([]);
     vi.restoreAllMocks();
+  });
+});
+
+describe("attemptMineralDepositCreation", () => {
+  const baseParams = {
+    userId: "user-1",
+    anomalyId: 99,
+    classificationId: 10,
+    mineralConfig: { type: "soil" as const },
+  };
+
+  beforeEach(() => {
+    vi.stubGlobal("fetch", vi.fn());
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    vi.restoreAllMocks();
+  });
+
+  it("returns false when user has no mineral research", async () => {
+    const fetchMock = vi.mocked(fetch);
+    fetchMock.mockResolvedValueOnce({
+      ok: false,
+      json: async () => ({}),
+    } as Response);
+
+    
+    const result = await attemptMineralDepositCreation(baseParams);
+    expect(result).toBe(false);
+  });
+
+  it("returns false when hasMineralResearch throws", async () => {
+    const fetchMock = vi.mocked(fetch);
+    fetchMock.mockRejectedValueOnce(new Error("network error"));
+
+    
+    const result = await attemptMineralDepositCreation(baseParams);
+    expect(result).toBe(false);
+  });
+
+  it("returns false when planet is not compatible (no classifications)", async () => {
+    const fetchMock = vi.mocked(fetch);
+    // hasMineralResearch → true
+    fetchMock.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ inventory: [{ id: 1 }] }),
+    } as Response);
+    // isPlanetCompatible – classification fetch (for classificationId)
+    fetchMock.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ classifications: [] }),
+    } as Response);
+    // isPlanetCompatible – planet classifications
+    fetchMock.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ classifications: [] }),
+    } as Response);
+
+    
+    const result = await attemptMineralDepositCreation(baseParams);
+    expect(result).toBe(false);
+  });
+
+  it("returns false when roll fails (> 1/3)", async () => {
+    const fetchMock = vi.mocked(fetch);
+    // hasMineralResearch
+    fetchMock.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ inventory: [{ id: 1 }] }),
+    } as Response);
+    // isPlanetCompatible – classification fetch
+    fetchMock.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ classifications: [] }),
+    } as Response);
+    // isPlanetCompatible – planet classifications (has stats)
+    fetchMock.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({
+        classifications: [{ classificationConfiguration: { planet_mass: "5.0", planet_radius: "1.2" } }],
+      }),
+    } as Response);
+
+    vi.spyOn(Math, "random").mockReturnValue(0.9); // > 1/3 → roll fails
+
+    
+    const result = await attemptMineralDepositCreation(baseParams);
+    expect(result).toBe(false);
+  });
+
+  it("returns true when research + compatible planet + roll succeeds + deposit created", async () => {
+    const fetchMock = vi.mocked(fetch);
+    // hasMineralResearch
+    fetchMock.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ inventory: [{ id: 1 }] }),
+    } as Response);
+    // isPlanetCompatible – classification fetch
+    fetchMock.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ classifications: [] }),
+    } as Response);
+    // isPlanetCompatible – planet classifications (has stats)
+    fetchMock.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({
+        classifications: [{ classificationConfiguration: { planet_mass: "5.0", planet_radius: "1.2" } }],
+      }),
+    } as Response);
+    // createMineralDeposit
+    fetchMock.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ id: 42 }),
+    } as Response);
+
+    vi.spyOn(Math, "random").mockReturnValue(0.1); // < 1/3 → roll succeeds
+
+    
+    const result = await attemptMineralDepositCreation(baseParams);
+    expect(result).toBe(true);
   });
 });

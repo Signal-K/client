@@ -1,20 +1,25 @@
 import React, { useEffect, useState, type ChangeEvent } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useActivePlanet } from "@/src/core/context/ActivePlanet";
 import { getCurrentProfileAction, updateProfileSetupAction } from "./actions";
 
 interface ProfileSetupFormProps {
   onProfileUpdate: () => void | null;
+  embedded?: boolean;
+  redirectOnSuccess?: boolean;
 };
 
-export default function ProfileSetupForm({ onProfileUpdate }: ProfileSetupFormProps) {
-  const { activePlanet } = useActivePlanet();
+export default function ProfileSetupForm({
+  onProfileUpdate,
+  embedded = false,
+  redirectOnSuccess = true,
+}: ProfileSetupFormProps) {
   const router = useRouter();
 
   const [loading, setLoading] = useState(true);
   const [initialLoaded, setInitialLoaded] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
 
   const [username, setUsername] = useState("");
   const [firstName, setFirstName] = useState("");
@@ -89,11 +94,15 @@ export default function ProfileSetupForm({ onProfileUpdate }: ProfileSetupFormPr
 
     setLoading(true);
     setError(null);
+    setSuccess(null);
 
     const formData = new FormData();
     formData.set("username", username);
     formData.set("firstName", firstName);
-    formData.set("existingAvatarPreview", avatarPreview || "");
+    // Only send existingAvatarPreview if it's a real storage URL (not a data URL)
+    if (avatarPreview && !avatarPreview.startsWith('data:')) {
+      formData.set("existingAvatarPreview", avatarPreview);
+    }
     if (avatar) {
       formData.set("avatar", avatar);
     }
@@ -103,7 +112,11 @@ export default function ProfileSetupForm({ onProfileUpdate }: ProfileSetupFormPr
     if (!result.ok) {
       setError(result.error);
     } else {
-      router.push("/");
+      if (redirectOnSuccess) {
+        router.push("/game");
+      } else {
+        setSuccess("Profile updated successfully.");
+      }
       onProfileUpdate?.();
     }
 
@@ -111,6 +124,13 @@ export default function ProfileSetupForm({ onProfileUpdate }: ProfileSetupFormPr
   }
 
   if (!initialLoaded) {
+    if (embedded) {
+      return (
+        <div className="rounded-2xl border border-cyan-300/20 bg-slate-900/70 p-6">
+          <p className="text-cyan-100/85 text-center">Loading profile…</p>
+        </div>
+      );
+    }
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#1D2833] p-4 bg-[url('/game-background.jpg')] bg-cover bg-center">
         <div className="bg-[#2C4F64]/90 p-8 rounded-3xl shadow-2xl max-w-md w-full backdrop-blur-sm border border-[#5FCBC3]/30">
@@ -120,9 +140,14 @@ export default function ProfileSetupForm({ onProfileUpdate }: ProfileSetupFormPr
     );
   }
 
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-[#1D2833] p-4 bg-[url('/game-background.jpg')] bg-cover bg-center">
-      <div className="bg-[#2C4F64]/90 p-8 rounded-3xl shadow-2xl max-w-md w-full backdrop-blur-sm border border-[#5FCBC3]/30 transform hover:scale-105 transition-all duration-300">
+  const formPanel = (
+    <div
+      className={`p-8 rounded-3xl shadow-2xl max-w-md w-full backdrop-blur-sm border border-[#5FCBC3]/30 transition-all duration-300 ${
+        embedded
+          ? "bg-gradient-to-br from-slate-900/90 via-cyan-950/75 to-indigo-950/75 hover:shadow-[0_18px_45px_rgba(0,0,0,0.45)]"
+          : "bg-[#2C4F64]/90 transform hover:scale-105"
+      }`}
+    >
         <h1 className="text-4xl font-bold text-[#FFE3BA] mb-8 text-center tracking-wide">
           My Profile
         </h1>
@@ -182,6 +207,7 @@ export default function ProfileSetupForm({ onProfileUpdate }: ProfileSetupFormPr
               <input
                 type="file"
                 id="avatar"
+                name="avatar"
                 data-testid="profile-avatar-input"
                 accept="image/*"
                 onChange={handleAvatarChange}
@@ -203,8 +229,19 @@ export default function ProfileSetupForm({ onProfileUpdate }: ProfileSetupFormPr
           >
             {loading ? "Saving..." : "Update your profile"}
           </button>
+          {success && <p className="text-emerald-300 text-sm text-center">{success}</p>}
+          {error && <p className="text-rose-300 text-sm text-center">{error}</p>}
         </form>
       </div>
+  );
+
+  if (embedded) {
+    return formPanel;
+  }
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-[#1D2833] p-4 bg-[url('/game-background.jpg')] bg-cover bg-center">
+      {formPanel}
     </div>
   );
 };

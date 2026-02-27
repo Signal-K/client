@@ -118,7 +118,7 @@ export default function ExtractionPage() {
   }
 
   // Determine project type from mineral configuration
-  const mineralType = deposit.mineralconfiguration.type
+  const mineralType = deposit.mineral_configuration.type
   let projectType: "P4" | "cloudspotting" | "JVH" | "AI4M" = "AI4M"
 
   if (["dust", "soil", "water-vapour"].includes(mineralType)) {
@@ -142,10 +142,10 @@ export default function ExtractionPage() {
       <div className="flex-1 overflow-y-auto pt-16">
         <ExtractionScene
           id={deposit.id}
-          mineralConfiguration={deposit.mineralconfiguration}
+          mineralConfiguration={deposit.mineral_configuration}
           location={deposit.location}
           discoveryId={deposit.discovery}
-          roverName={deposit.roverName}
+          roverName={deposit.rover_name}
           projectType={projectType}
           onExtractionComplete={handleExtractionComplete}
         />

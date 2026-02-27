@@ -1,0 +1,482 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		342014DA1472FEE8140DEE71 /* PulseShared.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EB31A9FA0716CF38997AD66 /* PulseShared.swift */; };
+		4C2C8B4294927DDB9C820A06 /* StarSailorsPulseWidget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = AB875CCEF5256AB9F49E19C0 /* StarSailorsPulseWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		710021FC306885108E215FE4 /* PulseShared.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EB31A9FA0716CF38997AD66 /* PulseShared.swift */; };
+		8C9751A9421F00C2CFA9F764 /* PulseSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAEEA78D355190714C176734 /* PulseSettingsView.swift */; };
+		9BEB9556105C790EC9308F51 /* StarSailorsPulseWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = B80D501E48549F7A04192385 /* StarSailorsPulseWidget.swift */; };
+		BF062F925A331FF673D1E011 /* PulseMenuBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A273EA386770E3099073743E /* PulseMenuBarView.swift */; };
+		D1B63928665A01094721C664 /* PulseViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E81B92924CCB09B988C7B8C7 /* PulseViewModel.swift */; };
+		E4C862D008C251B88B9AE957 /* StarSailorsPulseApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6313585E504F5D3B7AA42B9 /* StarSailorsPulseApp.swift */; };
+		FE43D6E33869D04E7927A367 /* PulseWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94AFB2703AECFC9FFD0DBE11 /* PulseWidgetView.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		D6E43C500BBC2D03CBA5E6BF /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 9356384FB829FAAC63912B9F /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 1DB3667BDAA78911BA0393A8;
+			remoteInfo = StarSailorsPulseWidget;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		8CD83EF9609CA50E34761B9D /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				4C2C8B4294927DDB9C820A06 /* StarSailorsPulseWidget.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		5EB31A9FA0716CF38997AD66 /* PulseShared.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PulseShared.swift; sourceTree = "<group>"; };
+		94AFB2703AECFC9FFD0DBE11 /* PulseWidgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PulseWidgetView.swift; sourceTree = "<group>"; };
+		A273EA386770E3099073743E /* PulseMenuBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PulseMenuBarView.swift; sourceTree = "<group>"; };
+		AB875CCEF5256AB9F49E19C0 /* StarSailorsPulseWidget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = StarSailorsPulseWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		B80D501E48549F7A04192385 /* StarSailorsPulseWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StarSailorsPulseWidget.swift; sourceTree = "<group>"; };
+		C6313585E504F5D3B7AA42B9 /* StarSailorsPulseApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StarSailorsPulseApp.swift; sourceTree = "<group>"; };
+		C8CF49CF2C09392E8D6E68C8 /* StarSailorsPulse.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = StarSailorsPulse.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		CB50007E928DE5A63C99380B /* Secrets.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Secrets.xcconfig; sourceTree = "<group>"; };
+		E81B92924CCB09B988C7B8C7 /* PulseViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PulseViewModel.swift; sourceTree = "<group>"; };
+		EAEEA78D355190714C176734 /* PulseSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PulseSettingsView.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		3D026C3B7F3A2F0CC0760CF3 /* Widget */ = {
+			isa = PBXGroup;
+			children = (
+				B80D501E48549F7A04192385 /* StarSailorsPulseWidget.swift */,
+			);
+			name = Widget;
+			path = Sources/Widget;
+			sourceTree = "<group>";
+		};
+		4A44E9C3A146818F35BE8B89 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				C8CF49CF2C09392E8D6E68C8 /* StarSailorsPulse.app */,
+				AB875CCEF5256AB9F49E19C0 /* StarSailorsPulseWidget.appex */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		4BBD09ECC15D2E17F32E9AE8 /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				5EB31A9FA0716CF38997AD66 /* PulseShared.swift */,
+			);
+			name = Shared;
+			path = Sources/Shared;
+			sourceTree = "<group>";
+		};
+		6455CE8318A1132FDFD7944F = {
+			isa = PBXGroup;
+			children = (
+				F5C77BF8CF37865D485DB1E1 /* App */,
+				6745E0391F59F363C171E0CD /* Config */,
+				4BBD09ECC15D2E17F32E9AE8 /* Shared */,
+				3D026C3B7F3A2F0CC0760CF3 /* Widget */,
+				4A44E9C3A146818F35BE8B89 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		6745E0391F59F363C171E0CD /* Config */ = {
+			isa = PBXGroup;
+			children = (
+				CB50007E928DE5A63C99380B /* Secrets.xcconfig */,
+			);
+			path = Config;
+			sourceTree = "<group>";
+		};
+		F5C77BF8CF37865D485DB1E1 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				A273EA386770E3099073743E /* PulseMenuBarView.swift */,
+				EAEEA78D355190714C176734 /* PulseSettingsView.swift */,
+				E81B92924CCB09B988C7B8C7 /* PulseViewModel.swift */,
+				94AFB2703AECFC9FFD0DBE11 /* PulseWidgetView.swift */,
+				C6313585E504F5D3B7AA42B9 /* StarSailorsPulseApp.swift */,
+			);
+			name = App;
+			path = Sources/App;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		1DB3667BDAA78911BA0393A8 /* StarSailorsPulseWidget */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DB324DFEBB8DBE0F8F72DEB0 /* Build configuration list for PBXNativeTarget "StarSailorsPulseWidget" */;
+			buildPhases = (
+				912820FB6E1CB6AB55A662BE /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = StarSailorsPulseWidget;
+			packageProductDependencies = (
+			);
+			productName = StarSailorsPulseWidget;
+			productReference = AB875CCEF5256AB9F49E19C0 /* StarSailorsPulseWidget.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+		66E975F67EBC12377D8BB356 /* StarSailorsPulse */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 36E797C63EC738CFD3DFE32C /* Build configuration list for PBXNativeTarget "StarSailorsPulse" */;
+			buildPhases = (
+				AFD1B861531CF43F7CD77AD8 /* Sources */,
+				8CD83EF9609CA50E34761B9D /* Embed Foundation Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				55242E3A13022841EE639B2D /* PBXTargetDependency */,
+			);
+			name = StarSailorsPulse;
+			packageProductDependencies = (
+			);
+			productName = StarSailorsPulse;
+			productReference = C8CF49CF2C09392E8D6E68C8 /* StarSailorsPulse.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		9356384FB829FAAC63912B9F /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					1DB3667BDAA78911BA0393A8 = {
+						DevelopmentTeam = 7GDC42L522;
+						ProvisioningStyle = Automatic;
+					};
+					66E975F67EBC12377D8BB356 = {
+						DevelopmentTeam = 7GDC42L522;
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = 9682F935799EAEECF11B6105 /* Build configuration list for PBXProject "StarSailorsPulse" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 6455CE8318A1132FDFD7944F;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				66E975F67EBC12377D8BB356 /* StarSailorsPulse */,
+				1DB3667BDAA78911BA0393A8 /* StarSailorsPulseWidget */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		912820FB6E1CB6AB55A662BE /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				710021FC306885108E215FE4 /* PulseShared.swift in Sources */,
+				9BEB9556105C790EC9308F51 /* StarSailorsPulseWidget.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AFD1B861531CF43F7CD77AD8 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BF062F925A331FF673D1E011 /* PulseMenuBarView.swift in Sources */,
+				8C9751A9421F00C2CFA9F764 /* PulseSettingsView.swift in Sources */,
+				342014DA1472FEE8140DEE71 /* PulseShared.swift in Sources */,
+				D1B63928665A01094721C664 /* PulseViewModel.swift in Sources */,
+				FE43D6E33869D04E7927A367 /* PulseWidgetView.swift in Sources */,
+				E4C862D008C251B88B9AE957 /* StarSailorsPulseApp.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		55242E3A13022841EE639B2D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 1DB3667BDAA78911BA0393A8 /* StarSailorsPulseWidget */;
+			targetProxy = D6E43C500BBC2D03CBA5E6BF /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		727943327C837EECE8400727 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = 7GDC42L522;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MARKETING_VERSION = 0.1.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.starsailors.pulse;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.9;
+			};
+			name = Debug;
+		};
+		737F94CD8B6AA677D13C1459 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = CB50007E928DE5A63C99380B /* Secrets.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = Config/StarSailorsPulseWidget.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = 7GDC42L522;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = "Config/Widget-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.starsailors.pulse.widget;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		B30B386A801ECB87AF19C603 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = CB50007E928DE5A63C99380B /* Secrets.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = Config/StarSailorsPulseWidget.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = 7GDC42L522;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = "Config/Widget-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.starsailors.pulse.widget;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		D24BD03E43BA45B4F3CE7B23 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = CB50007E928DE5A63C99380B /* Secrets.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Config/StarSailorsPulse.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = 7GDC42L522;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = "Config/App-Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Star Sailors Pulse";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
+				INFOPLIST_KEY_NSAppTransportSecurity_NSAllowsArbitraryLoads = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		E5292D8BD46DB67E8FD105AC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = 7GDC42L522;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MARKETING_VERSION = 0.1.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.starsailors.pulse;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.9;
+			};
+			name = Release;
+		};
+		ECA78DAE87D74E61D56811E7 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = CB50007E928DE5A63C99380B /* Secrets.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Config/StarSailorsPulse.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = 7GDC42L522;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = "Config/App-Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Star Sailors Pulse";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
+				INFOPLIST_KEY_NSAppTransportSecurity_NSAllowsArbitraryLoads = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		36E797C63EC738CFD3DFE32C /* Build configuration list for PBXNativeTarget "StarSailorsPulse" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D24BD03E43BA45B4F3CE7B23 /* Debug */,
+				ECA78DAE87D74E61D56811E7 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		9682F935799EAEECF11B6105 /* Build configuration list for PBXProject "StarSailorsPulse" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				727943327C837EECE8400727 /* Debug */,
+				E5292D8BD46DB67E8FD105AC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		DB324DFEBB8DBE0F8F72DEB0 /* Build configuration list for PBXNativeTarget "StarSailorsPulseWidget" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				737F94CD8B6AA677D13C1459 /* Debug */,
+				B30B386A801ECB87AF19C603 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 9356384FB829FAAC63912B9F /* Project object */;
+}

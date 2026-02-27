@@ -38,8 +38,8 @@ export async function GET() {
     prisma.$queryRaw<Array<{ classificationtype: string }>>`
       SELECT classificationtype FROM classifications WHERE author = ${userId}
     `,
-    prisma.$queryRaw<Array<{ mineralconfiguration: Record<string, unknown> | null }>>`
-      SELECT mineralconfiguration FROM "mineralDeposits" WHERE owner = ${userId}
+    prisma.$queryRaw<Array<{ mineral_configuration: Record<string, unknown> | null }>>`
+      SELECT mineral_configuration FROM mineral_deposits WHERE owner = ${userId}
     `,
   ]);
 
@@ -82,7 +82,7 @@ export async function GET() {
 
   const extractedTypes = new Set<string>();
   (mineralsData || []).forEach((deposit) => {
-    const config = deposit.mineralconfiguration;
+    const config = deposit.mineral_configuration;
     if (!config) return;
     const type = config.type || config.mineralType;
     if (!type) return;

@@ -13,7 +13,8 @@ import PlanetGenerator from "@/src/components/discovery/data-sources/Astronomers
 import BiomeAggregator from "@/src/components/discovery/data-sources/BiomeAggregator";
 import PlanetProgress from "@/src/components/deployment/missions/structures/Astronomers/PlanetHunters/PlanetCompletion";
 // import WeatherGenerator from "@/src/components/discovery/data-sources/Weather/SimpleWeatherEvents";
-import GameNavbar from "@/src/components/layout/Tes";
+import MainHeader from "@/src/components/layout/Header/MainHeader";
+import UseDarkMode from "@/src/shared/hooks/useDarkMode";
 
 export interface Classification {
   id: number;
@@ -101,6 +102,7 @@ export default function TestPlanetWrapper() {
   const id = params?.id as string;
   
   const session = useSession();
+  const { isDark, toggleDarkMode } = UseDarkMode();
 
   const [classification, setClassification] = useState<Classification | null>(null);
   const [anomaly, setAnomaly] = useState<Anomaly | null>(null);
@@ -459,7 +461,14 @@ export default function TestPlanetWrapper() {
 
     return (
       <div className="min-h-screen w-screen">
-        <GameNavbar />
+        <MainHeader
+          isDark={isDark}
+          onThemeToggle={toggleDarkMode}
+          notificationsOpen={false}
+          onToggleNotifications={() => {}}
+          activityFeed={[]}
+          otherClassifications={[]}
+        />
         <div className="relative py-4 overflow-hidden bg-black text-white">
             <div className="absolute inset-0 z-0">
                 <Image
@@ -478,7 +487,7 @@ export default function TestPlanetWrapper() {
                 </div>
             )} */}
 
-            <main className="relative z-10 h-[100vh] flex flex-col justify-start pt-12">
+            <main className="relative z-10 h-[100vh] flex flex-col justify-start pt-20">
                 {currentView !== "planet" && (
                     <div className="absolute top-4 left-4 z-20">
                         <Button

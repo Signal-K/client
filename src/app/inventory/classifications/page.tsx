@@ -8,7 +8,7 @@ import { usePageData, useGroupedClassifications } from "@/hooks/usePageData";
 import { ClassificationTypeIcon } from "@/src/components/classification/ClassificationTypeIcon";
 import { AnnotationOptionLabel } from "@/src/components/classification/AnnotationOptionLabel";
 import ActivityHeaderSection from "@/src/components/social/activity/ActivityHeaderSection";
-import Login from "@/app/auth/page";
+import Link from "next/link";
 
 export default function UserClassificationsInventoryPage() {
   const session = useSession();
@@ -59,7 +59,11 @@ export default function UserClassificationsInventoryPage() {
 
   if (!session) {
     return (
-      <Login />
+      <div className="min-h-screen w-full flex items-center justify-center">
+        <Link href="/auth" className="text-primary hover:underline">
+          Sign in to view your classifications
+        </Link>
+      </div>
     );
   };
 

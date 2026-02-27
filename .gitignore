@@ -41,6 +41,9 @@ storage_downloads/
 
 # production
 /build
+apps/mac-widget/StarSailorsPulse/build/
+apps/mac-widget/StarSailorsPulse/build_signed/
+apps/mac-widget/StarSailorsPulse/Config/Secrets.xcconfig
 
 # misc
 .DS_Store

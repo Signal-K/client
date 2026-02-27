@@ -41,6 +41,18 @@ if [[ -z "${NEXT_PUBLIC_SUPABASE_ANON_KEY}" || -z "${SUPABASE_SERVICE_ROLE_KEY}"
   exit 1
 fi
 
+if [[ -z "${DATABASE_URL:-}" ]]; then
+  STATUS_ENV="$(supabase status -o env 2>/dev/null || true)"
+  if [[ -n "${STATUS_ENV}" ]]; then
+    export DATABASE_URL="$(printf '%s\n' "${STATUS_ENV}" | sed -n 's/^DB_URL=//p' | tail -n1 | sed 's/^"//; s/"$//')"
+  fi
+fi
+
+if [[ -z "${DATABASE_URL:-}" ]]; then
+  echo "Missing DATABASE_URL. Could not derive DB_URL from local Supabase."
+  exit 1
+fi
+
 unset ELECTRON_RUN_AS_NODE
 
 echo "Running unit tests..."

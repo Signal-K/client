@@ -53,6 +53,7 @@ Primary spec path: .knowns/docs/specs/migration/two-two-migration.md
 - Wired CTA tracking for ecosystem cards via `posthog.capture('ecosystem_cta_clicked', ...)`.
 - Reused `#about` anchor for desktop/mobile navigation so "About" now targets ecosystem routing guidance.
 - Completed redesign pass with clearer ecosystem routing and explicit external Saily linkage (`https://thedailysail.starsailors.space`).
+- Visual overhaul superseded by **task-e9f2px** (2026-02-23): full rewrite of `src/app/apt/page.tsx` as a light-mode page with full-bleed hero imagery (landing*.jpg), colour-coded 3-column project cards, image strip, and about section.
 <!-- SECTION:NOTES:END -->
 
 

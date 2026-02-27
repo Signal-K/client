@@ -1,60 +1,49 @@
 "use client";
 export const dynamic = "force-dynamic";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { usePostHog } from "posthog-js/react";
-import { Badge } from "@/src/components/ui/badge";
 import { Button } from "@/src/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/src/components/ui/card";
-import { ArrowRight, ExternalLink, Menu, Rocket, Star, X } from "lucide-react";
+import {
+  ArrowRight,
+  Clock,
+  ExternalLink,
+  Menu,
+  Rocket,
+  Star,
+  Telescope,
+  Zap,
+  X,
+} from "lucide-react";
+import { VariantSwitcher } from "@/src/components/landing/VariantSwitcher";
 
-const projects = [
-  {
-    key: "web-client",
-    name: "Star Sailors Web Client",
-    status: "Live",
-    description: "Primary frontend in this repository. Best for full progression, deploy loops, and active mechanics.",
-    bestFor: "Text-first strategy loop and broadest current features.",
-    href: "/auth",
-    cta: "Play Web Client",
-    external: false,
-    disabled: false,
-  },
-  {
-    key: "experiment-1",
-    name: "PlanetHunters Experiment 1",
-    status: "Live (Subset)",
-    description: "Focused subset for game-first mission flow with smaller scope.",
-    bestFor: "Players wanting a tighter mission-first loop.",
-    href: "/auth",
-    cta: "Start Here",
-    external: false,
-    disabled: false,
-  },
-  {
-    key: "saily",
-    name: "Saily",
-    status: "External Frontend",
-    description: "Saily is not part of this codebase and is linked as an external experience.",
-    bestFor: "Daily puzzle cadence and short sessions.",
-    href: "https://thedailysail.starsailors.space",
-    cta: "Open Saily",
-    external: true,
-    disabled: false,
-  },
-  {
-    key: "click-a-coral",
-    name: "Click-A-Coral",
-    status: "In Development",
-    description: "Upcoming ecosystem surface, currently not ready for public playtesting.",
-    bestFor: "Coral-focused puzzle gameplay (planned).",
-    href: "",
-    cta: "Coming Soon",
-    external: false,
-    disabled: true,
-  },
-];
+// TODO(task-tdi1lj): Replace EXPERIMENT_1_URL with real URL once Experiment 1
+// Godot build URL contract is defined. Currently links to web client auth as fallback.
+const EXPERIMENT_1_URL = "/auth";
+const EXPERIMENT_1_EXTERNAL = false;
+
+const SAILY_URL = "https://thedailysail.starsailors.space";
+
+interface Project {
+  key: string;
+  icon: React.ReactNode;
+  color: string;
+  iconBg: string;
+  badgeColor: string;
+  ctaColor: string;
+  ctaBorder: string;
+  name: string;
+  forWho: string;
+  tagline: string;
+  bullets: string[];
+  session: string;
+  cta: string;
+  href: string;
+  external: boolean;
+  image: string;
+}
 
 export default function AptPage() {
   const posthog = usePostHog();
@@ -66,162 +55,415 @@ export default function AptPage() {
 
   useEffect(() => {
     document.body.style.overflow = mobileMenuOpen ? "hidden" : "unset";
-    return () => {
-      document.body.style.overflow = "unset";
-    };
+    return () => { document.body.style.overflow = "unset"; };
   }, [mobileMenuOpen]);
 
-  return (
-    <div className="min-h-screen bg-slate-950 text-slate-100">
-      <div className="pointer-events-none fixed inset-0 -z-10">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_10%_20%,rgba(45,212,191,0.2),transparent_35%),radial-gradient(circle_at_90%_10%,rgba(249,115,22,0.15),transparent_30%),radial-gradient(circle_at_65%_80%,rgba(56,189,248,0.14),transparent_32%)]" />
-        <div className="absolute inset-0 opacity-25 [background:linear-gradient(to_right,rgba(148,163,184,.12)_1px,transparent_1px),linear-gradient(to_bottom,rgba(148,163,184,.12)_1px,transparent_1px)] [background-size:34px_34px]" />
-      </div>
+  const projects: Project[] = [
+    {
+      key: "web-client",
+      icon: <Telescope className="h-6 w-6" />,
+      color: "text-teal-600",
+      iconBg: "bg-teal-50 border-teal-100",
+      badgeColor: "bg-teal-50 text-teal-700 border-teal-200",
+      ctaColor: "bg-teal-500 hover:bg-teal-600 text-white",
+      ctaBorder: "border-t-4 border-teal-400",
+      name: "Star Sailors",
+      forWho: "Strategy & science explorers",
+      tagline: "The full game loop — deploy structures, classify real starlight, and build a space base.",
+      bullets: [
+        "Deploy telescope, rover & satellite structures",
+        "Classify real TESS & NASA data on 10+ missions",
+        "Mine minerals, research upgrades, earn stardust",
+      ],
+      session: "30–90 min sessions",
+      cta: "Launch Web Client",
+      href: "/auth",
+      external: false,
+      image: "/assets/Images/landing2.jpg",
+    },
+    {
+      key: "experiment-1",
+      icon: <Rocket className="h-6 w-6" />,
+      color: "text-amber-600",
+      iconBg: "bg-amber-50 border-amber-100",
+      badgeColor: "bg-amber-50 text-amber-700 border-amber-200",
+      ctaColor: "bg-amber-500 hover:bg-amber-600 text-white",
+      ctaBorder: "border-t-4 border-amber-400",
+      name: "Experiment 1",
+      forWho: "Game-first players",
+      tagline: "Build rockets, fly to real astronomical targets, mine the solar system.",
+      bullets: [
+        "Launch missions to real asteroids & exoplanet candidates",
+        "Scan targets using live TESS light-curve data",
+        "Focused scope: PlanetHunters, Asteroids & Minor Planets",
+      ],
+      session: "10–30 min sessions",
+      cta: "Play Experiment 1",
+      href: EXPERIMENT_1_URL,
+      external: EXPERIMENT_1_EXTERNAL,
+      image: "/assets/Images/landing3.jpg",
+    },
+    {
+      key: "saily",
+      icon: <Zap className="h-6 w-6" />,
+      color: "text-sky-600",
+      iconBg: "bg-sky-50 border-sky-100",
+      badgeColor: "bg-sky-50 text-sky-700 border-sky-200",
+      ctaColor: "bg-sky-500 hover:bg-sky-600 text-white",
+      ctaBorder: "border-t-4 border-sky-400",
+      name: "Saily",
+      forWho: "Daily puzzle players",
+      tagline: "One real telescope anomaly every day. Annotate it, submit, climb the leaderboard.",
+      bullets: [
+        "Fresh TESS light-curve data released each day",
+        "Annotate and classify solo — no hints required",
+        "Streaks, badges, and community discussion",
+      ],
+      session: "~5 min daily",
+      cta: "Open Saily",
+      href: SAILY_URL,
+      external: true,
+      image: "/assets/Images/landing4.jpg",
+    },
+  ];
 
-      <header className="sticky top-0 z-50 border-b border-slate-800 bg-slate-950/80 backdrop-blur-md">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
-          <div className="flex items-center gap-2">
-            <div className="grid h-8 w-8 place-items-center rounded-full bg-teal-400 text-slate-900">
-              <Star className="h-4 w-4" />
+  return (
+    <div className="min-h-screen bg-white text-gray-900">
+
+      {/* ─── Nav ─── */}
+      <header className="sticky top-0 z-50 border-b border-gray-200 bg-white/90 backdrop-blur-md">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-3.5 sm:px-8">
+          <div className="flex items-center gap-2.5">
+            <div className="grid h-8 w-8 place-items-center rounded-full bg-teal-500 text-white">
+              <Star className="h-4 w-4" aria-hidden />
             </div>
-            <h1 className="text-xl font-black tracking-tight">Star Sailors</h1>
+            <span className="text-lg font-black tracking-tight text-gray-900">Star Sailors</span>
           </div>
 
-          <nav className="hidden items-center gap-6 md:flex">
-            <a href="#ecosystem" className="text-sm text-slate-300 hover:text-teal-300">Ecosystem</a>
-            <a href="#flow" className="text-sm text-slate-300 hover:text-teal-300">Flow</a>
+          <nav className="hidden items-center gap-1 md:flex" aria-label="Primary navigation">
+            <a href="#choose" className="rounded-lg px-3 py-1.5 text-sm text-gray-500 hover:bg-gray-100 hover:text-gray-900 transition">
+              Explore
+            </a>
+            <a href="#about" className="rounded-lg px-3 py-1.5 text-sm text-gray-500 hover:bg-gray-100 hover:text-gray-900 transition">
+              About
+            </a>
           </nav>
 
-          <Link href="/auth" className="hidden md:block">
-            <Button className="rounded-full bg-teal-400 text-slate-900 hover:bg-teal-300">Play Web Client</Button>
-          </Link>
+          <div className="hidden items-center gap-3 md:flex">
+            <a
+              href={SAILY_URL}
+              target="_blank"
+              rel="noreferrer"
+              onClick={() => posthog?.capture("nav_cta_clicked", { destination: "saily" })}
+              className="rounded-full border border-sky-200 bg-sky-50 px-4 py-1.5 text-sm font-semibold text-sky-700 hover:bg-sky-100 transition"
+            >
+              Saily ↗
+            </a>
+            <Link href="/auth">
+              <Button
+                size="sm"
+                className="rounded-full bg-teal-500 text-white hover:bg-teal-600"
+                onClick={() => posthog?.capture("nav_cta_clicked", { destination: "web-client" })}
+              >
+                Web Client
+              </Button>
+            </Link>
+          </div>
 
           <button
-            className="rounded-lg p-2 hover:bg-slate-800 md:hidden"
-            aria-label="Toggle menu"
+            className="rounded-lg p-2 text-gray-500 hover:bg-gray-100 md:hidden"
+            aria-label="Toggle navigation menu"
+            aria-expanded={mobileMenuOpen}
             onClick={() => setMobileMenuOpen((v) => !v)}
           >
-            {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            {mobileMenuOpen ? <X className="h-5 w-5" aria-hidden /> : <Menu className="h-5 w-5" aria-hidden />}
           </button>
         </div>
 
         {mobileMenuOpen && (
-          <div className="border-t border-slate-800 px-6 py-4 md:hidden">
-            <div className="flex flex-col gap-4">
-              <a href="#ecosystem" onClick={() => setMobileMenuOpen(false)}>Ecosystem</a>
-              <a href="#flow" onClick={() => setMobileMenuOpen(false)}>Flow</a>
+          <div className="border-t border-gray-100 px-5 pb-5 pt-4 md:hidden">
+            <nav className="flex flex-col gap-1" aria-label="Mobile navigation">
+              <a href="#choose" onClick={() => setMobileMenuOpen(false)} className="rounded-lg px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-100">Explore</a>
+              <a href="#about" onClick={() => setMobileMenuOpen(false)} className="rounded-lg px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-100">About</a>
+            </nav>
+            <div className="mt-4 flex flex-col gap-2">
+              <a href={SAILY_URL} target="_blank" rel="noreferrer" onClick={() => setMobileMenuOpen(false)}>
+                <Button variant="outline" className="w-full rounded-full border-sky-200 bg-sky-50 text-sky-700 hover:bg-sky-100">
+                  Open Saily <ExternalLink className="ml-1.5 h-3.5 w-3.5" aria-hidden />
+                </Button>
+              </a>
               <Link href="/auth" onClick={() => setMobileMenuOpen(false)}>
-                <Button className="w-full rounded-full bg-teal-400 text-slate-900 hover:bg-teal-300">Play Web Client</Button>
+                <Button className="w-full rounded-full bg-teal-500 text-white hover:bg-teal-600">Launch Web Client</Button>
               </Link>
             </div>
           </div>
         )}
       </header>
 
-      <section className="px-6 pb-14 pt-20">
+      {/* ─── Hero ─── */}
+      <section className="relative overflow-hidden">
+        <div className="relative h-[520px] w-full sm:h-[600px] lg:h-[680px]">
+          <Image
+            src="/assets/Images/landing1.jpg"
+            alt="Star field with distant galaxies and nebulae"
+            fill
+            className="object-cover object-center"
+            priority
+          />
+          {/* Overlay */}
+          <div className="absolute inset-0 bg-gradient-to-b from-black/55 via-black/40 to-black/70" />
+          {/* Content */}
+          <div className="absolute inset-0 flex flex-col items-center justify-center px-5 text-center sm:px-8">
+            <span className="mb-4 inline-block rounded-full border border-white/30 bg-white/10 px-4 py-1.5 text-sm font-semibold text-white backdrop-blur-sm">
+              Citizen Science Ecosystem
+            </span>
+            <h1 className="max-w-3xl text-4xl font-black leading-tight text-white sm:text-6xl">
+              Real astronomy.<br />Your kind of game.
+            </h1>
+            <p className="mt-4 max-w-xl text-base text-white/80 sm:text-lg">
+              Star Sailors wraps genuine NASA and TESS research inside playable experiences.
+              Every classification you make contributes to real science.
+            </p>
+            <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+              <a href="#choose">
+                <Button size="lg" className="rounded-full bg-white text-gray-900 hover:bg-gray-100 font-semibold shadow-lg">
+                  Find your experience
+                  <ArrowRight className="ml-2 h-4 w-4" aria-hidden />
+                </Button>
+              </a>
+              <a href={SAILY_URL} target="_blank" rel="noreferrer">
+                <Button size="lg" variant="outline" className="rounded-full border-white/50 bg-white/10 text-white backdrop-blur-sm hover:bg-white/20">
+                  Open Saily <ExternalLink className="ml-2 h-4 w-4" aria-hidden />
+                </Button>
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ─── Project chooser ─── */}
+      <section id="choose" className="bg-gray-50 px-5 py-20 sm:px-8">
         <div className="mx-auto max-w-7xl">
-          <Badge className="mb-6 border border-teal-300/40 bg-teal-400/20 text-teal-200">Citizen Science Ecosystem</Badge>
-          <h2 className="max-w-4xl text-5xl font-black leading-tight md:text-7xl">
-            One Universe.
-            <br />
-            Multiple Frontends.
-            <br />
-            Clear Entry Points.
+          <div className="mb-12 text-center">
+            <h2 className="text-3xl font-black text-gray-900 sm:text-4xl">
+              Three experiences. One universe.
+            </h2>
+            <p className="mt-3 text-base text-gray-500 sm:text-lg">
+              Pick the frontend that matches your session length and playstyle.
+            </p>
+          </div>
+
+          <div className="grid gap-8 md:grid-cols-3">
+            {projects.map((project) => (
+              <article
+                key={project.key}
+                className={`group flex flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm hover:shadow-md transition-shadow duration-300 ${project.ctaBorder}`}
+              >
+                {/* Image */}
+                <div className="relative h-44 overflow-hidden">
+                  <Image
+                    src={project.image}
+                    alt={`${project.name} preview`}
+                    fill
+                    className="object-cover object-center transition-transform duration-500 group-hover:scale-105"
+                  />
+                </div>
+
+                <div className="flex flex-1 flex-col p-6">
+                  {/* For-who badge */}
+                  <span className={`mb-3 inline-flex w-fit items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold ${project.badgeColor}`}>
+                    {project.forWho}
+                  </span>
+
+                  {/* Icon + name */}
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className={`rounded-lg border p-2 ${project.iconBg} ${project.color}`} aria-hidden>
+                      {project.icon}
+                    </div>
+                    <h3 className="text-xl font-black text-gray-900">{project.name}</h3>
+                  </div>
+
+                  {/* Tagline */}
+                  <p className="text-sm text-gray-600 mb-5">{project.tagline}</p>
+
+                  {/* Bullets */}
+                  <ul className="flex flex-1 flex-col gap-2 mb-5" aria-label={`${project.name} features`}>
+                    {project.bullets.map((b, i) => (
+                      <li key={i} className="flex items-start gap-2 text-sm text-gray-700">
+                        <svg className={`mt-0.5 h-4 w-4 shrink-0 ${project.color}`} fill="none" viewBox="0 0 16 16" aria-hidden>
+                          <circle cx="8" cy="8" r="7" stroke="currentColor" strokeWidth="1.5" />
+                          <path d="M5 8l2 2 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                        {b}
+                      </li>
+                    ))}
+                  </ul>
+
+                  {/* Session */}
+                  <div className="flex items-center gap-1.5 text-xs text-gray-400 mb-5">
+                    <Clock className="h-3.5 w-3.5 shrink-0" aria-hidden />
+                    <span>{project.session}</span>
+                  </div>
+
+                  {/* CTA */}
+                  {project.external ? (
+                    <a
+                      href={project.href}
+                      target="_blank"
+                      rel="noreferrer"
+                      aria-label={`${project.cta} — opens in a new tab`}
+                      onClick={() => posthog?.capture("ecosystem_cta_clicked", { project: project.key, destination: project.href })}
+                    >
+                      <Button className={`w-full rounded-full font-semibold ${project.ctaColor}`}>
+                        {project.cta}
+                        <ExternalLink className="ml-2 h-4 w-4" aria-hidden />
+                      </Button>
+                    </a>
+                  ) : (
+                    <Link
+                      href={project.href}
+                      aria-label={project.cta}
+                      onClick={() => posthog?.capture("ecosystem_cta_clicked", { project: project.key, destination: project.href })}
+                    >
+                      <Button className={`w-full rounded-full font-semibold ${project.ctaColor}`}>
+                        {project.cta}
+                        <ArrowRight className="ml-2 h-4 w-4" aria-hidden />
+                      </Button>
+                    </Link>
+                  )}
+                </div>
+              </article>
+            ))}
+          </div>
+
+          {/* Click-A-Coral teaser */}
+          <div className="mt-8 flex flex-col items-start justify-between gap-4 rounded-2xl border border-dashed border-gray-300 bg-white p-6 sm:flex-row sm:items-center">
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <span className="font-bold text-gray-800">Click-A-Coral</span>
+                <span className="rounded-full bg-gray-100 border border-gray-200 px-2 py-0.5 text-xs text-gray-500">In Development</span>
+              </div>
+              <p className="text-sm text-gray-500">
+                A coral-breeding puzzle game linked to the ClickACoral citizen science project. Not yet ready for playtesting.
+              </p>
+            </div>
+            <Button disabled variant="outline" className="shrink-0 rounded-full border-gray-200 text-gray-400">
+              Coming Soon
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* ─── Image strip ─── */}
+      <section className="overflow-hidden bg-white">
+        <div className="flex h-52 sm:h-64">
+          {["/assets/Images/landing5.jpg", "/assets/Images/landing6.jpg", "/assets/Images/landing2.jpg"].map((src, i) => (
+            <div key={i} className="relative flex-1 overflow-hidden">
+              <Image
+                src={src}
+                alt=""
+                fill
+                className="object-cover object-center"
+                aria-hidden
+              />
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ─── About ─── */}
+      <section id="about" className="px-5 py-20 sm:px-8">
+        <div className="mx-auto max-w-7xl">
+          <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
+            <div>
+              <span className="mb-4 inline-block text-xs font-bold uppercase tracking-widest text-teal-600">
+                About the project
+              </span>
+              <h2 className="text-3xl font-black text-gray-900 sm:text-4xl">
+                Play games. Do real science.
+              </h2>
+              <p className="mt-4 text-gray-600 leading-relaxed">
+                Star Sailors is an open-source citizen science platform. Each frontend wraps genuine
+                astronomical research — exoplanet detection from TESS data, asteroid surveys, coral reef monitoring —
+                inside playable loops. Every annotation you submit goes to real scientific databases.
+              </p>
+              <div className="mt-8 grid grid-cols-3 gap-4">
+                {[
+                  { value: "11+", label: "Science projects" },
+                  { value: "3", label: "Deployment structures" },
+                  { value: "3", label: "Live frontends" },
+                ].map((s) => (
+                  <div key={s.label} className="rounded-xl border border-gray-200 bg-gray-50 px-4 py-4 text-center">
+                    <div className="text-2xl font-black text-teal-600">{s.value}</div>
+                    <div className="mt-0.5 text-xs text-gray-500">{s.label}</div>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-8 flex flex-wrap gap-4">
+                <a href="https://github.com/signal-k/client" target="_blank" rel="noreferrer" className="text-sm font-semibold text-teal-600 underline underline-offset-4 hover:text-teal-700">
+                  View on GitHub ↗
+                </a>
+                <a href="https://zooniverse.org" target="_blank" rel="noreferrer" className="text-sm font-semibold text-gray-400 underline underline-offset-4 hover:text-gray-600">
+                  Partner: Zooniverse ↗
+                </a>
+              </div>
+            </div>
+            <div className="relative h-72 overflow-hidden rounded-2xl shadow-lg lg:h-96">
+              <Image
+                src="/assets/Images/landing3.jpg"
+                alt="Telescope observing a star field"
+                fill
+                className="object-cover object-center"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ─── Bottom CTA Band ─── */}
+      <section className="bg-teal-500 px-5 py-14 sm:px-8">
+        <div className="mx-auto max-w-3xl text-center">
+          <h2 className="text-2xl font-black text-white sm:text-3xl">
+            Ready to explore?
           </h2>
-          <p className="mt-6 max-w-3xl text-lg text-slate-300 md:text-xl">
-            Start in the web client for the most complete experience, then branch to specialized experiences like Saily.
+          <p className="mt-3 text-teal-100">
+            Start with the web client, try the daily Saily puzzle, or follow missions in Experiment 1.
           </p>
-          <div className="mt-8 flex flex-wrap gap-3">
-            <Link href="/auth">
-              <Button size="lg" className="rounded-full bg-teal-400 text-slate-900 hover:bg-teal-300">
-                <Rocket className="mr-2 h-5 w-5" />
-                Start Web Client
+          <div className="mt-7 flex flex-wrap justify-center gap-3">
+            <Link href="/auth" onClick={() => posthog?.capture("ecosystem_cta_clicked", { project: "web-client", destination: "/auth" })}>
+              <Button size="lg" className="rounded-full bg-white text-teal-700 hover:bg-gray-100 font-semibold shadow">
+                Launch Web Client
+                <ArrowRight className="ml-2 h-4 w-4" aria-hidden />
               </Button>
             </Link>
-            <a href="https://thedailysail.starsailors.space" target="_blank" rel="noreferrer">
-              <Button size="lg" variant="outline" className="rounded-full border-slate-600 bg-slate-900/70 text-slate-100 hover:bg-slate-800">
-                Open Saily
-                <ExternalLink className="ml-2 h-5 w-5" />
+            <a href={SAILY_URL} target="_blank" rel="noreferrer" onClick={() => posthog?.capture("ecosystem_cta_clicked", { project: "saily", destination: SAILY_URL })}>
+              <Button size="lg" variant="outline" className="rounded-full border-white/50 bg-white/10 text-white hover:bg-white/20">
+                Open Saily <ExternalLink className="ml-2 h-4 w-4" aria-hidden />
               </Button>
             </a>
           </div>
         </div>
       </section>
 
-      <section id="ecosystem" className="px-6 py-14">
-        <div className="mx-auto max-w-7xl">
-          <h3 className="text-3xl font-black md:text-4xl">Ecosystem Routing</h3>
-          <p className="mt-3 max-w-3xl text-slate-300">What is live, who it is for, and where to go.</p>
-
-          <div className="mt-8 grid gap-6 md:grid-cols-2">
-            {projects.map((project) => (
-              <Card key={project.key} className="border-slate-700 bg-slate-900/70">
-                <CardHeader>
-                  <div className="mb-2 flex items-center justify-between">
-                    <CardTitle>{project.name}</CardTitle>
-                    <Badge className="border-slate-600 bg-slate-800 text-slate-200">{project.status}</Badge>
-                  </div>
-                  <CardDescription className="text-slate-300">{project.description}</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p className="mb-4 text-sm text-slate-300"><span className="font-semibold text-slate-100">Best for:</span> {project.bestFor}</p>
-                  {project.disabled ? (
-                    <Button disabled className="rounded-full">{project.cta}</Button>
-                  ) : project.external ? (
-                    <a href={project.href} target="_blank" rel="noreferrer">
-                      <Button
-                        className="rounded-full bg-sky-400 text-slate-900 hover:bg-sky-300"
-                        onClick={() => posthog?.capture("ecosystem_cta_clicked", { project: project.key, cta: project.cta })}
-                      >
-                        {project.cta}
-                        <ExternalLink className="ml-2 h-4 w-4" />
-                      </Button>
-                    </a>
-                  ) : (
-                    <Link href={project.href}>
-                      <Button
-                        className="rounded-full bg-teal-400 text-slate-900 hover:bg-teal-300"
-                        onClick={() => posthog?.capture("ecosystem_cta_clicked", { project: project.key, cta: project.cta })}
-                      >
-                        {project.cta}
-                        <ArrowRight className="ml-2 h-4 w-4" />
-                      </Button>
-                    </Link>
-                  )}
-                </CardContent>
-              </Card>
-            ))}
+      {/* ─── Footer ─── */}
+      <footer className="border-t border-gray-200 bg-white px-5 py-8 sm:px-8">
+        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 text-sm text-gray-400 sm:flex-row">
+          <div className="flex items-center gap-2">
+            <div className="grid h-6 w-6 place-items-center rounded-full bg-teal-500 text-white">
+              <Star className="h-3 w-3" aria-hidden />
+            </div>
+            <span className="font-semibold text-gray-600">Star Sailors</span>
+            <span>© 2026</span>
           </div>
-        </div>
-      </section>
-
-      <section id="flow" className="px-6 py-14">
-        <div className="mx-auto max-w-7xl rounded-3xl border border-slate-700 bg-slate-900/70 p-8 md:p-12">
-          <h3 className="text-3xl font-black md:text-4xl">Web Client Flow</h3>
-          <p className="mt-4 max-w-3xl text-slate-300">
-            Enter Home Base, deploy structures, classify anomalies, and progress through mission loops. Notifications and surveys trigger after meaningful engagement.
-          </p>
-          <div className="mt-8">
-            <Link href="/auth">
-              <Button size="lg" className="rounded-full bg-teal-400 text-slate-900 hover:bg-teal-300">
-                Launch
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      <footer className="border-t border-slate-800 px-6 py-10">
-        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 text-sm text-slate-400 md:flex-row">
-          <p>© 2026 Star Sailors</p>
-          <div className="flex items-center gap-4">
-            <a href="/terms" className="hover:text-slate-200">Terms</a>
-            <a href="/privacy" className="hover:text-slate-200">Privacy</a>
-            <a href="https://github.com/signal-k/client" className="hover:text-slate-200">Codebase</a>
-          </div>
+          <nav className="flex items-center gap-5" aria-label="Footer navigation">
+            <a href="/terms" className="hover:text-gray-700">Terms</a>
+            <a href="/privacy" className="hover:text-gray-700">Privacy</a>
+            <a href="https://github.com/signal-k/client" target="_blank" rel="noreferrer" className="hover:text-gray-700">GitHub</a>
+          </nav>
         </div>
       </footer>
+
+      <VariantSwitcher />
     </div>
   );
 }

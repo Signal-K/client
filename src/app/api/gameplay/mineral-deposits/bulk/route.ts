@@ -22,15 +22,23 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "No deposits provided" }, { status: 400 });
   }
 
-  const normalized = deposits.map((row) => ({
-    ...row,
-    owner: user.id,
-  }));
+  // Normalise camelCase keys from legacy clients to snake_case column names
+  const normalized = deposits.map((row) => {
+    const { mineralconfiguration, mineralConfiguration, roverName, ...rest } =
+      row as Record<string, unknown>;
+    return {
+      ...rest,
+      owner: user.id,
+      mineral_configuration:
+        mineralconfiguration ?? mineralConfiguration ?? null,
+      rover_name: roverName ?? null,
+    };
+  });
 
   const data = await prisma.$queryRaw<Array<{ id: number }>>`
-    INSERT INTO "mineralDeposits"
+    INSERT INTO mineral_deposits
     SELECT *
-    FROM jsonb_populate_recordset(NULL::"mineralDeposits", ${JSON.stringify(normalized)}::jsonb)
+    FROM jsonb_populate_recordset(NULL::mineral_deposits, ${JSON.stringify(normalized)}::jsonb)
     RETURNING id
   `;
 

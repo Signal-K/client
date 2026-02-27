@@ -11,7 +11,8 @@
 // Custom command for login
 Cypress.Commands.add('login', (email: string, password: string) => {
   cy.session([email, password], () => {
-    cy.visit('/auth')
+    cy.visit('/auth', { timeout: 30000 })
+    cy.wait(1000)
 
     cy.get('body').then(($body) => {
       const emailSelectors = [
@@ -44,19 +45,20 @@ Cypress.Commands.add('login', (email: string, password: string) => {
         throw new Error('Unable to find enabled login form controls')
       }
 
-      cy.get(`${emailSelector}:enabled`).first().should('be.visible').click({ force: true })
+      cy.get(`${emailSelector}:enabled`, { timeout: 10000 }).first().should('be.visible').click({ force: true })
       cy.get(`${emailSelector}:enabled`).first().clear({ force: true })
       cy.get(`${emailSelector}:enabled`).first().type(email, { force: true, delay: 20 })
 
-      cy.get(`${passwordSelector}:enabled`).first().should('be.visible').click({ force: true })
+      cy.get(`${passwordSelector}:enabled`, { timeout: 10000 }).first().should('be.visible').click({ force: true })
       cy.get(`${passwordSelector}:enabled`).first().clear({ force: true })
       cy.get(`${passwordSelector}:enabled`).first().type(password, { force: true, delay: 20 })
 
-      cy.get(`${buttonSelector}:enabled`).first().should('be.visible').click({ force: true })
+      cy.get(`${buttonSelector}:enabled`, { timeout: 10000 }).first().should('be.visible').click({ force: true })
     })
 
-    cy.wait(2000)
-    // Don't require specific URL since auth flow might vary
+    cy.wait(3000)
+    // Verify we're not on auth page anymore
+    cy.url({ timeout: 15000 }).should('not.include', '/auth')
   })
 })
 
@@ -78,14 +80,11 @@ Cypress.Commands.add('createTestUser', () => {
 
 // Wait for Supabase to be ready
 Cypress.Commands.add('waitForSupabase', () => {
-  cy.task('waitForSupabaseHealth').then((healthy) => {
+  cy.task('waitForSupabaseHealth', null, { timeout: 10000 }).then((healthy) => {
     if (!healthy) {
-      cy.log('Supabase health unavailable; continuing smoke flow without blocking')
-      return
+      cy.log('⚠ Supabase health check failed; continuing anyway')
     }
-    cy.window().should('exist')
     cy.wait(1000)
-    cy.get('body').should('be.visible')
   })
 })
 

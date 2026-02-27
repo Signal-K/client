@@ -12,16 +12,23 @@ services:
     environment:
       - NODE_ENV=test
       - SKIP_USER_CREATION_TESTS=true
+      - DATABASE_URL=${DATABASE_URL:-postgresql://postgres:postgres@host.docker.internal:54322/postgres}
+      - SUPABASE_URL=${SUPABASE_URL:-http://host.docker.internal:54321}
+      - NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL:-http://host.docker.internal:54321}
+      - NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY:-}
+      - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY:-}
+      - SUPABASE_SECRET_KEY=${SUPABASE_SECRET_KEY:-}
     volumes:
       - ../../:/app
       - /app/node_modules
-      - /app/.next
     working_dir: /app
     networks:
       - test-network
-    command: "yarn dev"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    command: "sh -c 'yarn build && yarn start'"
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000"]
+      test: ["CMD", "curl", "-f", "http://localhost:3000/auth"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -36,12 +43,20 @@ services:
       - ../../.env.test
     environment:
       - NODE_ENV=test
+      - DATABASE_URL=${DATABASE_URL:-postgresql://postgres:postgres@host.docker.internal:54322/postgres}
+      - SUPABASE_URL=${SUPABASE_URL:-http://host.docker.internal:54321}
+      - NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL:-http://host.docker.internal:54321}
+      - NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY:-}
+      - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY:-}
+      - SUPABASE_SECRET_KEY=${SUPABASE_SECRET_KEY:-}
     volumes:
       - ../../:/app
       - /app/node_modules
     working_dir: /app
     networks:
       - test-network
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     command: "yarn test:unit"
     profiles:
       - unit
@@ -59,15 +74,22 @@ services:
       - SKIP_USER_CREATION_TESTS=true
       - CYPRESS_baseUrl=http://nextapp-test:3000
       - DISPLAY=:99
+      - DATABASE_URL=${DATABASE_URL:-postgresql://postgres:postgres@host.docker.internal:54322/postgres}
+      - SUPABASE_URL=${SUPABASE_URL:-http://host.docker.internal:54321}
+      - NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL:-http://host.docker.internal:54321}
+      - NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY:-}
+      - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY:-}
+      - SUPABASE_SECRET_KEY=${SUPABASE_SECRET_KEY:-}
     volumes:
       - ../../:/app
       - /app/node_modules
-      - /app/.cypress
       - ../../cypress/screenshots:/app/cypress/screenshots
       - ../../cypress/videos:/app/cypress/videos
     working_dir: /app
     networks:
       - test-network
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     depends_on:
       nextapp-test:
         condition: service_healthy
@@ -94,15 +116,22 @@ services:
       - SKIP_USER_CREATION_TESTS=false
       - CYPRESS_baseUrl=http://nextapp-test:3000
       - DISPLAY=:99
+      - DATABASE_URL=${DATABASE_URL:-postgresql://postgres:postgres@host.docker.internal:54322/postgres}
+      - SUPABASE_URL=${SUPABASE_URL:-http://host.docker.internal:54321}
+      - NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL:-http://host.docker.internal:54321}
+      - NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY:-}
+      - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY:-}
+      - SUPABASE_SECRET_KEY=${SUPABASE_SECRET_KEY:-}
     volumes:
       - ../../:/app
       - /app/node_modules
-      - /app/.cypress
       - ../../cypress/screenshots:/app/cypress/screenshots
       - ../../cypress/videos:/app/cypress/videos
     working_dir: /app
     networks:
       - test-network
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     depends_on:
       nextapp-test:
         condition: service_healthy
@@ -128,15 +157,22 @@ services:
       - NODE_ENV=test
       - SKIP_USER_CREATION_TESTS=true
       - CYPRESS_baseUrl=http://nextapp-test:3000
+      - DATABASE_URL=${DATABASE_URL:-postgresql://postgres:postgres@host.docker.internal:54322/postgres}
+      - SUPABASE_URL=${SUPABASE_URL:-http://host.docker.internal:54321}
+      - NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL:-http://host.docker.internal:54321}
+      - NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY:-}
+      - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY:-}
+      - SUPABASE_SECRET_KEY=${SUPABASE_SECRET_KEY:-}
     volumes:
       - ../../:/app
       - /app/node_modules
-      - /app/.cypress
       - ../../cypress/screenshots:/app/cypress/screenshots
       - ../../cypress/videos:/app/cypress/videos
     working_dir: /app
     networks:
       - test-network
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     depends_on:
       nextapp-test:
         condition: service_healthy

@@ -65,14 +65,6 @@ export function generateAnomalyProperties(dbAnomaly: DatabaseAnomaly) {
   const type = normalizeAnomalyType(dbAnomaly.anomalySet)
   const config = ANOMALY_TYPES[type]
 
-  // Debug logging for ALL anomalies to see what's happening
-  console.log(`🔍 DEBUG: Anomaly ${seed}:`, {
-    anomalySet: dbAnomaly.anomalySet,
-    normalizedType: type,
-    project: config.project,
-    content: dbAnomaly.content
-  });
-
   // Generate sector coordinates that match the current sector system
   const sectorX = Math.floor(seededRandom(seed, 9) * 10) - 5
   const sectorY = Math.floor(seededRandom(seed, 10) * 10) - 5

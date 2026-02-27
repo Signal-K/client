@@ -88,6 +88,33 @@ interface UserPreferences {
 const STORAGE_KEY = "star-sailors-preferences";
 const DEVICE_ID_KEY = "star-sailors-device-id";
 
+function storageGetItem(key: string): string | null {
+  if (typeof window === "undefined") return null;
+  try {
+    return localStorage.getItem(key);
+  } catch {
+    return null;
+  }
+}
+
+function storageSetItem(key: string, value: string) {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.setItem(key, value);
+  } catch {
+    // Ignore storage write errors in restricted contexts.
+  }
+}
+
+function storageRemoveItem(key: string) {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.removeItem(key);
+  } catch {
+    // Ignore storage delete errors in restricted contexts.
+  }
+}
+
 // Generate a random device ID
 function generateDeviceId(): string {
   return `device-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
@@ -97,10 +124,10 @@ function generateDeviceId(): string {
 function getDeviceId(): string {
   if (typeof window === "undefined") return "";
   
-  let deviceId = localStorage.getItem(DEVICE_ID_KEY);
+  let deviceId = storageGetItem(DEVICE_ID_KEY);
   if (!deviceId) {
     deviceId = generateDeviceId();
-    localStorage.setItem(DEVICE_ID_KEY, deviceId);
+    storageSetItem(DEVICE_ID_KEY, deviceId);
   }
   return deviceId;
 }
@@ -128,7 +155,7 @@ export function useUserPreferences() {
     if (typeof window === "undefined") return;
 
     try {
-      const stored = localStorage.getItem(STORAGE_KEY);
+      const stored = storageGetItem(STORAGE_KEY);
       const currentDeviceId = getDeviceId();
       
       if (stored) {
@@ -180,9 +207,7 @@ export function useUserPreferences() {
     setPreferences((prev) => {
       const updated = { ...prev, ...newPreferences };
       
-      if (typeof window !== "undefined") {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-      }
+      storageSetItem(STORAGE_KEY, JSON.stringify(updated));
       
       return updated;
     });
@@ -254,9 +279,7 @@ export function useUserPreferences() {
           [tutorialId]: true,
         },
       };
-      if (typeof window !== "undefined") {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-      }
+      storageSetItem(STORAGE_KEY, JSON.stringify(updated));
       return updated;
     });
   }, []);
@@ -272,18 +295,14 @@ export function useUserPreferences() {
       const updated = { ...prev.completedTutorials };
       delete updated[tutorialId];
       const newPrefs = { ...prev, completedTutorials: updated };
-      if (typeof window !== "undefined") {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(newPrefs));
-      }
+      storageSetItem(STORAGE_KEY, JSON.stringify(newPrefs));
       return newPrefs;
     });
   }, []);
 
   // Reset all preferences (for testing)
   const resetPreferences = useCallback(() => {
-    if (typeof window !== "undefined") {
-      localStorage.removeItem(STORAGE_KEY);
-    }
+    storageRemoveItem(STORAGE_KEY);
     setPreferences({
       ...defaultPreferences,
       deviceId: getDeviceId(),

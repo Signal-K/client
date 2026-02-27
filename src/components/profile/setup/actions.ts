@@ -49,7 +49,7 @@ export async function updateProfileSetupAction(formData: FormData) {
     return { ok: false as const, error: "Username is required." };
   }
 
-  let avatar_url = existingAvatarPreview || null;
+  let avatar_url: string | null = existingAvatarPreview && existingAvatarPreview.trim() ? existingAvatarPreview : null;
   if (avatar && avatar instanceof File && avatar.size > 0) {
     const fileName = `${Date.now()}-${user.id}-avatar.png`;
     const { data, error } = await supabase.storage
@@ -139,32 +139,20 @@ export async function completeProfileAction(input: {
         await prisma.$queryRaw<Array<{ id: string; referral_code: string | null }>>`
           SELECT id, referral_code
           FROM profiles
-          WHERE referral_code = ${referrerCode}
+          WHERE lower(referral_code) = lower(${referrerCode})
           LIMIT 1
         `
       )[0];
 
-      if (referrerProfile) {
+      if (
+        referrerProfile &&
+        referrerProfile.id !== user.id &&
+        referrerProfile.referral_code
+      ) {
         await prisma.$executeRaw`
           INSERT INTO referrals (referree_id, referral_code)
-          VALUES (${user.id}::uuid, ${referrerCode})
+          VALUES (${user.id}::uuid, ${referrerProfile.referral_code})
         `;
-
-        const referrersReferral = (
-          await prisma.$queryRaw<Array<{ referral_code: string }>>`
-            SELECT referral_code
-            FROM referrals
-            WHERE referree_id::text = ${referrerProfile.id}
-            LIMIT 1
-          `
-        )[0];
-
-        if (referrersReferral?.referral_code) {
-          await prisma.$executeRaw`
-            INSERT INTO referrals (referree_id, referral_code)
-            VALUES (${user.id}::uuid, ${referrersReferral.referral_code})
-          `;
-        }
       }
     }
   }
@@ -244,12 +232,70 @@ export async function submitReferralCodeAction(referralCode: string) {
   if (!code) return { ok: false as const, error: "Please enter a valid referral code." };
 
   try {
+    const ownProfile = (
+      await prisma.$queryRaw<Array<{ id: string; referral_code: string | null }>>`
+        SELECT id::text AS id, referral_code
+        FROM profiles
+        WHERE id::text = ${user.id}
+        LIMIT 1
+      `
+    )[0];
+
+    if (!ownProfile) {
+      return { ok: false as const, error: "Create your profile before applying a referral code." };
+    }
+
+    if (
+      ownProfile.referral_code &&
+      ownProfile.referral_code.toLowerCase() === code.toLowerCase()
+    ) {
+      return { ok: false as const, error: "You cannot use your own referral code." };
+    }
+
+    const existingReferral = (
+      await prisma.$queryRaw<Array<{ id: string }>>`
+        SELECT id::text AS id
+        FROM referrals
+        WHERE referree_id::text = ${user.id}
+        LIMIT 1
+      `
+    )[0];
+    if (existingReferral) {
+      return { ok: false as const, error: "You have already used a referral code." };
+    }
+
+    const referrerProfile = (
+      await prisma.$queryRaw<Array<{ id: string; referral_code: string | null }>>`
+        SELECT id::text AS id, referral_code
+        FROM profiles
+        WHERE lower(referral_code) = lower(${code})
+        LIMIT 1
+      `
+    )[0];
+
+    if (!referrerProfile) {
+      return { ok: false as const, error: "Referral code not found." };
+    }
+
+    if (referrerProfile.id === user.id) {
+      return { ok: false as const, error: "You cannot use your own referral code." };
+    }
+    if (!referrerProfile.referral_code) {
+      return { ok: false as const, error: "Referral code not found." };
+    }
+
     await prisma.$executeRaw`
       INSERT INTO referrals (referree_id, referral_code)
-      VALUES (${user.id}::uuid, ${code})
+      VALUES (${user.id}::uuid, ${referrerProfile.referral_code})
     `;
-  } catch {
-    return { ok: false as const, error: "Failed to submit referral code. Please try again." };
+  } catch (error) {
+    return {
+      ok: false as const,
+      error:
+        error instanceof Error
+          ? error.message
+          : "Failed to submit referral code. Please try again.",
+    };
   }
 
   revalidatePath("/research");

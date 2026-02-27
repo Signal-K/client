@@ -8,7 +8,7 @@ interface MineralDeposit {
   id: number;
   anomaly: number | null;
   owner: string | null;
-  mineralconfiguration: {
+  mineral_configuration: {
     mineral: string;
     quantity: number;
   };

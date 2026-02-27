@@ -26,6 +26,24 @@ export default function CompleteProfileForm({ onSuccess }: { onSuccess: () => vo
     setOwnReferralCode(generateReferralCode());
   }, []);
 
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      const pending = window.localStorage.getItem("pending_referral_code") || "";
+      if (pending && /^[A-Za-z0-9]{3,32}$/.test(pending)) {
+        setReferrerCodeInput(pending);
+        return;
+      }
+      const params = new URLSearchParams(window.location.search);
+      const refFromUrl = params.get("ref")?.trim() || "";
+      if (refFromUrl && /^[A-Za-z0-9]{3,32}$/.test(refFromUrl)) {
+        setReferrerCodeInput(refFromUrl);
+      }
+    } catch {
+      // Ignore storage/query parsing issues.
+    }
+  }, []);
+
   const handleSubmit = async () => {
     if (username.trim().length < 3) {
       setErrorMsg("Username must be at least 3 characters.");
@@ -44,6 +62,14 @@ export default function CompleteProfileForm({ onSuccess }: { onSuccess: () => vo
       setErrorMsg(result.error || "Failed to update profile.");
       setLoading(false);
       return;
+    }
+
+    try {
+      if (typeof window !== "undefined") {
+        window.localStorage.removeItem("pending_referral_code");
+      }
+    } catch {
+      // Ignore storage restrictions.
     }
 
     if (typeof onSuccess === "function") {

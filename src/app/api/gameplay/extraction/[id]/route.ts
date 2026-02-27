@@ -18,7 +18,7 @@ export async function GET(_request: NextRequest, { params }: { params: { id: str
   }
 
   const rows = await prisma.$queryRaw<Array<Record<string, unknown>>>`
-    SELECT * FROM "mineralDeposits" WHERE id = ${depositId} LIMIT 1
+    SELECT * FROM mineral_deposits WHERE id = ${depositId} LIMIT 1
   `;
   const data = rows[0] as Record<string, unknown> | undefined;
   if (!data) {
@@ -51,10 +51,10 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
   }
 
   const depositRows = await prisma.$queryRaw<
-    Array<{ id: number; owner: string; mineralconfiguration: Record<string, unknown> | null }>
+    Array<{ id: number; owner: string; mineral_configuration: Record<string, unknown> | null }>
   >`
-    SELECT id, owner, mineralconfiguration
-    FROM "mineralDeposits"
+    SELECT id, owner, mineral_configuration
+    FROM mineral_deposits
     WHERE id = ${depositId}
     LIMIT 1
   `;
@@ -65,7 +65,7 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
     return NextResponse.json({ error: "You don't have permission to extract this deposit" }, { status: 403 });
   }
 
-  const mineralType = deposit.mineralconfiguration?.type;
+  const mineralType = deposit.mineral_configuration?.type;
   if (!mineralType) {
     return NextResponse.json({ error: "Deposit has no mineral type" }, { status: 400 });
   }
@@ -76,14 +76,14 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
   `;
 
   const updatedConfig = {
-    ...deposit.mineralconfiguration,
+    ...deposit.mineral_configuration,
     amount: 0,
     quantity: 0,
   };
 
   await prisma.$executeRaw`
-    UPDATE "mineralDeposits"
-    SET mineralconfiguration = ${JSON.stringify(updatedConfig)}::jsonb
+    UPDATE mineral_deposits
+    SET mineral_configuration = ${JSON.stringify(updatedConfig)}::jsonb
     WHERE id = ${deposit.id}
   `;
 

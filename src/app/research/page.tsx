@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { Suspense, useEffect, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import ActivityHeaderSection from "@/src/components/social/activity/ActivityHeaderSection";
 import { Button } from "@/src/components/ui/button";
 import CompactResearchPanel from "@/src/components/research/CompactResearchPanel";
@@ -64,11 +65,13 @@ function StardustSummary({ textColor }: { textColor: string }) {
   );
 };
 
-export default function ResearchPage() {
+function ResearchPageContent() {
   const { isDark, toggleDarkMode } = UseDarkMode();
+  const searchParams = useSearchParams();
+  const referralPanelRef = useRef<HTMLDivElement | null>(null);
 
   // Referral related states
-  const [authenticated, setAuthenticated] = useState<boolean>(true);
+  const [authenticated, setAuthenticated] = useState<boolean | null>(null);
   const [userHasReferral, setUserHasReferral] = useState<boolean | null>(null);
   const [referralCodeInput, setReferralCodeInput] = useState("");
   const [referralError, setReferralError] = useState<string | null>(null);
@@ -77,15 +80,41 @@ export default function ResearchPage() {
 
   useEffect(() => {
     const checkReferral = async () => {
-      const response = await fetch("/api/gameplay/profile/referral-status", {
-        method: "GET",
-      });
-      const payload = await response.json();
-      setAuthenticated(!!payload?.authenticated);
-      setUserHasReferral(!!payload?.hasReferral);
+      try {
+        const response = await fetch("/api/gameplay/profile/referral-status", {
+          method: "GET",
+        });
+        const payload = await response.json();
+        setAuthenticated(!!payload?.authenticated);
+        setUserHasReferral(!!payload?.hasReferral);
+
+        if (payload?.authenticated && !payload?.hasReferral && typeof window !== "undefined") {
+          try {
+            const pending = window.localStorage.getItem("pending_referral_code") || "";
+            if (pending && /^[A-Za-z0-9]{3,32}$/.test(pending)) {
+              setReferralCodeInput(pending);
+            }
+          } catch {
+            // Ignore storage access issues.
+          }
+        }
+      } catch {
+        setAuthenticated(false);
+        setUserHasReferral(false);
+      }
     };
     checkReferral();
   }, []);
+
+  useEffect(() => {
+    const panel = searchParams.get("panel");
+    if (panel !== "referral") return;
+    if (userHasReferral !== false) return;
+    const timer = window.setTimeout(() => {
+      referralPanelRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 120);
+    return () => window.clearTimeout(timer);
+  }, [searchParams, userHasReferral]);
 
   const handleReferralSubmit = async () => {
     setReferralError(null);
@@ -109,12 +138,27 @@ export default function ResearchPage() {
       setReferralSuccess("Referral code added successfully!");
       setUserHasReferral(true);
       setReferralCodeInput("");
+      if (typeof window !== "undefined") {
+        try {
+          window.localStorage.removeItem("pending_referral_code");
+        } catch {
+          // Ignore storage restrictions.
+        }
+      }
     } catch (e) {
       setReferralError("An unexpected error occurred.");
     } finally {
       setIsSubmittingReferral(false);
     };
   };
+
+  if (authenticated === null) {
+    return (
+      <div className="min-h-screen w-full bg-black text-white flex items-center justify-center">
+        Loading research...
+      </div>
+    );
+  }
 
   if (!authenticated) {
     return (
@@ -123,7 +167,6 @@ export default function ResearchPage() {
   };
 
   // Theme-based colors
-  const bgColor = isDark ? "bg-[#232a36]" : "bg-[#E5EEF4]";
   const textColor = isDark ? "text-[#E5EEF4]" : "text-[#232a36]";
   const cardColor = isDark ? "bg-[#2E3440]" : "bg-white";
   const borderColor = isDark ? "border-[#5E81AC]" : "border-[#1e3a5f]";
@@ -179,27 +222,30 @@ export default function ResearchPage() {
               
               {/* Referral Input - Only show if user has no referral */}
               {userHasReferral === false && (
-                <div className={`p-4 ${cardColor} rounded-lg shadow-sm border ${borderColor}`}>
+                <div
+                  ref={referralPanelRef}
+                  className={`p-4 sm:p-5 ${cardColor} rounded-xl shadow-sm border ${borderColor} bg-gradient-to-br ${isDark ? "from-[#2E3440] to-[#2A2F3A]" : "from-white to-[#EDF3F8]"}`}
+                >
                   <h4 className={`text-base font-semibold ${isDark ? "text-[#81A1C1]" : "text-[#5E81AC]"} mb-2`}>
                     Add Referral Code
                   </h4>
                   <p className={`text-sm ${isDark ? "text-[#D8DEE9]" : "text-[#232a36]"} mb-3`}>
                     Get bonus stardust if someone referred you!
                   </p>
-                  <div className="flex gap-2">
+                  <div className="flex flex-col sm:flex-row gap-2">
                     <input
                       type="text"
                       value={referralCodeInput}
                       onChange={(e) => setReferralCodeInput(e.target.value)}
                       placeholder="Enter referral code"
                       disabled={isSubmittingReferral}
-                      className={`flex-1 px-3 py-2 rounded-lg border-0 text-sm ${isDark ? "bg-[#3B4252] text-[#ECEFF4]" : "bg-[#E5EEF4] text-[#232a36]"} focus:outline-none focus:ring-2 focus:ring-[#88C0D0]`}
+                      className={`w-full sm:flex-1 px-3 py-2 rounded-lg border-0 text-sm ${isDark ? "bg-[#3B4252] text-[#ECEFF4]" : "bg-[#E5EEF4] text-[#232a36]"} focus:outline-none focus:ring-2 focus:ring-[#88C0D0]`}
                     />
                     <Button
                       onClick={handleReferralSubmit}
                       disabled={isSubmittingReferral}
                       size="sm"
-                      className={`${isDark ? "bg-[#81A1C1] text-[#2E3440] hover:bg-[#88C0D0]" : "bg-[#5E81AC] text-white hover:bg-[#88C0D0]"}`}
+                      className={`w-full sm:w-auto ${isDark ? "bg-[#81A1C1] text-[#2E3440] hover:bg-[#88C0D0]" : "bg-[#5E81AC] text-white hover:bg-[#88C0D0]"}`}
                     >
                       {isSubmittingReferral ? "..." : "Submit"}
                     </Button>
@@ -218,4 +264,12 @@ export default function ResearchPage() {
       </div>
     </div>
   );
-};
+}
+
+export default function ResearchPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen w-full bg-black text-white flex items-center justify-center">Loading research...</div>}>
+      <ResearchPageContent />
+    </Suspense>
+  );
+}

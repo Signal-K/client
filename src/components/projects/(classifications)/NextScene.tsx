@@ -11,7 +11,7 @@ import {
   DialogTrigger,
 } from "@/src/components/ui/dialog";
 import Image from "next/image";
-import GameNavbar from "@/src/components/layout/Tes";
+import MainHeader from "@/src/components/layout/Header/MainHeader";
 import { Progress } from "@/src/components/ui/progress";
 import {
   getMineralDisplayName,
@@ -19,6 +19,8 @@ import {
 } from "@/src/utils/mineralAnalysis";
 import { SourceClassificationCallout } from "@/src/components/classifications/SourceClassificationCallout";
 import { MediaSlider } from "@/src/components/classifications/MediaSlider";
+import UseDarkMode from "@/src/shared/hooks/useDarkMode";
+import { TelescopeBackground } from "@/src/components/classification/telescope/telescope-background";
 
 type Props = {
   id: string;
@@ -79,6 +81,7 @@ const badgeColors = [
 export default function ClientClassificationPage({ id }: Props) {
   const session = useSession();
   const router = useRouter();
+  const { isDark, toggleDarkMode } = UseDarkMode();
 
   const [classification, setClassification] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -313,19 +316,27 @@ export default function ClientClassificationPage({ id }: Props) {
 
   return (
     <div className="relative min-h-screen w-full overflow-hidden">
-      <div className="absolute inset-0 -z-10">
-        <img
-          src="/assets/Backdrops/Earth.png"
-          alt="Earth Background"
-          className="w-full h-full object-cover blur-md brightness-90 opacity-80"
+      <div className="fixed inset-0 -z-10">
+        <TelescopeBackground
+          sectorX={0}
+          sectorY={0}
+          showAllAnomalies={false}
+          isDarkTheme={isDark}
+          variant="stars-only"
+          onAnomalyClick={() => {}}
         />
       </div>
 
-      <div className="w-full z-10">
-        <GameNavbar />
-      </div>
+      <MainHeader
+        isDark={isDark}
+        onThemeToggle={toggleDarkMode}
+        notificationsOpen={false}
+        onToggleNotifications={() => {}}
+        activityFeed={[]}
+        otherClassifications={[]}
+      />
 
-      <div className="flex items-center justify-center min-h-screen px-2 py-4 sm:px-4 sm:py-8">
+      <div className="flex items-center justify-center min-h-screen px-2 py-4 pt-24 sm:px-4 sm:py-8">
         <div className="bg-[#F8FAFC] rounded-2xl shadow-xl p-3 sm:p-6 max-w-4xl w-full border border-[#88C0D0] space-y-4 sm:space-y-6 max-h-[95vh] overflow-y-auto">
           <div className="space-y-1">
             <h1 className="text-xl font-semibold text-[#2E3440]">
@@ -524,29 +535,29 @@ export default function ClientClassificationPage({ id }: Props) {
                 <div className="font-medium text-amber-700 dark:text-amber-300">
                   Type:{" "}
                   <span className="font-bold text-amber-900 dark:text-amber-100">
-                    {mineralDeposit.mineralconfiguration?.type || 'Unknown'}
+                    {mineralDeposit.mineral_configuration?.type || 'Unknown'}
                   </span>
                 </div>
                 <div className="font-medium text-amber-700 dark:text-amber-300">
                   Purity:{" "}
                   <span className="font-bold text-amber-900 dark:text-amber-100">
-                    {mineralDeposit.mineralconfiguration?.purity 
-                      ? `${(mineralDeposit.mineralconfiguration.purity * 100).toFixed(1)}%`
+                    {mineralDeposit.mineral_configuration?.purity 
+                      ? `${(mineralDeposit.mineral_configuration.purity * 100).toFixed(1)}%`
                       : 'N/A'}
                   </span>
                 </div>
                 <div className="font-medium text-amber-700 dark:text-amber-300">
                   Amount:{" "}
                   <span className="font-bold text-amber-900 dark:text-amber-100">
-                    {mineralDeposit.mineralconfiguration?.amount 
-                      ? `${Math.round(mineralDeposit.mineralconfiguration.amount)} units`
+                    {mineralDeposit.mineral_configuration?.amount 
+                      ? `${Math.round(mineralDeposit.mineral_configuration.amount)} units`
                       : 'N/A'}
                   </span>
                 </div>
                 <div className="font-medium text-amber-700 dark:text-amber-300">
                   Source:{" "}
                   <span className="font-bold text-amber-900 dark:text-amber-100">
-                    {mineralDeposit.mineralconfiguration?.metadata?.source || 'Unknown'}
+                    {mineralDeposit.mineral_configuration?.metadata?.source || 'Unknown'}
                   </span>
                 </div>
               </div>

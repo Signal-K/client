@@ -7,32 +7,73 @@ export const dynamic = "force-dynamic";
 
 const QUANTITY_UPGRADES = ["probereceptors", "satellitecount", "roverwaypoints"];
 
+function createEmptySummary() {
+  return {
+    authenticated: false,
+    userId: null,
+    researchedEntries: [],
+    researchedTechTypes: [],
+    referralCode: null,
+    referralCount: 0,
+    referralBonus: 0,
+    surveyBonus: 0,
+    counts: {
+      all: 0,
+      asteroid: 0,
+      cloud: 0,
+      planet: 0,
+    },
+    availableStardust: 0,
+    upgrades: {
+      telescopeReceptors: 1,
+      satelliteCount: 1,
+      roverWaypoints: 4,
+      spectroscopyUnlocked: false,
+      findMineralsUnlocked: false,
+      p4MineralsUnlocked: false,
+      roverExtractionUnlocked: false,
+      satelliteExtractionUnlocked: false,
+      ngtsAccessUnlocked: false,
+    },
+    skillTree: {
+      classifiedPlanets: 0,
+      discoveredAsteroids: 0,
+      unlockedSkills: [],
+    },
+  };
+}
+
 export async function GET() {
   const { user, authError } = await getRouteUser();
 
   if (authError || !user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return NextResponse.json(createEmptySummary());
   }
 
   const userId = user.id;
 
-  const [researched, classifications] = await Promise.all([
+  const [researched, classifications, surveyRewards] = await Promise.all([
     prisma.$queryRaw<Array<{ tech_type: string; created_at: string }>>`
       SELECT tech_type, created_at
       FROM researched
-      WHERE user_id = ${userId}
+      WHERE user_id = ${userId}::uuid
     `,
     prisma.$queryRaw<Array<{ classificationtype: string }>>`
       SELECT classificationtype
       FROM classifications
-      WHERE author = ${userId}
+      WHERE author = ${userId}::uuid
+    `,
+    prisma.$queryRaw<Array<{ stardust_granted: number }>>`
+      SELECT stardust_granted
+      FROM survey_rewards
+      WHERE user_id = ${userId}::uuid
     `,
   ]);
 
   const profileRows = await prisma.$queryRaw<Array<{ referral_code: string | null }>>`
     SELECT referral_code
     FROM profiles
-    WHERE id = ${userId}
+    WHERE id = ${userId}::uuid
     LIMIT 1
   `;
   const referralCode = profileRows[0]?.referral_code ?? null;
@@ -75,15 +116,18 @@ export async function GET() {
     return total + (QUANTITY_UPGRADES.includes(tech) ? 10 : 2);
   }, 0);
 
-  const availableStardust = Math.max(0, counts.all - researchPenalty);
+  const surveyBonus = surveyRewards.reduce((sum, r) => sum + (r.stardust_granted ?? 0), 0);
+  const availableStardust = Math.max(0, counts.all + surveyBonus - researchPenalty);
 
   return NextResponse.json({
+    authenticated: true,
     userId,
     researchedEntries: researchedRows,
     researchedTechTypes: techTypes,
     referralCode,
     referralCount,
     referralBonus,
+    surveyBonus,
     counts,
     availableStardust,
     upgrades: {

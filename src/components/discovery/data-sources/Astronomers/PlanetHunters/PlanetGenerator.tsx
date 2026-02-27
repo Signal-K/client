@@ -189,11 +189,11 @@ export default function PlanetGenerator({
             // Parse mineralconfiguration JSON string
             let config;
             try {
-              config = typeof deposit.mineralconfiguration === 'string'
-                ? JSON.parse(deposit.mineralconfiguration)
-                : deposit.mineralconfiguration;
+              config = typeof deposit.mineral_configuration === 'string'
+                ? JSON.parse(deposit.mineral_configuration)
+                : deposit.mineral_configuration;
             } catch (e) {
-              console.error("Error parsing mineralconfiguration:", e);
+              console.error("Error parsing mineral_configuration:", e);
               config = {};
             }
 

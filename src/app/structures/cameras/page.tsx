@@ -5,8 +5,10 @@ import dynamic from "next/dynamic";
 import { useSession } from "@/src/lib/auth/session-context";
 import { useRouter } from "next/navigation";
 import { BuildingIcon, CloudCogIcon, MicroscopeIcon } from "lucide-react";
-import GameNavbar from "@/src/components/layout/Tes";
 import { Dialog, DialogContent } from "@/src/components/ui/dialog";
+import MainHeader from "@/src/components/layout/Header/MainHeader";
+import UseDarkMode from "@/src/shared/hooks/useDarkMode";
+import { TelescopeBackground } from "@/src/components/classification/telescope/telescope-background";
 
 const ChatGPTImageClassifier = dynamic(
   () => import("@/src/components/classification/tools/image-classifier"),
@@ -22,6 +24,7 @@ export default function CameraAggregatesPage() {
     const router = useRouter();
 
     const [activeComponent, setActiveComponent] = useState<React.ReactNode | null>(null);
+    const { isDark, toggleDarkMode } = UseDarkMode();
 
     useEffect(() => {
         if (!session) {
@@ -54,18 +57,27 @@ export default function CameraAggregatesPage() {
     };
 
     return (
-        <div className="relative min-h-screen w-full flex flex-col">
-            <img
-                className="absolute inset-0 w-full h-full object-cover"
-                src="/assets/Backdrops/Earth.png"
-                alt="Earth Background"
+        <div className="relative min-h-screen w-full">
+            <div className="fixed inset-0 -z-10">
+                <TelescopeBackground
+                    sectorX={0}
+                    sectorY={0}
+                    showAllAnomalies={false}
+                    isDarkTheme={isDark}
+                    variant="stars-only"
+                    onAnomalyClick={() => {}}
+                />
+            </div>
+            <MainHeader
+                isDark={isDark}
+                onThemeToggle={toggleDarkMode}
+                notificationsOpen={false}
+                onToggleNotifications={() => {}}
+                activityFeed={[]}
+                otherClassifications={[]}
             />
 
-            <div className="w-full z-50">
-                <GameNavbar />
-            </div>
-
-            <div className="flex flex-row space-y-4">
+            <div className="pt-20 flex flex-row space-y-4">
                 <Dialog
                     defaultOpen
                     onOpenChange={(open) => {

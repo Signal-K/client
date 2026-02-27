@@ -4,17 +4,20 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useSessionContext } from "@/src/lib/auth/session-context";
 
-import GameNavbar from "@/src/components/layout/Tes";
 import PlanetHuntersSteps from "@/src/components/deployment/missions/structures/Astronomers/PlanetHunters/PlanetHunters";
 import { TelescopeDiskDetector } from "@/src/components/projects/Telescopes/DiskDetector";
 import DailyMinorPlanetMissions from "@/src/components/deployment/missions/structures/Astronomers/DailyMinorPlanet/DailyMinorPlanet";
 import SunspotSteps from "@/src/components/projects/Telescopes/Sunspots/SunspotShell";
+import MainHeader from "@/src/components/layout/Header/MainHeader";
+import UseDarkMode from "@/src/shared/hooks/useDarkMode";
+import { TelescopeBackground } from "@/src/components/classification/telescope/telescope-background";
 
 export default function TelescopeProjectRoute() {
   const params = useParams();
   const projectParam = params ? params['project'] : undefined;
   const project = Array.isArray(projectParam) ? projectParam[0] : projectParam;
   const router = useRouter();
+  const { isDark, toggleDarkMode } = UseDarkMode();
 
   const { session, isLoading } = useSessionContext();
 
@@ -53,18 +56,27 @@ export default function TelescopeProjectRoute() {
   };
 
   return (
-    <div className="relative min-h-screen w-full flex flex-col">
-      <img
-        className="absolute inset-0 w-full h-full object-cover"
-        src="/assets/Backdrops/Earth.png"
-        alt='Earth Background'
+    <div className="relative min-h-screen w-full">
+      <div className="fixed inset-0 -z-10">
+        <TelescopeBackground
+          sectorX={0}
+          sectorY={0}
+          showAllAnomalies={false}
+          isDarkTheme={isDark}
+          variant="stars-only"
+          onAnomalyClick={() => {}}
+        />
+      </div>
+      <MainHeader
+        isDark={isDark}
+        onThemeToggle={toggleDarkMode}
+        notificationsOpen={false}
+        onToggleNotifications={() => {}}
+        activityFeed={[]}
+        otherClassifications={[]}
       />
 
-      <div className="relative z-50 pb-8">
-        <GameNavbar />
-      </div>
-
-      <main className="flex-grow z-10 px-4 py-12 flex justify-center items-start overflow-y-auto">
+      <main className="pt-20 min-h-screen z-10 px-4 py-12 flex justify-center items-start overflow-y-auto">
         <div className="max-w-4xl w-full">
           <div className="mb-6 flex justify-end">
             <button

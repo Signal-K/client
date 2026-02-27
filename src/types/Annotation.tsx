@@ -341,10 +341,10 @@ interface MineralConfiguration {
 interface MineralDepositData {
   anomaly: number;
   owner: string;
-  mineralconfiguration: MineralConfiguration;
+  mineral_configuration: MineralConfiguration;
   location: string;
   discovery: number;
-  roverName: string;
+  rover_name: string;
 };
 
 type DrawingMode = 'freehand' | 'rectangle' | 'circle';

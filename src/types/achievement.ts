@@ -121,15 +121,15 @@ export const ALL_RESEARCH_UPGRADES = [
 ];
 
 export const CLASSIFICATION_ROUTES: Record<ClassificationType, { route: string; hint: string }> = {
-  "DiskDetective": { route: "/app/projects/disk-detective", hint: "Use the Disk Detective telescope project" },
-  "automaton-aiForMars": { route: "/app/projects/ai-for-mars", hint: "Analyze Mars terrain with AI" },
-  "balloon-marsCloudShapes": { route: "/app/projects/mars-cloud-shapes", hint: "Classify Mars cloud formations" },
-  "cloud": { route: "/app/projects/cloudspotting", hint: "Spot clouds on Mars" },
-  "lidar-jovianVortexHunter": { route: "/app/projects/jovian-vortex-hunter", hint: "Hunt for vortices on Jupiter" },
-  "planet": { route: "/viewports/telescope", hint: "Discover and classify planets using your telescope" },
+  "DiskDetective": { route: "/structures/telescope/disk-detective", hint: "Use the Disk Detective telescope project" },
+  "automaton-aiForMars": { route: "/structures/balloon/landmarks", hint: "Analyze Mars terrain with AI" },
+  "balloon-marsCloudShapes": { route: "/structures/balloon/clouds", hint: "Classify Mars cloud formations" },
+  "cloud": { route: "/structures/balloon/clouds", hint: "Spot clouds on Mars" },
+  "lidar-jovianVortexHunter": { route: "/structures/balloon/storms", hint: "Hunt for vortices on Jupiter" },
+  "planet": { route: "/structures/telescope", hint: "Discover and classify planets using your telescope" },
   "planet-inspection": { route: "/viewports/satellite", hint: "Deploy satellites to inspect planets" },
-  "sunspot": { route: "/app/projects/sunspots", hint: "Observe and classify sunspots" },
-  "satellite-planetFour": { route: "/app/projects/planet-four", hint: "Study Mars surface features" },
+  "sunspot": { route: "/structures/telescope/sunspots", hint: "Observe and classify sunspots" },
+  "satellite-planetFour": { route: "/structures/balloon/surface", hint: "Study Mars surface features" },
 };
 
 export const ALL_MINERAL_TYPES = [

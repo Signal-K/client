@@ -2,8 +2,10 @@
 
 import React, { useEffect, useState } from "react";
 import PostCard from "@/src/components/social/posts/TestPostCard";
-import GameNavbar from "@/src/components/layout/Tes";
 import StructuresOnPlanet from "@/src/components/deployment/structures/Structures";
+import MainHeader from "@/src/components/layout/Header/MainHeader";
+import UseDarkMode from "@/src/shared/hooks/useDarkMode";
+import { TelescopeBackground } from "@/src/components/classification/telescope/telescope-background";
 
 interface Classification {
     id: number;
@@ -20,6 +22,7 @@ export default function SurveyorPostPage({ params }: { params: { id: string } })
       const [classification, setClassification] = useState<Classification | null>(null);
       const [loading, setLoading] = useState(true);
       const [error, setError] = useState<string | null>(null);
+      const { isDark, toggleDarkMode } = UseDarkMode();
     
       useEffect(() => {
         const fetchClassification = async () => {
@@ -62,13 +65,26 @@ export default function SurveyorPostPage({ params }: { params: { id: string } })
     
       if (loading)
         return (
-          <div className="min-h-screen w-full flex flex-col">
-            <img
-              className="absolute inset-0 w-full h-full object-cover"
-              src="/assets/Backdrops/Earth.png"
-              alt="Backdrop"
+          <div className="relative min-h-screen w-full flex flex-col">
+            <div className="fixed inset-0 -z-10">
+              <TelescopeBackground
+                sectorX={0}
+                sectorY={0}
+                showAllAnomalies={false}
+                isDarkTheme={isDark}
+                variant="stars-only"
+                onAnomalyClick={() => {}}
+              />
+            </div>
+            <MainHeader
+              isDark={isDark}
+              onThemeToggle={toggleDarkMode}
+              notificationsOpen={false}
+              onToggleNotifications={() => {}}
+              activityFeed={[]}
+              otherClassifications={[]}
             />
-            <div className="relative min-h-screen container mx-auto py-8">
+            <div className="relative min-h-screen container mx-auto pt-24 py-8 text-white">
               <p>Loading classification...</p>
             </div>
           </div>
@@ -78,16 +94,28 @@ export default function SurveyorPostPage({ params }: { params: { id: string } })
       if (!classification) return <p>No classification found.</p>;
     
       return (
-        <div className="min-h-screen w-full flex flex-col">
-          <GameNavbar />
-          <img
-            className="absolute inset-0 w-full h-full object-cover"
-            src="/assets/Backdrops/Earth.png"
-            alt="Backdrop"
+        <div className="relative min-h-screen w-full flex flex-col">
+          <div className="fixed inset-0 -z-10">
+            <TelescopeBackground
+              sectorX={0}
+              sectorY={0}
+              showAllAnomalies={false}
+              isDarkTheme={isDark}
+              variant="stars-only"
+              onAnomalyClick={() => {}}
+            />
+          </div>
+          <MainHeader
+            isDark={isDark}
+            onThemeToggle={toggleDarkMode}
+            notificationsOpen={false}
+            onToggleNotifications={() => {}}
+            activityFeed={[]}
+            otherClassifications={[]}
           />
-          <div className="relative flex items-center justify-center min-h-screen container mx-auto">
+          <div className="relative flex items-center justify-center min-h-screen container mx-auto pt-24 px-4">
             {classification.author && (
-              <div className="w-1/2">
+              <div className="w-full max-w-4xl">
                 <PostCard
                   
                               title={`Classification #${classification.id}`}

@@ -86,28 +86,27 @@ jobs:
           yarn install --frozen-lockfile
 
       - name: Setup Supabase CLI
-        if: github.event_name != 'push' || github.ref_name == 'main'
         uses: supabase/setup-cli@v1
         with:
           version: latest
 
       - name: Start local Supabase
-        if: github.event_name != 'push' || github.ref_name == 'main'
         run: supabase start
 
       - name: Normalize local test env defaults
-        if: github.event_name != 'push' || github.ref_name == 'main'
         run: |
           SUPABASE_URL="${SUPABASE_URL:-${{ vars.SUPABASE_URL }}}"
           NEXT_PUBLIC_SUPABASE_URL="${NEXT_PUBLIC_SUPABASE_URL:-${{ vars.NEXT_PUBLIC_SUPABASE_URL }}}"
           NEXT_PUBLIC_SUPABASE_ANON_KEY="${NEXT_PUBLIC_SUPABASE_ANON_KEY:-${{ vars.NEXT_PUBLIC_SUPABASE_ANON_KEY }}}"
           SUPABASE_SERVICE_ROLE_KEY="${SUPABASE_SERVICE_ROLE_KEY:-${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}}"
+          DATABASE_URL="${DATABASE_URL:-}"
 
           SUPABASE_URL="${SUPABASE_URL:-http://127.0.0.1:54321}"
           NEXT_PUBLIC_SUPABASE_URL="${NEXT_PUBLIC_SUPABASE_URL:-http://127.0.0.1:54321}"
 
           STATUS_ENV="$(supabase status -o env 2>/dev/null || true)"
           if [ -n "${STATUS_ENV}" ]; then
+            LOCAL_DB_URL="$(printf '%s\n' "${STATUS_ENV}" | sed -n 's/^DB_URL=//p' | tail -n1 | sed 's/^"//; s/"$//')"
             LOCAL_PUBLISHABLE="$(printf '%s\n' "${STATUS_ENV}" | sed -n 's/^ANON_KEY=//p' | tail -n1 | sed 's/^"//; s/"$//')"
             LOCAL_SECRET="$(printf '%s\n' "${STATUS_ENV}" | sed -n 's/^SERVICE_ROLE_KEY=//p' | tail -n1 | sed 's/^"//; s/"$//')"
             if [ -z "${LOCAL_PUBLISHABLE}" ]; then
@@ -123,14 +122,16 @@ jobs:
             LOCAL_SECRET="$(printf '%s\n' "${STATUS_TEXT}" | sed -n 's/^| Secret      | \(.*\) |$/\1/p' | tail -n1)"
           fi
 
+          DATABASE_URL="${DATABASE_URL:-$LOCAL_DB_URL}"
           NEXT_PUBLIC_SUPABASE_ANON_KEY="${NEXT_PUBLIC_SUPABASE_ANON_KEY:-$LOCAL_PUBLISHABLE}"
           SUPABASE_SERVICE_ROLE_KEY="${SUPABASE_SERVICE_ROLE_KEY:-$LOCAL_SECRET}"
 
-          if [ -z "${NEXT_PUBLIC_SUPABASE_ANON_KEY}" ] || [ -z "${SUPABASE_SERVICE_ROLE_KEY}" ]; then
-            echo "Unable to resolve local Supabase auth keys from supabase status." >&2
+          if [ -z "${DATABASE_URL}" ] || [ -z "${NEXT_PUBLIC_SUPABASE_ANON_KEY}" ] || [ -z "${SUPABASE_SERVICE_ROLE_KEY}" ]; then
+            echo "Unable to resolve local Supabase database/auth env from supabase status." >&2
             exit 1
           fi
 
+          echo "DATABASE_URL=${DATABASE_URL}" >> "$GITHUB_ENV"
           echo "SUPABASE_URL=${SUPABASE_URL}" >> "$GITHUB_ENV"
           echo "NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}" >> "$GITHUB_ENV"
           echo "NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY}" >> "$GITHUB_ENV"
@@ -145,14 +146,18 @@ jobs:
       - name: Run lint
         run: yarn lint
 
-      - name: Run Cypress smoke (minimal)
-        if: github.event_name == 'push' && github.ref_name == 'main'
-        run: env -u ELECTRON_RUN_AS_NODE yarn start-server-and-test "yarn dev" http://localhost:3000 "yarn test:e2e:smoke:minimal"
+      - name: Run E2E tests (minimal smoke for regular pushes)
+        if: github.event_name == 'push' && github.ref_name != 'main'
+        run: yarn test:e2e:smoke:minimal
 
-      - name: Run Cypress smoke (full for PR to main) with coverage
+      - name: Run E2E tests (full suite for main branch pushes)
+        if: github.event_name == 'push' && github.ref_name == 'main'
+        run: yarn test:e2e
+
+      - name: Run E2E tests (full suite for PR to main)
         if: >
           github.event_name == 'pull_request' && github.base_ref == 'main'
-        run: env -u ELECTRON_RUN_AS_NODE yarn start-server-and-test "yarn dev" http://localhost:3000 "CYPRESS_COVERAGE=true yarn test:e2e:smoke:full"
+        run: yarn test:e2e
 
       - name: Upload e2e coverage
         if: >

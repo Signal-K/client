@@ -5,16 +5,19 @@ import { useParams, useRouter } from "next/navigation"
 import { useSessionContext } from "@/src/lib/auth/session-context"
 
 import { StarterLidar } from "@/src/components/projects/Lidar/Clouds"
-import GameNavbar from "@/src/components/layout/Tes"
 import { StarterJovianVortexHunter } from "@/src/components/projects/Lidar/JovianVortexHunter"
 import { StarterCoMShapes } from "@/src/components/projects/Lidar/CloudspottingOnMarsShapes"
 import { StarterPlanetFour } from "@/src/components/projects/Satellite/PlanetFour"
+import MainHeader from "@/src/components/layout/Header/MainHeader"
+import UseDarkMode from "@/src/shared/hooks/useDarkMode"
+import { TelescopeBackground } from "@/src/components/classification/telescope/telescope-background"
 
 export default function BalloonClassifyPage() {
     const params = useParams();
     const router = useRouter();
 
     const { session, isLoading } = useSessionContext();
+    const { isDark, toggleDarkMode } = UseDarkMode();
 
     const [MissionComponent, setMissionComponent] = useState<React.ReactNode | null>(null);
 
@@ -82,18 +85,26 @@ export default function BalloonClassifyPage() {
     return (
         <div className="relative min-h-screen w-full flex flex-col">
             <div className="fixed inset-0 -z-10">
-                <img 
-                    className="w-full h-full object-cover"
-                    src="/assets/Backdrops/Earth.png"
-                    alt="Earth Background"
+                <TelescopeBackground
+                    sectorX={0}
+                    sectorY={0}
+                    showAllAnomalies={false}
+                    isDarkTheme={isDark}
+                    variant="stars-only"
+                    onAnomalyClick={() => {}}
                 />
             </div>
 
-            <div className="relative z-50 pb-8">
-                <GameNavbar />
-            </div>
+            <MainHeader
+                isDark={isDark}
+                onThemeToggle={toggleDarkMode}
+                notificationsOpen={false}
+                onToggleNotifications={() => {}}
+                activityFeed={[]}
+                otherClassifications={[]}
+            />
 
-            <main className="relative z-5 py-8 flex justify-center">
+            <main className="relative z-5 py-8 pt-24 flex justify-center">
                 <div className="w-full max-w-6xl p-4 py-4">
                     {MissionComponent}
                 </div>

@@ -42,4 +42,22 @@ describe("useDeploymentStatus", () => {
       })
     })
   })
+
+  it("uses fallback defaults when payload has no deploymentStatus or planetTargets", async () => {
+    vi.spyOn(globalThis, "fetch").mockResolvedValue({
+      ok: true,
+      json: async () => ({}),
+    } as Response)
+
+    const { result } = renderHook(() => useDeploymentStatus())
+
+    await waitFor(() => {
+      expect(result.current.deploymentStatus).toEqual({
+        telescope: { deployed: false, unclassifiedCount: 0 },
+        satellites: { deployed: false, unclassifiedCount: 0, available: false },
+        rover: { deployed: false, unclassifiedCount: 0 },
+      })
+      expect(result.current.planetTargets).toEqual([])
+    })
+  })
 })

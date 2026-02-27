@@ -57,8 +57,8 @@ function SupabaseAuthWrapper({ children }: { children: ReactNode }) {
         setAnonymousError(error.message);
         console.error('Anonymous sign-in error:', error);
       } else {
-        // Successfully signed in anonymously — navigate to home
-        router.push('/');
+        // Successfully signed in anonymously — navigate to game.
+        router.replace("/game");
       }
     } catch (err: any) {
       setAnonymousError('An unexpected error occurred');

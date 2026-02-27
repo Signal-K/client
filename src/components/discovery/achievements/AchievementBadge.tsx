@@ -28,15 +28,9 @@ export const AchievementBadge: React.FC<AchievementBadgeProps> = ({
   };
 
   const iconSizeClasses = {
-    sm: "w-6 h-6",
-    md: "w-8 h-8",
-    lg: "w-12 h-12",
-  };
-
-  const countSizeClasses = {
-    sm: "text-xs",
-    md: "text-sm",
-    lg: "text-lg",
+    sm: "w-5 h-5",
+    md: "w-7 h-7",
+    lg: "w-9 h-9",
   };
 
   const labelSizeClasses = {
@@ -62,7 +56,6 @@ export const AchievementBadge: React.FC<AchievementBadgeProps> = ({
   };
 
   const milestoneColor = getMilestoneColor();
-
   const svgSizes = {
     sm: { width: 64, height: 64 },
     md: { width: 80, height: 80 },
@@ -70,95 +63,67 @@ export const AchievementBadge: React.FC<AchievementBadgeProps> = ({
   };
 
   return (
-    <div 
-      className={`flex flex-col items-center gap-2 p-2 ${onClick ? 'cursor-pointer hover:scale-105 transition-transform' : ''}`}
+    <button
+      type="button"
+      className={`flex flex-col items-center gap-2 p-2 text-left ${onClick ? 'cursor-pointer hover:scale-105 transition-transform' : ''}`}
       onClick={onClick}
+      disabled={!onClick}
+      aria-label={`${label} achievement`}
     >
-      <svg
-        width={svgSizes[size].width}
-        height={svgSizes[size].height}
-        viewBox="0 0 100 100"
-        className={sizeClasses[size]}
+      <div
+        className={`${sizeClasses[size]} relative rounded-full border-2 flex items-center justify-center`}
+        data-milestone-color={milestoneColor}
+        style={{
+          backgroundColor: isUnlocked ? milestoneColor : "#2c4f64",
+          opacity: isUnlocked ? 0.95 : 0.45,
+          borderColor: isUnlocked ? "#ffffff" : "#1e2a3a",
+        }}
       >
-        {/* Outer circle/badge background */}
-        <circle
-          cx="50"
-          cy="50"
-          r="45"
-          fill={isUnlocked ? milestoneColor : "#2c4f64"}
-          opacity={isUnlocked ? 0.9 : 0.4}
-          stroke={isUnlocked ? "#fff" : "#1e2a3a"}
-          strokeWidth="2"
+        <svg
+          width={svgSizes[size].width}
+          height={svgSizes[size].height}
+          className="sr-only"
+          aria-hidden="true"
         />
-        
-        {/* Inner circle for icon */}
-        <circle
-          cx="50"
-          cy="50"
-          r="32"
-          fill={isUnlocked ? "#1e2a3a" : "#0a0f14"}
-          opacity={isUnlocked ? 0.8 : 0.6}
-        />
-
-        {/* Icon container (we'll render React icon as foreignObject) */}
-        <foreignObject x="34" y="30" width="32" height="32">
+        <div
+          className="absolute inset-[16%] rounded-full flex items-center justify-center"
+          style={{
+            backgroundColor: isUnlocked ? "#1e2a3a" : "#0a0f14",
+            opacity: isUnlocked ? 0.86 : 0.65,
+          }}
+        >
           <div className={`flex items-center justify-center ${iconSizeClasses[size]} ${isUnlocked ? 'opacity-100' : 'opacity-40'}`}>
             {icon}
           </div>
-        </foreignObject>
+        </div>
 
-        {/* Count badge at bottom */}
-        <circle
-          cx="50"
-          cy="75"
-          r="15"
-          fill={isUnlocked ? "#2c4f64" : "#0a0f14"}
-          stroke={isUnlocked ? milestoneColor : "#1e2a3a"}
-          strokeWidth="2"
-        />
-        <text
-          x="50"
-          y="80"
-          textAnchor="middle"
-          fill={isUnlocked ? "#fff" : "#555"}
-          fontSize="14"
-          fontWeight="bold"
-          className={countSizeClasses[size]}
+        <div
+          className="absolute -bottom-1 left-1/2 -translate-x-1/2 rounded-full border px-2 py-0.5 font-bold"
+          style={{
+            backgroundColor: isUnlocked ? "#2c4f64" : "#0a0f14",
+            borderColor: isUnlocked ? milestoneColor : "#1e2a3a",
+            color: isUnlocked ? "#fff" : "#555",
+          }}
         >
           {count}
-        </text>
+        </div>
 
-        {/* Lock icon if not unlocked */}
         {!isUnlocked && (
-          <g opacity="0.6">
-            <rect x="43" y="38" width="14" height="10" rx="1" fill="#999" />
-            <path
-              d="M 46 38 v -3 a 4 4 0 0 1 8 0 v 3"
-              stroke="#999"
-              strokeWidth="2"
-              fill="none"
-            />
-          </g>
+          <div className="absolute top-[28%] right-[20%] text-[10px] font-semibold text-gray-300 opacity-80">
+            LOCK
+          </div>
         )}
 
-        {/* Milestone indicator */}
         {milestone && isUnlocked && (
-          <text
-            x="85"
-            y="25"
-            textAnchor="middle"
-            fill="#fff"
-            fontSize="16"
-            fontWeight="bold"
-          >
+          <div className="absolute top-0 right-0 text-xs font-bold text-white rounded-full bg-black/30 px-1.5 py-0.5">
             {milestone}
-          </text>
+          </div>
         )}
-      </svg>
+      </div>
 
       <div className={`text-center ${labelSizeClasses[size]} ${isUnlocked ? 'text-white' : 'text-gray-500'} font-medium max-w-[120px] line-clamp-2`}>
         {label}
       </div>
-    </div>
+    </button>
   );
 };

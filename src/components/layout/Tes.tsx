@@ -148,11 +148,9 @@ export default function GameNavbar() {
     <nav className="fixed top-0 left-0 right-0 z-50 px-2 py-1">
       <div className="relative flex items-center justify-between rounded-lg bg-black border border-white/10 shadow-lg px-3 py-1">
       <div className="flex items-center space-x-1 flex-nowrap min-w-0">
-        <Link href="/" legacyBehavior>
-              <a>
-                <img src="/planet.svg" alt="Logo" className="h-8 w-8 ml-1" />
-              </a>
-            </Link>
+        <Link href="/">
+          <img src="/planet.svg" alt="Logo" className="h-8 w-8 ml-1" />
+        </Link>
 
             <Menu as="div" className="relative inline-block text-left">
               <div>
@@ -183,42 +181,34 @@ export default function GameNavbar() {
                 leaveTo="transform opacity-0 scale-95"
               >
                 <Menu.Items className="absolute left-0 mt-2 w-48 bg-white rounded-lg shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                  <Link href="/" passHref>
-                    <Menu.Item>
-                      {({ active }) => (
-                        <a className={`block px-4 py-2 text-sm text-gray-700 ${active ? "bg-gray-100" : ""}`}>
-                          My Settlements
-                        </a>
-                      )}
-                    </Menu.Item>
-                  </Link>
-                  <Link href="/scenes/desert" passHref>
-                    <Menu.Item>
-                      {({ active }) => (
-                        <a className={`block px-4 py-2 text-sm text-gray-700 ${active ? "bg-gray-100" : ""}`}>
-                          Desert Base
-                        </a>
-                      )}
-                    </Menu.Item>
-                  </Link>
-                  <Link href="/scenes/ocean" passHref>
-                    <Menu.Item>
-                      {({ active }) => (
-                        <a className={`block px-4 py-2 text-sm text-gray-700 ${active ? "bg-gray-100" : ""}`}>
-                          Ocean Base
-                        </a>
-                      )}
-                    </Menu.Item>
-                  </Link>
-                  <Link href="/scenes/uploads" passHref>
-                    <Menu.Item>
-                      {({ active }) => (
-                        <a className={`block px-4 py-2 text-sm text-gray-700 ${active ? "bg-gray-100" : ""}`}>
-                          Conservation
-                        </a>
-                      )}
-                    </Menu.Item>
-                  </Link>
+                  <Menu.Item>
+                    {({ active }) => (
+                      <Link href="/game" className={`block px-4 py-2 text-sm text-gray-700 ${active ? "bg-gray-100" : ""}`}>
+                        My Settlements
+                      </Link>
+                    )}
+                  </Menu.Item>
+                  <Menu.Item>
+                    {({ active }) => (
+                      <Link href="/setup/rover" className={`block px-4 py-2 text-sm text-gray-700 ${active ? "bg-gray-100" : ""}`}>
+                        Desert Base
+                      </Link>
+                    )}
+                  </Menu.Item>
+                  <Menu.Item>
+                    {({ active }) => (
+                      <Link href="/setup/satellite" className={`block px-4 py-2 text-sm text-gray-700 ${active ? "bg-gray-100" : ""}`}>
+                        Ocean Base
+                      </Link>
+                    )}
+                  </Menu.Item>
+                  <Menu.Item>
+                    {({ active }) => (
+                      <Link href="/scenes/uploads" className={`block px-4 py-2 text-sm text-gray-700 ${active ? "bg-gray-100" : ""}`}>
+                        Conservation
+                      </Link>
+                    )}
+                  </Menu.Item>
                 </Menu.Items>
               </Transition>
             </Menu>
@@ -269,14 +259,28 @@ export default function GameNavbar() {
               <DropdownMenuLabel>My Account</DropdownMenuLabel>
               <DropdownMenuSeparator className="bg-white/10" />
               <DropdownMenuGroup>
-                <DropdownMenuItem className="hover:bg-white/10 focus:bg-white/10 cursor-pointer">
-                  <User className="mr-2 h-4 w-4" />
-                  <span>Profile</span>
+                <DropdownMenuItem asChild className="hover:bg-white/10 focus:bg-white/10 cursor-pointer">
+                  <Link href="/account">
+                    <User className="mr-2 h-4 w-4" />
+                    <span>Profile</span>
+                  </Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem className="hover:bg-white/10 focus:bg-white/10 cursor-pointer flex items-center">
-                  <Link href='/account' className="flex items-center">
+                <DropdownMenuItem asChild className="hover:bg-white/10 focus:bg-white/10 cursor-pointer">
+                  <Link href="/research">
                     <Settings className="mr-2 h-4 w-4" />
-                    Settings
+                    Research
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild className="hover:bg-white/10 focus:bg-white/10 cursor-pointer">
+                  <Link href="/leaderboards">
+                    <Star className="mr-2 h-4 w-4" />
+                    Leaderboards
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild className="hover:bg-white/10 focus:bg-white/10 cursor-pointer">
+                  <Link href="/ecosystem">
+                    <Sparkles className="mr-2 h-4 w-4" />
+                    Ecosystem Hub
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem 
@@ -296,11 +300,9 @@ export default function GameNavbar() {
     </>
   )}
               <DropdownMenuSeparator className="bg-white/10" />
-              <DropdownMenuItem className="hover:bg-white/10 focus:bg-white/10 cursor-pointer text-red-400">
-                <Button onClick={signOut}>
-                  <LogOut className="mr-2 h-4 w-4" />
-                  <span>Log out</span>
-                </Button>
+              <DropdownMenuItem className="hover:bg-white/10 focus:bg-white/10 cursor-pointer text-red-400" onClick={signOut}>
+                <LogOut className="mr-2 h-4 w-4" />
+                <span>Log out</span>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -384,7 +386,7 @@ export default function GameNavbar() {
           <User className="mr-2 h-5 w-5" />
           Profile
         </Button>
-        <Link href="/account" passHref>
+        <Link href="/account" className="block">
           <Button className="w-full justify-start" variant="ghost">
             <Settings className="mr-2 h-5 w-5" />
             Settings

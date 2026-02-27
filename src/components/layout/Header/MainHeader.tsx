@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Bell, Sun, Moon, User, UserPlus, UserX, Zap, LogOut, Sparkles } from "lucide-react";
+import { Bell, Sun, Moon, User, UserPlus, UserX, Zap, LogOut, Sparkles, Rocket } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -122,6 +122,13 @@ export default function MainHeader({
         </div>
 
         <div className="flex items-center gap-4">
+          <Link
+            href="/referrals"
+            className="hidden sm:inline-flex items-center gap-2 rounded-md border border-amber-300/40 bg-amber-500/15 px-3 py-1.5 text-xs font-medium text-amber-100 hover:bg-amber-500/25 transition-colors"
+          >
+            <Rocket className="w-3.5 h-3.5" />
+            Invite Crew
+          </Link>
           <div className="flex items-center gap-2">
             <Sun className="w-4 h-4 text-chart-2" />
             <Switch checked={isDark} onCheckedChange={onThemeToggle} />
@@ -185,12 +192,35 @@ export default function MainHeader({
                   </DropdownMenuItem>
                 </>
               ) : (
-                <DropdownMenuItem>
-                  <User className="w-4 h-4 mr-2" />
-                  Profile
+                <DropdownMenuItem asChild>
+                  <Link href="/account">
+                    <User className="w-4 h-4 mr-2" />
+                    Profile
+                  </Link>
                 </DropdownMenuItem>
               )}
               
+              <DropdownMenuItem asChild>
+                <Link href="/leaderboards">
+                  <Sparkles className="w-4 h-4 mr-2" />
+                  Leaderboards
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/ecosystem">
+                  <Sparkles className="w-4 h-4 mr-2" />
+                  Ecosystem Hub
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/research">Research</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/referrals">
+                  <Rocket className="w-4 h-4 mr-2" />
+                  Referral Program
+                </Link>
+              </DropdownMenuItem>
               <DropdownMenuItem>Settings</DropdownMenuItem>
               <DropdownMenuItem 
                 onClick={() => setProjectPreferencesOpen(true)}

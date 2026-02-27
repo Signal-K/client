@@ -1,7 +1,7 @@
 ---
 id: r8t6vy
 title: "Component and page consolidation audit"
-status: in-progress
+status: done
 priority: high
 labels:
   - architecture

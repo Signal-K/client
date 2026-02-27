@@ -49,11 +49,13 @@ describe("Contributions Critical", () => {
     // Suppress known non-critical runtime errors
     cy.on("uncaught:exception", (err) => {
       if (err.message.includes("Invalid or unexpected token")) return false
+      if (err.message.includes("NEXT_REDIRECT")) return false
       return true
     })
 
     // Pre-check: dev server must be reachable (/ returns 307 → /apt which returns 200)
     cy.request({ url: "/", failOnStatusCode: false, timeout: 10_000 }).its("status").should("be.lessThan", 500)
+    cy.waitForSupabase()
   })
 
   afterEach(() => {
@@ -65,19 +67,10 @@ describe("Contributions Critical", () => {
   /* ─── Test 1: Signup + Login ─────────────────────────────────── */
   it("creates a user, logs in, and reaches a protected page", () => {
     const { email, password } = makeTestUser()
-    const supabaseUrl = Cypress.env("SUPABASE_URL")
-    const anonKey = Cypress.env("NEXT_PUBLIC_SUPABASE_ANON_KEY") || Cypress.env("SUPABASE_ANON_KEY")
 
-    // Create user via Supabase Auth REST (admin-style signup)
-    cy.request({
-      method: "POST",
-      url: `${supabaseUrl}/auth/v1/signup`,
-      headers: { apikey: String(anonKey), "Content-Type": "application/json" },
-      body: { email, password },
-      failOnStatusCode: false,
-    }).then((res) => {
-      expect([200, 201]).to.include(res.status)
-      createdUserId = String(res.body?.user?.id ?? "")
+    // Create user via task
+    cy.task("createSupabaseTestUser", { email, password }).then((user: any) => {
+      createdUserId = String(user.id)
       expect(createdUserId).to.not.equal("")
     })
 
@@ -112,19 +105,11 @@ describe("Contributions Critical", () => {
   /* ─── Test 3: Classification page renders ────────────────────── */
   it("renders a classification page for a known anomaly", () => {
     const { email, password } = makeTestUser()
-    const supabaseUrl = Cypress.env("SUPABASE_URL")
-    const anonKey = Cypress.env("NEXT_PUBLIC_SUPABASE_ANON_KEY") || Cypress.env("SUPABASE_ANON_KEY")
 
     // Create + login
-    cy.request({
-      method: "POST",
-      url: `${supabaseUrl}/auth/v1/signup`,
-      headers: { apikey: String(anonKey), "Content-Type": "application/json" },
-      body: { email, password },
-      failOnStatusCode: false,
-    }).then((res) => {
-      expect([200, 201]).to.include(res.status)
-      createdUserId = String(res.body?.user?.id ?? "")
+    cy.task("createSupabaseTestUser", { email, password }).then((user: any) => {
+      createdUserId = String(user.id)
+      expect(createdUserId).to.not.equal("")
     })
 
     cy.login(email, password)

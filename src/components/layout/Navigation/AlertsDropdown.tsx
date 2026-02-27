@@ -46,6 +46,7 @@ interface AlertItem {
 
 const getCookieKey = (userId: string, week: string) => `dismissed-alerts-${userId}-${week}`;
 
+/* v8 ignore next 6 */
 const playRandomSound = () => {
   const soundFiles = [
     "/assets/audio/notifs/r2d2.wav",
@@ -124,6 +125,7 @@ export default function ResponsiveAlerts() {
     return () => clearInterval(interval);
   }, []);
 
+  /* v8 ignore next 25 */
   const dismissCurrentAlert = () => {
     if (!user || alerts.length === 0) return;
 

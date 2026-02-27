@@ -6,7 +6,9 @@ import PlanetViewer from "@/src/components/discovery/data-sources/Astronomers/Pl
 import { type PlanetConfig, defaultPlanetConfig } from "@/src/components/discovery/planets/planet-config"
 import SettingsPanel from "@/src/components/discovery/data-sources/Astronomers/PlanetHunters/SettingsPanel"
 import { Button } from "@/src/components/ui/button"
-import GameNavbar from "@/src/components/layout/Tes"
+import MainHeader from "@/src/components/layout/Header/MainHeader"
+import UseDarkMode from "@/src/shared/hooks/useDarkMode"
+import { TelescopeBackground } from "@/src/components/classification/telescope/telescope-background"
 
 export default function PlanetGeneratorPage() {
   const router = useRouter()
@@ -16,6 +18,7 @@ export default function PlanetGeneratorPage() {
   const [planetConfig, setPlanetConfig] = useState<PlanetConfig>(defaultPlanetConfig)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const { isDark, toggleDarkMode } = UseDarkMode()
 
   const handleConfigChange = (newConfig: Partial<PlanetConfig>) => {
     setPlanetConfig((prev) => ({ ...prev, ...newConfig }))
@@ -95,7 +98,25 @@ export default function PlanetGeneratorPage() {
 
   if (loading) {
     return (
-      <div className="w-full h-screen flex items-center justify-center bg-black text-white">
+      <div className="relative w-full h-screen flex items-center justify-center text-white">
+        <div className="fixed inset-0 -z-10">
+          <TelescopeBackground
+            sectorX={0}
+            sectorY={0}
+            showAllAnomalies={false}
+            isDarkTheme={isDark}
+            variant="stars-only"
+            onAnomalyClick={() => {}}
+          />
+        </div>
+        <MainHeader
+          isDark={isDark}
+          onThemeToggle={toggleDarkMode}
+          notificationsOpen={false}
+          onToggleNotifications={() => {}}
+          activityFeed={[]}
+          otherClassifications={[]}
+        />
         <div className="text-center">
           <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-white mb-4"></div>
           <p>Loading planet data...</p>
@@ -106,7 +127,25 @@ export default function PlanetGeneratorPage() {
 
   if (error) {
     return (
-      <div className="w-full h-screen flex items-center justify-center bg-black text-white">
+      <div className="relative w-full h-screen flex items-center justify-center text-white">
+        <div className="fixed inset-0 -z-10">
+          <TelescopeBackground
+            sectorX={0}
+            sectorY={0}
+            showAllAnomalies={false}
+            isDarkTheme={isDark}
+            variant="stars-only"
+            onAnomalyClick={() => {}}
+          />
+        </div>
+        <MainHeader
+          isDark={isDark}
+          onThemeToggle={toggleDarkMode}
+          notificationsOpen={false}
+          onToggleNotifications={() => {}}
+          activityFeed={[]}
+          otherClassifications={[]}
+        />
         <div className="text-center">
           <h1 className="text-2xl font-bold mb-4">Error</h1>
           <p className="text-red-400 mb-4">{error}</p>
@@ -122,9 +161,26 @@ export default function PlanetGeneratorPage() {
   }
 
   return (
-    <div className="w-full h-screen overflow-hidden">
-      <GameNavbar />
-      <div className="flex flex-col md:flex-row w-full h-full">
+    <div className="relative w-full h-screen overflow-hidden">
+      <div className="fixed inset-0 -z-10">
+        <TelescopeBackground
+          sectorX={0}
+          sectorY={0}
+          showAllAnomalies={false}
+          isDarkTheme={isDark}
+          variant="stars-only"
+          onAnomalyClick={() => {}}
+        />
+      </div>
+      <MainHeader
+        isDark={isDark}
+        onThemeToggle={toggleDarkMode}
+        notificationsOpen={false}
+        onToggleNotifications={() => {}}
+        activityFeed={[]}
+        otherClassifications={[]}
+      />
+      <div className="flex flex-col md:flex-row w-full h-full pt-20">
         {/* Planet Viewer */}
         <div className="w-full md:flex-1 h-1/2 md:h-full">
           <PlanetViewer planetConfig={planetConfig} onConfigChange={handleConfigChange} />

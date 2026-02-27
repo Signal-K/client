@@ -112,7 +112,7 @@ export default function UserInventoryPage() {
             // Filter out deposits with quantity <= 0
             const validDeposits = (deposits as any[])
               .filter((row) => {
-                const quantity = row.mineralconfiguration?.amount || row.mineralconfiguration?.quantity || 0;
+                const quantity = row.mineral_configuration?.amount || row.mineral_configuration?.quantity || 0;
                 return quantity > 0;
               })
               .map(
@@ -120,13 +120,13 @@ export default function UserInventoryPage() {
                   ({
                     id: row.id,
                     mineral: {
-                      type: row.mineralconfiguration?.type ?? "unknown",
-                      purity: Number(row.mineralconfiguration?.purity ?? 0),
-                      ...row.mineralconfiguration,
+                      type: row.mineral_configuration?.type ?? "unknown",
+                      purity: Number(row.mineral_configuration?.purity ?? 0),
+                      ...row.mineral_configuration,
                     },
                     location: row.location,
-                    roverName: row.roverName,
-                    projectType: (row.mineralconfiguration as any)?.metadata
+                    roverName: row.rover_name,
+                    projectType: (row.mineral_configuration as any)?.metadata
                       ?.source,
                     discoveryId: row.discovery,
                   } as MineralDeposit)

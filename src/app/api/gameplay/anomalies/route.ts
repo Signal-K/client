@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 
-import { Prisma } from "@prisma/client";
-
 import { prisma } from "@/lib/server/prisma";
 import { getRouteUser } from "@/lib/server/supabaseRoute";
 
@@ -23,49 +21,58 @@ export async function GET(request: NextRequest) {
   const author = request.nextUrl.searchParams.get("author");
   const content = request.nextUrl.searchParams.get("content");
   const limit = Number(request.nextUrl.searchParams.get("limit") || 500);
+  const clampedLimit = Math.max(1, Math.min(limit, 2000));
 
-  const conditions: Prisma.Sql[] = [Prisma.sql`1 = 1`];
+  const conditions: string[] = ["1 = 1"];
+  const params: unknown[] = [];
+  const addParam = (value: unknown) => {
+    params.push(value);
+    return `$${params.length}`;
+  };
+
   if (anomalySet) {
-    conditions.push(Prisma.sql`"anomalySet" = ${anomalySet}`);
+    conditions.push(`"anomalySet" = ${addParam(anomalySet)}`);
   }
   if (parentAnomaly) {
     const value = Number(parentAnomaly);
     if (!Number.isFinite(value)) {
       return NextResponse.json({ error: "Invalid parentAnomaly" }, { status: 400 });
     }
-    conditions.push(Prisma.sql`"parentAnomaly" = ${value}`);
+    conditions.push(`"parentAnomaly" = ${addParam(Math.trunc(value))}`);
   }
   if (id) {
     const value = Number(id);
     if (!Number.isFinite(value)) {
       return NextResponse.json({ error: "Invalid id" }, { status: 400 });
     }
-    conditions.push(Prisma.sql`id = ${value}`);
+    conditions.push(`id = ${addParam(Math.trunc(value))}`);
   }
   if (ids) {
     const parsed = ids
       .split(",")
       .map((x) => Number(x.trim()))
-      .filter((x) => Number.isFinite(x));
+      .filter((x) => Number.isFinite(x))
+      .map((x) => Math.trunc(x));
     if (parsed.length > 0) {
-      conditions.push(Prisma.sql`id IN (${Prisma.join(parsed)})`);
+      conditions.push(`id = ANY(${addParam(parsed)}::bigint[])`);
     }
   }
   if (author) {
-    conditions.push(Prisma.sql`author = ${author}`);
+    conditions.push(`author = ${addParam(author)}`);
   }
   if (content) {
-    conditions.push(Prisma.sql`content = ${content}`);
+    conditions.push(`content = ${addParam(content)}`);
   }
 
   try {
-    const rows = await prisma.$queryRaw<Array<Record<string, unknown>>>(Prisma.sql`
+    const query = `
       SELECT *
       FROM anomalies
-      WHERE ${Prisma.join(conditions, " AND ")}
+      WHERE ${conditions.join(" AND ")}
       ORDER BY id DESC
-      LIMIT ${Math.max(1, Math.min(limit, 2000))}
-    `);
+      LIMIT ${addParam(clampedLimit)}
+    `;
+    const rows = await prisma.$queryRawUnsafe<Array<Record<string, unknown>>>(query, ...params);
 
     return NextResponse.json({ anomalies: rows });
   } catch (err: unknown) {

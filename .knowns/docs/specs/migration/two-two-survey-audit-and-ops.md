@@ -68,3 +68,19 @@ Baseline from recent event history:
 4. Run recurring monitoring via:
    - `node scripts/posthog/monitor_surveys.cjs` with env `POSTHOG_PERSONAL_API_KEY`.
 
+## Schema Audit Changes (2026-02-23)
+
+### Summary
+- `mineralDeposits` table renamed to `mineral_deposits` (migration 005)
+- Columns `mineralconfiguration` → `mineral_configuration`, `roverName` → `rover_name`
+- Tables dropped: `user_anomalies`, `unlocked_technologies`, `sectors` (migrations 003/004)
+
+### Impact
+- API routes updated to reflect new table/column names
+- Prisma schema updated; models removed for dropped tables
+- Tests updated to validate schema changes
+
+### Next Steps
+- Push migrations to production (tracked in `task-m9p4rs`)
+- Normalise client-side key names to snake_case (tracked in `task-k2b7wn`)
+

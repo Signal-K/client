@@ -1,3 +1,12 @@
+---
+title: "Star Sailors - Client Application"
+description: "Overview, setup, testing, and deployment guide for the Star Sailors Next.js client application"
+category: "guide"
+status: "active"
+created: "2026-02-23"
+updated: "2026-02-23"
+---
+
 # Star Sailors - Client Application
 
 A Next.js application for space exploration, citizen science, and data classification.

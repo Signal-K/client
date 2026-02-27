@@ -1,7 +1,9 @@
 "use client";
 
 import type { ReactNode } from "react";
-import GameNavbar from "@/src/components/layout/Tes";
+import MainHeader from "@/src/components/layout/Header/MainHeader";
+import { TelescopeBackground } from "@/src/components/classification/telescope/telescope-background";
+import UseDarkMode from "@/src/shared/hooks/useDarkMode";
 
 type SetupScaffoldProps = {
   title: string;
@@ -10,15 +12,30 @@ type SetupScaffoldProps = {
 };
 
 export function SetupScaffold({ title, subtitle, children }: SetupScaffoldProps) {
+  const { isDark, toggleDarkMode } = UseDarkMode();
+
   return (
-    <div className="min-h-[100dvh] w-full overflow-hidden bg-[#070b14] text-slate-100">
+    <div className="min-h-[100dvh] w-full overflow-hidden text-slate-100">
       <div className="fixed inset-0 -z-10">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_15%_20%,rgba(56,189,248,0.16),transparent_35%),radial-gradient(circle_at_85%_0%,rgba(251,146,60,0.12),transparent_30%),linear-gradient(180deg,#05070d_0%,#0b1220_55%,#070b14_100%)]" />
-        <div className="absolute inset-0 opacity-20 [background-image:linear-gradient(rgba(148,163,184,0.15)_1px,transparent_1px),linear-gradient(90deg,rgba(148,163,184,0.15)_1px,transparent_1px)] [background-size:36px_36px]" />
+        <TelescopeBackground
+          sectorX={0}
+          sectorY={0}
+          showAllAnomalies={false}
+          isDarkTheme={isDark}
+          variant="stars-only"
+          onAnomalyClick={() => {}}
+        />
       </div>
 
       <div className="relative z-20">
-        <GameNavbar />
+        <MainHeader
+          isDark={isDark}
+          onThemeToggle={toggleDarkMode}
+          notificationsOpen={false}
+          onToggleNotifications={() => {}}
+          activityFeed={[]}
+          otherClassifications={[]}
+        />
       </div>
 
       <main className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 pb-8 pt-20 md:px-6 md:pt-24">
