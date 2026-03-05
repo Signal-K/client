@@ -60,4 +60,20 @@ describe("useDeploymentStatus", () => {
       expect(result.current.planetTargets).toEqual([])
     })
   })
+
+  it("keeps defaults when fetch throws a network error", async () => {
+    vi.spyOn(globalThis, "fetch").mockRejectedValue(new TypeError("Failed to fetch"))
+
+    const { result } = renderHook(() => useDeploymentStatus())
+
+    // Wait a tick for the async effect to settle
+    await waitFor(() => {
+      expect(result.current.deploymentStatus).toEqual({
+        telescope: { deployed: false, unclassifiedCount: 0 },
+        satellites: { deployed: false, unclassifiedCount: 0, available: false },
+        rover: { deployed: false, unclassifiedCount: 0 },
+      })
+      expect(result.current.planetTargets).toEqual([])
+    })
+  })
 })

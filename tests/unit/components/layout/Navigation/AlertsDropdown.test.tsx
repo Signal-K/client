@@ -204,4 +204,21 @@ describe("AlertsDropdown", () => {
       expect(links.length).toBeGreaterThan(0);
     });
   });
+
+  it("handles corrupted cookie JSON without crashing (generateAlerts branch)", async () => {
+    const Cookies = await import("js-cookie");
+    (Cookies.default.get as any).mockReturnValue("{not valid json{{");
+
+    mockUseAuthUser.mockReturnValue({ user: { id: "user-9" } });
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ alerts: [makeAnomalyAlert("30")] }),
+    } as any);
+
+    // Should not throw; falls back to empty dismissed list so alert is visible
+    expect(() => render(<AlertsDropdown />)).not.toThrow();
+    await waitFor(() => {
+      expect(global.fetch).toHaveBeenCalled();
+    });
+  });
 });

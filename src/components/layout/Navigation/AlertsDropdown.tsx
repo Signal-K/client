@@ -8,30 +8,6 @@ import { formatDistanceToNow, startOfDay, addDays, subDays } from 'date-fns';
 import Cookies from 'js-cookie';
 import { useAuthUser } from '@/src/hooks/useAuthUser';
 
-interface LinkedAnomaly {
-  id: string;
-  anomaly: {
-    id: number;
-    anomalytype: string;
-    content: string;
-    classification_status: string;
-  };
-  date: string; // updated from created_at to date
-}
-
-interface UpcomingEvent {
-  id: number;
-  type: string;
-  time: string;
-  location: {
-    id: number;
-    content: string;
-  };
-  classification_location: {
-    id: number;
-  };
-}
-
 interface AlertItem {
   id: string;
   type: 'anomaly' | 'event' | 'completion';
@@ -70,7 +46,13 @@ async function generateAlerts(userId: string | null | undefined): Promise<AlertI
 
     const currentWeek = new Date().toISOString().split('T')[0];
     const cookieKey = getCookieKey(userId, currentWeek);
-    const dismissedIds = JSON.parse(Cookies.get(cookieKey) || "[]");
+    let dismissedIds: string[] = [];
+    try {
+      const parsed = JSON.parse(Cookies.get(cookieKey) || "[]");
+      dismissedIds = Array.isArray(parsed) ? parsed : [];
+    } catch {
+      dismissedIds = [];
+    }
     const visibleAlerts = fetchedAlerts.filter((alert) => !dismissedIds.includes(alert.id));
 
     if (visibleAlerts.length === 0) {
@@ -134,7 +116,13 @@ export default function ResponsiveAlerts() {
 
     const currentWeek = new Date().toISOString().split('T')[0];
     const cookieKey = getCookieKey(user.id, currentWeek);
-    const dismissedIds: string[] = JSON.parse(Cookies.get(cookieKey) || "[]");
+    let dismissedIds: string[] = [];
+    try {
+      dismissedIds = JSON.parse(Cookies.get(cookieKey) || "[]");
+      if (!Array.isArray(dismissedIds)) dismissedIds = [];
+    } catch {
+      dismissedIds = [];
+    }
     const updated = [...new Set([...dismissedIds, currentAlert.id])];
     Cookies.set(cookieKey, JSON.stringify(updated), { expires: 7 });
 

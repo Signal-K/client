@@ -26,7 +26,13 @@ export function PostHogProvider({ children, apiKey, projectId, region }: PostHog
     const uiHost = isEURegion ? "https://eu.posthog.com" : "https://us.posthog.com"
 
     ;(async () => {
-      const { default: posthog } = await import("posthog-js")
+      let posthog: import("posthog-js").PostHog
+      try {
+        const mod = await import("posthog-js")
+        posthog = mod.default
+      } catch {
+        return
+      }
       if (!mounted) return
 
       if (!posthog.__loaded) {

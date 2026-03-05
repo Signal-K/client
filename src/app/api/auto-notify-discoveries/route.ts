@@ -2,6 +2,60 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import webpush from 'web-push';
 
+const SEND_TIMEOUT_MS = 8000;
+const SEND_CONCURRENCY = 6;
+const USER_CONCURRENCY = 4;
+const MAX_USERS_PER_RUN = 120;
+const MAX_ENDPOINTS_PER_USER = 20;
+
+type PushSubscriptionRow = {
+    endpoint: string;
+    auth: string;
+    p256dh: string;
+    profile_id: string;
+};
+
+function dedupeByEndpoint(subscriptions: PushSubscriptionRow[]) {
+    const unique = new Map<string, PushSubscriptionRow>();
+    for (const sub of subscriptions) {
+        if (!unique.has(sub.endpoint)) unique.set(sub.endpoint, sub);
+    }
+    return Array.from(unique.values());
+}
+
+async function withTimeout<T>(promise: Promise<T>, timeoutMs: number): Promise<T> {
+    let timeoutHandle: ReturnType<typeof setTimeout> | null = null;
+    const timeoutPromise = new Promise<never>((_, reject) => {
+        timeoutHandle = setTimeout(() => reject(new Error(`Push send timed out after ${timeoutMs}ms`)), timeoutMs);
+    });
+    try {
+        return await Promise.race([promise, timeoutPromise]);
+    } finally {
+        if (timeoutHandle) clearTimeout(timeoutHandle);
+    }
+}
+
+async function mapWithConcurrency<T, R>(
+    items: T[],
+    concurrency: number,
+    fn: (item: T, index: number) => Promise<R>
+): Promise<R[]> {
+    const results = new Array<R>(items.length);
+    let currentIndex = 0;
+
+    async function worker() {
+        while (true) {
+            const index = currentIndex++;
+            if (index >= items.length) return;
+            results[index] = await fn(items[index], index);
+        }
+    }
+
+    const workers = Array.from({ length: Math.min(concurrency, items.length) }, () => worker());
+    await Promise.all(workers);
+    return results;
+}
+
 export async function POST(request: NextRequest) {
     try {
         // Configure web-push with VAPID keys
@@ -45,14 +99,10 @@ export async function POST(request: NextRequest) {
         }
 
         // Get unique user IDs
-        const userIds = [...new Set(allSubscriptions.map(sub => sub.profile_id))];
+        const userIds = [...new Set(allSubscriptions.map(sub => sub.profile_id))].slice(0, MAX_USERS_PER_RUN);
         console.log(`Found ${userIds.length} unique users with push subscriptions`);
 
-        let totalNotificationsSent = 0;
-        let usersWithUnclassified = 0;
-
-        // Process each user
-        for (const userId of userIds) {
+        const perUserResults = await mapWithConcurrency(userIds, USER_CONCURRENCY, async (userId) => {
             try {
                 // Get user's linked anomalies
                 const { data: linkedAnomalies, error: linkedError } = await supabase
@@ -61,13 +111,8 @@ export async function POST(request: NextRequest) {
                     .eq('author', userId)
                     .order('date', { ascending: false });
 
-                if (linkedError) {
-                    console.error(`Error fetching linked anomalies for user ${userId}:`, linkedError);
-                    continue;
-                }
-
-                if (!linkedAnomalies || linkedAnomalies.length === 0) {
-                    continue; // No discoveries for this user
+                if (linkedError || !linkedAnomalies || linkedAnomalies.length === 0) {
+                    return { sent: 0, hasUnclassified: false };
                 }
 
                 // Get anomaly details
@@ -90,8 +135,7 @@ export async function POST(request: NextRequest) {
                     .eq('author', userId);
 
                 if (classError) {
-                    console.error(`Error fetching classifications for user ${userId}:`, classError);
-                    continue;
+                    return { sent: 0, hasUnclassified: false };
                 }
 
                 // Create set of classified anomaly IDs
@@ -105,10 +149,8 @@ export async function POST(request: NextRequest) {
                 );
 
                 if (unclassifiedDiscoveries.length === 0) {
-                    continue; // No unclassified discoveries for this user
+                    return { sent: 0, hasUnclassified: false };
                 }
-
-                usersWithUnclassified++;
 
                 // Prepare discovery data
                 const discoveryData = unclassifiedDiscoveries.map(d => ({
@@ -126,18 +168,10 @@ export async function POST(request: NextRequest) {
                     .order('created_at', { ascending: false });
 
                 if (userSubError || !userSubscriptions || userSubscriptions.length === 0) {
-                    continue; // Skip if user has no subscriptions
+                    return { sent: 0, hasUnclassified: true };
                 }
 
-                // Deduplicate subscriptions by endpoint
-                const uniqueSubscriptions = new Map();
-                userSubscriptions.forEach(sub => {
-                    if (!uniqueSubscriptions.has(sub.endpoint)) {
-                        uniqueSubscriptions.set(sub.endpoint, sub);
-                    }
-                });
-
-                const deduplicatedSubscriptions = Array.from(uniqueSubscriptions.values());
+                const deduplicatedSubscriptions = dedupeByEndpoint(userSubscriptions as PushSubscriptionRow[]).slice(0, MAX_ENDPOINTS_PER_USER);
 
                 // Create notification message
                 const discoveryCount = unclassifiedDiscoveries.length;
@@ -158,35 +192,32 @@ export async function POST(request: NextRequest) {
                 });
 
                 // Send notifications to all user's unique endpoints
-                const results = await Promise.all(
-                    deduplicatedSubscriptions.map(async (subscription) => {
-                        try {
-                            const pushSubscription = {
-                                endpoint: subscription.endpoint,
-                                keys: {
-                                    auth: subscription.auth,
-                                    p256dh: subscription.p256dh
-                                }
-                            };
+                const results = await mapWithConcurrency(deduplicatedSubscriptions, SEND_CONCURRENCY, async (subscription) => {
+                    try {
+                        const pushSubscription = {
+                            endpoint: subscription.endpoint,
+                            keys: {
+                                auth: subscription.auth,
+                                p256dh: subscription.p256dh
+                            }
+                        };
 
-                            await webpush.sendNotification(pushSubscription, payload);
-                            return { success: true };
-                        } catch (pushError) {
-                            console.error(`Failed to send notification:`, pushError);
-                            return { success: false };
-                        }
-                    })
-                );
+                        await withTimeout(webpush.sendNotification(pushSubscription, payload), SEND_TIMEOUT_MS);
+                        return { success: true };
+                    } catch {
+                        return { success: false };
+                    }
+                });
 
                 const successful = results.filter(r => r.success).length;
-                totalNotificationsSent += successful;
-
-                console.log(`Sent ${successful} notifications to user ${userId} for ${discoveryCount} unclassified discoveries`);
-
-            } catch (userError) {
-                console.error(`Error processing user ${userId}:`, userError);
+                return { sent: successful, hasUnclassified: true };
+            } catch {
+                return { sent: 0, hasUnclassified: false };
             }
-        }
+        });
+
+        const totalNotificationsSent = perUserResults.reduce((sum, item) => sum + item.sent, 0);
+        const usersWithUnclassified = perUserResults.filter((item) => item.hasUnclassified).length;
 
         return NextResponse.json({
             message: `Auto-notification complete`,

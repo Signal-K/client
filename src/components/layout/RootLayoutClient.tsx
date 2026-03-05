@@ -62,7 +62,8 @@ export default function RootLayoutClient({ children }: { children: ReactNode }) 
       return;
     }
 
-    navigator.serviceWorker.register("/service-worker.js", { scope: "/" }).catch((error) => {
+    // Versioned URL forces clients with stale workers to fetch a fresh script after deploy.
+    navigator.serviceWorker.register("/service-worker.js?v=20260227-2", { scope: "/" }).catch((error) => {
       console.error("Service Worker registration failed:", error);
     });
   }, []);

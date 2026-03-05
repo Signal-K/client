@@ -2,6 +2,50 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import webpush from 'web-push';
 
+const SEND_TIMEOUT_MS = 8000;
+const SEND_CONCURRENCY = 6;
+const MAX_ENDPOINTS_PER_USER = 30;
+
+type PushSubscriptionRow = {
+    endpoint: string;
+    auth: string;
+    p256dh: string;
+    profile_id: string;
+};
+
+async function withTimeout<T>(promise: Promise<T>, timeoutMs: number): Promise<T> {
+    let timeoutHandle: ReturnType<typeof setTimeout> | null = null;
+    const timeoutPromise = new Promise<never>((_, reject) => {
+        timeoutHandle = setTimeout(() => reject(new Error(`Push send timed out after ${timeoutMs}ms`)), timeoutMs);
+    });
+    try {
+        return await Promise.race([promise, timeoutPromise]);
+    } finally {
+        if (timeoutHandle) clearTimeout(timeoutHandle);
+    }
+}
+
+async function mapWithConcurrency<T, R>(
+    items: T[],
+    concurrency: number,
+    fn: (item: T, index: number) => Promise<R>
+): Promise<R[]> {
+    const results = new Array<R>(items.length);
+    let currentIndex = 0;
+
+    async function worker() {
+        while (true) {
+            const index = currentIndex++;
+            if (index >= items.length) return;
+            results[index] = await fn(items[index], index);
+        }
+    }
+
+    const workers = Array.from({ length: Math.min(concurrency, items.length) }, () => worker());
+    await Promise.all(workers);
+    return results;
+}
+
 export async function POST(request: NextRequest) {
     try {
         // Configure web-push with VAPID keys
@@ -12,26 +56,17 @@ export async function POST(request: NextRequest) {
         );
 
         // Get the discovery data and user info from the request
-        const requestBody = await request.json();
+        const requestBody = await request.json().catch(() => ({}));
         const { userId, unclassifiedDiscoveries, customMessage } = requestBody;
 
         if (!userId) {
             return NextResponse.json({ error: 'User ID is required' }, { status: 400 });
         }
 
-        // Create Supabase client with service role for admin access to push subscriptions
-        console.log('Environment check:');
-        console.log('SUPABASE_URL:', process.env.NEXT_PUBLIC_SUPABASE_URL);
-        console.log('SERVICE_ROLE_KEY exists:', !!process.env.SUPABASE_SERVICE_ROLE_KEY);
-        console.log('VAPID_PUBLIC_KEY exists:', !!process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY);
-        console.log('VAPID_PRIVATE_KEY exists:', !!process.env.VAPID_PRIVATE_KEY);
-        
         // Check if we're in Docker environment
-        const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.includes('127.0.0.1') 
-            ? process.env.NEXT_PUBLIC_SUPABASE_URL?.replace('127.0.0.1', 'host.docker.internal') 
+        const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.includes('127.0.0.1')
+            ? process.env.NEXT_PUBLIC_SUPABASE_URL?.replace('127.0.0.1', 'host.docker.internal')
             : process.env.NEXT_PUBLIC_SUPABASE_URL;
-            
-        console.log('Using Supabase URL:', supabaseUrl);
         
         const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
@@ -80,7 +115,8 @@ export async function POST(request: NextRequest) {
                 }
             });
 
-            const deduplicatedSubscriptions = Array.from(uniqueSubscriptions.values());
+            const deduplicatedSubscriptions = Array.from(uniqueSubscriptions.values()).slice(0, MAX_ENDPOINTS_PER_USER);
+            const skipped = Math.max(0, uniqueSubscriptions.size - deduplicatedSubscriptions.length);
 
             const payload = JSON.stringify({
                 title: customMessage.title,
@@ -90,26 +126,22 @@ export async function POST(request: NextRequest) {
             });
 
             // Send notifications to all user's unique endpoints
-            const results = await Promise.all(
-                deduplicatedSubscriptions.map(async (subscription) => {
-                    try {
-                        const pushSubscription = {
-                            endpoint: subscription.endpoint,
-                            keys: {
-                                auth: subscription.auth,
-                                p256dh: subscription.p256dh
-                            }
-                        };
+            const results = await mapWithConcurrency(deduplicatedSubscriptions, SEND_CONCURRENCY, async (subscription) => {
+                try {
+                    const pushSubscription = {
+                        endpoint: subscription.endpoint,
+                        keys: {
+                            auth: subscription.auth,
+                            p256dh: subscription.p256dh
+                        }
+                    };
 
-                        await webpush.sendNotification(pushSubscription, payload);
-                        console.log(`Sent custom notification to user ${subscription.profile_id}`);
-                        return { success: true, endpoint: subscription.endpoint };
-                    } catch (pushError) {
-                        console.error(`Failed to send custom notification to user ${subscription.profile_id}:`, pushError);
-                        return { success: false, endpoint: subscription.endpoint, error: String(pushError) };
-                    }
-                })
-            );
+                    await withTimeout(webpush.sendNotification(pushSubscription, payload), SEND_TIMEOUT_MS);
+                    return { success: true, endpoint: subscription.endpoint };
+                } catch (pushError) {
+                    return { success: false, endpoint: subscription.endpoint, error: String(pushError) };
+                }
+            });
 
             const successful = results.filter(r => r.success).length;
             const failed = results.filter(r => !r.success).length;
@@ -117,7 +149,9 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({
                 message: `Sent ${successful} custom notifications, ${failed} failed`,
                 notificationsSent: successful,
-                notificationsFailed: failed
+                notificationsFailed: failed,
+                attempted: deduplicatedSubscriptions.length,
+                skipped
             });
         }
 
@@ -128,16 +162,12 @@ export async function POST(request: NextRequest) {
             });
         }
 
-        console.log('Fetching push subscriptions for user:', userId);
-
         // Get user's push subscriptions
         const { data: subscriptions, error: subError } = await supabase
             .from('push_subscriptions')
             .select('*')
             .eq('profile_id', userId)
             .order('created_at', { ascending: false });
-
-        console.log('Supabase response:', { data: subscriptions, error: subError });
 
         if (subError) {
             console.error('Error fetching subscriptions:', subError);
@@ -164,8 +194,8 @@ export async function POST(request: NextRequest) {
             }
         });
 
-        const deduplicatedSubscriptions = Array.from(uniqueSubscriptions.values());
-        console.log(`Deduplicated from ${subscriptions.length} to ${deduplicatedSubscriptions.length} unique endpoints`);
+        const deduplicatedSubscriptions = Array.from(uniqueSubscriptions.values()).slice(0, MAX_ENDPOINTS_PER_USER);
+        const skipped = Math.max(0, uniqueSubscriptions.size - deduplicatedSubscriptions.length);
 
         // Create notification message
         const discoveryCount = unclassifiedDiscoveries.length;
@@ -185,29 +215,24 @@ export async function POST(request: NextRequest) {
             url: '/structures/telescope'
         });
 
-        console.log(`Sending discovery notifications to ${deduplicatedSubscriptions.length} subscribers`);
 
         // Send notifications to all user's unique endpoints
-        const results = await Promise.all(
-            deduplicatedSubscriptions.map(async (subscription) => {
-                try {
-                    const pushSubscription = {
-                        endpoint: subscription.endpoint,
-                        keys: {
-                            auth: subscription.auth,
-                            p256dh: subscription.p256dh
-                        }
-                    };
+        const results = await mapWithConcurrency(deduplicatedSubscriptions, SEND_CONCURRENCY, async (subscription) => {
+            try {
+                const pushSubscription = {
+                    endpoint: subscription.endpoint,
+                    keys: {
+                        auth: subscription.auth,
+                        p256dh: subscription.p256dh
+                    }
+                };
 
-                    await webpush.sendNotification(pushSubscription, payload);
-                    console.log(`Sent notification to user ${subscription.profile_id}`);
-                    return { success: true, endpoint: subscription.endpoint };
-                } catch (pushError) {
-                    console.error(`Failed to send notification to user ${subscription.profile_id}:`, pushError);
-                    return { success: false, endpoint: subscription.endpoint, error: String(pushError) };
-                }
-            })
-        );
+                await withTimeout(webpush.sendNotification(pushSubscription, payload), SEND_TIMEOUT_MS);
+                return { success: true, endpoint: subscription.endpoint };
+            } catch (pushError) {
+                return { success: false, endpoint: subscription.endpoint, error: String(pushError) };
+            }
+        });
 
         const successful = results.filter(r => r.success).length;
         const failed = results.filter(r => !r.success).length;
@@ -217,6 +242,8 @@ export async function POST(request: NextRequest) {
             unclassifiedCount: discoveryCount,
             notificationsSent: successful,
             notificationsFailed: failed,
+            attempted: deduplicatedSubscriptions.length,
+            skipped,
             discoveries: unclassifiedDiscoveries
         });
 

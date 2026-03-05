@@ -75,8 +75,16 @@ export default function PushNotificationPrompt() {
 
       const rawKey = subscription.getKey("p256dh");
       const rawAuth = subscription.getKey("auth");
-      const p256dh = rawKey ? btoa(String.fromCharCode(...new Uint8Array(rawKey))) : "";
-      const auth = rawAuth ? btoa(String.fromCharCode(...new Uint8Array(rawAuth))) : "";
+      const arrayBufferToBase64 = (buf: ArrayBuffer): string => {
+        const bytes = new Uint8Array(buf);
+        let binary = "";
+        for (let i = 0; i < bytes.byteLength; i++) {
+          binary += String.fromCharCode(bytes[i]);
+        }
+        return btoa(binary);
+      };
+      const p256dh = rawKey ? arrayBufferToBase64(rawKey) : "";
+      const auth = rawAuth ? arrayBufferToBase64(rawAuth) : "";
 
       const response = await fetch("/api/gameplay/notifications/subscribe", {
         method: "POST",

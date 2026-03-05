@@ -86,4 +86,24 @@ describe("UseDarkMode", () => {
     expect(result.current).toHaveProperty("toggleDarkMode");
     expect(typeof result.current.toggleDarkMode).toBe("function");
   });
+
+  it("does not crash when localStorage.getItem throws (private mode)", () => {
+    vi.spyOn(window.localStorage, "getItem").mockImplementation(() => {
+      throw new DOMException("Access denied", "SecurityError");
+    });
+    // Should not throw; falls back to system preference (false)
+    expect(() => renderHook(() => UseDarkMode())).not.toThrow();
+  });
+
+  it("does not crash when localStorage.setItem throws (private mode)", () => {
+    vi.spyOn(window.localStorage, "setItem").mockImplementation(() => {
+      throw new DOMException("Access denied", "SecurityError");
+    });
+    const { result } = renderHook(() => UseDarkMode());
+    expect(() => {
+      act(() => {
+        result.current.toggleDarkMode();
+      });
+    }).not.toThrow();
+  });
 });

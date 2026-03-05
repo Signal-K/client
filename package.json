@@ -124,7 +124,7 @@
     "@types/react-dom": "^18.2.7",
     "@types/web-push": "^3.6.4",
     "@vitest/coverage-v8": "3.2.4",
-    "cypress": "^14.5.4",
+    "cypress": "15.10.0",
     "eslint": "^8.57.1",
     "eslint-config-next": "^14.2.21",
     "istanbul-lib-coverage": "^3.2.2",
