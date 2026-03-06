@@ -1,72 +1,18 @@
 "use client";
 
-import { ReactNode, useState } from "react";
-import { useRouter } from "next/navigation";
+import { ReactNode } from "react";
 import { Auth } from "@supabase/auth-ui-react";
 import Image from "next/image";
 import Link from "next/link";
-import { MicroscopeIcon, CodeIcon, FilesIcon, UserX, Mail, ArrowRight } from "lucide-react";
-import { Flexbox } from 'react-layout-kit';
-import { createStyles } from 'antd-style';
 import { Card, CardContent } from "@/src/components/ui/card";
-import { Separator } from "@/src/components/ui/separator";
-import { Button } from "@/src/components/ui/button";
-import { Alert, AlertDescription } from "@/src/components/ui/alert";
 import { getSupabaseBrowserClient } from "@/lib/supabase/browser";
 
 interface AuthPageProps {
   children: ReactNode;
 }
 
-const useStyles = createStyles(({ css, token }) => {
-    return {
-      desc: css`
-        font-size: min(24px, 4vw);
-        font-weight: 400;
-        text-align: center;
-        text-wrap: balance;
-      `,
-      title: css`
-        margin-block-end: 0;
-        font-size: min(56px, 7vw);
-        font-weight: 800;
-        line-height: 1;
-        text-align: center;
-        text-wrap: balance;
-      `,
-    };
-});
-
 function SupabaseAuthWrapper({ children }: { children: ReactNode }) {
   const supabase = getSupabaseBrowserClient();
-  const [showAnonymousSignIn, setShowAnonymousSignIn] = useState(false);
-  const [isLoadingAnonymous, setIsLoadingAnonymous] = useState(false);
-  const [anonymousError, setAnonymousError] = useState<string | null>(null);
-  
-  const { styles } = useStyles();
-  const router = useRouter();
-
-  const handleAnonymousSignIn = async () => {
-    setIsLoadingAnonymous(true);
-    setAnonymousError(null);
-
-    try {
-      const { data, error } = await supabase.auth.signInAnonymously();
-      
-      if (error) {
-        setAnonymousError(error.message);
-        console.error('Anonymous sign-in error:', error);
-      } else {
-        // Successfully signed in anonymously — navigate to game.
-        router.replace("/game");
-      }
-    } catch (err: any) {
-      setAnonymousError('An unexpected error occurred');
-      console.error('Anonymous sign-in error:', err);
-    } finally {
-      setIsLoadingAnonymous(false);
-    }
-  };
 
   return (
     <div className="min-h-screen relative overflow-hidden">      
@@ -127,51 +73,6 @@ function SupabaseAuthWrapper({ children }: { children: ReactNode }) {
                     <p className="text-white/70 text-sm leading-relaxed">
                       Create your Star Sailors account and grow your share of the cosmic discoveries.
                     </p>
-                  </div>
-
-                  {/* Anonymous Sign-In Section */}
-                  <div className="space-y-4">
-                    {anonymousError && (
-                      <Alert className="bg-red-500/10 backdrop-blur-sm border border-red-400/20 rounded-2xl">
-                        <AlertDescription className="text-red-300">
-                          {anonymousError}
-                        </AlertDescription>
-                      </Alert>
-                    )}
-
-                    <Button
-                      onClick={handleAnonymousSignIn}
-                      disabled={isLoadingAnonymous}
-                      className="w-full h-12 bg-gradient-to-r from-purple-500/80 to-pink-500/80 hover:from-purple-600/90 hover:to-pink-600/90 text-white border-0 rounded-2xl backdrop-blur-sm shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-[1.02]"
-                      size="lg"
-                    >
-                      {isLoadingAnonymous ? (
-                        <div className="flex items-center gap-2">
-                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                          Creating temporary account...
-                        </div>
-                      ) : (
-                        <div className="flex items-center gap-2">
-                          <UserX className="w-4 h-4" />
-                          Continue as Guest
-                          <ArrowRight className="w-4 h-4" />
-                        </div>
-                      )}
-                    </Button>
-
-                    <div className="text-xs text-white/60 text-center">
-                      No email required • Your progress will be saved temporarily
-                    </div>
-                  </div>
-
-                  {/* Separator */}
-                  <div className="relative">
-                    <div className="absolute inset-0 flex items-center">
-                      <Separator className="w-full border-white/30" />
-                    </div>
-                    <div className="relative flex justify-center text-xs uppercase">
-                      <span className="bg-white/10 px-4 py-1 rounded-full text-white/70 backdrop-blur-sm">or sign up via</span>
-                    </div>
                   </div>
 
                   {/* Auth UI Component with glass styling */}

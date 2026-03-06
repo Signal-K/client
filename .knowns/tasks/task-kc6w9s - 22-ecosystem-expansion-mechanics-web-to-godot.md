@@ -1,7 +1,7 @@
 ---
 id: kc6w9s
 title: "2.2 ecosystem expansion mechanics web to godot"
-status: in_progress
+status: completed
 priority: medium
 labels:
   - migration-2.2
@@ -14,7 +14,7 @@ specRefs:
 spec: "specs/migration/two-two-migration"
 specPath: ".knowns/docs/specs/migration/two-two-migration.md"
 createdAt: '2026-02-26T18:25:00Z'
-updatedAt: '2026-02-26T21:02:00Z'
+updatedAt: '2026-03-06T08:51:42Z'
 timeSpent: 0
 ---
 

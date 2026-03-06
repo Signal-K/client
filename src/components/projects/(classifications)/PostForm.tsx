@@ -235,9 +235,9 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({
         body: JSON.stringify({
           anomaly: anomalyId,
           discovery: classificationId,
-          mineralconfiguration: mineralConfiguration,
+          mineral_configuration: mineralConfiguration,
           location: `Mars - Waypoint ${anomalyIndex + 1}`,
-          roverName: "Mars Rover Alpha",
+          rover_name: "Mars Rover Alpha",
         }),
       });
       if (!response.ok) {

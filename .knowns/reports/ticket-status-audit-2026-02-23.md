@@ -166,11 +166,6 @@
 - Blocker: Saily project must define URL contract for referral links
 - **Next step:** Coordinate with Saily team for referral URL pattern; add shared link-builder utility once defined
 
-### 🟡 BLOCKED – EXTERNAL REPO SCOPE
-**task-w1j8cm, task-y6t4nb, task-z7n5rf** (All Saily-owned)
-- Out of scope for this repo; correctly marked blocked
-- Tracked here for cross-project dependency visibility
-
 ### ⚠️ TODO (Needs Definition)
 **task-1jurpa** – Anomaly workflow organization
 - Currently has: title, spec reference only

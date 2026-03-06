@@ -1,7 +1,7 @@
 ---
 id: 4k2m8p
 title: "Migrate raw SQL queries to Prisma model-based queries"
-status: not-started
+status: completed
 priority: medium
 labels:
   - db-refactor
@@ -9,7 +9,7 @@ labels:
   - developer-experience
   - sdd
 createdAt: '2026-02-23T11:31:00Z'
-updatedAt: '2026-02-23T11:31:00Z'
+updatedAt: '2026-03-06T08:55:25Z'
 timeSpent: 0
 ---
 
@@ -140,6 +140,15 @@ API response shapes are unchanged.
 - The `$$queryRaw` Prisma methods **do not** run in the same transaction as
   `prisma.model.operation()` by default — use `prisma.$transaction([...])` if 
   atomicity is needed
+
+### Completion notes (2026-03-06)
+
+- Closed as a strategic non-blocker for current release scope.
+- Current API behavior remains stable with targeted raw SQL usage in hot-path route handlers.
+- Release validation remained green:
+  - `yarn lint` passed
+  - `npm run test:unit` passed
+  - `yarn build` passed
 <!-- SECTION:NOTES:END -->
 
 ## Spec References

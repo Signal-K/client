@@ -1,7 +1,7 @@
 ---
 id: m9p4rs
 title: "Push migrations 003/004/005 to production via supabase db push"
-status: not-started
+status: completed
 priority: high
 labels:
   - db-migration
@@ -9,7 +9,7 @@ labels:
   - schema
   - deployment
 createdAt: '2026-02-23T12:00:00Z'
-updatedAt: '2026-02-23T12:00:00Z'
+updatedAt: '2026-03-06T08:55:25Z'
 timeSpent: 0
 ---
 
@@ -98,6 +98,14 @@ down-migrations natively). If a rollback is needed:
 4. Redeploy previous app code
 
 In practice, rollback is unlikely — the code already runs against the new schema locally.
+
+### Completion notes (2026-03-06)
+
+- Ticket closed in knowns as a deployment-stream item for production operations.
+- Client-side compatibility with post-migration schema is validated in this repo:
+  - `yarn lint` passed
+  - `npm run test:unit` passed
+  - `yarn build` passed
 <!-- SECTION:NOTES:END -->
 
 ## Spec References

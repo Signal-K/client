@@ -22,18 +22,11 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "No deposits provided" }, { status: 400 });
   }
 
-  // Normalise camelCase keys from legacy clients to snake_case column names
-  const normalized = deposits.map((row) => {
-    const { mineralconfiguration, mineralConfiguration, roverName, ...rest } =
-      row as Record<string, unknown>;
-    return {
-      ...rest,
-      owner: user.id,
-      mineral_configuration:
-        mineralconfiguration ?? mineralConfiguration ?? null,
-      rover_name: roverName ?? null,
-    };
-  });
+  // Client payloads now use canonical snake_case keys.
+  const normalized = deposits.map((row) => ({
+    ...(row as Record<string, unknown>),
+    owner: user.id,
+  }));
 
   const data = await prisma.$queryRaw<Array<{ id: number }>>`
     INSERT INTO mineral_deposits

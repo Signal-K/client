@@ -156,7 +156,7 @@ async function createMineralDeposit({
         owner: userId,
         anomaly: anomalyId,
         discovery: classificationId,
-        mineralconfiguration: mineralConfig,
+        mineral_configuration: mineralConfig,
         location: typeof window !== "undefined" ? location || null : null,
         created_at: new Date().toISOString(),
       }),

@@ -237,9 +237,9 @@ export function useAnnotatorLogic({
             body: JSON.stringify({
               anomaly: parseInt(anomalyId),
               discovery: classificationData.id,
-              mineralconfiguration: mineralConfig,
+              mineral_configuration: mineralConfig,
               location: "Mars",
-              roverName: "Rover 1",
+              rover_name: "Rover 1",
               created_at: new Date().toISOString(),
             }),
           });
@@ -552,9 +552,9 @@ export function useAnnotatorLogic({
           body: JSON.stringify({
             anomaly: anomalyId ? parseInt(anomalyId) : null,
             discovery: classificationData.id,
-            mineralConfiguration: mineralConfig,
+            mineral_configuration: mineralConfig,
             location: "Mars",
-            roverName: "Rover 1",
+            rover_name: "Rover 1",
             created_at: new Date().toISOString(),
           }),
         });

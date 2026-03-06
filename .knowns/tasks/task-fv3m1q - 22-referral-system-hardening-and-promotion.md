@@ -1,7 +1,7 @@
 ---
 id: fv3m1q
 title: "2.2 referral system hardening and promotion"
-status: in_progress
+status: completed
 priority: high
 labels:
   - migration-2.2
@@ -15,7 +15,7 @@ specPath: ".knowns/docs/specs/migration/two-two-migration.md"
 references:
   - ".knowns/tasks/task-tdi1lj - Add-linkreferrals-between-client-and-saily.md"
 createdAt: '2026-02-26T18:25:00Z'
-updatedAt: '2026-02-26T22:58:00Z'
+updatedAt: '2026-03-06T08:51:42Z'
 timeSpent: 0
 ---
 

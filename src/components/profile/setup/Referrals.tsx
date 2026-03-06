@@ -5,6 +5,7 @@ import { Button } from "@/src/components/ui/button";
 import { getReferralPanelDataAction } from "./actions";
 import { Check, Copy, Share2, Sparkles } from "lucide-react";
 import { getReferralProgress, REFERRAL_TIERS } from "@/src/features/referrals/referral-progress";
+import { buildClientReferralUrl, buildReferralShareText, buildSailyReferralUrl } from "@/src/features/referrals/referral-links";
 
 interface ReferredUser {
   id: string;
@@ -50,18 +51,15 @@ export default function ReferralCodePanel() {
 
   const handleCopy = () => {
     if (!referralCode) return;
-    navigator.clipboard.writeText(referralCode);
+    const inviteUrl = buildClientReferralUrl(referralCode);
+    navigator.clipboard.writeText(inviteUrl || referralCode);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
 
   const handleShare = async () => {
     if (!referralCode) return;
-    const inviteUrl =
-      typeof window !== "undefined"
-        ? `${window.location.origin}/auth?ref=${encodeURIComponent(referralCode)}`
-        : "";
-    const shareText = `Join me in Star Sailors. Use my referral code: ${referralCode}${inviteUrl ? ` (${inviteUrl})` : ""}`;
+    const shareText = buildReferralShareText(referralCode);
     if (typeof navigator !== "undefined" && navigator.share) {
       try {
         await navigator.share({
@@ -175,6 +173,18 @@ export default function ReferralCodePanel() {
             {shared ? <Check className="mr-2 h-4 w-4" /> : <Share2 className="mr-2 h-4 w-4" />}
             {shared ? "Shared" : "Share Invite"}
           </Button>
+          <a
+            href={referralCode ? buildSailyReferralUrl(referralCode) : "#"}
+            target="_blank"
+            rel="noreferrer"
+            className={`inline-flex items-center rounded-md border px-4 py-2 text-sm font-medium transition-colors ${
+              referralCode && !loading
+                ? "border-amber-300/30 bg-amber-500/20 text-amber-100 hover:bg-amber-500/30"
+                : "pointer-events-none border-amber-300/20 bg-amber-500/10 text-amber-100/60"
+            }`}
+          >
+            Open in Saily
+          </a>
         </div>
 
         <h3 className="mt-6 text-sm font-semibold uppercase tracking-wider text-cyan-200/90">
