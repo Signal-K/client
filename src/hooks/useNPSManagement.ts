@@ -31,7 +31,8 @@ export function useNPSManagement() {
 
   useEffect(() => {
     if (session) {
-      scheduleNpsCheck();
+      const cleanup = scheduleNpsCheck();
+      return cleanup;
     }
   }, [session, hasCheckedNps]);
 

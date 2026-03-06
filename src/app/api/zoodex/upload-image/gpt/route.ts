@@ -23,11 +23,13 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "No file uploaded" }, { status: 400 });
     }
 
+    if (!process.env.OPENAI_API_KEY) {
+      return NextResponse.json({ error: "OpenAI API key is not configured" }, { status: 503 });
+    }
+
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
     const base64Image = buffer.toString("base64");
-
-    console.log("File received. Size: ", buffer.length, " bytes");
 
     const openaiRes = await axios.post(
       "https://api.openai.com/v1/chat/completions",
@@ -62,28 +64,24 @@ export async function POST(req: NextRequest) {
       }
     );
 
-    console.log("Raw OpenAI response:", openaiRes.data);
-
-    let classification = openaiRes.data.choices[0].message.content;
-    classification = classification.replace(/```json|```/g, "").trim();
+    const rawContent = openaiRes.data?.choices?.[0]?.message?.content;
+    if (!rawContent) {
+      return NextResponse.json({ error: "No response from model" }, { status: 502 });
+    }
+    const classification = String(rawContent).replace(/```json|```/g, "").trim();
 
     let parsedClassification;
     try {
       parsedClassification = JSON.parse(classification);
-    } catch (parseError) {
-      console.error("Failed to parse classification:", parseError);
+    } catch {
       return NextResponse.json({ error: "Invalid classification data" }, { status: 500 });
     }
-
-    console.log("Parsed Classification:", parsedClassification);
 
     const detectedTraits = Array.isArray(parsedClassification.traits)
       ? parsedClassification.traits
       : typeof parsedClassification.traits === "string"
       ? parsedClassification.traits.split(",").map((t: string) => t.trim())
       : [];
-
-    console.log("Detected Traits:", detectedTraits);
 
     const relevantTraits = starterTraits
       .filter((trait) => detectedTraits.includes(trait))

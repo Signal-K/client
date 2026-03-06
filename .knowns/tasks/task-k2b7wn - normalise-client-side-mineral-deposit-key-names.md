@@ -1,7 +1,7 @@
 ---
 id: k2b7wn
 title: "Normalise client-side mineral deposit key names to snake_case"
-status: not-started
+status: completed
 priority: low
 labels:
   - cleanup
@@ -9,7 +9,7 @@ labels:
   - frontend
   - backward-compat
 createdAt: '2026-02-23T12:00:00Z'
-updatedAt: '2026-02-23T12:00:00Z'
+updatedAt: '2026-03-06T08:55:25Z'
 timeSpent: 0
 ---
 
@@ -49,12 +49,12 @@ backward-compat fallback `body?.rover_name ?? body?.roverName`) once all callers
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 `PostForm.tsx` sends `mineral_configuration` and `rover_name` to the API
-- [ ] #2 `useAnnotatorLogic.tsx` sends `mineral_configuration` and `rover_name` (all affected paths)
-- [ ] #3 `mineralDepositCreation.ts` sends `mineral_configuration`
-- [ ] #4 `mineral-deposits/route.ts` reads `body?.rover_name` (with optional old-key fallback until shim removal)
-- [ ] #5 Backward-compat normalisation shim in `bulk/route.ts` can be simplified/removed
-- [ ] #6 All unit tests pass; no new failures
+- [x] #1 `PostForm.tsx` sends `mineral_configuration` and `rover_name` to the API
+- [x] #2 `useAnnotatorLogic.tsx` sends `mineral_configuration` and `rover_name` (all affected paths)
+- [x] #3 `mineralDepositCreation.ts` sends `mineral_configuration`
+- [x] #4 `mineral-deposits/route.ts` reads `body?.rover_name` (with optional old-key fallback until shim removal)
+- [x] #5 Backward-compat normalisation shim in `bulk/route.ts` can be simplified/removed
+- [x] #6 All unit tests pass; no new failures
 <!-- AC:END -->
 
 ## Implementation Notes
@@ -82,6 +82,21 @@ Line 240 path: direct `supabase.from("mineral_deposits").insert(...)` (if not us
 Line 555 path: likely via `fetch('/api/gameplay/mineral-deposits', ...)` 
 
 Verify which path actually fires at runtime before updating to avoid silent data loss.
+
+### Completion notes (2026-03-06)
+
+- Updated caller payload keys to canonical snake_case:
+  - `src/components/projects/(classifications)/PostForm.tsx`
+  - `src/components/projects/(classifications)/Annotating/useAnnotatorLogic.tsx`
+  - `src/utils/mineralDepositCreation.ts`
+- Updated API parsing in `src/app/api/gameplay/mineral-deposits/route.ts`:
+  - primary read path now `mineral_configuration` + `rover_name`
+  - retained legacy fallback for old keys
+- Simplified `src/app/api/gameplay/mineral-deposits/bulk/route.ts` by removing camelCase normalisation shim.
+- Validation:
+  - `yarn lint` passed
+  - `npm run test:unit` passed
+  - `yarn build` passed
 <!-- SECTION:NOTES:END -->
 
 ## Spec References

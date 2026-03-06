@@ -4,11 +4,16 @@ export default function UseDarkMode() {
     const [isDark, setIsDark] = useState<boolean>(false);
 
     useEffect(() => {
-        const savedTheme = localStorage.getItem('star-sailors-theme');
+        let savedTheme: string | null = null;
+        try {
+            savedTheme = localStorage.getItem('star-sailors-theme');
+        } catch {
+            // localStorage unavailable (e.g. Safari private mode)
+        }
         const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        
+
         const shouldBeDark = savedTheme === 'dark' || (savedTheme === null && prefersDark);
-        
+
         setIsDark(shouldBeDark);
         document.documentElement.classList.toggle('dark', shouldBeDark);
     }, []);
@@ -16,11 +21,13 @@ export default function UseDarkMode() {
     const toggleDarkMode = () => {
         const newTheme = !isDark;
         setIsDark(newTheme);
-        
-        // Save to localStorage
-        localStorage.setItem('star-sailors-theme', newTheme ? 'dark' : 'light');
-        
-        // Apply to document
+
+        try {
+            localStorage.setItem('star-sailors-theme', newTheme ? 'dark' : 'light');
+        } catch {
+            // localStorage unavailable (e.g. Safari private mode)
+        }
+
         document.documentElement.classList.toggle('dark', newTheme);
     };
 

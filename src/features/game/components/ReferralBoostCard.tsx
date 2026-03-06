@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { Share2, Copy, Check, Sparkles } from "lucide-react";
 import { cn } from "@/src/shared/utils";
 import { getReferralProgress } from "@/src/features/referrals/referral-progress";
+import { buildClientReferralUrl, buildReferralShareText, buildSailyReferralUrl } from "@/src/features/referrals/referral-links";
 
 interface ReferralBoostCardProps {
   referralCode: string | null;
@@ -21,19 +22,20 @@ export default function ReferralBoostCard({
 
   const rewardEstimate = referralsCount * 5;
   const progress = getReferralProgress(referralsCount);
-  const referralShareText = useMemo(() => {
-    if (!referralCode) return "";
-    const inviteUrl =
-      typeof window !== "undefined"
-        ? `${window.location.origin}/auth?ref=${encodeURIComponent(referralCode)}`
-        : "";
-    return `Join me in Star Sailors. Use my referral code: ${referralCode}${inviteUrl ? ` (${inviteUrl})` : ""}`;
-  }, [referralCode]);
+  const referralShareText = useMemo(
+    () => (referralCode ? buildReferralShareText(referralCode) : ""),
+    [referralCode]
+  );
+  const sailyReferralUrl = useMemo(
+    () => (referralCode ? buildSailyReferralUrl(referralCode) : ""),
+    [referralCode]
+  );
 
   const handleCopy = async () => {
     if (!referralCode) return;
     try {
-      await navigator.clipboard.writeText(referralCode);
+      const clientReferralUrl = buildClientReferralUrl(referralCode);
+      await navigator.clipboard.writeText(clientReferralUrl || referralCode);
       setCopied(true);
       setTimeout(() => setCopied(false), 1800);
     } catch {
@@ -138,6 +140,19 @@ export default function ReferralBoostCard({
             {shared ? <Check className="w-4 h-4" /> : <Share2 className="w-4 h-4" />}
             {shared ? "Shared" : "Share Invite"}
           </button>
+          <a
+            href={referralCode ? sailyReferralUrl : "#"}
+            target="_blank"
+            rel="noreferrer"
+            className={cn(
+              "inline-flex items-center gap-2 rounded-lg border px-3 py-2 text-sm font-medium transition-colors",
+              referralCode
+                ? "border-amber-300/30 bg-amber-500/15 text-amber-100 hover:bg-amber-500/25"
+                : "border-amber-300/20 bg-amber-500/10 text-amber-100/60 pointer-events-none"
+            )}
+          >
+            Open in Saily
+          </a>
         </div>
       </div>
     </section>

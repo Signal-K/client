@@ -226,12 +226,43 @@ jobs:
       VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
     steps:
       - uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "yarn"
       - name: Pull Vercel Environment Information
         run: npx vercel@latest pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }} --scope=${{ secrets.VERCEL_ORG_ID }}
       - name: Build Project Artifacts
-        run: npx vercel@latest build --token=${{ secrets.VERCEL_TOKEN }} --scope=${{ secrets.VERCEL_ORG_ID }}
+        run: |
+          ATTEMPTS=3
+          for ATTEMPT in $(seq 1 "$ATTEMPTS"); do
+            echo "Vercel preview build attempt ${ATTEMPT}/${ATTEMPTS}"
+            if npx vercel@latest build --yes --token=${{ secrets.VERCEL_TOKEN }} --scope=${{ secrets.VERCEL_ORG_ID }}; then
+              exit 0
+            fi
+            if [ "$ATTEMPT" -lt "$ATTEMPTS" ]; then
+              echo "Build failed (likely transient). Retrying in 20s..."
+              sleep 20
+            fi
+          done
+          echo "Vercel preview build failed after ${ATTEMPTS} attempts."
+          exit 1
       - name: Deploy Project Artifacts to Vercel Staging
-        run: npx vercel@latest deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }} --scope=${{ secrets.VERCEL_ORG_ID }}
+        run: |
+          ATTEMPTS=3
+          for ATTEMPT in $(seq 1 "$ATTEMPTS"); do
+            echo "Vercel preview deploy attempt ${ATTEMPT}/${ATTEMPTS}"
+            if npx vercel@latest deploy --prebuilt --yes --token=${{ secrets.VERCEL_TOKEN }} --scope=${{ secrets.VERCEL_ORG_ID }}; then
+              exit 0
+            fi
+            if [ "$ATTEMPT" -lt "$ATTEMPTS" ]; then
+              echo "Deploy failed (likely transient). Retrying in 20s..."
+              sleep 20
+            fi
+          done
+          echo "Vercel preview deploy failed after ${ATTEMPTS} attempts."
+          exit 1
 
   deploy_production:
     if: github.event_name == 'push' && github.ref_name == 'main'
@@ -242,12 +273,43 @@ jobs:
       VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
     steps:
       - uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "yarn"
       - name: Pull Vercel Environment Information
         run: npx vercel@latest pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }} --scope=${{ secrets.VERCEL_ORG_ID }}
       - name: Build Project Artifacts
-        run: npx vercel@latest build --prod --token=${{ secrets.VERCEL_TOKEN }} --scope=${{ secrets.VERCEL_ORG_ID }}
+        run: |
+          ATTEMPTS=3
+          for ATTEMPT in $(seq 1 "$ATTEMPTS"); do
+            echo "Vercel production build attempt ${ATTEMPT}/${ATTEMPTS}"
+            if npx vercel@latest build --prod --yes --token=${{ secrets.VERCEL_TOKEN }} --scope=${{ secrets.VERCEL_ORG_ID }}; then
+              exit 0
+            fi
+            if [ "$ATTEMPT" -lt "$ATTEMPTS" ]; then
+              echo "Build failed (likely transient). Retrying in 20s..."
+              sleep 20
+            fi
+          done
+          echo "Vercel production build failed after ${ATTEMPTS} attempts."
+          exit 1
       - name: Deploy Project Artifacts to Vercel
-        run: npx vercel@latest deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }} --scope=${{ secrets.VERCEL_ORG_ID }}
+        run: |
+          ATTEMPTS=3
+          for ATTEMPT in $(seq 1 "$ATTEMPTS"); do
+            echo "Vercel production deploy attempt ${ATTEMPT}/${ATTEMPTS}"
+            if npx vercel@latest deploy --prebuilt --prod --yes --token=${{ secrets.VERCEL_TOKEN }} --scope=${{ secrets.VERCEL_ORG_ID }}; then
+              exit 0
+            fi
+            if [ "$ATTEMPT" -lt "$ATTEMPTS" ]; then
+              echo "Deploy failed (likely transient). Retrying in 20s..."
+              sleep 20
+            fi
+          done
+          echo "Vercel production deploy failed after ${ATTEMPTS} attempts."
+          exit 1
 
   notify_unclassified_discoveries:
     if: >

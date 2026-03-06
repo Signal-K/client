@@ -1,7 +1,7 @@
 ---
 id: rf8k2n
 title: "2.2 star sailors feedback immediate UX and stability sprint"
-status: in_progress
+status: completed
 priority: high
 labels:
   - migration-2.2
@@ -16,7 +16,7 @@ references:
   - ".knowns/docs/specs/migration/two-two-survey-audit-and-ops.md"
   - ".knowns/reports/posthog/survey-monitor-2026-02-22T05-32-31-136Z.json"
 createdAt: '2026-02-26T18:25:00Z'
-updatedAt: '2026-02-26T23:18:00Z'
+updatedAt: '2026-03-06T08:51:42Z'
 timeSpent: 0
 ---
 

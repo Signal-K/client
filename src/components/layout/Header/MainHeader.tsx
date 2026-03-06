@@ -80,21 +80,25 @@ export default function MainHeader({
   const handleLogout = async () => {
     // Clear all browser storage before signing out
     if (typeof window !== 'undefined') {
-      window.localStorage.clear();
-      window.sessionStorage.clear();
+      try { window.localStorage.clear(); } catch { /* private mode */ }
+      try { window.sessionStorage.clear(); } catch { /* private mode */ }
       // Remove all cookies
-      document.cookie.split(';').forEach(function(c) {
-        document.cookie = c.replace(/^ +/, '').replace(/=.*/, '=;expires=' + new Date(0).toUTCString() + ';path=/');
-      });
+      try {
+        document.cookie.split(';').forEach(function(c) {
+          document.cookie = c.replace(/^ +/, '').replace(/=.*/, '=;expires=' + new Date(0).toUTCString() + ';path=/');
+        });
+      } catch { /* ignore cookie errors */ }
     }
-    const { error } = await supabase.auth.signOut();
-    if (error) {
-      console.error("Error signing out:", error.message);
-    } else {
-      // Signed out
-      if (typeof window !== "undefined") {
-        window.location.href = '/';
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        console.error("Error signing out:", error.message);
       }
+    } catch (err) {
+      console.error("Sign out failed:", err);
+    }
+    if (typeof window !== "undefined") {
+      window.location.href = '/';
     }
   };
 

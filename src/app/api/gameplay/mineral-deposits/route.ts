@@ -44,9 +44,11 @@ type MineralDepositBody = {
   anomaly?: number | string | null;
   discovery?: number | string | null;
   owner?: string | null;
+  mineral_configuration?: Record<string, unknown>;
   mineralconfiguration?: Record<string, unknown>;
-  mineralConfiguration?: Record<string, unknown>;
+  mineralConfiguration?: Record<string, unknown>; // legacy fallback
   location?: string | null;
+  rover_name?: string | null;
   roverName?: string | null;
   created_at?: string;
 };
@@ -65,18 +67,24 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Invalid anomaly or discovery value" }, { status: 400 });
   }
 
-  const mineralconfiguration =
+  const mineralConfiguration =
+    (body?.mineral_configuration as Record<string, unknown> | undefined) ||
     (body?.mineralconfiguration as Record<string, unknown> | undefined) ||
-    (body?.mineralConfiguration as Record<string, unknown> | undefined) ||
+    (body?.mineralConfiguration as Record<string, unknown> | undefined) || // legacy fallback
     {};
 
   const payload = {
     anomaly,
     discovery,
     owner: user.id,
-    mineralconfiguration,
+    mineralConfiguration,
     location: typeof body?.location === "string" ? body.location : "Mars",
-    roverName: typeof body?.roverName === "string" ? body.roverName : "Rover 1",
+    roverName:
+      typeof body?.rover_name === "string"
+        ? body.rover_name
+        : typeof body?.roverName === "string"
+          ? body.roverName
+          : "Rover 1",
     created_at: typeof body?.created_at === "string" ? body.created_at : new Date().toISOString(),
   };
 
@@ -86,7 +94,7 @@ export async function POST(request: NextRequest) {
       ${payload.anomaly},
       ${payload.discovery},
       ${payload.owner},
-      ${JSON.stringify(payload.mineralconfiguration)}::jsonb,
+      ${JSON.stringify(payload.mineralConfiguration)}::jsonb,
       ${payload.location},
       ${payload.roverName},
       ${payload.created_at}
