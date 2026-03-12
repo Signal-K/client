@@ -127,7 +127,12 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const body = (await request.json().catch(() => ({}))) as CreateClassificationPayload;
+  let body: CreateClassificationPayload;
+  try {
+    body = await request.json();
+  } catch (e) {
+    return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
+  }
 
   const anomaly = body?.anomaly == null ? null : Number(body.anomaly);
   const classificationtype =
@@ -140,50 +145,66 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const insertPayload: Record<string, any> = {
-    author: user.id,
-    anomaly,
-    classificationtype,
-    content: typeof body?.content === "string" ? body.content : "",
-  };
+  try {
+    const insertPayload: Record<string, any> = {
+      author: user.id,
+      anomaly,
+      classificationtype,
+      content: typeof body?.content === "string" ? body.content : "",
+    };
 
-  if (body?.media !== undefined) {
-    insertPayload.media = body.media;
-  }
-  if (body?.classificationConfiguration !== undefined) {
-    insertPayload.classificationConfiguration = body.classificationConfiguration;
-  }
-  if (body?.classificationParent !== undefined && body?.classificationParent !== null) {
-    const parentId = Number(body.classificationParent);
-    if (Number.isFinite(parentId)) {
-      insertPayload.classificationParent = parentId;
+    if (body?.media !== undefined) {
+      insertPayload.media = body.media;
     }
+    if (body?.classificationConfiguration !== undefined) {
+      insertPayload.classificationConfiguration = body.classificationConfiguration;
+    }
+    if (body?.classificationParent !== undefined && body?.classificationParent !== null) {
+      const parentId = Number(body.classificationParent);
+      if (Number.isFinite(parentId)) {
+        insertPayload.classificationParent = parentId;
+      }
+    }
+
+    // Safely execute the query
+    const rows = await prisma.$queryRaw<Array<Record<string, unknown>>>`
+      INSERT INTO classifications (author, anomaly, classificationtype, content, media, "classificationConfiguration", "classificationParent")
+      VALUES (
+        ${insertPayload.author as string}::uuid,
+        ${insertPayload.anomaly as number},
+        ${insertPayload.classificationtype as string},
+        ${insertPayload.content as string},
+        ${(insertPayload.media ?? null) ? JSON.stringify(insertPayload.media) : null}::jsonb,
+        ${(insertPayload.classificationConfiguration ?? null)
+          ? JSON.stringify(insertPayload.classificationConfiguration)
+          : null}::jsonb,
+        ${(insertPayload.classificationParent as number | null | undefined) ?? null}
+      )
+      RETURNING *
+    `;
+    
+    const data = rows[0];
+    if (!data) throw new Error("Database insert returned no data");
+
+    // Revalidate paths
+    revalidatePath("/game");
+    revalidatePath("/research");
+    revalidatePath("/viewports/satellite");
+    revalidatePath("/viewports/solar");
+    revalidatePath("/viewports/roover");
+    revalidatePath(`/next/${String(data.id)}`);
+
+    // Serialize BigInts to strings for JSON response
+    const safeData = JSON.parse(JSON.stringify(data, (key, value) =>
+      typeof value === 'bigint' ? value.toString() : value
+    ));
+
+    return NextResponse.json(safeData);
+  } catch (error: any) {
+    console.error("Error creating classification:", error);
+    return NextResponse.json(
+      { error: "Failed to create classification", details: error.message },
+      { status: 500 }
+    );
   }
-
-  const rows = await prisma.$queryRaw<Array<Record<string, unknown>>>`
-    INSERT INTO classifications (author, anomaly, classificationtype, content, media, "classificationConfiguration", "classificationParent")
-    VALUES (
-      ${insertPayload.author as string},
-      ${insertPayload.anomaly as number},
-      ${insertPayload.classificationtype as string},
-      ${insertPayload.content as string},
-      ${(insertPayload.media ?? null) ? JSON.stringify(insertPayload.media) : null}::jsonb,
-      ${(insertPayload.classificationConfiguration ?? null)
-        ? JSON.stringify(insertPayload.classificationConfiguration)
-        : null}::jsonb,
-      ${(insertPayload.classificationParent as number | null | undefined) ?? null}
-    )
-    RETURNING *
-  `;
-  const data = rows[0];
-  if (!data) return NextResponse.json({ error: "Failed to create classification" }, { status: 500 });
-
-  revalidatePath("/game");
-  revalidatePath("/research");
-  revalidatePath("/viewports/satellite");
-  revalidatePath("/viewports/solar");
-  revalidatePath("/viewports/roover");
-  revalidatePath(`/next/${String(data.id)}`);
-
-  return NextResponse.json(data);
 }

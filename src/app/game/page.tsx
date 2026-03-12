@@ -765,7 +765,7 @@ function GamePageContent() {
         // Base view - main dashboard
         return (
           <Suspense fallback={<div>Loading...</div>}>
-            <div className="min-h-screen w-full relative pb-20 md:pb-6">
+            <div className="min-h-screen w-full relative pb-32 md:pb-6">
               {/* Background */}
               <div className="fixed inset-0 -z-10">
                 <TelescopeBackground
@@ -834,44 +834,50 @@ function GamePageContent() {
                     </div>
                   )}
 
-                  {/* Mission Control Section */}
+                  {/* Mission Control Section - SIMPLIFIED */}
                   <section>
-                    <h2 className="text-xs uppercase tracking-wider text-muted-foreground mb-3 px-1">
-                      Mission Control
+                    <h2 className="text-xs uppercase tracking-wider text-muted-foreground mb-3 px-1 flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-cyan-500 animate-pulse" />
+                      Current Objective
                     </h2>
                     <div className="space-y-3">
-                      {/* Anomalies Awaiting */}
-                      {missionStats.awaiting > 0 && (
+                      {/* Priority 1: Anomalies Awaiting */}
+                      {missionStats.awaiting > 0 ? (
                         <MissionControlCard
-                          icon={<AlertCircle className="w-5 h-5" />}
-                          title={`${missionStats.awaiting} Anomalies Awaiting`}
-                          subtitle="Telescope targets ready to classify"
+                          icon={<AlertCircle className="w-6 h-6" />}
+                          title={`${missionStats.awaiting} Signals Detected`}
+                          subtitle="Unclassified anomalies in your sector"
                           variant="action"
-                          actionLabel="Classify Now"
+                          actionLabel="Analyze Data"
                           onAction={handleClassifyNow}
+                          className="border-amber-500/40 shadow-[0_0_20px_rgba(245,158,11,0.15)]"
                         />
-                      )}
-
-                      {/* Recent Classification */}
-                      {missionStats.lastClassification && (
+                      ) : missionStats.hasUnlockingSoon ? (
+                        /* Priority 2: Unlock Progress */
                         <MissionControlCard
-                          icon={<CheckCircle className="w-5 h-5" />}
-                          title="Classification Confirmed"
-                          subtitle={`${missionStats.lastClassification.classificationtype || "Discovery"} • ${
-                            new Date(missionStats.lastClassification.created_at).toLocaleDateString()
-                          }`}
-                          variant="status"
-                        />
-                      )}
-
-                      {/* Unlock Progress */}
-                      {missionStats.hasUnlockingSoon && (
-                        <MissionControlCard
-                          icon={<Clock className="w-5 h-5" />}
-                          title="Satellite Unlocks Soon"
-                          subtitle="Cloud formations awaiting analysis"
+                          icon={<Clock className="w-6 h-6" />}
+                          title="Structure Unlocking"
+                          subtitle="Gathering data for next deployment..."
                           variant="progress"
                           progress={65}
+                        />
+                      ) : missionStats.lastClassification ? (
+                        /* Priority 3: Recent Success */
+                        <MissionControlCard
+                          icon={<CheckCircle className="w-6 h-6" />}
+                          title="All Systems Nominal"
+                          subtitle={`Last analysis: ${missionStats.lastClassification.classificationtype || "Confirmed"}`}
+                          variant="status"
+                        />
+                      ) : (
+                        /* Fallback */
+                        <MissionControlCard
+                          icon={<Telescope className="w-6 h-6" />}
+                          title="Ready for Exploration"
+                          subtitle="Deploy telescope to begin"
+                          variant="action"
+                          actionLabel="Start Mission"
+                          onAction={() => handleViewChange("telescope")}
                         />
                       )}
                     </div>

@@ -37,22 +37,23 @@ function NavButton({
     return (
       <button
         onClick={onClick}
-        className="relative flex flex-col items-center justify-center -mt-6"
+        className="relative flex flex-col items-center justify-center -mt-8 group"
       >
         <div
           className={cn(
-            "w-14 h-14 rounded-2xl flex items-center justify-center transition-all shadow-lg",
+            "w-16 h-16 rounded-full flex items-center justify-center transition-all shadow-xl border-4 border-background",
+            "active:scale-95 duration-200 ease-out",
             isActive
-              ? "bg-cyan-500 text-white scale-105"
-              : "bg-card border border-border text-muted-foreground hover:bg-card/80"
+              ? "bg-cyan-500 text-white shadow-cyan-500/25 scale-110"
+              : "bg-card text-muted-foreground hover:bg-card/90"
           )}
         >
           {icon}
         </div>
         <span
           className={cn(
-            "text-[10px] mt-1 font-medium transition-colors",
-            isActive ? "text-cyan-400" : "text-muted-foreground"
+            "text-xs mt-1 font-semibold transition-colors bg-background/80 px-2 rounded-full backdrop-blur-sm",
+            isActive ? "text-cyan-500" : "text-muted-foreground"
           )}
         >
           {label}
@@ -64,23 +65,26 @@ function NavButton({
   return (
     <button
       onClick={onClick}
-      className="relative flex flex-col items-center justify-center py-2 px-3"
+      className={cn(
+        "relative flex flex-col items-center justify-center py-2 px-1 min-w-[64px] min-h-[50px]",
+        "active:scale-95 transition-transform duration-150"
+      )}
     >
       {hasNotification && (
-        <span className="absolute top-1 right-1/4 w-2 h-2 rounded-full bg-red-500" />
+        <span className="absolute top-2 right-4 w-2.5 h-2.5 rounded-full bg-red-500 ring-2 ring-background z-10" />
       )}
       <div
         className={cn(
-          "w-8 h-8 flex items-center justify-center transition-colors",
-          isActive ? "text-primary" : "text-muted-foreground"
+          "w-7 h-7 flex items-center justify-center transition-colors mb-0.5",
+          isActive ? "text-cyan-500" : "text-muted-foreground"
         )}
       >
         {icon}
       </div>
       <span
         className={cn(
-          "text-[10px] mt-0.5 font-medium transition-colors",
-          isActive ? "text-primary" : "text-muted-foreground"
+          "text-[11px] font-medium leading-tight transition-colors",
+          isActive ? "text-cyan-500" : "text-muted-foreground/80"
         )}
       >
         {label}
@@ -101,41 +105,47 @@ export default function BottomNavigation({
   return (
     <nav
       className={cn(
-        "fixed bottom-0 left-0 right-0 z-40 bg-card/95 backdrop-blur-lg border-t border-border/50 pb-safe md:hidden",
+        "fixed bottom-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-t border-border/40 pb-safe md:hidden shadow-[0_-5px_20px_rgba(0,0,0,0.1)]",
         className
       )}
     >
-      <div className="flex items-end justify-around px-2 py-1 max-w-md mx-auto">
+      <div className="flex items-end justify-between px-4 py-2 max-w-md mx-auto relative">
         <NavButton
-          icon={<Telescope className="w-5 h-5" />}
-          label="Telescope"
+          icon={<Telescope className="w-6 h-6" />}
+          label="Scope"
           isActive={activeItem === "telescope"}
           hasNotification={telescopeNotification}
           onClick={() => onItemClick("telescope")}
         />
         <NavButton
-          icon={<Satellite className="w-5 h-5" />}
-          label="Satellite"
+          icon={<Satellite className="w-6 h-6" />}
+          label="Orbit"
           isActive={activeItem === "satellite"}
           hasNotification={satelliteNotification}
           onClick={() => onItemClick("satellite")}
         />
+        
+        {/* Spacer for center button */}
+        <div className="w-16" />
+        <div className="absolute left-1/2 -translate-x-1/2 bottom-3">
+             <NavButton
+              icon={<Home className="w-7 h-7" />}
+              label="Base"
+              isActive={activeItem === "base"}
+              isCenter
+              onClick={() => onItemClick("base")}
+            />
+        </div>
+
         <NavButton
-          icon={<Home className="w-6 h-6" />}
-          label="Base"
-          isActive={activeItem === "base"}
-          isCenter
-          onClick={() => onItemClick("base")}
-        />
-        <NavButton
-          icon={<Car className="w-5 h-5" />}
+          icon={<Car className="w-6 h-6" />}
           label="Rover"
           isActive={activeItem === "rover"}
           hasNotification={roverNotification}
           onClick={() => onItemClick("rover")}
         />
         <NavButton
-          icon={<Sun className="w-5 h-5" />}
+          icon={<Sun className="w-6 h-6" />}
           label="Solar"
           isActive={activeItem === "solar"}
           hasNotification={solarNotification}

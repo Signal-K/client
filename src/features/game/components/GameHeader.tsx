@@ -100,23 +100,23 @@ export default function GameHeader({
             {/* Notifications */}
             <button
               onClick={onNotificationsClick}
-              className="relative p-2 rounded-full hover:bg-card/50 transition-colors"
+              className="relative w-11 h-11 flex items-center justify-center rounded-full hover:bg-card/50 active:scale-95 transition-all"
               aria-label="Notifications"
             >
-              <Bell className="w-5 h-5 text-muted-foreground" />
+              <Bell className="w-6 h-6 text-muted-foreground" />
               {hasNotifications && (
-                <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-red-500" />
+                <span className="absolute top-2.5 right-2.5 w-2.5 h-2.5 rounded-full bg-red-500 ring-2 ring-background" />
               )}
             </button>
 
             {/* Profile dropdown */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button className="p-2 rounded-full hover:bg-card/50 transition-colors">
+                <button className="w-11 h-11 flex items-center justify-center rounded-full hover:bg-card/50 active:scale-95 transition-all">
                   {isAnonymousUser ? (
-                    <UserX className="w-5 h-5 text-amber-500" />
+                    <UserX className="w-6 h-6 text-amber-500" />
                   ) : (
-                    <User className="w-5 h-5 text-muted-foreground" />
+                    <User className="w-6 h-6 text-muted-foreground" />
                   )}
                 </button>
               </DropdownMenuTrigger>

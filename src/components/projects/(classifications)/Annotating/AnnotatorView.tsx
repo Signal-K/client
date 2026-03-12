@@ -102,6 +102,20 @@ export default function AnnotatorView(props: ImageAnnotatorProps) {
         </div>
       )}
 
+      {/* Uploading Overlay */}
+      {isUploading && (
+        <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-black/80 backdrop-blur-sm animate-in fade-in duration-300">
+          <div className="relative">
+            <div className="w-16 h-16 border-4 border-cyan-500/30 border-t-cyan-400 rounded-full animate-spin" />
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse" />
+            </div>
+          </div>
+          <h3 className="mt-4 text-xl font-bold text-cyan-400 tracking-widest animate-pulse">TRANSMITTING</h3>
+          <p className="text-xs text-cyan-300/70 mt-1">Securing connection to satellite...</p>
+        </div>
+      )}
+
       {selectedImage && (
         <>
           {useHorizontalLayout && (
