@@ -1,5 +1,6 @@
-import { render, screen } from "@testing-library/react";
-import { describe, it, expect, beforeEach } from "vitest";
+import { render, screen, waitFor, act } from "@testing-library/react";
+import { describe, it, expect, beforeEach, vi } from "vitest";
+
 Object.defineProperty(window, "matchMedia", {
   writable: true,
   configurable: true,
@@ -14,6 +15,7 @@ Object.defineProperty(window, "matchMedia", {
     dispatchEvent: vi.fn(),
   })),
 });
+
 import PWAPrompt from "@/src/components/pwa/PWAPrompt";
 
 describe("PWAPrompt", () => {
@@ -39,25 +41,21 @@ describe("PWAPrompt", () => {
   });
 
   it("shows install prompt after beforeinstallprompt event fires", async () => {
-    const { container } = render(<PWAPrompt />);
+    render(<PWAPrompt />);
 
     // Simulate the beforeinstallprompt event
     const mockEvent = Object.assign(new Event("beforeinstallprompt"), {
       prompt: async () => {},
       userChoice: Promise.resolve({ outcome: "accepted" as const }),
     });
-    window.dispatchEvent(mockEvent);
+    
+    act(() => {
+      window.dispatchEvent(mockEvent);
+    });
 
     // Component state update requires waiting
-    await new Promise((r) => setTimeout(r, 0));
-
-    // After event, showPrompt = true, so the prompt card should render
-    const heading = screen.queryByText("Install Star Sailors");
-    if (heading) {
-      expect(heading).toBeInTheDocument();
-    } else {
-      // In some environments the prompt may not show due to standalone check
-      expect(container).toBeDefined();
-    }
+    await waitFor(() => {
+      expect(screen.queryByText("Install Star Sailors")).toBeInTheDocument();
+    });
   });
 });

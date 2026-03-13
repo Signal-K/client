@@ -22,8 +22,8 @@ describe("BottomNavigation", () => {
 
   it("renders all nav labels", () => {
     render(<BottomNavigation {...defaultProps} />);
-    expect(screen.getByText("Telescope")).toBeInTheDocument();
-    expect(screen.getByText("Satellite")).toBeInTheDocument();
+    expect(screen.getByText("Scope")).toBeInTheDocument();
+    expect(screen.getByText("Orbit")).toBeInTheDocument();
     expect(screen.getByText("Base")).toBeInTheDocument();
     expect(screen.getByText("Rover")).toBeInTheDocument();
     expect(screen.getByText("Solar")).toBeInTheDocument();
@@ -32,14 +32,14 @@ describe("BottomNavigation", () => {
   it("calls onItemClick with correct item when telescope clicked", () => {
     const onItemClick = vi.fn();
     render(<BottomNavigation {...defaultProps} onItemClick={onItemClick} />);
-    fireEvent.click(screen.getByText("Telescope").closest("button")!);
+    fireEvent.click(screen.getByText("Scope").closest("button")!);
     expect(onItemClick).toHaveBeenCalledWith("telescope");
   });
 
   it("calls onItemClick with correct item when satellite clicked", () => {
     const onItemClick = vi.fn();
     render(<BottomNavigation {...defaultProps} onItemClick={onItemClick} />);
-    fireEvent.click(screen.getByText("Satellite").closest("button")!);
+    fireEvent.click(screen.getByText("Orbit").closest("button")!);
     expect(onItemClick).toHaveBeenCalledWith("satellite");
   });
 

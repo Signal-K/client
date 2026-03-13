@@ -187,28 +187,26 @@ export default defineConfig({
                         throw new Error('SUPABASE_ANON_KEY is required for Cypress user creation')
                     }
 
-                    const response = await fetch(`${supabaseUrl}/auth/v1/signup`, {
+                    const response = await fetch(`${supabaseUrl}/auth/v1/admin/users`, {
                         method: 'POST',
-                        headers: {
-                            apikey: resolvedAnonKey,
-                            Authorization: `Bearer ${resolvedAnonKey}`,
-                            'Content-Type': 'application/json',
-                        },
+                        headers: adminAuthHeaders,
                         body: JSON.stringify({
                             email,
                             password,
+                            email_confirm: true,
                         }),
                     })
 
                     if (!response.ok) {
                         const message = await response.text()
-                        throw new Error(`Failed to create test user: ${message}`)
+                        throw new Error(`Failed to create test user via admin API: ${message}`)
                     }
 
                     const payload = await response.json()
-                    const user = payload?.user
+                    // Admin API returns the user object directly
+                    const user = payload
                     if (!user?.id) {
-                        throw new Error(`Unexpected signup response: ${JSON.stringify(payload)}`)
+                        throw new Error(`Unexpected admin signup response: ${JSON.stringify(payload)}`)
                     }
 
                     return {

@@ -21,7 +21,7 @@ build:
 	docker-compose -f ops/compose/compose.yml build
 
 up-full:
-	yarn && docker-compose -f ops/compose/compose.yml up --build
+	supabase start && yarn && docker-compose -f ops/compose/compose.yml up --build
 
 down:
 	docker-compose -f ops/compose/compose.yml down

@@ -28,6 +28,9 @@ describe("StardustBalance", () => {
 
     render(<StardustBalance />);
     expect(screen.getByText("Loading...")).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.queryByText("Loading...")).toBeNull();
+    });
   });
 
   it("renders stardust after fetch resolves", async () => {

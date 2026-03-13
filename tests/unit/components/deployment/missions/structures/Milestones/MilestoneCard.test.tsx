@@ -1,5 +1,5 @@
-import { describe, it, expect, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import { render, screen, waitFor } from "@testing-library/react";
 import MilestoneCard from "@/src/components/deployment/missions/structures/Milestones/MilestoneCard";
 
 const mockUseSession = vi.hoisted(() => vi.fn());
@@ -34,20 +34,29 @@ beforeEach(() => {
 });
 
 describe("MilestoneCard", () => {
-  it("renders without crashing", () => {
+  it("renders without crashing", async () => {
     const { container } = render(<MilestoneCard />);
     expect(container).toBeDefined();
+    await waitFor(() => {
+      expect(global.fetch).toHaveBeenCalled();
+    });
   });
 
-  it("renders loading state initially", () => {
+  it("renders loading state initially", async () => {
     render(<MilestoneCard />);
     // Multiple "Loading" texts appear while data is fetching
     expect(screen.getAllByText(/Loading/i).length).toBeGreaterThanOrEqual(1);
+    await waitFor(() => {
+      expect(global.fetch).toHaveBeenCalled();
+    });
   });
 
-  it("renders Yours and Community tab triggers", () => {
+  it("renders Yours and Community tab triggers", async () => {
     render(<MilestoneCard />);
     expect(screen.getByText("Yours")).toBeDefined();
     expect(screen.getByText("Community")).toBeDefined();
+    await waitFor(() => {
+      expect(global.fetch).toHaveBeenCalled();
+    });
   });
 });

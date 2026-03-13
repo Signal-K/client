@@ -35,7 +35,7 @@ function buildRoutePlan(anomalySet: string, anomalyId: number): RoutePlan | null
 
 function makeTestUser() {
   const tag = `e2e-${Date.now()}`
-  return { email: `${tag}@example.com`, password: "testpassword123", tag }
+  return { email: `${tag}@testing.com`, password: "testpassword123", tag }
 }
 
 /* ------------------------------------------------------------------ */

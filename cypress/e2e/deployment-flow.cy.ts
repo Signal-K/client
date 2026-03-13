@@ -33,7 +33,7 @@ describe.skip('Deployment Mechanics - E2E', () => {
       body: { userId: 'test-user-1', level: 3 },
     })
 
-    cy.login('testuser@example.com', 'password123')
+    cy.login('testuser@testing.com', 'password123')
     cy.visit('/activity/deploy')
   })
 

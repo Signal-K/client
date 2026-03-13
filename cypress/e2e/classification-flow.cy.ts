@@ -29,7 +29,7 @@ describe('Complete Classification Workflow', () => {
       body: { classifications: [] },
     })
 
-    cy.login('testuser@example.com', 'password123')
+    cy.login('testuser@testing.com', 'password123')
     cy.visit('/game')
   })
 

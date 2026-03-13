@@ -69,7 +69,7 @@ Cypress.Commands.add('createTestUser', () => {
     return
   }
   
-  const testEmail = `test-${Date.now()}@example.com`
+  const testEmail = `test-${Date.now()}@testing.com`
   const testPassword = 'testpassword123'
 
   cy.task('createSupabaseTestUser', { email: testEmail, password: testPassword }).then((user: any) => {

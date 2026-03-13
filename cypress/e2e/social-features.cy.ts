@@ -38,7 +38,7 @@ describe.skip('Social Interactions - E2E', () => {
       body: { success: true },
     })
 
-    cy.login('testuser@example.com', 'password123')
+    cy.login('testuser@testing.com', 'password123')
     cy.visit('/game')
   })
 

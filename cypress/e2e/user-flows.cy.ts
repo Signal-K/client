@@ -17,7 +17,7 @@ describe('User Flows', () => {
       return
     }
 
-    const testEmail = `test-${Date.now()}@example.com`
+    const testEmail = `test-${Date.now()}@testing.com`
     const testPassword = 'testpassword123'
 
     // Navigate to registration

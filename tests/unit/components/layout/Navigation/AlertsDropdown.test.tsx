@@ -46,16 +46,23 @@ describe("AlertsDropdown", () => {
     } as any);
   });
 
-  it("renders the Bell icon trigger button", () => {
+  it("renders the Bell icon trigger button", async () => {
+    mockUseAuthUser.mockReturnValue({ user: { id: "user-test" } });
     render(<AlertsDropdown />);
     const button = screen.getByRole("button");
     expect(button).toBeInTheDocument();
+    await waitFor(() => {
+      expect(global.fetch).toHaveBeenCalled();
+    });
   });
 
-  it("renders without crashing when no user", () => {
+  it("renders without crashing when no user", async () => {
     mockUseAuthUser.mockReturnValue({ user: null });
     render(<AlertsDropdown />);
     expect(screen.getByRole("button")).toBeInTheDocument();
+    await waitFor(() => {
+      expect(global.fetch).not.toHaveBeenCalled();
+    });
   });
 
   it("fetches alerts for authenticated user (covers getCookieKey)", async () => {

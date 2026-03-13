@@ -1,14 +1,12 @@
 #!/bin/bash
 
 ################################################################################
-# Full Test Suite Runner
+# Full Test Suite Runner (Optimized)
 #
 # This script runs:
-# 1. Frontend (Next.js dev server)
-# 2. Local Supabase (if not already running)
-# 3. All smoke tests
-# 4. All unit tests
-# 5. All e2e tests
+# 1. Local Supabase (if not already running)
+# 2. All unit tests
+# 3. All e2e tests (handles its own frontend build/start)
 #
 # Usage: ./scripts/run-full-test-suite.sh
 ################################################################################
@@ -25,36 +23,6 @@ NC='\033[0m' # No Color
 # Configuration
 FRONTEND_PORT=${FRONTEND_PORT:-3000}
 FRONTEND_URL="http://localhost:${FRONTEND_PORT}"
-MAX_RETRIES=30
-RETRY_INTERVAL=2
-
-# Cleanup on exit
-cleanup() {
-  echo -e "\n${BLUE}═══════════════════════════════════════════════════════════${NC}"
-  echo -e "${YELLOW}Cleaning up...${NC}"
-  
-  # Kill frontend process and its children
-  if [ ! -z "$FRONTEND_PID" ] && kill -0 "$FRONTEND_PID" 2>/dev/null; then
-    echo -e "${YELLOW}Stopping frontend (PID: $FRONTEND_PID)...${NC}"
-    kill "$FRONTEND_PID" 2>/dev/null || true
-  fi
-  
-  # Also kill any remaining Next.js processes spawned by npm
-  REMAINING=$(pgrep -f "next dev|next-server" 2>/dev/null || true)
-  if [ ! -z "$REMAINING" ]; then
-    echo "$REMAINING" | xargs kill -9 2>/dev/null || true
-  fi
-  
-  # Free up the port
-  PORT_PID=$(lsof -ti :${FRONTEND_PORT} 2>/dev/null || true)
-  if [ ! -z "$PORT_PID" ]; then
-    echo "$PORT_PID" | xargs kill -9 2>/dev/null || true
-  fi
-  
-  echo -e "${GREEN}✓ Cleanup complete${NC}"
-}
-
-trap cleanup EXIT
 
 # Log function
 log() {
@@ -91,62 +59,7 @@ fi
 sleep 2
 
 ################################################################################
-# 2. Start Frontend Dev Server
-################################################################################
-
-# Kill any existing Next.js processes to prevent port conflicts
-EXISTING_PIDS=$(pgrep -f "next dev|next-server" 2>/dev/null || true)
-if [ ! -z "$EXISTING_PIDS" ]; then
-  warning "Found existing Next.js processes, killing them..."
-  echo "$EXISTING_PIDS" | xargs kill -9 2>/dev/null || true
-  sleep 2
-  success "Killed existing Next.js processes"
-fi
-
-# Also kill anything already on our target port
-PORT_PID=$(lsof -ti :${FRONTEND_PORT} 2>/dev/null || true)
-if [ ! -z "$PORT_PID" ]; then
-  warning "Port $FRONTEND_PORT is in use (PID: $PORT_PID), killing..."
-  echo "$PORT_PID" | xargs kill -9 2>/dev/null || true
-  sleep 1
-fi
-
-# Clean stale .next cache to prevent MODULE_NOT_FOUND errors
-if [ -d ".next" ]; then
-  log "Cleaning .next build cache for a fresh start..."
-  rm -rf .next
-fi
-
-log "Starting frontend dev server on port $FRONTEND_PORT..."
-
-npm run dev &
-FRONTEND_PID=$!
-success "Frontend started (PID: $FRONTEND_PID)"
-
-# Wait for frontend to be ready
-log "Waiting for frontend to be ready at $FRONTEND_URL..."
-
-RETRIES=0
-while [ $RETRIES -lt $MAX_RETRIES ]; do
-  if curl -s -o /dev/null -w "%{http_code}" "$FRONTEND_URL" | grep -qE "^[23][0-9]{2}$"; then
-    success "Frontend is ready"
-    break
-  fi
-  
-  RETRIES=$((RETRIES + 1))
-  if [ $RETRIES -eq $MAX_RETRIES ]; then
-    error "Frontend did not start within ${MAX_RETRIES} retries"
-    exit 1
-  fi
-  
-  sleep $RETRY_INTERVAL
-done
-
-# Give frontend a bit more time to fully initialize
-sleep 2
-
-################################################################################
-# 3. Run Unit Tests
+# 2. Run Unit Tests
 ################################################################################
 
 log "Running unit tests..."
@@ -162,14 +75,15 @@ fi
 echo -e "${BLUE}═══════════════════════════════════════════════════════════${NC}"
 
 ################################################################################
-# 4. Run E2E Tests
+# 3. Run E2E Tests
 ################################################################################
 
 log "Running E2E tests..."
+warning "This will build the frontend and run Cypress tests. This may take a few minutes."
 echo -e "${BLUE}═══════════════════════════════════════════════════════════${NC}"
 
 # Set environment variable to skip user creation tests
-export SKIP_USER_CREATION_TESTS=true
+export SKIP_USER_CREATION_TESTS=false
 
 if npm run test:e2e; then
   success "E2E tests passed"
@@ -190,7 +104,6 @@ echo -e "${BLUE}═════════════════════�
 echo ""
 echo "Summary:"
 echo "  ✓ Supabase: Running"
-echo "  ✓ Frontend: Running on $FRONTEND_URL"
 echo "  ✓ Unit Tests: Passed"
 echo "  ✓ E2E Tests: Passed"
 echo ""

@@ -33,7 +33,7 @@ describe.skip('Mining and Inventory - E2E', () => {
       body: { success: true, tradeId: 'trade-1' },
     })
 
-    cy.login('testuser@example.com', 'password123')
+    cy.login('testuser@testing.com', 'password123')
     cy.visit('/game')
   })
 

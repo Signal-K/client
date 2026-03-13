@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
-import { renderHook, waitFor } from "@testing-library/react";
+import { renderHook, waitFor, act } from "@testing-library/react";
 import { useAchievements } from "@/hooks/useAchievements";
 
 describe("useAchievements", () => {
@@ -8,7 +8,7 @@ describe("useAchievements", () => {
   });
 
   it("should initialize with loading state", () => {
-    global.fetch = vi.fn();
+    global.fetch = vi.fn(() => new Promise(() => {})); // Never resolves to keep it in loading state
     const { result } = renderHook(() => useAchievements());
 
     expect(result.current.loading).toBe(true);
@@ -83,7 +83,9 @@ describe("useAchievements", () => {
     expect(global.fetch).toHaveBeenCalledTimes(1);
 
     // Refetch
-    result.current.refetch();
+    await act(async () => {
+      result.current.refetch();
+    });
 
     await waitFor(() => {
       expect(global.fetch).toHaveBeenCalledTimes(2);

@@ -38,7 +38,7 @@ describe("Avatar", () => {
     vi.clearAllMocks();
   });
 
-  it("shows loading skeleton initially when session exists", () => {
+  it("shows loading skeleton initially when session exists", async () => {
     mockUseSession.mockReturnValue({ user: { id: "user-1" } });
     vi.spyOn(globalThis, "fetch").mockResolvedValue({
       ok: true,
@@ -46,6 +46,9 @@ describe("Avatar", () => {
     } as Response);
     render(<Avatar />);
     expect(document.querySelector(".animate-pulse")).not.toBeNull();
+    await waitFor(() => {
+      expect(document.querySelector(".animate-pulse")).toBeNull();
+    });
   });
 
   it("shows default SVG avatar when no avatar_url", async () => {

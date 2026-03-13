@@ -26,13 +26,15 @@ describe("SessionContextProvider", () => {
     mockOnAuthStateChange.mockReturnValue({ data: { subscription: { unsubscribe: vi.fn() } } });
   });
 
-  it("renders children", () => {
+  it("renders children", async () => {
     render(
       <SessionContextProvider>
         <p>Session child</p>
       </SessionContextProvider>
     );
-    expect(screen.getByText("Session child")).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText("Session child")).toBeInTheDocument();
+    });
   });
 
   it("provides session after auth resolves", async () => {

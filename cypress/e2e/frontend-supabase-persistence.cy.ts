@@ -19,7 +19,7 @@ describe("Frontend Supabase persistence", () => {
     cy.waitForSupabase();
 
     const tag = `ui-persist-${Date.now()}`;
-    testEmail = `${tag}@example.com`;
+    testEmail = `${tag}@testing.com`;
 
     cy.task("createSupabaseTestUser", { email: testEmail, password: testPassword }).then((user: any) => {
       createdUserId = String(user.id);
