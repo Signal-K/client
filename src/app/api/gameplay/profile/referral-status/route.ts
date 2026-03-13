@@ -6,14 +6,20 @@ import { getRouteUser } from "@/lib/server/supabaseRoute";
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  const { user, authError } = await getRouteUser();
-  if (authError || !user) {
-    return NextResponse.json({ authenticated: false, hasReferral: false }, { status: 200 });
+  try {
+    const { user, authError } = await getRouteUser();
+    if (authError || !user) {
+      return NextResponse.json({ authenticated: false, hasReferral: false }, { status: 200 });
+    }
+
+    const data = await prisma.$queryRaw<Array<{ id: string }>>`
+      SELECT id FROM referrals WHERE referree_id::text = ${user.id} LIMIT 1
+    `;
+
+    return NextResponse.json({ authenticated: true, hasReferral: data.length > 0 });
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : String(err);
+    console.error("[referral-status] GET error:", message);
+    return NextResponse.json({ error: "Internal server error", message }, { status: 500 });
   }
-
-  const data = await prisma.$queryRaw<Array<{ id: number }>>`
-    SELECT id FROM referrals WHERE referree_id = ${user.id}::uuid LIMIT 1
-  `;
-
-  return NextResponse.json({ authenticated: true, hasReferral: data.length > 0 });
 }

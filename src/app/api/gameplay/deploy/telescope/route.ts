@@ -32,139 +32,145 @@ function computeSetsToFetch(
 }
 
 export async function GET(request: NextRequest) {
-  const { user, authError } = await getRouteUser();
-  if (authError || !user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
-  const action = request.nextUrl.searchParams.get("action");
-
-  if (action === "anomalies") {
-    const deploymentType = request.nextUrl.searchParams.get("deploymentType") as DeploymentType | null;
-    if (deploymentType !== "stellar" && deploymentType !== "planetary") {
-      return NextResponse.json({ error: "Invalid deploymentType" }, { status: 400 });
+  try {
+    const { user, authError } = await getRouteUser();
+    if (authError || !user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    let includeActiveAsteroids = false;
-    let includeNgts = false;
+    const action = request.nextUrl.searchParams.get("action");
 
-    if (deploymentType === "planetary") {
-      const [minorPlanetRows, ngtsData] = await Promise.all([
-        prisma.$queryRaw<Array<{ count: bigint }>>`
-          SELECT COUNT(*)::bigint AS count
-          FROM classifications
-          WHERE author = ${user.id}::uuid
-            AND classificationtype = 'telescope-minorPlanet'
+    if (action === "anomalies") {
+      const deploymentType = request.nextUrl.searchParams.get("deploymentType") as DeploymentType | null;
+      if (deploymentType !== "stellar" && deploymentType !== "planetary") {
+        return NextResponse.json({ error: "Invalid deploymentType" }, { status: 400 });
+      }
+
+      let includeActiveAsteroids = false;
+      let includeNgts = false;
+
+      if (deploymentType === "planetary") {
+        const [minorPlanetRows, ngtsData] = await Promise.all([
+          prisma.$queryRaw<Array<{ count: bigint }>>`
+            SELECT COUNT(*)::bigint AS count
+            FROM classifications
+            WHERE author::text = ${user.id}
+              AND classificationtype = 'telescope-minorPlanet'
+          `,
+          prisma.$queryRaw<Array<{ tech_type: string }>>`
+            SELECT tech_type
+            FROM researched
+            WHERE user_id::text = ${user.id}
+              AND tech_type = 'ngtsAccess'
+            LIMIT 1
+          `,
+        ]);
+
+        includeActiveAsteroids = Number(minorPlanetRows[0]?.count ?? 0) >= 2;
+        includeNgts = ngtsData.length > 0;
+      }
+
+      const setsToFetch = computeSetsToFetch(deploymentType, {
+        includeActiveAsteroids,
+        includeNgts,
+      });
+
+      const data = await prisma.$queryRaw<Array<Record<string, unknown>>>`
+        SELECT *
+        FROM anomalies
+        WHERE "anomalySet" = ANY(${setsToFetch}::text[])
+      `;
+
+      return NextResponse.json({ anomalies: data });
+    }
+
+    if (action === "status") {
+      const oneWeekAgo = new Date();
+      oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+
+      const [linkedRes, commentsRes, votesRes] = await Promise.all([
+        prisma.$queryRaw<Array<{ id: number }>>`
+          SELECT id
+          FROM linked_anomalies
+          WHERE automaton = 'Telescope'
+            AND author::text = ${user.id}
+            AND date >= ${oneWeekAgo.toISOString()}
         `,
-        prisma.$queryRaw<Array<{ tech_type: string }>>`
-          SELECT tech_type
-          FROM researched
-          WHERE user_id = ${user.id}::uuid
-            AND tech_type = 'ngtsAccess'
-          LIMIT 1
+        prisma.$queryRaw<Array<{ id: number; classification_author: string | null }>>`
+          SELECT c.id, cls.author AS classification_author
+          FROM comments c
+          LEFT JOIN classifications cls ON cls.id = c.classification_id
+          WHERE c.author::text = ${user.id}
+            AND c.created_at >= ${oneWeekAgo.toISOString()}
+        `,
+        prisma.$queryRaw<Array<{ id: number; classification_author: string | null }>>`
+          SELECT v.id, cls.author AS classification_author
+          FROM votes v
+          LEFT JOIN classifications cls ON cls.id = v.classification_id
+          WHERE v.user_id::text = ${user.id}
+            AND v.vote_type = 'up'
+            AND v.created_at >= ${oneWeekAgo.toISOString()}
         `,
       ]);
 
-      includeActiveAsteroids = Number(minorPlanetRows[0]?.count ?? 0) >= 2;
-      includeNgts = ngtsData.length > 0;
-    }
+      const linkedCount = linkedRes.length;
+      const validComments = commentsRes.filter((c) => c.classification_author && c.classification_author !== user.id);
+      const validVotes = votesRes.filter((v) => v.classification_author && v.classification_author !== user.id);
 
-    const setsToFetch = computeSetsToFetch(deploymentType, {
-      includeActiveAsteroids,
-      includeNgts,
-    });
+      const additionalDeploys = Math.floor(validVotes.length / 3) + validComments.length;
+      const userCanRedeploy = linkedCount + additionalDeploys > linkedCount;
 
-    const data = await prisma.$queryRaw<Array<Record<string, unknown>>>`
-      SELECT *
-      FROM anomalies
-      WHERE "anomalySet" = ANY(${setsToFetch}::text[])
-    `;
+      if (linkedCount === 0) {
+        return NextResponse.json({ alreadyDeployed: false, deploymentMessage: null });
+      }
 
-    return NextResponse.json({ anomalies: data });
-  }
+      if (userCanRedeploy) {
+        return NextResponse.json({
+          alreadyDeployed: false,
+          deploymentMessage: "You have earned additional deploys by interacting with the community this week!",
+        });
+      }
 
-  if (action === "status") {
-    const oneWeekAgo = new Date();
-    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
-
-    const [linkedRes, commentsRes, votesRes] = await Promise.all([
-      prisma.$queryRaw<Array<{ id: number }>>`
-        SELECT id
-        FROM linked_anomalies
-        WHERE automaton = 'Telescope'
-          AND author = ${user.id}::uuid
-          AND date >= ${oneWeekAgo.toISOString()}
-      `,
-      prisma.$queryRaw<Array<{ id: number; classification_author: string | null }>>`
-        SELECT c.id, cls.author AS classification_author
-        FROM comments c
-        LEFT JOIN classifications cls ON cls.id = c.classification_id
-        WHERE c.author = ${user.id}::uuid
-          AND c.created_at >= ${oneWeekAgo.toISOString()}
-      `,
-      prisma.$queryRaw<Array<{ id: number; classification_author: string | null }>>`
-        SELECT v.id, cls.author AS classification_author
-        FROM votes v
-        LEFT JOIN classifications cls ON cls.id = v.classification_id
-        WHERE v.user_id = ${user.id}::uuid
-          AND v.vote_type = 'up'
-          AND v.created_at >= ${oneWeekAgo.toISOString()}
-      `,
-    ]);
-
-    const linkedCount = linkedRes.length;
-    const validComments = commentsRes.filter((c) => c.classification_author && c.classification_author !== user.id);
-    const validVotes = votesRes.filter((v) => v.classification_author && v.classification_author !== user.id);
-
-    const additionalDeploys = Math.floor(validVotes.length / 3) + validComments.length;
-    const userCanRedeploy = linkedCount + additionalDeploys > linkedCount;
-
-    if (linkedCount === 0) {
-      return NextResponse.json({ alreadyDeployed: false, deploymentMessage: null });
-    }
-
-    if (userCanRedeploy) {
       return NextResponse.json({
-        alreadyDeployed: false,
-        deploymentMessage: "You have earned additional deploys by interacting with the community this week!",
+        alreadyDeployed: true,
+        deploymentMessage: "Telescope has already been deployed this week. Recalibrate & search again next week.",
       });
     }
 
-    return NextResponse.json({
-      alreadyDeployed: true,
-      deploymentMessage: "Telescope has already been deployed this week. Recalibrate & search again next week.",
-    });
+    if (action === "skill-progress") {
+      const start = new Date("2000-01-01").toISOString();
+
+      const [telescopeRows, weatherRows] = await Promise.all([
+        prisma.$queryRaw<Array<{ count: bigint }>>`
+          SELECT COUNT(*)::bigint AS count
+          FROM classifications
+          WHERE author::text = ${user.id}
+            AND classificationtype IN ('planet', 'telescope-minorPlanet')
+            AND created_at >= ${start}
+        `,
+        prisma.$queryRaw<Array<{ count: bigint }>>`
+          SELECT COUNT(*)::bigint AS count
+          FROM classifications
+          WHERE author::text = ${user.id}
+            AND classificationtype IN ('cloud', 'lidar-jovianVortexHunter')
+            AND created_at >= ${start}
+        `,
+      ]);
+
+      return NextResponse.json({
+        skillProgress: {
+          telescope: Number(telescopeRows[0]?.count ?? 0),
+          weather: Number(weatherRows[0]?.count ?? 0),
+        },
+      });
+    }
+
+    return NextResponse.json({ error: "Invalid action" }, { status: 400 });
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : String(err);
+    console.error("[telescope] GET error:", message);
+    return NextResponse.json({ error: "Internal server error", message }, { status: 500 });
   }
-
-  if (action === "skill-progress") {
-    const start = new Date("2000-01-01").toISOString();
-
-    const [telescopeRows, weatherRows] = await Promise.all([
-      prisma.$queryRaw<Array<{ count: bigint }>>`
-        SELECT COUNT(*)::bigint AS count
-        FROM classifications
-        WHERE author = ${user.id}::uuid
-          AND classificationtype IN ('planet', 'telescope-minorPlanet')
-          AND created_at >= ${start}
-      `,
-      prisma.$queryRaw<Array<{ count: bigint }>>`
-        SELECT COUNT(*)::bigint AS count
-        FROM classifications
-        WHERE author = ${user.id}::uuid
-          AND classificationtype IN ('cloud', 'lidar-jovianVortexHunter')
-          AND created_at >= ${start}
-      `,
-    ]);
-
-    return NextResponse.json({
-      skillProgress: {
-        telescope: Number(telescopeRows[0]?.count ?? 0),
-        weather: Number(weatherRows[0]?.count ?? 0),
-      },
-    });
-  }
-
-  return NextResponse.json({ error: "Invalid action" }, { status: 400 });
 }
 
 export async function POST(request: NextRequest) {
@@ -190,7 +196,7 @@ export async function POST(request: NextRequest) {
   const upgradeRows = await prisma.$queryRaw<Array<{ tech_type: string }>>`
     SELECT tech_type
     FROM researched
-    WHERE user_id = ${user.id}::uuid
+    WHERE user_id::text = ${user.id}
       AND tech_type = 'probereceptors'
   `;
 

@@ -66,7 +66,7 @@ export async function GET() {
     if (message.includes("relation") && message.includes("does not exist")) {
       return NextResponse.json({ error: "Database schema error" }, { status: 503 });
     }
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json({ error: "Internal server error", message }, { status: 500 });
   }
 }
 
