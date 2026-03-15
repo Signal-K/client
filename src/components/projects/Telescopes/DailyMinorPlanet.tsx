@@ -137,19 +137,15 @@ export function DailyMinorPlanetWithId({ anomalyId }: { anomalyId: string }) {
       }
 
       try {
-        console.log("Fetching anomaly with ID:", anomalyId);
-        
         if (anomalyId === "random" || !anomalyId) {
           const anomaliesRes = await fetch("/api/gameplay/anomalies?anomalySet=telescope-minorPlanet&limit=50");
           const anomaliesPayload = await anomaliesRes.json();
           const linkedAnomalies = anomaliesRes.ok ? anomaliesPayload?.anomalies || [] : [];
           if (!linkedAnomalies || linkedAnomalies.length === 0) {
-            console.log("No linked anomalies found for user");
             setError("No anomalies available for classification.");
             return;
           }
 
-          // Pick a random anomaly from the list
           const randomIndex = Math.floor(Math.random() * linkedAnomalies.length);
           const anomaly = linkedAnomalies[randomIndex] as Anomaly;
 
@@ -161,32 +157,21 @@ export function DailyMinorPlanetWithId({ anomalyId }: { anomalyId: string }) {
 
           setSelectedAnomaly(anomaly);
 
-          // Set up image URLs for all frames (1-4)
           const urls = [1, 2, 3, 4].map(i => 
             `${supabaseUrl}/storage/v1/object/public/telescope/telescope-dailyMinorPlanet/${anomaly.id}/${i}.png`
           );
           setImageUrls(urls);
-          
-          // Set the initial current image URL to the first frame
           setCurrentImageUrl(urls[0]);
         } else {
-          // Fetch specific anomaly by ID
           const anomalyRes = await fetch(
             `/api/gameplay/anomalies?id=${encodeURIComponent(anomalyId)}&anomalySet=telescope-minorPlanet&limit=1`
           );
           const anomalyPayload = await anomalyRes.json();
           const anomalies = anomalyRes.ok ? anomalyPayload?.anomalies || [] : [];
 
-          console.log("Query returned:", anomalies);
-
           if (!anomalies || anomalies.length === 0) {
-            console.log("No anomaly found with ID:", anomalyId);
             setError("Anomaly not found.");
             return;
-          }
-
-          if (anomalies.length > 1) {
-            console.warn("Multiple anomalies found with same ID:", anomalies);
           }
 
           const anomaly = anomalies[0];

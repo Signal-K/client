@@ -439,8 +439,3 @@ const DEPLOYMENT_STEPS: TutorialStep[] = [
     position: "center",
   },
 ];
-
-// Ensure location-related logic is wrapped in a client-side check
-if (typeof window !== "undefined") {
-  console.log("Location is available on the client-side.");
-}

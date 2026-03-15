@@ -154,7 +154,7 @@ export default function TelescopeClassifyPage() {
           sectorX={0} 
           sectorY={0} 
           showAllAnomalies={true}
-          onAnomalyClick={(anomaly) => console.log('Clicked anomaly:', anomaly)}
+          onAnomalyClick={(anomaly) => {}}
         />
       </div>
 

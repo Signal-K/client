@@ -313,9 +313,6 @@ export default function TestPlanetWrapper() {
   useEffect(() => {
       fetchComments();
       fetchDensity();
-      if (cloudSummary && p4Summary && ai4MSummary) {
-        console.log(cloudSummary, p4Summary, ai4MSummary);
-      }
   }, [classification]);
 
   useEffect(() => {

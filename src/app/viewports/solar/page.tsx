@@ -1,9 +1,7 @@
-"use client"
+"use client";
 
-import dynamic from "next/dynamic"
-import MainHeader from "@/src/components/layout/Header/MainHeader"
-import { TelescopeBackground } from "@/src/components/classification/telescope/telescope-background"
-import UseDarkMode from "@/src/shared/hooks/useDarkMode"
+import dynamic from "next/dynamic";
+import ViewportShell from "@/src/components/layout/ViewportShell";
 
 const SolarHealth = dynamic(() => import("@/src/components/scenes/deploy/solar/SolarHealth"), {
   ssr: false,
@@ -11,33 +9,9 @@ const SolarHealth = dynamic(() => import("@/src/components/scenes/deploy/solar/S
 });
 
 export default function SolarHealthViewportExpandedPage() {
-    const { isDark, toggleDarkMode } = UseDarkMode();
-
-    return (
-        <div className="min-h-screen w-full relative overflow-hidden">
-            <div className="fixed inset-0 -z-10">
-                <TelescopeBackground
-                    sectorX={0}
-                    sectorY={0}
-                    showAllAnomalies={false}
-                    isDarkTheme={isDark}
-                    variant="stars-only"
-                    onAnomalyClick={() => {}}
-                />
-            </div>
-            <MainHeader
-                isDark={isDark}
-                onThemeToggle={toggleDarkMode}
-                notificationsOpen={false}
-                onToggleNotifications={() => {}}
-                activityFeed={[]}
-                otherClassifications={[]}
-            />
-            <div className="pt-20 h-screen">
-                <div className="h-[calc(100vh-80px)] min-h-0 overflow-hidden">
-                    <SolarHealth />
-                </div>
-            </div>
-        </div>
-    )
+  return (
+    <ViewportShell>
+      <SolarHealth />
+    </ViewportShell>
+  );
 }

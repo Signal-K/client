@@ -1,7 +1,15 @@
 import { ReactNode } from "react";
 import type { Metadata, Viewport } from "next";
+import { Nunito } from "next/font/google";
 import RootLayoutClient from "@/src/components/layout/RootLayoutClient";
 import { PostHogProvider } from "@/src/components/providers/PostHogProvider";
+
+const nunito = Nunito({
+  subsets: ["latin"],
+  variable: "--font-nunito",
+  display: "swap",
+  weight: ["400", "500", "600", "700", "800", "900"],
+});
 
 export const metadata: Metadata = {
   title: "Star Sailors",
@@ -69,7 +77,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       projectId={posthogProjectId}
       region={posthogRegion}
     >
-      <RootLayoutClient>{children}</RootLayoutClient>
+      <RootLayoutClient fontClassName={nunito.variable}>{children}</RootLayoutClient>
     </PostHogProvider>
   );
 };

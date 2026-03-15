@@ -66,8 +66,6 @@ export default function PlanetGeneratorPage() {
 
         if (config?.planetConfiguration) {
           setPlanetConfig(config.planetConfiguration)
-        } else {
-          console.log("No planetConfiguration found, using default.")
         }
 
         setError(null)

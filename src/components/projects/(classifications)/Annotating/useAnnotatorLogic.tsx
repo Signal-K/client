@@ -528,8 +528,6 @@ export function useAnnotatorLogic({
       }
       const classificationData = await classificationResponse.json();
 
-      console.log("Classification created successfully: ", classificationData);
-
       setContent("");
       setAdditionalFields({});
       setUploads([]);

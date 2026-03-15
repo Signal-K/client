@@ -275,7 +275,6 @@ export const DiskDetectorTutorial: React.FC<TelescopeProps> = ({
         return;
       }
 
-      console.log("Classification saved successfully:", data);
       
       // Show success message
       alert("Classification submitted successfully!");

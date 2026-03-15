@@ -132,7 +132,6 @@ export default function VotePlanetClassifications({ classificationId }: VotePlan
             {/* Success Popup */}
       {showSuccessPopup && (
         <>
-          {console.log('PHVote: Rendering popup - showSuccessPopup is true')}
           <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
             <div className="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-2xl max-w-md mx-4 text-center animate-in zoom-in-95 duration-300">
               <div className="mb-4">
@@ -149,7 +148,6 @@ export default function VotePlanetClassifications({ classificationId }: VotePlan
                 </p>
                 <button 
                   onClick={() => {
-                    console.log('PHVote: Manual redirect button clicked');
                     try {
                       router.push('/');
                     } catch (error) {

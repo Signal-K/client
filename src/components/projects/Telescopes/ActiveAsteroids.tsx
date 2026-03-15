@@ -132,16 +132,12 @@ export function ActiveAsteroidClassifyWithId({ anomalyId }: { anomalyId: string 
             }
 
             try {
-                console.log("Fetching active asteroid anomaly with ID:", anomalyId);
-                
                 const res = await fetch(
                   `/api/gameplay/anomalies?id=${encodeURIComponent(anomalyId)}&anomalySet=active-asteroids&limit=1`
                 );
                 const payload = await res.json();
                 if (!res.ok) throw new Error(payload?.error || "Failed to load anomaly");
                 const anomalyData = payload?.anomalies?.[0];
-
-                console.log("Query returned:", anomalyData);
 
                 if (anomalyData) {
                     setAnomaly(anomalyData);

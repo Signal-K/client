@@ -2,15 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useSession } from "@/src/lib/auth/session-context";
-import { Card } from "@/src/components/ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/src/components/ui/dialog";
-import { Wrench } from "lucide-react";
 import Link from "next/link";
+import { Wrench, Wifi } from "lucide-react";
 import TelescopeIcon from "@/src/components/icons/TelescopeIcon";
 import SatelliteIcon from "@/src/components/icons/SatelliteIcon";
 import RoverIcon from "@/src/components/icons/RoverIcon";
@@ -18,11 +11,223 @@ import StardustBalance from "@/src/components/stardust/StardustBalance";
 import PlanetSelectorModal from "@/src/components/modals/PlanetSelectorModal";
 import useDeploymentStatus from "@/src/hooks/useDeploymentStatus";
 import { AvatarGenerator } from "@/src/components/profile/setup/Avatar";
+import { cn } from "@/src/shared/utils";
 
+// ─── HUD corner bracket ────────────────────────────────────────────────────────
+function HudCorner({ pos }: { pos: "tl" | "tr" | "bl" | "br" }) {
+  return (
+    <div
+      className={cn(
+        "absolute w-4 h-4 pointer-events-none",
+        pos === "tl" && "top-2.5 left-2.5 border-t border-l",
+        pos === "tr" && "top-2.5 right-2.5 border-t border-r",
+        pos === "bl" && "bottom-2.5 left-2.5 border-b border-l",
+        pos === "br" && "bottom-2.5 right-2.5 border-b border-r",
+      )}
+      style={{ borderColor: "rgba(136,192,208,0.45)" }}
+      aria-hidden
+    />
+  );
+}
+
+// ─── Animated 3D orbit ring + satellite dot ────────────────────────────────────
+function OrbitRing({
+  size,
+  tiltX,
+  tiltZ,
+  period,
+  color,
+  reverse,
+  showDot,
+  dotColor,
+  dotGlow,
+}: {
+  size: number;        // px diameter of the ring
+  tiltX: number;       // deg, rotateX to tilt into perspective
+  tiltZ: number;       // deg, rotateZ to rotate the orbital plane
+  period: number;      // seconds for one orbit
+  color: string;       // ring border color rgba
+  reverse?: boolean;
+  showDot?: boolean;
+  dotColor?: string;
+  dotGlow?: string;
+}) {
+  return (
+    <div
+      className="absolute pointer-events-none"
+      style={{
+        width: size,
+        height: size,
+        top: "50%",
+        left: "50%",
+        marginTop: -size / 2,
+        marginLeft: -size / 2,
+        borderRadius: "50%",
+        border: `1px solid ${color}`,
+        transform: `rotateX(${tiltX}deg) rotateZ(${tiltZ}deg)`,
+        animation: `spinOrbit ${period}s linear infinite ${reverse ? "reverse" : ""}`,
+        transformStyle: "preserve-3d",
+      }}
+    >
+      {showDot && (
+        <div
+          className="absolute"
+          style={{
+            top: -3,
+            left: "50%",
+            marginLeft: -3,
+            width: 6,
+            height: 6,
+            borderRadius: "50%",
+            background: dotColor ?? "white",
+            boxShadow: dotGlow ?? `0 0 6px ${dotColor}`,
+          }}
+        />
+      )}
+    </div>
+  );
+}
+
+// ─── Surface beacon (telescope / rover on the planet) ─────────────────────────
+function SurfaceBeacon({
+  deployed,
+  hasSignals,
+  signalCount,
+  label,
+  icon,
+  href,
+  onClick,
+  accentColor,
+  glowColor,
+}: {
+  deployed: boolean;
+  hasSignals: boolean;
+  signalCount: number;
+  label: string;
+  icon: React.ReactNode;
+  href?: string;
+  onClick?: () => void;
+  accentColor: string;
+  glowColor: string;
+}) {
+  const content = (
+    <div className="flex flex-col items-center gap-1 cursor-pointer group select-none">
+      {/* Beacon tower */}
+      <div className="relative flex flex-col items-center">
+        {/* Pulse ring when active */}
+        {deployed && (
+          <span
+            className="absolute inset-0 rounded-full animate-ping pointer-events-none"
+            style={{
+              inset: hasSignals ? "-12px" : "-8px",
+              background: `radial-gradient(circle, ${glowColor.replace("X", hasSignals ? "0.25" : "0.12")} 0%, transparent 70%)`,
+              animationDuration: hasSignals ? "1.8s" : "3s",
+            }}
+          />
+        )}
+
+        {/* Orbit ring decoration around icon */}
+        {deployed && (
+          <div
+            className="absolute rounded-full border pointer-events-none"
+            style={{
+              inset: "-7px",
+              borderColor: hasSignals
+                ? "rgba(251,191,36,0.4)"
+                : glowColor.replace("X", "0.3"),
+              animation: "pulse-slow 3s ease-in-out infinite",
+            }}
+          />
+        )}
+
+        {/* Icon pod */}
+        <div
+          className="relative w-11 h-11 rounded-full flex items-center justify-center border transition-all duration-300"
+          style={{
+            borderColor: deployed
+              ? hasSignals
+                ? "rgba(251,191,36,0.7)"
+                : glowColor.replace("X", "0.6")
+              : "rgba(255,255,255,0.08)",
+            background: deployed
+              ? hasSignals
+                ? "rgba(251,191,36,0.12)"
+                : glowColor.replace("X", "0.1")
+              : "rgba(0,0,0,0.3)",
+            boxShadow: deployed
+              ? hasSignals
+                ? "0 0 16px rgba(251,191,36,0.4), inset 0 0 8px rgba(251,191,36,0.08)"
+                : `0 0 14px ${glowColor.replace("X", "0.35")}, inset 0 0 8px ${glowColor.replace("X", "0.06")}`
+              : "none",
+          }}
+        >
+          {icon}
+        </div>
+      </div>
+
+      {/* Ground shadow — Pokémon GO-style placement indicator */}
+      <div
+        className="w-7 h-1 rounded-full"
+        style={{
+          background: deployed
+            ? hasSignals
+              ? "rgba(251,191,36,0.35)"
+              : glowColor.replace("X", "0.3")
+            : "rgba(255,255,255,0.06)",
+          boxShadow: deployed
+            ? hasSignals
+              ? "0 0 10px rgba(251,191,36,0.5)"
+              : `0 0 10px ${glowColor.replace("X", "0.4")}`
+            : "none",
+        }}
+        aria-hidden
+      />
+
+      {/* Label */}
+      <div className="text-center mt-0.5">
+        <div
+          className="font-mono text-[8px] uppercase tracking-[0.15em] leading-none"
+          style={{ color: "rgba(255,255,255,0.5)" }}
+        >
+          {label}
+        </div>
+        <div
+          className="font-mono text-[7px] leading-none mt-0.5"
+          style={{
+            color: hasSignals
+              ? "#fbbf24"
+              : deployed
+                ? glowColor.replace("X", "0.9")
+                : "rgba(255,255,255,0.18)",
+          }}
+        >
+          {hasSignals ? `${signalCount} SIG` : deployed ? "ACTIVE" : "STANDBY"}
+        </div>
+      </div>
+    </div>
+  );
+
+  if (onClick) return <button onClick={onClick} className="outline-none">{content}</button>;
+  if (href) return <Link href={href}>{content}</Link>;
+  return <div>{content}</div>;
+}
+
+// ─── Telemetry data line ──────────────────────────────────────────────────────
+function TelemetryLine({ label, value, color }: { label: string; value: string; color?: string }) {
+  return (
+    <div className="flex items-center gap-1.5">
+      <span className="font-mono text-[7px] uppercase tracking-widest" style={{ color: "rgba(136,192,208,0.35)" }}>
+        {label}
+      </span>
+      <span className="font-mono text-[8px] tabular-nums" style={{ color: color ?? "rgba(255,255,255,0.45)" }}>
+        {value}
+      </span>
+    </div>
+  );
+}
+
+// ─── Main component ───────────────────────────────────────────────────────────
 export default function ActivityHeader({
-  landmarksExpanded,
-  onToggleLandmarks,
-  scrolled,
   location,
 }: {
   landmarksExpanded: boolean;
@@ -32,93 +237,50 @@ export default function ActivityHeader({
 }) {
   const session = useSession();
 
-  const [profile, setProfile] = useState<{
-    classificationPoints: number | null;
-    username: string | null;
-  } | null>(null);
-
-  const [showDetailsModal, setShowDetailsModal] = useState(false);
-  const [groupsToShow, setGroupsToShow] = useState<string[]>(["Astronomy", "Meteorology", "Geology", "Biology"]);
+  const [profile, setProfile] = useState<{ username: string | null } | null>(null);
   const [deploymentMessage, setDeploymentMessage] = useState<string>("");
   const [isAnimating, setIsAnimating] = useState(false);
-  const [stardustPoints, setStardustPoints] = useState<number>(0);
   const [showPlanetSelector, setShowPlanetSelector] = useState(false);
   const [classificationsCount, setClassificationsCount] = useState<number>(0);
   const [availableUpgrades, setAvailableUpgrades] = useState<number>(0);
   const [bothUpgradesUnlocked, setBothUpgradesUnlocked] = useState<boolean>(false);
+  const [missionElapsed, setMissionElapsed] = useState("00:00:00");
 
-  // Close planet selector when clicking outside
+  // Mission elapsed timer (time since UTC midnight, as a "mission clock")
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (showDetailsModal) {
-        const target = event.target as Element;
-        if (!target.closest('.planet-selector-container')) {
-          setShowDetailsModal(false);
-        }
-      }
+    const tick = () => {
+      const now = new Date();
+      const h = String(now.getUTCHours()).padStart(2, "0");
+      const m = String(now.getUTCMinutes()).padStart(2, "0");
+      const s = String(now.getUTCSeconds()).padStart(2, "0");
+      setMissionElapsed(`${h}:${m}:${s}`);
     };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [showDetailsModal]);
-
-  useEffect(() => {
-    const updateGroups = () => {
-      if (window.innerWidth < 640) {
-        setGroupsToShow(["Astronomy"]);
-      } else {
-        setGroupsToShow(["Astronomy", "Meteorology", "Geology", "Biology"]);
-      }
-    };
-
-    updateGroups();
-    window.addEventListener("resize", updateGroups);
-    return () => window.removeEventListener("resize", updateGroups);
+    tick();
+    const id = setInterval(tick, 1000);
+    return () => clearInterval(id);
   }, []);
 
   useEffect(() => {
     if (!session?.user?.id) return;
-
     const fetchData = async () => {
-      const [pageDataResponse, researchSummaryResponse] = await Promise.all([
+      const [pageRes, researchRes] = await Promise.all([
         fetch("/api/gameplay/page-data", { cache: "no-store" }),
         fetch("/api/gameplay/research/summary", { cache: "no-store" }),
       ]);
-
-      const pageDataPayload = await pageDataResponse.json().catch(() => null);
-      const researchSummaryPayload = await researchSummaryResponse.json().catch(() => null);
-
-      if (pageDataResponse.ok && pageDataPayload) {
-        setProfile(pageDataPayload.profile ?? null);
+      const pagePayload = await pageRes.json().catch(() => null);
+      const researchPayload = await researchRes.json().catch(() => null);
+      if (pageRes.ok && pagePayload) setProfile(pagePayload.profile ?? null);
+      if (researchRes.ok && researchPayload) {
+        setClassificationsCount(Number(researchPayload?.counts?.all ?? 0));
+        const techTypes: string[] = Array.isArray(researchPayload?.researchedTechTypes)
+          ? researchPayload.researchedTechTypes
+          : [];
+        const hasT = techTypes.includes("probereceptors") || Number(researchPayload?.upgrades?.telescopeReceptors ?? 1) > 1;
+        const hasS = techTypes.includes("satellitecount") || Number(researchPayload?.upgrades?.satelliteCount ?? 1) > 1;
+        setBothUpgradesUnlocked(hasT && hasS);
+        setAvailableUpgrades(hasT && hasS ? 1 : (!hasT ? 1 : 0) + (!hasS ? 1 : 0));
       }
-      if (researchSummaryResponse.ok && researchSummaryPayload) {
-        setClassificationsCount(Number(researchSummaryPayload?.counts?.all ?? 0));
-      }
-
-      const researchedTechTypes: string[] = Array.isArray(researchSummaryPayload?.researchedTechTypes)
-        ? researchSummaryPayload.researchedTechTypes
-        : [];
-      const hasTelescopeUpgrade =
-        researchedTechTypes.includes("probereceptors") ||
-        Number(researchSummaryPayload?.upgrades?.telescopeReceptors ?? 1) > 1;
-      const hasSatelliteUpgrade =
-        researchedTechTypes.includes("satellitecount") ||
-        Number(researchSummaryPayload?.upgrades?.satelliteCount ?? 1) > 1;
-      
-      setBothUpgradesUnlocked(hasTelescopeUpgrade && hasSatelliteUpgrade);
-      
-      let upgradeCount = 0;
-      if (!hasTelescopeUpgrade) upgradeCount++;
-      if (!hasSatelliteUpgrade) upgradeCount++;
-      
-      // If both upgrades are unlocked, show projects instead
-      if (hasTelescopeUpgrade && hasSatelliteUpgrade) {
-        upgradeCount = 1; // Show projects notification
-      }
-      
-      setAvailableUpgrades(upgradeCount);
     };
-
     fetchData();
   }, [session]);
 
@@ -126,220 +288,386 @@ export default function ActivityHeader({
 
   const handleSendSatellite = async (planetId: number, planetName: string) => {
     if (!session) return;
-
     try {
-      const response = await fetch("/api/gameplay/deploy/satellite/quick", {
+      const res = await fetch("/api/gameplay/deploy/satellite/quick", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ planetClassificationId: planetId }),
       });
-      const payload = await response.json().catch(() => null);
-      if (!response.ok) {
-        console.error("Error deploying satellite:", payload?.error || response.statusText);
-        return;
-      }
-
-      // Show success message and animation
-      setDeploymentMessage(`🛰️ Satellite successfully deployed to ${planetName}!`);
+      if (!res.ok) return;
+      setDeploymentMessage(`Satellite deployed to ${planetName}`);
       setIsAnimating(true);
       setShowPlanetSelector(false);
-
-      // Hide message after animation
-      setTimeout(() => {
-        setDeploymentMessage("");
-        setIsAnimating(false);
-      }, 4000);
-
-      // Refresh deployment status
-      setTimeout(() => {
-        if (typeof window !== "undefined") {
-          window.location.reload();
-        }
-      }, 2000);
-
-    } catch (error) {
-      console.error("Error deploying satellite:", error);
-    }
+      setTimeout(() => { setDeploymentMessage(""); setIsAnimating(false); }, 4000);
+      setTimeout(() => { if (typeof window !== "undefined") window.location.reload(); }, 2000);
+    } catch {}
   };
 
-  const getStatusLabel = (deployed: boolean, unclassifiedCount: number, type: string) => {
-    if (!deployed) return `Deploy ${type}`;
-    if (unclassifiedCount > 0) return `${unclassifiedCount} new discoveries`;
-    return `${type} active`;
-  };
-
-  const getStatusColor = (deployed: boolean, unclassifiedCount: number) => {
-    if (!deployed) return "text-gray-500 dark:text-gray-400";
-    if (unclassifiedCount > 0) return "text-emerald-600 dark:text-emerald-400 font-semibold";
-    return "text-blue-600 dark:text-blue-400";
-  };
-
-  const getIconBackgroundColor = (deployed: boolean, unclassifiedCount: number) => {
-    if (!deployed) return "bg-gray-100 dark:bg-gray-800 group-hover:bg-gray-200 dark:group-hover:bg-gray-700";
-    if (unclassifiedCount > 0) return "bg-emerald-100 dark:bg-emerald-900/30 group-hover:bg-emerald-200 dark:group-hover:bg-emerald-800/40";
-    return "bg-blue-100 dark:bg-blue-900/30 group-hover:bg-blue-200 dark:group-hover:bg-blue-800/40";
-  };
-
-  const displayName = profile?.username || (session?.user?.is_anonymous ? "Guest Account" : session?.user?.email) || "User";
-
-  // Determine background image based on location prop
-  const getBackgroundImage = (location?: string) => {
-    if (!location) return "/assets/Backdrops/Earth.png"; // Default image
-    
-    // Map location strings to background images
-    const locationBackgrounds: { [key: string]: string } = {
-      'earth': "/assets/Backdrops/Earth.png",
-      'mars': "/assets/Backdrops/Mars.png",
-      'moon': "/assets/Backdrops/Moon.png",
-      'space': "/assets/Backdrops/Space.png",
-      'jupiter': "/assets/Backdrops/Jupiter.png",
-      'saturn': "/assets/Backdrops/Saturn.png",
-      'nebula': "/assets/Backdrops/Nebula.png",
-      'galaxy': "/assets/Backdrops/Galaxy.png",
+  const getBackgroundImage = (loc?: string) => {
+    const map: Record<string, string> = {
+      earth:   "/assets/Backdrops/Earth.png",
+      mercury: "/assets/Backdrops/Mercury.png",
+      venus:   "/assets/Backdrops/Venus.png",
+      gas:     "/assets/Backdrops/gasgiant.jpeg",
     };
-    
-    return locationBackgrounds[location?.toLowerCase() || 'earth'] || "/assets/Backdrops/Earth.png";
+    return map[loc?.toLowerCase() ?? ""] ?? "/assets/Backdrops/Earth.png";
   };
+
+  const displayName =
+    profile?.username ||
+    (session?.user?.is_anonymous ? "Guest" : session?.user?.email?.split("@")[0]) ||
+    "Commander";
+
+  const uid = session?.user?.id ?? "default";
+  const ra  = ((uid.charCodeAt(0) * 137 + (uid.charCodeAt(1) || 65) * 31) % 3600) / 10;
+  const dec = (((uid.charCodeAt(2) || 65) * 53) % 900) / 10 - 45;
+
+  const totalSignals =
+    deploymentStatus.telescope.unclassifiedCount +
+    deploymentStatus.satellites.unclassifiedCount +
+    deploymentStatus.rover.unclassifiedCount;
 
   return (
-    <Card className="relative w-full h-48 sm:h-56 md:h-64 overflow-visible rounded-lg border-chart-4/30 bg-card">
-      <img
-        src={getBackgroundImage(location)}
-        alt={location ? `${location} backdrop` : "Earth"}
-        className="absolute inset-0 w-full h-full object-cover object-center opacity-70"
-      />
-      <div className="absolute inset-0 bg-gradient-to-t from-card/80 to-transparent via-card/20 flex items-end p-3 sm:p-4 md:p-6">
-        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between w-full gap-2 sm:gap-4">
-          {/* User info */}
-          <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
-            <AvatarGenerator author={session?.user.id || ""} />
-            <h2 className="text-sm sm:text-base md:text-lg font-bold text-foreground truncate">
-              {displayName}
-            </h2>
+    <>
+      <style>{`
+        @keyframes spinOrbit {
+          from { transform: rotateX(var(--tilt-x, 72deg)) rotateZ(0deg); }
+          to   { transform: rotateX(var(--tilt-x, 72deg)) rotateZ(360deg); }
+        }
+        @keyframes scanDown {
+          0%   { top: -1px; opacity: 0; }
+          5%   { opacity: 1; }
+          95%  { opacity: 0.5; }
+          100% { top: 100%; opacity: 0; }
+        }
+        @keyframes planetDrift {
+          0%   { background-position: 50% 50%; }
+          50%  { background-position: 53% 50%; }
+          100% { background-position: 50% 50%; }
+        }
+        .hud-scan-line { animation: scanDown 10s linear infinite; }
+        .planet-drift  { animation: planetDrift 60s ease-in-out infinite; }
+      `}</style>
+
+      <div
+        className="relative w-full rounded-xl overflow-hidden"
+        style={{ height: "320px" }}
+      >
+        {/* ── Layer 1: Planet backdrop — slow drift simulates rotation ── */}
+        <div
+          className="planet-drift absolute inset-0"
+          style={{
+            backgroundImage: `url(${getBackgroundImage(location)})`,
+            backgroundSize: "110% 110%",
+            backgroundPosition: "50% 50%",
+            backgroundRepeat: "no-repeat",
+          }}
+          role="img"
+          aria-label="Planetary viewport"
+        />
+
+        {/* ── Layer 2: Planet disc mask — circular crop so the planet floats in space ── */}
+        {/* Outer deep-space void: everything outside the disc goes nearly black */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background:
+              "radial-gradient(ellipse 72% 60% at 50% 38%, transparent 0%, transparent 42%, rgba(0,0,6,0.6) 62%, rgba(0,0,6,0.92) 80%, rgba(0,0,6,0.98) 100%)",
+          }}
+        />
+        {/* Atmosphere rim glow around the planet disc */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background:
+              "radial-gradient(ellipse 70% 58% at 50% 38%, transparent 36%, rgba(88,160,200,0.18) 48%, rgba(88,160,200,0.08) 56%, transparent 65%)",
+          }}
+        />
+
+        {/* ── Layer 2b: Deep-space star field — fills the void outside the planet disc ── */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            backgroundImage:
+              "radial-gradient(circle, rgba(255,255,255,0.55) 1px, transparent 1px), " +
+              "radial-gradient(circle, rgba(255,255,255,0.3) 1px, transparent 1px), " +
+              "radial-gradient(circle, rgba(136,192,208,0.25) 1px, transparent 1px)",
+            backgroundSize: "34px 34px, 62px 62px, 97px 97px",
+            backgroundPosition: "3px 7px, 18px 22px, 45px 11px",
+            mixBlendMode: "screen",
+            opacity: 0.7,
+          }}
+        />
+
+        {/* ── Layer 3: Blueprint grid ── */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            backgroundImage:
+              "linear-gradient(rgba(136,192,208,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(136,192,208,0.04) 1px, transparent 1px)",
+            backgroundSize: "40px 40px",
+          }}
+        />
+
+        {/* ── Layer 4: Scan line ── */}
+        <div
+          className="hud-scan-line absolute left-0 right-0 h-px pointer-events-none z-10"
+          style={{
+            background:
+              "linear-gradient(90deg, transparent 0%, rgba(136,192,208,0.5) 30%, rgba(136,192,208,0.5) 70%, transparent 100%)",
+          }}
+        />
+
+        {/* ── Layer 5: Atmosphere gradient at bottom ── */}
+        <div
+          className="absolute bottom-0 left-0 right-0"
+          style={{
+            height: "60%",
+            background:
+              "linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.5) 40%, transparent 100%)",
+          }}
+        />
+
+        {/* ── Layer 6: 3D Orbit rings — perspective container ── */}
+        <div
+          className="absolute pointer-events-none"
+          style={{
+            inset: 0,
+            perspective: "400px",
+            perspectiveOrigin: "50% 35%",
+          }}
+        >
+          {/* Decorative outer ring */}
+          <OrbitRing
+            size={260}
+            tiltX={74}
+            tiltZ={20}
+            period={30}
+            color="rgba(136,192,208,0.08)"
+            reverse
+          />
+          {/* Satellite orbit ring — shows when satellite available */}
+          {deploymentStatus.satellites.available && (
+            <OrbitRing
+              size={210}
+              tiltX={72}
+              tiltZ={0}
+              period={9}
+              color={
+                deploymentStatus.satellites.deployed
+                  ? deploymentStatus.satellites.unclassifiedCount > 0
+                    ? "rgba(251,191,36,0.35)"
+                    : "rgba(56,189,248,0.3)"
+                  : "rgba(255,255,255,0.07)"
+              }
+              showDot={deploymentStatus.satellites.deployed}
+              dotColor={
+                deploymentStatus.satellites.unclassifiedCount > 0
+                  ? "#fbbf24"
+                  : "#38bdf8"
+              }
+              dotGlow={
+                deploymentStatus.satellites.unclassifiedCount > 0
+                  ? "0 0 8px #fbbf24, 0 0 16px rgba(251,191,36,0.5)"
+                  : "0 0 8px #38bdf8, 0 0 16px rgba(56,189,248,0.4)"
+              }
+            />
+          )}
+          {/* Inner decorative ring */}
+          <OrbitRing
+            size={168}
+            tiltX={70}
+            tiltZ={-30}
+            period={18}
+            color="rgba(136,192,208,0.06)"
+          />
+        </div>
+
+        {/* ── HUD corners ── */}
+        <HudCorner pos="tl" />
+        <HudCorner pos="tr" />
+        <HudCorner pos="bl" />
+        <HudCorner pos="br" />
+
+        {/* ── Top HUD row ── */}
+        <div className="absolute top-3 left-0 right-0 px-4 flex items-start justify-between z-20">
+          {/* Left: sector + coordinates */}
+          <div>
+            <div
+              className="font-mono text-[8px] uppercase tracking-[0.28em] leading-none"
+              style={{ color: "rgba(136,192,208,0.7)" }}
+            >
+              Home Sector
+            </div>
+            <div className="mt-1 space-y-0.5">
+              <TelemetryLine label="RA" value={`${ra.toFixed(1)}°`} />
+              <TelemetryLine label="DEC" value={`${dec >= 0 ? "+" : ""}${dec.toFixed(1)}°`} />
+            </div>
           </div>
-          
-          {/* Deployment status */}
-          <div className="flex flex-col items-end gap-2 w-full sm:w-auto">
-            {/* Stardust Balance and Upgrades Row */}
-            <div className="flex items-center justify-end gap-2 w-full">
-              <StardustBalance onPointsUpdate={setStardustPoints} />
-              
-              {/* Upgrades Section - Only show if user has more than 2 classifications */}
-              {classificationsCount > 2 && availableUpgrades > 0 && (
-                <Link
-                  href="/research"
-                  aria-label={bothUpgradesUnlocked ? "View research projects" : "View available upgrades"}
-                  className="group flex items-center gap-2 rounded-full border border-amber-400/40 bg-amber-200/20 px-2.5 py-1.5 text-xs font-medium text-amber-900 shadow-sm transition-all hover:border-amber-400/60 hover:bg-amber-200/30 hover:-translate-y-0.5 dark:border-amber-300/30 dark:bg-amber-300/10 dark:text-amber-100"
-                >
-                  <div className="relative flex h-8 w-8 items-center justify-center rounded-full bg-amber-300/50 text-amber-900 transition-colors group-hover:bg-amber-300/70 dark:bg-amber-900/40 dark:group-hover:bg-amber-900/60">
-                    <Wrench className="h-6 w-6" strokeWidth={1.5} />
-                    <span className="absolute -top-1 -right-1 flex h-4 min-w-[1rem] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white">
-                      {availableUpgrades}
-                    </span>
-                  </div>
-                  <div className="flex min-w-0 flex-col text-left leading-tight text-amber-900 dark:text-amber-100">
-                    <span className="text-[11px] font-semibold tracking-wide uppercase">
-                      {bothUpgradesUnlocked ? "Projects" : "Research"}
-                    </span>
-                    <span className="text-[10px] font-normal text-amber-800/80 transition-colors group-hover:text-amber-900 dark:text-amber-200/80 dark:group-hover:text-amber-100">
-                      {bothUpgradesUnlocked ? "New expeditions available" : `${availableUpgrades} upgrade${availableUpgrades > 1 ? "s" : ""} ready`}
-                    </span>
-                  </div>
-                  <span className="ml-auto hidden text-[11px] font-semibold uppercase tracking-wide text-amber-800/90 transition-colors group-hover:text-amber-900 dark:text-amber-200/90 sm:inline">
-                    Go
-                  </span>
-                </Link>
-              )}
-            </div>
 
-            <div className="text-xs uppercase tracking-wide text-muted-foreground hidden sm:block">
-              Deployment Status
-            </div>
-            
-            {/* Deployment Success Message */}
-            {deploymentMessage && (
-              <div className={`p-2 rounded-lg bg-green-100 dark:bg-green-900/30 border border-green-200 dark:border-green-800 text-green-800 dark:text-green-200 text-xs font-medium transition-all duration-500 ${isAnimating ? 'animate-bounce' : ''}`}>
-                {deploymentMessage}
-              </div>
+          {/* Right: stardust + upgrades */}
+          <div className="flex flex-col items-end gap-1.5">
+            <StardustBalance onPointsUpdate={() => {}} />
+
+            {classificationsCount > 2 && availableUpgrades > 0 && (
+              <Link
+                href="/research"
+                className="flex items-center gap-1.5 rounded-full px-2 py-1 transition-colors hover:bg-white/10"
+                style={{
+                  border: "1px solid rgba(251,191,36,0.35)",
+                  background: "rgba(251,191,36,0.08)",
+                }}
+              >
+                <div className="relative">
+                  <Wrench className="h-3 w-3 text-amber-300" strokeWidth={1.5} />
+                  <span
+                    className="absolute -top-1.5 -right-1.5 flex h-3.5 w-3.5 items-center justify-center rounded-full text-[7px] font-bold text-white leading-none"
+                    style={{ background: "#ef4444" }}
+                  >
+                    {availableUpgrades}
+                  </span>
+                </div>
+                <span
+                  className="font-mono text-[8px] uppercase tracking-widest hidden sm:inline"
+                  style={{ color: "rgba(251,191,36,0.8)" }}
+                >
+                  {bothUpgradesUnlocked ? "Labs" : "Research"}
+                </span>
+              </Link>
             )}
-            
-            <div className="flex gap-1.5 sm:gap-3 justify-end w-full">
-              {/* Telescope Status */}
-              <Link 
-                href="/structures/telescope"
-                className="flex flex-col items-center gap-0.5 sm:gap-1 p-1 sm:p-1.5 rounded-lg hover:bg-card/20 transition-colors group min-w-[60px] max-w-[80px] sm:min-w-0 sm:max-w-none"
-              >
-                <div className={`p-1 sm:p-1.5 rounded-full transition-colors ${getIconBackgroundColor(deploymentStatus.telescope.deployed, deploymentStatus.telescope.unclassifiedCount)}`}>
-                  <TelescopeIcon 
-                    deployed={deploymentStatus.telescope.deployed} 
-                    hasDiscoveries={deploymentStatus.telescope.unclassifiedCount > 0} 
-                  />
-                </div>
-                <div className="text-center w-full">
-                  <span className="text-xs font-medium group-hover:text-foreground transition-colors block truncate">
-                    Telescope
-                  </span>
-                  <span className={`text-xs ${getStatusColor(deploymentStatus.telescope.deployed, deploymentStatus.telescope.unclassifiedCount)} transition-colors block truncate hidden sm:block`}>
-                    {getStatusLabel(deploymentStatus.telescope.deployed, deploymentStatus.telescope.unclassifiedCount, "telescope")}
-                  </span>
-                </div>
-              </Link>
 
-              {/* Satellite Status - Only show if available */}
-              {deploymentStatus.satellites.available && (
-                <button
-                  onClick={() => setShowPlanetSelector(true)}
-                  className="flex flex-col items-center gap-0.5 sm:gap-1 p-1 sm:p-1.5 rounded-lg hover:bg-card/20 transition-colors group min-w-[60px] max-w-[80px] sm:min-w-0 sm:max-w-none"
-                >
-                  <div className={`p-1 sm:p-1.5 rounded-full transition-colors ${getIconBackgroundColor(deploymentStatus.satellites.deployed, deploymentStatus.satellites.unclassifiedCount)}`}>
-                    <SatelliteIcon 
-                      deployed={deploymentStatus.satellites.deployed} 
-                      hasDiscoveries={deploymentStatus.satellites.unclassifiedCount > 0} 
-                    />
-                  </div>
-                  <div className="text-center w-full">
-                    <span className="text-xs font-medium group-hover:text-foreground transition-colors block truncate">
-                      Satellites
-                    </span>
-                    <span className={`text-xs ${getStatusColor(deploymentStatus.satellites.deployed, deploymentStatus.satellites.unclassifiedCount)} transition-colors block truncate hidden sm:block`}>
-                      {getStatusLabel(deploymentStatus.satellites.deployed, deploymentStatus.satellites.unclassifiedCount, "satellites")}
-                    </span>
-                  </div>
-                </button>
-              )}
-
-              {/* Rover Status */}
-              <Link 
-                href="/viewports/roover"
-                className="flex flex-col items-center gap-0.5 sm:gap-1 p-1 sm:p-1.5 rounded-lg hover:bg-card/20 transition-colors group min-w-[60px] max-w-[80px] sm:min-w-0 sm:max-w-none"
-              >
-                <div className={`p-1 sm:p-1.5 rounded-full transition-colors ${getIconBackgroundColor(deploymentStatus.rover.deployed, deploymentStatus.rover.unclassifiedCount)}`}>
-                  <RoverIcon 
-                    deployed={deploymentStatus.rover.deployed} 
-                    hasDiscoveries={deploymentStatus.rover.unclassifiedCount > 0} 
-                  />
-                </div>
-                <div className="text-center w-full">
-                  <span className="text-xs font-medium group-hover:text-foreground transition-colors block truncate">
-                    Rover
-                  </span>
-                  <span className={`text-xs ${getStatusColor(deploymentStatus.rover.deployed, deploymentStatus.rover.unclassifiedCount)} transition-colors block truncate hidden sm:block`}>
-                    {getStatusLabel(deploymentStatus.rover.deployed, deploymentStatus.rover.unclassifiedCount, "rover")}
-                  </span>
-                </div>
-              </Link>
+            {/* Mission clock */}
+            <div
+              className="font-mono text-[7px] tabular-nums"
+              style={{ color: "rgba(255,255,255,0.2)" }}
+            >
+              MET {missionElapsed}
             </div>
           </div>
         </div>
+
+        {/* ── Horizon divider ── */}
+        <div
+          className="absolute left-0 right-0 pointer-events-none z-10"
+          style={{ bottom: "58px" }}
+        >
+          <div
+            style={{
+              height: "1px",
+              background:
+                "linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.08) 20%, rgba(255,255,255,0.12) 50%, rgba(255,255,255,0.08) 80%, transparent 100%)",
+            }}
+          />
+        </div>
+
+        {/* ── Center: Surface beacons — structures deployed on planet ── */}
+        <div
+          className="absolute left-0 right-0 flex items-end justify-center gap-10 sm:gap-16 z-20"
+          style={{ bottom: "64px" }}
+        >
+          <SurfaceBeacon
+            deployed={deploymentStatus.telescope.deployed}
+            hasSignals={deploymentStatus.telescope.unclassifiedCount > 0}
+            signalCount={deploymentStatus.telescope.unclassifiedCount}
+            label="Telescope"
+            icon={
+              <TelescopeIcon
+                deployed={deploymentStatus.telescope.deployed}
+                hasDiscoveries={deploymentStatus.telescope.unclassifiedCount > 0}
+              />
+            }
+            href="/structures/telescope"
+            accentColor="teal"
+            glowColor="rgba(136,192,208,X)"
+          />
+
+          {deploymentStatus.satellites.available && (
+            <SurfaceBeacon
+              deployed={deploymentStatus.satellites.deployed}
+              hasSignals={deploymentStatus.satellites.unclassifiedCount > 0}
+              signalCount={deploymentStatus.satellites.unclassifiedCount}
+              label="Satellite"
+              icon={
+                <SatelliteIcon
+                  deployed={deploymentStatus.satellites.deployed}
+                  hasDiscoveries={deploymentStatus.satellites.unclassifiedCount > 0}
+                />
+              }
+              onClick={() => setShowPlanetSelector(true)}
+              accentColor="sky"
+              glowColor="rgba(56,189,248,X)"
+            />
+          )}
+
+          <SurfaceBeacon
+            deployed={deploymentStatus.rover.deployed}
+            hasSignals={deploymentStatus.rover.unclassifiedCount > 0}
+            signalCount={deploymentStatus.rover.unclassifiedCount}
+            label="Rover"
+            icon={
+              <RoverIcon
+                deployed={deploymentStatus.rover.deployed}
+                hasDiscoveries={deploymentStatus.rover.unclassifiedCount > 0}
+              />
+            }
+            href="/viewports/roover"
+            accentColor="amber"
+            glowColor="rgba(251,146,60,X)"
+          />
+        </div>
+
+        {/* ── Bottom strip: avatar + signals summary ── */}
+        <div className="absolute bottom-0 left-0 right-0 px-4 pb-3 z-20 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <AvatarGenerator author={session?.user.id || ""} />
+            <div>
+              <div className="text-xs font-bold leading-none" style={{ color: "rgba(255,255,255,0.85)" }}>
+                {displayName}
+              </div>
+              <div
+                className="font-mono text-[7px] uppercase tracking-[0.2em] mt-0.5"
+                style={{ color: "rgba(255,255,255,0.25)" }}
+              >
+                Commander
+              </div>
+            </div>
+          </div>
+
+          {/* Total signals indicator */}
+          {totalSignals > 0 && (
+            <div className="flex items-center gap-1.5">
+              <Wifi className="h-3 w-3 text-amber-400 animate-pulse" aria-hidden />
+              <span className="font-mono text-[9px] text-amber-400">
+                {totalSignals} pending
+              </span>
+            </div>
+          )}
+
+          {/* Deployment success toast */}
+          {deploymentMessage && (
+            <div
+              className={cn(
+                "font-mono text-[9px] px-2 py-1 rounded border",
+                "text-teal-200",
+                isAnimating && "animate-fade-up",
+              )}
+              style={{
+                background: "rgba(0,0,0,0.6)",
+                borderColor: "rgba(136,192,208,0.3)",
+              }}
+            >
+              {deploymentMessage}
+            </div>
+          )}
+        </div>
       </div>
-      
-      {/* Planet Selector Modal */}
+
       <PlanetSelectorModal
         open={showPlanetSelector}
         onOpenChange={setShowPlanetSelector}
         planetTargets={planetTargets}
         onSelectPlanet={handleSendSatellite}
       />
-    </Card>
+    </>
   );
-};
+}

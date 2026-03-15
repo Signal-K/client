@@ -50,14 +50,11 @@ export default function ChatGPTImageClassifier() {
 
 // Capture image from webcam
 const captureWebcamImage = () => {
-  console.log('Capture button clicked');
   if (webcamRef.current) {
     const imageSrc = webcamRef.current.getScreenshot();
     if (imageSrc) {
-      console.log('Image captured:', imageSrc);
       setPreview(imageSrc);
-      setImage(null); // Clear the image file
-      // Convert base64 image to Blob (File)
+      setImage(null);
       const byteString = atob(imageSrc.split(',')[1]);
       const arrayBuffer = new ArrayBuffer(byteString.length);
       const view = new Uint8Array(arrayBuffer);
@@ -66,14 +63,13 @@ const captureWebcamImage = () => {
       }
       const blob = new Blob([arrayBuffer], { type: 'image/jpeg' });
       const file = new File([blob], `webcam-image-${Date.now()}.jpg`, { type: 'image/jpeg' });
-      setImage(file); // Set the file for upload
-      // Stop webcam stream after capture
+      setImage(file);
       const videoStream = webcamRef.current.video?.srcObject;
       if (videoStream) {
         const tracks = (videoStream as MediaStream).getTracks();
         tracks.forEach(track => track.stop());
       }
-      setUseWebcam(false); // Optionally toggle off webcam if you don't want it to continue
+      setUseWebcam(false);
     }
   }
 };
@@ -114,15 +110,7 @@ const uploadImageToSupabase = async (file: File) => {
 
 // Send image for classification
 const sendImage = async () => {
-  if (!preview && !image) {
-      console.log("No image selected or captured.");
-      return;
-  }
-
-  console.log("Sending image...");
-  
-  // Logging image format
-  console.log("Preview image base64 format: ", preview);
+  if (!preview && !image) return;
 
   setLoading(true);
   setResponse(null);
@@ -130,24 +118,15 @@ const sendImage = async () => {
   const formData = new FormData();
 
   if (image) {
-      // If file upload is used
-      console.log("Uploading image file...");
       formData.append("file", image);
   } else {
-      // Convert base64 to Blob for webcam image
-      console.log("Converting base64 to Blob...");
-      if (!preview) {
-          console.error("Preview is null. Cannot fetch image.");
-          return;
-      }
+      if (!preview) return;
       const blob = await fetch(preview).then((res) => res.blob());
       formData.append("file", blob);
   }
 
   try {
-      console.log("Sending API request...");
       const res = await axios.post("/api/zoodex/upload-image/gpt", formData);
-      console.log("Full API Response:", res.data); // Log full response
 
       if (res.data.refresh) {
           if (typeof window !== "undefined") {
@@ -449,12 +428,9 @@ const sendImage = async () => {
               <button
   onClick={() => {
     if (image) {
-      // Ensure the image is uploaded if it's a valid file
       uploadImageToSupabase(image);
-    } else {
-      console.log("No image selected or captured.");
     }
-    setResponse(null); // Reset the response after saving
+    setResponse(null);
   }}
   disabled={loading}
   className="flex-1 px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-md disabled:opacity-50 hover:from-blue-500 hover:to-blue-600 transition-colors"

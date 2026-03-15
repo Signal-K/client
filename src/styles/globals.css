@@ -61,6 +61,17 @@
   --tracking-wider: calc(var(--tracking-normal) + 0.05em);
   --tracking-widest: calc(var(--tracking-normal) + 0.1em);
   --spacing: 0.25rem;
+  --primary-rgb: 136, 192, 208;
+  --secondary-rgb: 94, 129, 172;
+  --accent-rgb: 129, 161, 193;
+
+  /* 3.0 tokens */
+  --font-display: var(--font-nunito, ui-rounded, sans-serif);
+  --glow-primary: 0 0 20px rgba(136, 192, 208, 0.4), 0 0 40px rgba(136, 192, 208, 0.15);
+  --glow-primary-sm: 0 0 8px rgba(136, 192, 208, 0.5);
+  --panel-border: rgba(136, 192, 208, 0.15);
+  --panel-bg: rgba(255, 255, 255, 0.04);
+  --orbit-radius: 40px;
 }
 
 .dark {
@@ -114,6 +125,13 @@
   --shadow-lg: 0px 5px 20px 0px hsl(0 0% 0% / 0.15), 0px 4px 6px -1px hsl(0 0% 0% / 0.15);
   --shadow-xl: 0px 5px 20px 0px hsl(0 0% 0% / 0.15), 0px 8px 10px -1px hsl(0 0% 0% / 0.15);
   --shadow-2xl: 0px 5px 20px 0px hsl(0 0% 0% / 0.38);
+  --primary-rgb: 136, 192, 208;
+  --secondary-rgb: 94, 129, 172;
+  --accent-rgb: 129, 161, 193;
+
+  /* 3.0 dark-mode tokens */
+  --panel-border: rgba(136, 192, 208, 0.2);
+  --panel-bg: rgba(0, 0, 0, 0.25);
 }
 
 @layer base {
@@ -122,12 +140,107 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-family: var(--font-display);
     letter-spacing: var(--tracking-normal);
-    /* Minimal background image */
-    background-image: url("/placeholder.svg?height=1000&width=1600");
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+    font-weight: 700;
+  }
+}
+
+@layer components {
+  /* Glass sci-fi panel — use as base for cards and dialogs */
+  .sci-fi-panel {
+    background: var(--panel-bg);
+    border: 1px solid var(--panel-border);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--glow-primary-sm), 0 4px 24px rgba(0, 0, 0, 0.15);
+    transition: box-shadow 0.2s ease, border-color 0.2s ease;
+  }
+  .sci-fi-panel:hover {
+    border-color: rgba(136, 192, 208, 0.35);
+    box-shadow: var(--glow-primary), 0 8px 32px rgba(0, 0, 0, 0.2);
+  }
+
+  /* Star field backdrop — applied to sections with space bg */
+  .star-field {
+    background-image: radial-gradient(circle, rgba(255,255,255,0.12) 1px, transparent 1px),
+                      radial-gradient(circle, rgba(255,255,255,0.06) 1px, transparent 1px);
+    background-size: 28px 28px, 56px 56px;
+    background-position: 0 0, 14px 14px;
+  }
+
+  /* Sunburst glow behind hero elements */
+  .sunburst-bg {
+    background-image: radial-gradient(ellipse 120% 80% at 50% 100%, rgba(136, 192, 208, 0.25) 0%, rgba(94, 129, 172, 0.08) 45%, transparent 70%);
+  }
+
+  /* Glow CTA button state */
+  .btn-glow {
+    box-shadow: var(--glow-primary-sm);
+    transition: box-shadow 0.25s ease, transform 0.15s ease;
+  }
+  .btn-glow:hover {
+    box-shadow: var(--glow-primary);
+    transform: translateY(-1px);
+  }
+
+  /* Micro-survey slide-up panel */
+  .survey-panel {
+    @apply fixed bottom-0 left-0 right-0 z-50 p-4;
+    animation: slide-up 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  /* ─── Game world atmosphere ───────────────────────────────────────────────── */
+
+  /* Orbital ring spin — used by ActivityHeader */
+  @keyframes spinOrbit {
+    from { transform: rotateX(72deg) rotateZ(0deg); }
+    to   { transform: rotateX(72deg) rotateZ(360deg); }
+  }
+
+  /* Page-level scan — full-screen CRT sweep */
+  @keyframes pageScan {
+    0%   { transform: translateY(-100vh); opacity: 0; }
+    5%   { opacity: 0.6; }
+    95%  { opacity: 0.4; }
+    100% { transform: translateY(100vh); opacity: 0; }
+  }
+
+  /* Atmosphere pulse — slow breathe on planet glow */
+  @keyframes atmoPulse {
+    0%, 100% { opacity: 0.6; transform: scale(1); }
+    50%       { opacity: 0.9; transform: scale(1.04); }
+  }
+
+  /* Blueprint reveal — modules fade up on mount */
+  @keyframes moduleReveal {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .module-reveal {
+    animation: moduleReveal 0.4s ease-out both;
+  }
+
+  /* Terminal cursor blink */
+  @keyframes termCursor {
+    0%, 49%  { opacity: 1; }
+    50%, 100% { opacity: 0; }
+  }
+  .term-cursor {
+    animation: termCursor 1.1s step-end infinite;
+  }
+
+  /* Deep space vignette overlay */
+  .space-vignette::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    box-shadow: inset 0 0 100px rgba(0,0,0,0.5);
+    border-radius: inherit;
   }
 }

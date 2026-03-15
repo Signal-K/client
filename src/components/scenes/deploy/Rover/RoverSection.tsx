@@ -147,7 +147,6 @@ export default function RoverViewportSection() {
                     let classData: any[] = [];
                     if (routeAnomalies.size > 0) {
                         const anomalyIdsToFetch = [...routeAnomalies];
-                        console.log("Querying classifications for author:", session.user.id, "and anomaly IDs:", anomalyIdsToFetch);
                         const classRes = await fetch(
                           `/api/gameplay/classifications?author=${encodeURIComponent(session.user.id)}&anomalies=${anomalyIdsToFetch.join(",")}&orderBy=created_at&ascending=false&limit=500`
                         );
@@ -161,11 +160,6 @@ export default function RoverViewportSection() {
                     setClassifications(classifications);
 
                     const classifiedAnomalyIds = new Set(classifications.map((c: any) => c.anomaly));
-
-                    console.log("Route Anomalies:", [...routeAnomalies]);
-                    console.log("Linked (unclassified) Anomaly IDs:", [...linkedAnomalyIds]);
-                    console.log("Classified Anomaly IDs:", [...classifiedAnomalyIds]);
-                    console.log("Fetched Classifications:", classifications);
 
                     // Compute classification progress
                     if (config && config.anomalies) {

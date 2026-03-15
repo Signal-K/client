@@ -1,104 +1,36 @@
 'use client'
 
 import { useSession } from "@/src/lib/auth/session-context";
-import {
-  BuildingIcon,
-  CameraOffIcon,
-  CloudCogIcon,
-  CloudDrizzleIcon,
-  MicroscopeIcon,
-  RssIcon
-} from "lucide-react";
+import { BuildingIcon, CameraOffIcon, CloudCogIcon, CloudDrizzleIcon, MicroscopeIcon, RssIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { Dialog, DialogContent } from "@/src/components/ui/dialog";
-import MainHeader from "@/src/components/layout/Header/MainHeader";
-import UseDarkMode from "@/src/shared/hooks/useDarkMode";
-import { TelescopeBackground } from "@/src/components/classification/telescope/telescope-background";
+import ViewportShell from "@/src/components/layout/ViewportShell";
 
 export default function WeatherBalloonOnEarthPage() {
   const session = useSession();
-
   const router = useRouter();
-  const { isDark, toggleDarkMode } = UseDarkMode();
 
   useEffect(() => {
-    if (!session) {
-      router.replace("/");
-    }
+    if (!session) router.replace("/");
   }, [session, router]);
 
-  if (!session) {
-    return null;
-  }
-
-  const actions = [
-    {
-      icon: <MicroscopeIcon className="w-6 h-6 text-[#B48EAD]" />,
-      text: "Research",
-      href: "/research",
-    },
-  ];
+  if (!session) return null;
 
   const buttons = [
-    {
-      icon: <CloudCogIcon className="w-6 h-6 text-[#88C0D0]" />,
-      text: "Search your clouds",
-      route: "clouds",
-    },
-    {
-      icon: <CloudDrizzleIcon className="w-6 h-6 text-[#81A1C1]" />,
-      text: "Map storms on gas planets",
-      route: "storms",
-    },
-    {
-      icon: <RssIcon className="w-6 h-6 text-[#D08770]" />,
-      text: "Identify landmarks on terrestrial planets",
-      route: "landmarks",
-    },
-    {
-      icon: <CameraOffIcon className="w-6 h-6 text-[#EBCB8B]" />,
-      text: "Map the surface of planets",
-      route: "surface",
-    },
+    { icon: <CloudCogIcon className="w-6 h-6 text-[#88C0D0]" />, text: "Search your clouds", route: "clouds" },
+    { icon: <CloudDrizzleIcon className="w-6 h-6 text-[#81A1C1]" />, text: "Map storms on gas planets", route: "storms" },
+    { icon: <RssIcon className="w-6 h-6 text-[#D08770]" />, text: "Identify landmarks on terrestrial planets", route: "landmarks" },
+    { icon: <CameraOffIcon className="w-6 h-6 text-[#EBCB8B]" />, text: "Map the surface of planets", route: "surface" },
   ];
 
   return (
-    <div className="relative min-h-screen w-full">
-      <div className="fixed inset-0 -z-10">
-        <TelescopeBackground
-          sectorX={0}
-          sectorY={0}
-          showAllAnomalies={false}
-          isDarkTheme={isDark}
-          variant="stars-only"
-          onAnomalyClick={() => {}}
-        />
-      </div>
-      <MainHeader
-        isDark={isDark}
-        onThemeToggle={toggleDarkMode}
-        notificationsOpen={false}
-        onToggleNotifications={() => {}}
-        activityFeed={[]}
-        otherClassifications={[]}
-      />
-
-      <div className="pt-20 flex flex-row space-y-4">
-        <Dialog
-          defaultOpen
-          onOpenChange={(open) => {
-            if (!open) {
-              router.push("/");
-            }
-          }}
-        >
+    <ViewportShell>
+      <div className="flex flex-row space-y-4">
+        <Dialog defaultOpen onOpenChange={(open) => { if (!open) router.push("/"); }}>
           <DialogContent
             className="p-6 rounded-3xl text-white max-w-3xl w-full h-[80vh] overflow-hidden flex flex-col justify-start"
-            style={{
-              background: "linear-gradient(135deg, rgba(191, 223, 245, 0.9), rgba(158, 208, 218, 0.85))",
-              color: "#2E3440",
-            }}
+            style={{ background: "linear-gradient(135deg, rgba(191, 223, 245, 0.9), rgba(158, 208, 218, 0.85))", color: "#2E3440" }}
           >
             <div className="flex-grow overflow-y-auto w-full">
               <div className="flex justify-between items-center">
@@ -109,27 +41,14 @@ export default function WeatherBalloonOnEarthPage() {
               </div>
 
               <div className="flex justify-center my-4">
-                <img
-                  src="/assets/Items/WeatherBalloon.png"
-                  alt="Weather Balloon"
-                  className="w-20 h-20"
-                  width="80"
-                  height="80"
-                  style={{ aspectRatio: "80/80", objectFit: "cover" }}
-                />
+                <img src="/assets/Items/WeatherBalloon.png" alt="Weather Balloon" className="w-20 h-20" width="80" height="80" style={{ aspectRatio: "80/80", objectFit: "cover" }} />
               </div>
 
               <div className="flex items-center justify-center my-4 space-x-4">
-                {actions.map((action, index) => (
-                  <div
-                    key={index}
-                    className="flex flex-col items-center cursor-pointer"
-                    onClick={() => router.push(action.href)}
-                  >
-                    {action.icon}
-                    <p className="text-xs text-[#4C566A]">{action.text}</p>
-                  </div>
-                ))}
+                <div className="flex flex-col items-center cursor-pointer" onClick={() => router.push("/research")}>
+                  <MicroscopeIcon className="w-6 h-6 text-[#B48EAD]" />
+                  <p className="text-xs text-[#4C566A]">Research</p>
+                </div>
               </div>
 
               <div className="gap-4 mt-6">
@@ -137,7 +56,7 @@ export default function WeatherBalloonOnEarthPage() {
                   {buttons.map((button, index) => (
                     <div
                       key={index}
-                      className="flex items-center justify-center bg-[#D8DEE9]/60 text-[#2E3440] font-bold py-2 px-4 rounded-md shadow-sm hover:bg-[#E5E9F0] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#81A1C1] cursor-pointer"
+                      className="flex items-center justify-center bg-[#D8DEE9]/60 text-[#2E3440] font-bold py-2 px-4 rounded-md shadow-sm hover:bg-[#E5E9F0] cursor-pointer"
                       onClick={() => router.push(`/structures/balloon/${button.route}`)}
                       style={{ width: "100%", maxWidth: "240px" }}
                     >
@@ -153,6 +72,6 @@ export default function WeatherBalloonOnEarthPage() {
           </DialogContent>
         </Dialog>
       </div>
-    </div>
+    </ViewportShell>
   );
-};
+}

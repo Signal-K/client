@@ -27,13 +27,6 @@ export default function AnomalyDialog({
     const id = selectedAnomaly?.id?.toString()
     if (!id) return
 
-    console.log('🔍 CLASSIFY DEBUG:', {
-      anomalyId: id,
-      anomalyType: selectedAnomaly.type,
-      anomalyProject: selectedAnomaly.project,
-      fullAnomaly: selectedAnomaly
-    });
-
     let path = ""
 
     // First check if anomaly has a specific project field
@@ -84,7 +77,6 @@ export default function AnomalyDialog({
       }
     }
 
-    console.log('🔍 ROUTING TO:', path);
     router.push(path)
   }
 

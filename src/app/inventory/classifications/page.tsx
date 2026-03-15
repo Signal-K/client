@@ -31,20 +31,6 @@ export default function UserClassificationsInventoryPage() {
     loading,
   } = usePageData();
 
-  // Debug: log all classificationConfiguration objects
-  useEffect(() => {
-    if (classifications && classifications.length > 0) {
-      console.log("classificationConfigurations:", classifications.map(c => c.classificationConfiguration));
-    }
-  }, [classifications]);
-
-  // Debug: log all classificationConfiguration objects
-  useEffect(() => {
-    if (classifications && classifications.length > 0) {
-      console.log("classificationConfigurations:", classifications.map(c => c.classificationConfiguration));
-    }
-  }, [classifications]);
-
   // Patch: ensure annotationOptions are extracted from classificationConfiguration
   const patchedClassifications = classifications.map((c) => {
     let annotationOptions: string[] = [];

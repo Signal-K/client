@@ -1,4 +1,4 @@
-import { supabase } from './supabase'
+import { getSupabaseBrowserClient } from './supabase/browser'
 
 export interface Classification {
   id: number
@@ -29,6 +29,7 @@ interface SupabaseClassification {
  * Fetch recent classifications of specific types for the discoveries section
  */
 export async function getRecentDiscoveries(): Promise<Classification[]> {
+  const supabase = getSupabaseBrowserClient();
   try {
     const { data, error } = await supabase
       .from('classifications')

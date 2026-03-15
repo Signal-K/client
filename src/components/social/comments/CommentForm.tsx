@@ -131,7 +131,6 @@ export function CommentForm({
                             </p>
                             <button 
                                 onClick={() => {
-                                    console.log('Manual redirect button clicked');
                                     try {
                                         router.push('/');
                                     } catch (error) {

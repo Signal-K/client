@@ -171,7 +171,6 @@ export function StarterJovianVortexHunter({
                                         });
 
                                         if (depositCreated) {
-                                            console.log(`[JVH] Created ${mineralConfig.type} deposit!`);
                                         }
                                     }
                                 } catch (error) {
@@ -289,7 +288,6 @@ export function LidarJVHSatelliteWithId() {
                                     });
 
                                     if (depositCreated) {
-                                        console.log(`[JVH] Created ${mineralConfig.type} deposit!`);
                                     }
                                 }
                             } catch (error) {

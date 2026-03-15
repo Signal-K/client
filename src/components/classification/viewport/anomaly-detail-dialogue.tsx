@@ -6,7 +6,7 @@ import { Badge } from "@/src/components/ui/badge";
 import { Card, CardContent } from "@/src/components/ui/card";
 import { Star, Zap, Target, Disc, Calendar, Eye, Palette, Info, Hash } from "lucide-react";
 import type { Anomaly } from "@/types/Structures/telescope";
-import { useTheme } from "@/hooks/useTheme";
+import UseDarkMode from "@/src/shared/hooks/useDarkMode";
 
 interface AnomalyDetailDialogProps {
   showDetailDialog: boolean
@@ -23,7 +23,7 @@ export function AnomalyDetailDialog({
   onClassify,
   config,
 }: AnomalyDetailDialogProps) {
-  const { isDark } = useTheme();
+  const { isDark } = UseDarkMode();
   if (!selectedAnomaly) return null;
 
   // Color scheme for telescope/dark/light

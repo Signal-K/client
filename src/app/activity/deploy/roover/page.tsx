@@ -173,7 +173,7 @@ export default function DeployRoverPage() {
           showAllAnomalies={false}
           isDarkTheme={isDark}
           variant="stars-only"
-          onAnomalyClick={(anomaly) => console.log("Clicked anomaly:", anomaly)}
+          onAnomalyClick={() => {}}
         />
       </div>
       <MainHeader

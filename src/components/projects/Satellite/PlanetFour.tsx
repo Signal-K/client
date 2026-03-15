@@ -349,7 +349,6 @@ export function PlanetFourProject() {
                                         });
 
                                         if (depositCreated) {
-                                            console.log(`[Planet Four] Created ${mineralConfig.type} deposit!`);
                                         }
                                     }
                                 } catch (error) {

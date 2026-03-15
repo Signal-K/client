@@ -1,13 +1,23 @@
 ---
 description: Overview of the discovery mechanic in frontend
-updatedAt: '2026-02-19T07:56:34.837Z'
+updatedAt: '2026-03-17T00:00:00Z'
 title: Discovery Mechanic
 ---
 # Discovery Mechanic
 
 ## Purpose
 
-Surface discoveries generated from classifications/deployments, including anomalies, milestones, and data-source visualizations.
+Surface discoveries generated from classifications/deployments, including anomalies, milestones, and data-source visualisations.
+
+## Terminology (Confirmed 2026-03-17)
+
+These are the canonical meanings — contextual usage differs:
+
+| Term | Meaning | When to use |
+|------|---------|-------------|
+| **Signals** | What a structure is actively detecting/finding | HUD context, active detection — "3 signals detected" |
+| **Anomalies** | Scientific data awaiting investigation/classification | Pending work — "You have 4 anomalies to classify" |
+| **Discoveries** | Confirmed finds post-classification | Achievement context — "Your discoveries: 42" |
 
 ## Component Areas
 
@@ -31,5 +41,6 @@ Surface discoveries generated from classifications/deployments, including anomal
 
 ## Notes
 
-- Discovery cards and related UI are strongly tied to classification type mapping.
-- Mineral discovery and extraction are discovery-to-deployment bridge features.
+- Discovery cards and related UI are strongly tied to classification type mapping
+- Mineral discovery and extraction are discovery-to-deployment bridge features
+- "Discoveries" shown on profile/inventory, never "Anomalies" in achievement contexts

@@ -72,7 +72,6 @@ function calculatePlanetType(density: string | number | null | undefined, radius
 }
 
 const PlanetFocusView: React.FC<PlanetFocusViewProps> = ({ planet, onNext, onPrev, isFirst, isLast, isDarkMode = true }) => {
-  console.log('🎨 PlanetFocusView render:', planet?.id, 'stats:', planet?.stats);
   const [showInfoTooltip, setShowInfoTooltip] = useState<string | null>(null);
   
   if (!planet) {

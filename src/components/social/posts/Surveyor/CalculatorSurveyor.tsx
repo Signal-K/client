@@ -247,13 +247,10 @@ export default function SurveyorCalculator({ classificationId }: Props) {
       const payload = await response.json().catch(() => null);
       if (!response.ok) throw new Error(payload?.error || "Failed to add period comment");
 
-      console.log('CalculatorSurveyor: Period comment submitted successfully, showing popup...');
       setCalculatorInputs({ input1: "", input2: "", input3: "" });
       setShowSuccessPopup(true);
       
-      // Show popup and redirect after 3 seconds
       setTimeout(() => {
-        console.log('CalculatorSurveyor: Redirecting to dashboard from period...');
         try {
           router.push('/');
         } catch (error) {
@@ -292,17 +289,10 @@ export default function SurveyorCalculator({ classificationId }: Props) {
       const payload = await response.json().catch(() => null);
       if (!response.ok) throw new Error(payload?.error || "Failed to add radius comment");
 
-      console.log('CalculatorSurveyor: Radius comment submitted successfully, showing popup...');
-      setCalculatorInputs({
-        input1: "",
-        input2: "",
-        input3: "",
-      });
+      setCalculatorInputs({ input1: "", input2: "", input3: "" });
       setShowSuccessPopup(true);
       
-      // Show popup and redirect after 3 seconds
       setTimeout(() => {
-        console.log('CalculatorSurveyor: Redirecting to dashboard from radius...');
         try {
           router.push('/');
         } catch (error) {

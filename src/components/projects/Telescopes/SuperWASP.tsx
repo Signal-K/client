@@ -217,7 +217,6 @@ export const SuperWASPTutorial: React.FC<TelescopeProps> = ({ anomalyId }) => {
         return;
       }
 
-      console.log("Classification saved successfully:", data);
       
       // Show success message
       alert("Classification submitted successfully!");

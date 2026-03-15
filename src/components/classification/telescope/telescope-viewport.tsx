@@ -123,7 +123,6 @@ const TelescopeViewport: React.FC = () => {
         : sectorAnomalies
 
       if (filteredItems.length === 0 && viewportState.anomalies.length > 0) {
-        console.log("🔭 No anomalies in current sector, showing fallback items")
         filteredItems = viewportState.anomalies.slice(0, 5)
       }
 
@@ -160,10 +159,6 @@ const TelescopeViewport: React.FC = () => {
         databaseOps.fetchAllClassifications(),
       ])
 
-      console.log("🔭 TELESCOPE DEBUG: Loaded anomalies:", anomaliesData.length)
-      console.log("🔭 TELESCOPE DEBUG: Anomaly data:", anomaliesData)
-
-      // Auto-select first anomaly if we have any AND show the modal
       const firstAnomaly = anomaliesData.length > 0 ? anomaliesData[0] : null
 
       setViewportState((prev) => ({

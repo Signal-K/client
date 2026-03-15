@@ -137,9 +137,6 @@ export function SkillTreeView({ onBack }: SkillTreeViewProps) {
   const fetchUserProgress = async () => {
     setLoading(true)
     try {
-      // Debug: Log user ID
-      console.log("Skill Tree View - Current user ID:", userId)
-
       const response = await fetch("/api/gameplay/research/summary")
       const payload = await response.json()
       if (!response.ok) {
@@ -152,8 +149,6 @@ export function SkillTreeView({ onBack }: SkillTreeViewProps) {
         "telescope-minorPlanet": payload?.counts?.asteroid || 0,
         cloud: payload?.counts?.cloud || 0,
       }
-
-      console.log("Skill Tree View - Classification counts:", classificationCounts)
 
       const researchedData = (payload?.researchedTechTypes || []).map((tech: string) => ({ tech_type: tech }))
 
