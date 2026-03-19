@@ -104,7 +104,10 @@ Focus on components with business logic and state management:
 Feature-specific logic and business rules:
 
 **src/features/**
-- Add tests for feature-specific utilities and services
+- ✅ `tests/unit/features/surveys/mechanic-surveys.test.ts` — 17 tests (schema + PROJECT_ENGAGEMENT_SURVEYS)
+- ✅ `tests/unit/features/surveys/useGameSurveys.test.ts` — 8 tests
+- ✅ `tests/unit/features/surveys/useProjectEngagementSurveys.test.ts` — 21 tests (new, Mar 22)
+- Add tests for other feature modules (game, notifications, referrals)
 - Target: 40% coverage
 
 ## Steps to Improve Coverage

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, use } from "react";
 import PostCard from "@/src/components/social/posts/TestPostCard";
 import StructuresOnPlanet from "@/src/components/deployment/structures/Structures";
 import MainHeader from "@/src/components/layout/Header/MainHeader";
@@ -18,8 +18,8 @@ interface Classification {
     classificationConfig?: any | null;
 };
 
-export default async function SurveyorPostPage(props: { params: Promise<{ id: string }> }) {
-  const params = await props.params;
+export default function SurveyorPostPage(props: { params: Promise<{ id: string }> }) {
+  const params = use(props.params);
       const [classification, setClassification] = useState<Classification | null>(null);
       const [loading, setLoading] = useState(true);
       const [error, setError] = useState<string | null>(null);

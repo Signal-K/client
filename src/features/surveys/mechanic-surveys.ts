@@ -1,4 +1,4 @@
-import type { MechanicMicroSurvey } from "@/src/features/surveys/types";
+import type { MechanicMicroSurvey, ProjectEngagementSurvey } from "@/src/features/surveys/types";
 
 export const MECHANIC_SURVEYS: readonly MechanicMicroSurvey[] = [
   // ── Phase 5 trigger surveys ──────────────────────────────────────────────
@@ -196,3 +196,92 @@ export const SURVEY_DISPLAY_DELAY_MS = 5000; // Reduced for testing
 export function surveyStorageKey(surveyId: string, userId: string): string {
   return `starsailors_mechanic_survey_${surveyId}_${userId}_v1`;
 }
+
+// ── Project engagement surveys ───────────────────────────────────────────────
+// Shown when a user reaches the contribution threshold for a project,
+// asking whether they'd like to try a dedicated standalone minigame.
+// The user's Supabase UUID is captured in PostHog alongside the response.
+
+export const PROJECT_ENGAGEMENT_SURVEYS: readonly ProjectEngagementSurvey[] = [
+  {
+    id: "project_engage_planet_hunters_v1",
+    title: "Planet Hunter Alert",
+    subtitle: "You've been busy finding planets — want to go further?",
+    triggerSurface: "game",
+    projectType: "planet-hunters",
+    contributionThreshold: 5,
+    questions: [
+      {
+        id: "dedicated_interest",
+        prompt:
+          "Would you play a dedicated planet-hunting game with mining, expeditions, and discoveries?",
+        options: ["Not for me", "Maybe later", "Yes, sign me up"],
+        required: true,
+      },
+    ],
+  },
+  {
+    id: "project_engage_asteroid_hunting_v1",
+    title: "Asteroid Tracker",
+    subtitle: "Your asteroid discoveries are stacking up.",
+    triggerSurface: "game",
+    projectType: "asteroid-hunting",
+    contributionThreshold: 5,
+    questions: [
+      {
+        id: "dedicated_interest",
+        prompt: "Would you play a specialised asteroid mining and tracking game?",
+        options: ["Not for me", "Maybe later", "Yes, sign me up"],
+        required: true,
+      },
+    ],
+  },
+  {
+    id: "project_engage_rover_v1",
+    title: "Rover Specialist",
+    subtitle: "You have a knack for terrain navigation.",
+    triggerSurface: "game",
+    projectType: "rover",
+    contributionThreshold: 5,
+    questions: [
+      {
+        id: "dedicated_interest",
+        prompt: "Would you try a dedicated rover navigation sim with real Mars terrain data?",
+        options: ["Not for me", "Maybe later", "Yes, sign me up"],
+        required: true,
+      },
+    ],
+  },
+  {
+    id: "project_engage_cloudspotting_v1",
+    title: "Cloud Analyst",
+    subtitle: "Your atmosphere data is piling up.",
+    triggerSurface: "game",
+    projectType: "cloudspotting",
+    contributionThreshold: 5,
+    questions: [
+      {
+        id: "dedicated_interest",
+        prompt: "Would you play a dedicated atmospheric science minigame?",
+        options: ["Not for me", "Maybe later", "Yes, sign me up"],
+        required: true,
+      },
+    ],
+  },
+  {
+    id: "project_engage_sunspots_v1",
+    title: "Solar Observer",
+    subtitle: "You've logged significant solar data.",
+    triggerSurface: "game",
+    projectType: "sunspots",
+    contributionThreshold: 5,
+    questions: [
+      {
+        id: "dedicated_interest",
+        prompt: "Would you play a dedicated solar observation game with real SOHO data?",
+        options: ["Not for me", "Maybe later", "Yes, sign me up"],
+        required: true,
+      },
+    ],
+  },
+];

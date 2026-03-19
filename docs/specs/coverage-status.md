@@ -4,7 +4,15 @@ description: "Current coverage baseline, what was done, and the realistic path t
 category: "status"
 status: "active"
 created: "2026-02-23"
-updated: "2026-02-23"
+updated: "2026-03-22"
+---
+
+# Coverage Status Update - Mar 22, 2026
+
+## Summary
+
+49 new survey tests added across two files, bringing the known total to ~448 unit tests. New test files cover `useProjectEngagementSurveys` (21 tests) and the extended `mechanic-surveys` suite (8 new tests). See [`survey-system-and-telescope-fix.md`](./survey-system-and-telescope-fix.md) for full ticket breakdown.
+
 ---
 
 # Coverage Status Update - Feb 23, 2026

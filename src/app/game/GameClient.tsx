@@ -688,7 +688,7 @@ export default function GameClient({ initialData, user }: GameClientProps) {
 
       <PWAPrompt />
       <PushNotificationPrompt />
-      <GameSurveys userId={user?.id} />
+      <GameSurveys userId={user?.id} classifications={data.classifications ?? []} />
     </div>
   );
 }

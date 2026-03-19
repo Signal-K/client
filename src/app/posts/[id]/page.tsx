@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, use } from "react";
 import { SimplePostSingle } from "@/src/components/social/posts/SimplePostSingle";
 import { useRouter } from "next/navigation";
 import { SourceClassificationCallout } from "@/src/components/classifications/SourceClassificationCallout";
@@ -19,8 +19,8 @@ interface Classification {
   classificationConfiguration?: any | null;
 };
 
-export default async function SinglePostPage(props: { params: Promise<{ id: string }> }) {
-  const params = await props.params;
+export default function SinglePostPage(props: { params: Promise<{ id: string }> }) {
+  const params = use(props.params);
   const router = useRouter();
   const { isDark, toggleDarkMode } = UseDarkMode();
 

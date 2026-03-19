@@ -1,14 +1,14 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, use } from "react";
 import { useSession } from "@/src/lib/auth/session-context";
 import Navbar from "@/src/components/layout/Navbar";
 import { PostCardSingleWithGeneratorEditMode } from "@/src/components/social/posts/PostWithGen";
 
 import { Classification } from "../../[id]/page";
 
-export default async function EditPlanetAnomaly(props: { params: Promise<{ id: string }> }) {
-  const params = await props.params;
+export default function EditPlanetAnomaly(props: { params: Promise<{ id: string }> }) {
+  const params = use(props.params);
     const session = useSession();
 
     const [classification, setClassification] = useState<Classification | null>(null);

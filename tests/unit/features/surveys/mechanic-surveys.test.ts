@@ -1,5 +1,10 @@
 import { describe, it, expect } from "vitest";
-import { MECHANIC_SURVEYS, SURVEY_DISPLAY_DELAY_MS, surveyStorageKey } from "@/features/surveys/mechanic-surveys";
+import {
+  MECHANIC_SURVEYS,
+  PROJECT_ENGAGEMENT_SURVEYS,
+  SURVEY_DISPLAY_DELAY_MS,
+  surveyStorageKey,
+} from "@/features/surveys/mechanic-surveys";
 
 describe("MECHANIC_SURVEYS", () => {
   it("is a non-empty array", () => {
@@ -66,5 +71,75 @@ describe("surveyStorageKey", () => {
     const key1 = surveyStorageKey("survey_x", "user-z");
     const key2 = surveyStorageKey("survey_x", "user-z");
     expect(key1).toBe(key2);
+  });
+});
+
+describe("PROJECT_ENGAGEMENT_SURVEYS", () => {
+  it("is a non-empty array", () => {
+    expect(Array.isArray(PROJECT_ENGAGEMENT_SURVEYS)).toBe(true);
+    expect(PROJECT_ENGAGEMENT_SURVEYS.length).toBeGreaterThan(0);
+  });
+
+  it("every survey has required MechanicMicroSurvey fields", () => {
+    for (const survey of PROJECT_ENGAGEMENT_SURVEYS) {
+      expect(survey.id).toBeTruthy();
+      expect(survey.title).toBeTruthy();
+      expect(survey.subtitle).toBeTruthy();
+      expect(["game", "ecosystem"]).toContain(survey.triggerSurface);
+      expect(Array.isArray(survey.questions)).toBe(true);
+      expect(survey.questions.length).toBeGreaterThanOrEqual(1);
+    }
+  });
+
+  it("every survey has a projectType and contributionThreshold", () => {
+    const validProjectTypes = [
+      "planet-hunters",
+      "asteroid-hunting",
+      "rover",
+      "cloudspotting",
+      "sunspots",
+    ];
+    for (const survey of PROJECT_ENGAGEMENT_SURVEYS) {
+      expect(validProjectTypes).toContain(survey.projectType);
+      expect(typeof survey.contributionThreshold).toBe("number");
+      expect(survey.contributionThreshold).toBeGreaterThan(0);
+    }
+  });
+
+  it("all project engagement survey IDs are unique", () => {
+    const ids = PROJECT_ENGAGEMENT_SURVEYS.map((s) => s.id);
+    expect(new Set(ids).size).toBe(ids.length);
+  });
+
+  it("every question has a dedicated_interest id with at least 3 options", () => {
+    for (const survey of PROJECT_ENGAGEMENT_SURVEYS) {
+      const q = survey.questions[0];
+      expect(q).toBeTruthy();
+      if (!q) continue;
+      expect(q.id).toBe("dedicated_interest");
+      expect(Array.isArray(q.options)).toBe(true);
+      expect(q.options.length).toBeGreaterThanOrEqual(3);
+    }
+  });
+
+  it("all project type values are unique across surveys", () => {
+    const types = PROJECT_ENGAGEMENT_SURVEYS.map((s) => s.projectType);
+    expect(new Set(types).size).toBe(types.length);
+  });
+
+  it("covers the five key project types", () => {
+    const types = new Set(PROJECT_ENGAGEMENT_SURVEYS.map((s) => s.projectType));
+    expect(types.has("planet-hunters")).toBe(true);
+    expect(types.has("asteroid-hunting")).toBe(true);
+    expect(types.has("rover")).toBe(true);
+    expect(types.has("cloudspotting")).toBe(true);
+    expect(types.has("sunspots")).toBe(true);
+  });
+
+  it("no overlap between MECHANIC_SURVEYS and PROJECT_ENGAGEMENT_SURVEYS ids", () => {
+    const mechanicIds = new Set(MECHANIC_SURVEYS.map((s) => s.id));
+    for (const survey of PROJECT_ENGAGEMENT_SURVEYS) {
+      expect(mechanicIds.has(survey.id)).toBe(false);
+    }
   });
 });
