@@ -2,6 +2,7 @@
 
 import { Suspense, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { usePostHog } from "posthog-js/react";
 import EnhancedAuthPage from "@/src/components/profile/auth/EnhancedAuth";
 import { useAuthUser } from "@/src/hooks/useAuthUser";
 
@@ -9,6 +10,7 @@ function LoginContent() {
     const { user, isLoading } = useAuthUser();
     const router = useRouter();
     const searchParams = useSearchParams();
+    const posthog = usePostHog();
 
     useEffect(() => {
       const ref = searchParams.get("ref");
@@ -24,13 +26,14 @@ function LoginContent() {
 
     useEffect(() => {
       if (isLoading || !user) return;
+      posthog?.capture("login_completed", { userId: user.id });
       const nextPath = searchParams.get("next");
       const destination =
         nextPath && nextPath.startsWith("/") && !nextPath.startsWith("//")
           ? nextPath
-          : "/game";
+          : "/onboarding";
       router.replace(destination);
-    }, [isLoading, user, router, searchParams]);
+    }, [isLoading, user, router, searchParams, posthog]);
 
     return <EnhancedAuthPage />;
 }

@@ -147,9 +147,9 @@ export async function POST(request: NextRequest) {
     )
   `;
 
-  revalidatePath("/activity/deploy/roover");
+  revalidatePath("/activity/deploy/rover");
   revalidatePath("/game");
-  revalidatePath("/viewports/roover");
+  revalidatePath("/viewports/rover");
 
   return NextResponse.json({ success: true, inserted: linkedRows.length });
 }

@@ -110,7 +110,7 @@ export async function POST(request: NextRequest) {
     `;
 
     revalidatePath("/game");
-    revalidatePath("/viewports/roover");
+    revalidatePath("/viewports/rover");
 
     return NextResponse.json(data);
   } catch (err: unknown) {

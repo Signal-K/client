@@ -9,6 +9,7 @@ interface CommandHeaderProps {
   stardust: number;
   hasAlerts: boolean;
   onAlertsClick: () => void;
+  onProfileClick?: () => void;
   agencyId?: string;
 }
 
@@ -16,6 +17,7 @@ export function CommandHeader({
   stardust,
   hasAlerts,
   onAlertsClick,
+  onProfileClick,
   agencyId,
 }: CommandHeaderProps) {
   const router = useRouter();
@@ -147,12 +149,18 @@ export function CommandHeader({
                   backdropFilter: "blur(16px)",
                 }}
               >
-                {/* Menu top accent */}
-                <div
-                  className="h-px mx-3 mb-1"
-                  style={{ background: "rgba(136,192,208,0.2)" }}
-                  aria-hidden
-                />
+                {/* Menu items */}
+                <button
+                  onClick={() => {
+                    setMenuOpen(false);
+                    if (onProfileClick) onProfileClick();
+                    else router.push("/profile");
+                  }}
+                  className="w-full px-3 py-2 text-left text-xs transition-colors hover:bg-white/[0.04]"
+                  style={{ color: "rgba(255,255,255,0.65)", fontFamily: "var(--font-mono, monospace)" }}
+                >
+                  Profile
+                </button>
                 {[
                   { label: "Research",     href: "/research" },
                   { label: "Leaderboards", href: "/leaderboards" },

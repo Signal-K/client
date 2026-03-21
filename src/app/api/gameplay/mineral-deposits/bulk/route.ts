@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
   `;
 
   revalidatePath("/inventory");
-  revalidatePath("/viewports/roover");
+  revalidatePath("/viewports/rover");
 
   return NextResponse.json({ success: true, count: data.length });
 }

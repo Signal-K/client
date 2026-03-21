@@ -22,7 +22,7 @@ describe("VariantSwitcher", () => {
 
   it("each link has the correct href", () => {
     render(<VariantSwitcher />);
-    expect(screen.getByRole("link", { name: "V1 Light" })).toHaveAttribute("href", "/apt");
+    expect(screen.getByRole("link", { name: "V1 Light" })).toHaveAttribute("href", "/");
     expect(screen.getByRole("link", { name: "V2 Dark" })).toHaveAttribute("href", "/apt/v2");
     expect(screen.getByRole("link", { name: "V6 Warm" })).toHaveAttribute("href", "/apt/v6");
   });
@@ -36,11 +36,7 @@ describe("VariantSwitcher", () => {
 
   it("active link has aria-current=page when pathname matches", () => {
     // The global mock makes usePathname return "/"
-    // None of the variants match "/", so no aria-current should be set
     render(<VariantSwitcher />);
-    const links = screen.getAllByRole("link");
-    links.forEach((link) => {
-      expect(link).not.toHaveAttribute("aria-current", "page");
-    });
+    expect(screen.getByRole("link", { name: "V1 Light" })).toHaveAttribute("aria-current", "page");
   });
 });

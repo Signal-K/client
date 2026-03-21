@@ -610,7 +610,7 @@ export default function ActivityHeader({
                 hasDiscoveries={deploymentStatus.rover.unclassifiedCount > 0}
               />
             }
-            href="/viewports/roover"
+            href="/viewports/rover"
             accentColor="amber"
             glowColor="rgba(251,146,60,X)"
           />

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const variants = [
-  { label: "V1 Light",       href: "/apt"     },
+  { label: "V1 Light",       href: "/"        },
   { label: "V2 Dark",        href: "/apt/v2"  },
   { label: "V3 Editorial",   href: "/apt/v3"  },
   { label: "V4 Cinematic",   href: "/apt/v4"  },

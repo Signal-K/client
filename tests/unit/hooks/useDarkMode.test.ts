@@ -12,9 +12,9 @@ Object.defineProperty(window, "matchMedia", {
   writable: true,
 });
 
-import UseDarkMode from "@/shared/hooks/useDarkMode";
+import useDarkMode from "@/shared/hooks/useDarkMode";
 
-describe("UseDarkMode", () => {
+describe("useDarkMode", () => {
   beforeEach(() => {
     vi.restoreAllMocks();
     localStorage.clear();
@@ -27,19 +27,19 @@ describe("UseDarkMode", () => {
   });
 
   it("defaults to light mode when no saved preference", () => {
-    const { result } = renderHook(() => UseDarkMode());
+    const { result } = renderHook(() => useDarkMode());
     expect(result.current.isDark).toBe(false);
   });
 
   it("reads saved dark preference from localStorage", () => {
     localStorage.setItem("star-sailors-theme", "dark");
-    const { result } = renderHook(() => UseDarkMode());
+    const { result } = renderHook(() => useDarkMode());
     expect(result.current.isDark).toBe(true);
   });
 
   it("reads saved light preference from localStorage", () => {
     localStorage.setItem("star-sailors-theme", "light");
-    const { result } = renderHook(() => UseDarkMode());
+    const { result } = renderHook(() => useDarkMode());
     expect(result.current.isDark).toBe(false);
   });
 
@@ -49,12 +49,12 @@ describe("UseDarkMode", () => {
       addEventListener: vi.fn(),
       removeEventListener: vi.fn(),
     });
-    const { result } = renderHook(() => UseDarkMode());
+    const { result } = renderHook(() => useDarkMode());
     expect(result.current.isDark).toBe(true);
   });
 
   it("toggleDarkMode switches from light to dark", () => {
-    const { result } = renderHook(() => UseDarkMode());
+    const { result } = renderHook(() => useDarkMode());
     expect(result.current.isDark).toBe(false);
 
     act(() => {
@@ -68,7 +68,7 @@ describe("UseDarkMode", () => {
 
   it("toggleDarkMode switches from dark to light", () => {
     localStorage.setItem("star-sailors-theme", "dark");
-    const { result } = renderHook(() => UseDarkMode());
+    const { result } = renderHook(() => useDarkMode());
     expect(result.current.isDark).toBe(true);
 
     act(() => {
@@ -81,7 +81,7 @@ describe("UseDarkMode", () => {
   });
 
   it("returns isDark and toggleDarkMode", () => {
-    const { result } = renderHook(() => UseDarkMode());
+    const { result } = renderHook(() => useDarkMode());
     expect(result.current).toHaveProperty("isDark");
     expect(result.current).toHaveProperty("toggleDarkMode");
     expect(typeof result.current.toggleDarkMode).toBe("function");
@@ -91,15 +91,14 @@ describe("UseDarkMode", () => {
     vi.spyOn(window.localStorage, "getItem").mockImplementation(() => {
       throw new DOMException("Access denied", "SecurityError");
     });
-    // Should not throw; falls back to system preference (false)
-    expect(() => renderHook(() => UseDarkMode())).not.toThrow();
+    expect(() => renderHook(() => useDarkMode())).not.toThrow();
   });
 
   it("does not crash when localStorage.setItem throws (private mode)", () => {
     vi.spyOn(window.localStorage, "setItem").mockImplementation(() => {
       throw new DOMException("Access denied", "SecurityError");
     });
-    const { result } = renderHook(() => UseDarkMode());
+    const { result } = renderHook(() => useDarkMode());
     expect(() => {
       act(() => {
         result.current.toggleDarkMode();

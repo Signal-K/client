@@ -1,12 +1,16 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { Radio, Users, BarChart2 } from "lucide-react";
+import { usePostHog } from "posthog-js/react";
+import { Radio, Users, BarChart2, ExternalLink } from "lucide-react";
+import { captureCrossGameNavigation } from "@/src/features/analytics/cross-game-navigation";
+import { getSailyUrl } from "@/src/features/referrals/referral-links";
 
 interface AgencyNetworkCardProps {
   referralCode: string | null;
   referralsCount: number;
   onCopyInvite: () => void;
+  userId?: string | null;
 }
 
 // Animated carrier wave bars (comms signal visualization)
@@ -29,43 +33,57 @@ function CarrierWave() {
   );
 }
 
-const rows: Array<{
-  icon: React.ReactNode;
-  label: string;
-  sublabel: (props: AgencyNetworkCardProps) => string;
-  channelId: string;
-  action: (props: AgencyNetworkCardProps, router: ReturnType<typeof useRouter>) => void;
-}> = [
-  {
-    icon: <Users className="h-3.5 w-3.5" />,
-    label: "Recruit Crew",
-    sublabel: (p) => p.referralsCount > 0 ? `${p.referralsCount} enlisted` : "No crew yet",
-    channelId: "CH-01",
-    action: (p) => p.onCopyInvite(),
-  },
-  {
-    icon: <Radio className="h-3.5 w-3.5" />,
-    label: "Research Lab",
-    sublabel: () => "Tech tree · Upgrades",
-    channelId: "CH-02",
-    action: (_, r) => r.push("/research"),
-  },
-  {
-    icon: <BarChart2 className="h-3.5 w-3.5" />,
-    label: "Fleet Rankings",
-    sublabel: () => "Global leaderboard",
-    channelId: "CH-03",
-    action: (_, r) => r.push("/leaderboards"),
-  },
-];
-
 export function AgencyNetworkCard({
   referralCode,
   referralsCount,
   onCopyInvite,
+  userId,
 }: AgencyNetworkCardProps) {
   const router = useRouter();
-  const props = { referralCode, referralsCount, onCopyInvite };
+  const posthog = usePostHog();
+  const rows: Array<{
+    icon: React.ReactNode;
+    label: string;
+    sublabel: string;
+    channelId: string;
+    action: () => void;
+  }> = [
+    {
+      icon: <Users className="h-3.5 w-3.5" />,
+      label: "Recruit Sailors",
+      sublabel: referralsCount > 0 ? `${referralsCount} sailors recruited` : "Copy your invite route",
+      channelId: "CH-01",
+      action: () => onCopyInvite(),
+    },
+    {
+      icon: <ExternalLink className="h-3.5 w-3.5" />,
+      label: "Launch Saily",
+      sublabel: referralCode ? "Open daily puzzle with your referral code" : "Open the daily puzzle",
+      channelId: "CH-02",
+      action: () => {
+        captureCrossGameNavigation(posthog, {
+          destination: "saily",
+          source_section: "agency_network_card",
+          user_id: userId ?? null,
+        });
+        window.open(getSailyUrl(referralCode), "_blank", "noopener,noreferrer");
+      },
+    },
+    {
+      icon: <Radio className="h-3.5 w-3.5" />,
+      label: "Research Lab",
+      sublabel: "Tech tree · Upgrades",
+      channelId: "CH-03",
+      action: () => router.push("/research"),
+    },
+    {
+      icon: <BarChart2 className="h-3.5 w-3.5" />,
+      label: "Fleet Rankings",
+      sublabel: "Global leaderboard",
+      channelId: "CH-04",
+      action: () => router.push("/leaderboards"),
+    },
+  ];
 
   return (
     <div
@@ -81,13 +99,31 @@ export function AgencyNetworkCard({
         className="flex items-center justify-between px-3 py-2 border-b"
         style={{ borderColor: "rgba(136,192,208,0.1)", background: "rgba(136,192,208,0.05)" }}
       >
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 min-w-0">
           <div className="h-1.5 w-1.5 rounded-full bg-teal-400 animate-pulse-slow shadow-[0_0_4px_rgba(136,192,208,0.8)]" aria-hidden />
-          <span className="font-mono text-[8px] uppercase tracking-[0.25em] text-teal-400/60">
-            Comms Array
-          </span>
+          <div className="min-w-0">
+            <div className="font-mono text-[8px] uppercase tracking-[0.25em] text-teal-400/60">
+              Recruit New Sailors
+            </div>
+            <div className="text-[11px] text-foreground/70">
+              {referralsCount > 0 ? `${referralsCount} crew in your network` : "Your referral route is live"}
+            </div>
+          </div>
         </div>
         <CarrierWave />
+      </div>
+
+      <div className="grid grid-cols-2 gap-2 border-b px-3 py-2" style={{ borderColor: "rgba(136,192,208,0.08)" }}>
+        <div className="rounded-lg border border-teal-400/15 bg-teal-500/8 px-2.5 py-2">
+          <div className="font-mono text-[7px] uppercase tracking-[0.2em] text-teal-300/55">Invite Code</div>
+          <div className="mt-1 truncate font-mono text-[11px] text-teal-100/85">
+            {referralCode ?? "Create profile"}
+          </div>
+        </div>
+        <div className="rounded-lg border border-amber-400/15 bg-amber-500/8 px-2.5 py-2">
+          <div className="font-mono text-[7px] uppercase tracking-[0.2em] text-amber-300/55">Crew Recruited</div>
+          <div className="mt-1 text-[11px] text-amber-100/85">{referralsCount}</div>
+        </div>
       </div>
 
       {/* Channel rows */}
@@ -95,7 +131,7 @@ export function AgencyNetworkCard({
         {rows.map((row) => (
           <button
             key={row.channelId}
-            onClick={() => row.action(props, router)}
+            onClick={row.action}
             className="w-full flex items-center gap-3 px-3 py-3 text-left transition-colors hover:bg-white/[0.03] group"
           >
             {/* Channel ID */}
@@ -117,7 +153,7 @@ export function AgencyNetworkCard({
                 {row.label}
               </p>
               <p className="font-mono text-[9px] text-muted-foreground/35 mt-0.5">
-                {row.sublabel(props)}
+                {row.sublabel}
               </p>
             </div>
 

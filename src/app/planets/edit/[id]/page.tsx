@@ -7,7 +7,8 @@ import { PostCardSingleWithGeneratorEditMode } from "@/src/components/social/pos
 
 import { Classification } from "../../[id]/page";
 
-export default function EditPlanetAnomaly({ params }: { params: { id: string } }) {
+export default async function EditPlanetAnomaly(props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
     const session = useSession();
 
     const [classification, setClassification] = useState<Classification | null>(null);

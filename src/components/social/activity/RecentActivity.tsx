@@ -4,22 +4,7 @@ import { MessageCircle, Star } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { formatDistanceToNowStrict } from "date-fns";
-
-interface CommentVote {
-  type: "comment" | "vote";
-  created_at: string;
-  content?: string;
-  vote_type?: string;
-  classification_id: number;
-}
-
-interface OtherClassification {
-  id: number;
-  classificationtype: string | null;
-  content: string | null;
-  author: string;
-  created_at: string;
-}
+import type { CommentVote, OtherClassification } from "@/types/game";
 
 interface RecentActivityProps {
   activityFeed: CommentVote[];

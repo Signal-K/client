@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { cn } from "@/src/shared/utils";
+import type { StructureId, StructureState } from "./StructureCard";
 
 // ─── Blip positions — fixed orbital angles per station ───────────────────────
 const BLIPS: Array<{ id: string; angle: number; radius: number }> = [
@@ -19,6 +20,23 @@ const STATION_COLORS: Record<string, { base: string; signal: string; glow: strin
   solar:     { base: "rgba(253,224,71,0.45)",  signal: "#fbbf24", glow: "rgba(253,224,71,0.6)"  },
 };
 
+const STATION_MOTION: Record<StructureId, React.CSSProperties> = {
+  telescope: {
+    animation: "radar-sweep 10s linear infinite",
+    transformOrigin: "50% 100%",
+  },
+  satellite: {
+    animation: "orbit 16s linear infinite",
+    ["--orbit-radius" as string]: "4px",
+  },
+  rover: {
+    animation: "vehicle-fly 8s ease-in-out -4s infinite alternate",
+  },
+  solar: {
+    animation: "pulse-glow 4s ease-in-out infinite",
+  },
+};
+
 export interface RadarStation {
   deployed: boolean;
   signals: number;
@@ -30,6 +48,8 @@ interface SectorRadarProps {
   rover:     RadarStation;
   solar:     RadarStation;
   className?: string;
+  onSelect?: (id: StructureId) => void;
+  states?: Partial<Record<StructureId, StructureState>>;
 }
 
 const SIZE    = 152; // px
@@ -44,7 +64,7 @@ function blipIsLit(sweep: number, blipAngle: number) {
   return delta >= 0 && delta < LIT_WINDOW;
 }
 
-export function SectorRadar({ telescope, satellite, rover, solar, className }: SectorRadarProps) {
+export function SectorRadar({ telescope, satellite, rover, solar, className, onSelect, states }: SectorRadarProps) {
   const [sweep, setSweep] = useState(0);
   const startRef = useRef<number>(0);
   const rafRef   = useRef<number>(0);
@@ -137,6 +157,7 @@ export function SectorRadar({ telescope, satellite, rover, solar, className }: S
 
         {/* Structure blips */}
         {BLIPS.map(({ id, angle, radius }) => {
+          const structureId = id as StructureId;
           const s = stationMap[id];
           if (!s?.deployed) return null;
 
@@ -146,28 +167,63 @@ export function SectorRadar({ telescope, satellite, rover, solar, className }: S
           const lit  = blipIsLit(sweep, angle);
           const cols = STATION_COLORS[id];
           const hasSignals = s.signals > 0;
+          const state = states?.[structureId] ?? (hasSignals ? "active" : "standby");
+          const isIncoming = state === "incoming";
+          const isActive = state === "active" || state === "incoming";
+          const label = id.charAt(0).toUpperCase() + id.slice(1);
 
           return (
             <div
               key={id}
-              className="absolute"
+              className="absolute flex flex-col items-center"
               style={{
-                width: 7,
-                height: 7,
-                left: bx - 3.5,
-                top:  by - 3.5,
-                borderRadius: "50%",
-                background: hasSignals
-                  ? lit ? cols.signal : "rgba(251,191,36,0.55)"
-                  : lit ? cols.glow   : cols.base,
-                boxShadow: lit
-                  ? hasSignals
-                    ? "0 0 14px rgba(251,191,36,0.9)"
-                    : `0 0 10px ${cols.glow}`
-                  : "none",
-                transition: "box-shadow 0.1s ease, background 0.1s ease",
+                left: bx,
+                top: by,
+                transform: "translate(-50%, -50%)",
               }}
-            />
+            >
+              <button
+                type="button"
+                onClick={() => onSelect?.(structureId)}
+                className={cn(
+                  "flex h-4 w-4 items-center justify-center rounded-full border transition-all",
+                  onSelect ? "cursor-pointer focus:outline-none focus:ring-2 focus:ring-white/40" : "cursor-default",
+                  isIncoming && "animate-pulse",
+                )}
+                style={{
+                  background: isActive
+                    ? lit ? cols.signal : cols.glow
+                    : "rgba(255,255,255,0.08)",
+                  borderColor: isActive ? cols.glow : "rgba(255,255,255,0.16)",
+                  boxShadow: isIncoming
+                    ? "0 0 16px rgba(251,191,36,0.95)"
+                    : isActive
+                      ? `0 0 12px ${cols.glow}`
+                      : "none",
+                  opacity: state === "standby" ? 0.7 : 1,
+                  ...STATION_MOTION[structureId],
+                }}
+                aria-label={`${label}: ${hasSignals ? `${s.signals} signals` : "clear"}${onSelect ? ". Open viewport." : ""}`}
+              >
+                <span
+                  className="h-1.5 w-1.5 rounded-full"
+                  style={{
+                    background: hasSignals ? "#020617" : "rgba(255,255,255,0.92)",
+                    opacity: hasSignals ? 1 : 0.65,
+                  }}
+                  aria-hidden
+                />
+              </button>
+              <span
+                className="mt-1 block text-center font-mono text-[6px] uppercase tracking-[0.18em]"
+                style={{
+                  color: isActive ? "rgba(255,255,255,0.72)" : "rgba(255,255,255,0.42)",
+                  textShadow: isActive ? `0 0 8px ${cols.glow}` : "none",
+                }}
+              >
+                {label}
+              </span>
+            </div>
           );
         })}
 
@@ -268,16 +324,31 @@ export function SectorRadar({ telescope, satellite, rover, solar, className }: S
 
         {/* Per-station rows */}
         {BLIPS.map(({ id }) => {
+          const structureId = id as StructureId;
           const s = stationMap[id];
           const cols = STATION_COLORS[id];
           const label = id.charAt(0).toUpperCase() + id.slice(1);
+          const state = states?.[structureId] ?? (!s?.deployed ? "undeployed" : s.signals > 0 ? "active" : "standby");
           return (
-            <div key={id} className="flex items-center gap-2">
+            <button
+              key={id}
+              type="button"
+              onClick={() => s?.deployed && onSelect?.(structureId)}
+              disabled={!s?.deployed || !onSelect}
+              className={cn(
+                "flex items-center gap-2 rounded-md px-1.5 py-1 text-left transition-colors",
+                s?.deployed && onSelect ? "hover:bg-white/5" : "cursor-default",
+              )}
+            >
               <div
                 className="h-1.5 w-1.5 rounded-full shrink-0"
                 style={{
-                  background: s?.deployed ? cols.base : "rgba(255,255,255,0.1)",
-                  boxShadow: s?.deployed ? `0 0 4px ${cols.base}` : "none",
+                  background: !s?.deployed
+                    ? "rgba(255,255,255,0.1)"
+                    : state === "standby"
+                      ? "rgba(255,255,255,0.32)"
+                      : cols.base,
+                  boxShadow: s?.deployed && state !== "standby" ? `0 0 4px ${cols.base}` : "none",
                 }}
               />
               <span
@@ -298,7 +369,7 @@ export function SectorRadar({ telescope, satellite, rover, solar, className }: S
               >
                 {!s?.deployed ? "——" : s.signals > 0 ? `${s.signals} SIG` : "CLEAR"}
               </span>
-            </div>
+            </button>
           );
         })}
 

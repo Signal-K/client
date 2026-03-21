@@ -1,33 +1,23 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import { getRecentDiscoveries, getDiscoveryTypeLabel, getDiscoveryDescription } from "@/src/lib/discoveries";
 
-const { mockLimit } = vi.hoisted(() => ({
-  mockLimit: vi.fn().mockResolvedValue({ data: [], error: null }),
+// Define the mock chain
+const mockLimit = vi.fn();
+const mockOrder = vi.fn(() => ({ limit: mockLimit }));
+const mockIn = vi.fn(() => ({ order: mockOrder }));
+const mockSelect = vi.fn(() => ({ in: mockIn }));
+const mockFrom = vi.fn(() => ({ select: mockSelect }));
+
+// Mock the supabase client module
+vi.mock("@/src/lib/supabase/browser", () => ({
+  getSupabaseBrowserClient: vi.fn(() => ({
+    from: mockFrom,
+  })),
 }));
-
-// Mock supabase before importing discoveries
-vi.mock("@/lib/supabase", () => ({
-  supabase: {
-    from: vi.fn(() => ({
-      select: vi.fn(() => ({
-        in: vi.fn(() => ({
-          order: vi.fn(() => ({
-            limit: mockLimit,
-          })),
-        })),
-      })),
-    })),
-  },
-}));
-
-import {
-  getDiscoveryTypeLabel,
-  getDiscoveryDescription,
-  getRecentDiscoveries,
-} from "@/lib/discoveries";
 
 describe("getRecentDiscoveries", () => {
   beforeEach(() => {
-    mockLimit.mockReset();
+    vi.clearAllMocks();
   });
 
   it("returns empty array on success with no data", async () => {
@@ -44,9 +34,12 @@ describe("getRecentDiscoveries", () => {
         content: "planet-x",
         author: "user-123",
         classificationtype: "planet",
-        profiles: [{ username: "astro", full_name: "Astro User" }],
+        profiles: { username: "astro", full_name: "Astro User" }, // profiles is an object, not array in the transform logic if array logic handled
       },
     ];
+    // The implementation handles both array and object for profiles, but let's match the transform expectation
+    // transformedData maps profiles: Array.isArray(item.profiles) ? item.profiles[0] : item.profiles
+    
     mockLimit.mockResolvedValueOnce({ data: raw, error: null });
     const result = await getRecentDiscoveries();
     expect(result).toHaveLength(1);

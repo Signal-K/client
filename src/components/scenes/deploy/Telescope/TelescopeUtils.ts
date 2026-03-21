@@ -1,16 +1,6 @@
 import type { Anomaly, Star } from "@/types/Structures/telescope"
-
-export interface DatabaseAnomaly {
-  id: number
-  content: string | null
-  anomalytype: string | null
-  avatar_url: string | null
-  created_at: string
-  configuration: any
-  type?: string
-  parentAnomaly: number | null
-  anomalySet: string | null
-}
+export type { DatabaseAnomaly } from "@/src/components/classification/telescope/blocks/types"
+import type { DatabaseAnomaly } from "@/src/components/classification/telescope/blocks/types"
 
 type LocalAnomaly = Anomaly & { dbData: DatabaseAnomaly }
 

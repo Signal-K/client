@@ -313,18 +313,21 @@ export function TelescopeBackground({
     const loadDataDirectly = async () => {
       setLoading(true)
       try {
-        const fetchedAnomalies = await fetchAnomalies()
-        setAnomalies(fetchedAnomalies)
-
         // Generate environment-specific stars
         const environmentStars = generateEnvironmentStars(sectorX, sectorY, variant)
         setStars(environmentStars)
 
-        // Filter anomalies immediately based on variant
         if (variant === "stars-only") {
-          // Show no anomalies for stars-only variant
+          setAnomalies([])
           setFilteredAnomalies([])
-        } else if (showAllAnomalies) {
+          return
+        }
+
+        const fetchedAnomalies = await fetchAnomalies()
+        setAnomalies(fetchedAnomalies)
+
+        // Filter anomalies immediately based on variant
+        if (showAllAnomalies) {
           const maxAnomalies =
             variant === "reduced-density" ? 12 : variant === "leo" ? 8 : variant === "nebula" ? 15 : 50
           setFilteredAnomalies(fetchedAnomalies.slice(0, maxAnomalies))

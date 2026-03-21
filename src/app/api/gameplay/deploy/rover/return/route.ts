@@ -38,8 +38,8 @@ export async function POST() {
     return NextResponse.json({ error: routeError.message }, { status: 500 });
   }
 
-  revalidatePath("/activity/deploy/roover");
-  revalidatePath("/viewports/roover");
+  revalidatePath("/activity/deploy/rover");
+  revalidatePath("/viewports/rover");
   revalidatePath("/game");
 
   return NextResponse.json({ success: true });

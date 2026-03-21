@@ -40,7 +40,7 @@ const balloonTypes = [
   "satellite-planetFour",
 ];
 
-const rooverTypes = ["automaton-aiForMars"];
+const roverTypes = ["automaton-aiForMars"];
 
 const projectMap: Record<string, string> = {
   planet: "planethunters",
@@ -277,9 +277,9 @@ export default function ClientClassificationPage({ id }: Props) {
   } else if (balloonTypes.includes(type)) {
     structure = "balloon";
     viewportUrl = "/viewports/satellite";
-  } else if (rooverTypes.includes(type)) {
+  } else if (roverTypes.includes(type)) {
     structure = "rover";
-    viewportUrl = "/viewports/roover";
+    viewportUrl = "/viewports/rover";
   }
 
   const project = projectMap[type];

@@ -18,7 +18,8 @@ interface Classification {
     classificationConfig?: any | null;
 };
 
-export default function SurveyorPostPage({ params }: { params: { id: string } }) {
+export default async function SurveyorPostPage(props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
       const [classification, setClassification] = useState<Classification | null>(null);
       const [loading, setLoading] = useState(true);
       const [error, setError] = useState<string | null>(null);

@@ -6,7 +6,9 @@ supabase/seed.sql
 .env.production
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
-# dependencies
+# secrets
+.env.posthog
+.env.posthog.example
 /node_modules
 /.pnp
 .pnp.js

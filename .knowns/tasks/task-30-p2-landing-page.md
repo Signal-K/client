@@ -1,7 +1,7 @@
 ---
 id: task-30-p2-landing-page
 title: "3.0 Phase 2: /apt Landing Page Rewrite"
-status: todo
+status: completed
 priority: high
 phase: "3.0-p2"
 specRefs:
@@ -26,9 +26,9 @@ Convert `/apt/page.tsx` to a Next.js Server Component. Optimize for mobile-first
 
 ## Tasks
 - [x] Remove `"use client"` from `/apt/page.tsx` and `export const dynamic` — now a Server Component
-- [ ] Enable PPR via `export const experimental_ppr = true` — **BLOCKED: requires Next.js 15 upgrade**
-- [ ] Add server-side auth check → `redirect('/game')` if session found
-- [ ] Move hero section to a Server Component (`HeroSection`)
+- [x] Enable PPR via `export const experimental_ppr = true`
+- [x] Add server-side auth check → `redirect('/game')` if session found
+- [x] Move hero section to a Server Component (`HeroSection`)
   - Star texture background (CSS only)
   - Headline: explains the game (what/how/why), NOT a curiosity-bait tagline
   - Primary CTA: "Launch Web Client" → `/auth`
@@ -36,12 +36,12 @@ Convert `/apt/page.tsx` to a Next.js Server Component. Optimize for mobile-first
   - **Remove `<Suspense>` slot for `ActiveSailorsCount`** (no social proof needed)
 - [x] Create `LandingAnalytics` client island — PostHog `landing_page_viewed` event
 - [x] Create `LandingMobileMenu` client island — mobile nav toggle
-- [ ] Update nav: wordmark + "Full Guide" + "Games Ecosystem"
+- [x] Update nav: wordmark + "Full Guide" + "Games Ecosystem"
 - [x] Remove `VariantSwitcher` from new page (kept in v2–v6 variants only)
 - [x] Mobile-first layout — editorial V3 style: single column, numbered rows
 - [x] Add OG meta tags via `metadata` export
 - [x] Design: V3 editorial style — oversized clamp type, numbered project rows, clean dividers
-- [ ] Remove session length indicators from structure preview cards
+- [x] Remove session length indicators from structure preview cards
 - [ ] Performance: lazy-load image strip section, WebP images (low priority)
 
 ## Acceptance Criteria

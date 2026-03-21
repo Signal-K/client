@@ -39,7 +39,7 @@ type RouteExpectation = {
     { route: "/viewports/satellite" },
     { route: "/viewports/satellite/deploy" },
     { route: "/viewports/solar" },
-    { route: "/viewports/roover" },
+    { route: "/viewports/rover" },
     { route: "/research" },
   ]
 

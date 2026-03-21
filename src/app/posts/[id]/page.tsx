@@ -19,7 +19,8 @@ interface Classification {
   classificationConfiguration?: any | null;
 };
 
-export default function SinglePostPage({ params }: { params: { id: string } }) {
+export default async function SinglePostPage(props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const router = useRouter();
   const { isDark, toggleDarkMode } = UseDarkMode();
 

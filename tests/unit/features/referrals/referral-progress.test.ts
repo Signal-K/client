@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { getReferralProgress } from "@/src/features/referrals/referral-progress";
+import { getReferralProgress } from "@/features/referrals/referral-progress";
 
 describe("getReferralProgress", () => {
   it("handles zero referrals", () => {

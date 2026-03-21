@@ -14,6 +14,7 @@ const nunito = Nunito({
 export const metadata: Metadata = {
   title: "Star Sailors",
   description: "Catalogue the Stars",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://starsailors.space"),
   icons: {
     icon: [
       { url: "/icon-192.png", sizes: "192x192", type: "image/png" },

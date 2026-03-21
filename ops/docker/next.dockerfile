@@ -7,10 +7,10 @@ WORKDIR /app
 # Copy the package.json and yarn.lock
 COPY package.json yarn.lock ./
 
-# Install dependencies with retries to handle transient registry/cache failures
+# Install dependencies with retries to handle transient registry failures.
+# We remove 'yarn cache clean' as it invalidates the Docker layer cache locally.
 RUN set -eux; \
   for attempt in 1 2 3; do \
-    yarn cache clean || true; \
     if yarn install --frozen-lockfile; then \
       exit 0; \
     fi; \
@@ -22,7 +22,6 @@ RUN set -eux; \
 
 # Copy the rest of the application code
 COPY . .
-
 # Generate Prisma client in image so fresh CI-like containers have it available.
 RUN yarn prisma:generate
 

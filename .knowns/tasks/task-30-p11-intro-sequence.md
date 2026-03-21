@@ -1,13 +1,13 @@
 ---
 id: task-30-p11-intro-sequence
 title: "3.0 Phase 11: New User Intro Sequence & Onboarding Builds Hub"
-status: todo
+status: completed
 priority: high
 phase: "3.0-p11"
 specRefs:
   - "specs/redesign/3-0-unified-web-client"
 createdAt: '2026-03-17T00:00:00Z'
-updatedAt: '2026-03-17T00:00:00Z'
+updatedAt: '2026-03-21T00:00:00Z'
 ---
 
 # 3.0 Phase 11: New User Intro Sequence & Onboarding Builds Hub
@@ -27,32 +27,32 @@ New users get a brief intro animation before project selection (station powering
 ## Tasks
 
 ### Intro Sequence (fires on first visit to `/onboarding`)
-- [ ] Create `IntroSequence` component — CSS-animated sequence, no video
+- [x] Create `IntroSequence` component — CSS-animated sequence, no video
 - [ ] Steps (brief, < 5 seconds total):
   1. Dark screen — station powers up (lights flicker on, systems activate)
   2. First signals arrive (data wave sweeps across)
   3. Transition to project selection UI
-- [ ] Skip button: always visible, skips to project selection immediately
+- [x] Skip button: always visible, skips to project selection immediately
 - [ ] One-time: flag `intro_seen` in profile — never shows again after first visit
-- [ ] No sound (sound deferred to sprint 7+) — visuals only
+- [x] No sound (sound deferred to sprint 7+) — visuals only
 
 ### Onboarding "Build the Hub" Model
-- [ ] Redesign `/onboarding` page to show an empty station schematic / star map
-- [ ] As user selects a project → corresponding structure icon animates in on the map
+- [x] Redesign `/onboarding` page to show an empty station schematic / star map
+- [x] As user selects a project → corresponding structure icon animates in on the map
   - Pick Telescope project → teal telescope icon appears on star map
   - Pick Satellite project → sky satellite icon appears
   - Pick Rover project → amber rover icon appears
-- [ ] The schematic starts fully empty (no pre-deployed structures shown)
-- [ ] Each addition is animated (fade in + orbit/settle animation)
+- [x] The schematic starts fully empty (no pre-deployed structures shown)
+- [x] Each addition is animated (fade in + orbit/settle animation)
 - [ ] At completion: user sees their partially populated hub → transition to `/game` feels like arriving at something they built
 - [ ] This uses the same star map component as the hub (reuse `SectorRadarMap` / star map from task-30-p8)
 
 ### Viewport Zoom-In Continuity
-- [ ] Implement zoom-in transition when navigating from hub card → structure viewport
-- [ ] The hub is "home" — viewports are zoomed-in parts of the same world (Crashlands model)
-- [ ] Transition: CSS scale-up / zoom animation, not a hard cut
-- [ ] Returning from viewport → zoom-out back to hub
-- [ ] Must work with Next.js App Router (no full page reload, use `<Link>` + CSS transition)
+- [x] Implement zoom-in transition when navigating from hub card → structure viewport
+- [x] The hub is "home" — viewports are zoomed-in parts of the same world (Crashlands model)
+- [x] Transition: CSS scale-up / zoom animation, not a hard cut
+- [x] Returning from viewport → zoom-out back to hub
+- [x] Must work with Next.js App Router (no full page reload, use `<Link>` + CSS transition)
 
 ## Acceptance Criteria
 - First visit to `/onboarding` shows intro sequence (≤ 5s), skip always available

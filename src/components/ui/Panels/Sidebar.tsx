@@ -223,7 +223,7 @@ export default function Sidebar() {
       icon: Car,
       status: toolDeployment.Rover ? "deployed" : "undeployed",
       color: toolDeployment.Rover ? "text-primary" : "text-muted-foreground",
-      deployUrl: "/viewports/roover",
+      deployUrl: "/viewports/rover",
     },
     {
       name: "Sunspot Telescope",

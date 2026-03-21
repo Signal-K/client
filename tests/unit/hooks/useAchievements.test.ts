@@ -60,6 +60,19 @@ describe("useAchievements", () => {
     expect(result.current.achievements).toBe(null);
   });
 
+  it("should handle non-Error thrown values gracefully", async () => {
+    global.fetch = vi.fn(() => Promise.reject("string error")) as any;
+
+    const { result } = renderHook(() => useAchievements());
+
+    await waitFor(() => {
+      expect(result.current.loading).toBe(false);
+    });
+
+    expect(result.current.error).toBe("Failed to fetch achievements");
+    expect(result.current.achievements).toBe(null);
+  });
+
   it("should allow manual refetch", async () => {
     const mockAchievements = {
       total: 10,

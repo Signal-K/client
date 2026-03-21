@@ -1,13 +1,13 @@
 ---
 id: task-30-p9-structure-visual-states
 title: "3.0 Phase 9: Structure Visual States, Colour System & Guided Deploy"
-status: todo
+status: completed
 priority: high
 phase: "3.0-p9"
 specRefs:
   - "specs/redesign/3-0-unified-web-client"
 createdAt: '2026-03-17T00:00:00Z'
-updatedAt: '2026-03-17T00:00:00Z'
+updatedAt: '2026-03-21T00:00:00Z'
 ---
 
 # 3.0 Phase 9: Structure Visual States, Colour System & Guided Deploy
@@ -55,37 +55,37 @@ This applies consistently across: card borders, map icons, HUD indicators, badge
 
 ### Colour System
 - [ ] Define Tailwind tokens for structure colours (teal-400, amber-400, sky-400)
-- [ ] Apply accent colour consistently: card border, map icon, HUD indicator, badge, animations
+- [x] Apply accent colour consistently: card border, map icon, HUD indicator, badge, animations
 - [ ] Test readability in both dark and light mode at each accent
 
 ### Standby State (Powered Down)
-- [ ] Implement `standby` variant on structure cards: greyscale, dim, cold
-- [ ] Standby must look clearly "off" not just "quiet"
-- [ ] Copy: "Standby — no signals detected" or similar
+- [x] Implement `standby` variant on structure cards: greyscale, dim, cold
+- [x] Standby must look clearly "off" not just "quiet"
+- [x] Copy: "Standby — no signals detected" or similar
 
 ### Active State (Ambient Glow)
-- [ ] Implement `active` variant: full accent colour, slow-breathing ambient glow (`animate-pulse` variant, softer)
-- [ ] Badge: "X signals awaiting"
-- [ ] No aggressive pulsing — ambient, not urgent
+- [x] Implement `active` variant: full accent colour, slow-breathing ambient glow (`animate-pulse` variant, softer)
+- [x] Badge: "X signals awaiting"
+- [x] No aggressive pulsing — ambient, not urgent
 
 ### Incoming Signal Animation
-- [ ] Animate card when new signals arrive: data wave / scan line sweep (CSS keyframe)
-- [ ] Triggers on: new `linked_anomalies` appearing for a deployed structure
-- [ ] After animation settles: card moves to `active` state
+- [x] Animate card when new signals arrive: data wave / scan line sweep (CSS keyframe)
+- [x] Triggers on: new `linked_anomalies` appearing for a deployed structure
+- [x] After animation settles: card moves to `active` state
 
 ### Solar Card
-- [ ] Create Solar card variant with community glow
-- [ ] CTA: "Join Mission"
+- [x] Create Solar card variant with community glow
+- [x] CTA: "Join Mission"
 - [ ] Show community activity on Solar card (how many sailors joined, current mission)
 
 ### Guided Deploy Overlay
 - [ ] Audit `InteractiveTutorial.tsx` — does it cover deploy flow? Improve gaps
-- [ ] Wire to trigger on first deployment per structure type (check profile flag)
-- [ ] Mark flag `first_deploy_tutorial_[type]_complete` after first overlay dismissed/completed
+- [x] Wire to trigger on first deployment per structure type (check profile flag)
+- [x] Mark flag `first_deploy_tutorial_[type]_complete` after first overlay dismissed/completed
 
 ### Personality Copy (Initial Pass)
-- [ ] Add personality-flavoured status messages for each structure (min 3 states each)
-- [ ] Examples: "Your telescope is scanning the void..." / "Rover is idling on the plateau."
+- [x] Add personality-flavoured status messages for each structure (min 3 states each)
+- [x] Examples: "Your telescope is scanning the void..." / "Rover is idling on the plateau."
 
 ## Acceptance Criteria
 - Standby cards look powered-down (greyscale, cold), not just dimly active

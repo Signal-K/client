@@ -3,8 +3,12 @@
 import { useState, useRef, useEffect } from "react";
 import { useSession } from "@/src/lib/auth/session-context";
 import { useRouter } from "next/navigation";
+import { usePostHog } from "posthog-js/react";
 import { determineMineralType } from "@/src/utils/mineralAnalysis";
 import { useActivePlanet } from "@/src/core/context/ActivePlanet";
+import { createClassificationAction } from "@/src/features/gameplay/actions/classification-actions";
+import { createMineralDepositAction } from "@/src/features/gameplay/actions/mineral-actions";
+import { getLinkedAnomaly } from "@/src/features/gameplay/actions/deploy-actions";
 import {
   AI4MCATEGORIES,
   P4CATEGORIES,
@@ -24,6 +28,7 @@ import {
   type CACCategory,
   type P4Category,
   type PHCategory,
+  type PHCategory as PHCategoryType,
   type NGTSCategory,
   type CoMCategory,
   type DrawingObject,
@@ -74,8 +79,8 @@ export function useAnnotatorLogic({
   onClassificationComplete,
 }: ImageAnnotatorProps) {
   const router = useRouter();
-
   const session = useSession();
+  const posthog = usePostHog();
 
   const [selectedImage, setSelectedImage] = useState<string | null>(
     initialImageUrl
@@ -123,11 +128,45 @@ export function useAnnotatorLogic({
       ? CoMSCategories
       : ({} as Record<string, CategoryConfig>);
 
+  const checkFirstClassificationEver = async () => {
+    const summaryRes = await fetch("/api/gameplay/research/summary", { cache: "no-store" }).catch(() => null);
+    if (!summaryRes?.ok) return false;
+    const summaryPayload = await summaryRes.json().catch(() => null);
+    return Number(summaryPayload?.counts?.all ?? 0) === 0;
+  };
+
+  const getParentPlanetFromLinkedAnomaly = async () => {
+    if (!session?.user?.id || !anomalyId) return null;
+
+    try {
+      const linkedRes = await getLinkedAnomaly(Number(anomalyId));
+      const rawClassificationId =
+        linkedRes.success && linkedRes.data
+          ? (linkedRes.data as { classificationId?: number | string | null; classification_id?: number | string | null })
+              .classificationId ??
+            (linkedRes.data as { classificationId?: number | string | null; classification_id?: number | string | null })
+              .classification_id
+          : null;
+
+      if (rawClassificationId === null || rawClassificationId === undefined) {
+        return null;
+      }
+
+      const parsedClassificationId = Number(rawClassificationId);
+      return Number.isFinite(parsedClassificationId) ? parsedClassificationId : null;
+    } catch (error) {
+      console.error("Error checking linked_anomalies:", error);
+      return null;
+    }
+  };
+
   const handleSubmitClassification = async () => {
     if (!canvasRef.current || !session) return;
 
     setIsUploading(true);
     try {
+      const isFirstClassificationEver = await checkFirstClassificationEver();
+
       // First, save the canvas as an image
       const canvas = canvasRef.current;
       const blob = await new Promise<Blob | null>((resolve) =>
@@ -154,21 +193,7 @@ export function useAnnotatorLogic({
       finalUploads = [...uploads, [uploadPayload.publicUrl, fileName]];
 
       // Check if this anomaly is in the user's linked_anomalies and get the classification_id
-      let parentPlanetFromLinkedAnomaly = null;
-      if (session?.user?.id && anomalyId) {
-        try {
-          const response = await fetch(
-            `/api/gameplay/linked-anomalies?anomalyId=${anomalyId}&classificationIdOnly=true`,
-            { cache: "no-store" }
-          );
-          const payload = await response.json().catch(() => null);
-          if (response.ok && payload?.classification_id) {
-            parentPlanetFromLinkedAnomaly = payload.classification_id;
-          }
-        } catch (error) {
-          console.error("Error checking linked_anomalies:", error);
-        }
-      }
+      const parentPlanetFromLinkedAnomaly = await getParentPlanetFromLinkedAnomaly();
 
       // Then, create the classification
       const classificationConfiguration = {
@@ -179,36 +204,42 @@ export function useAnnotatorLogic({
         classificationParent: parentClassificationId ?? null,
       };
 
-      const classificationResponse = await fetch("/api/gameplay/classifications", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          content,
-          media: [
-            [],
-            ...finalUploads,
-            ...(otherAssets || []).map((url) => ["http://...", "generated-id"]),
-            ...(Array.isArray(assetMentioned) ? assetMentioned : [assetMentioned]).map((id) => id && [id, "id"]),
-          ].filter(
-            (item): item is [string, string] =>
-              Array.isArray(item) && item.length === 2
-          ),
-          anomaly: anomalyId,
-          classificationParent: classificationParent,
-          classificationtype: anomalyType,
-          classificationConfiguration,
-        }),
+      const classificationResponse = await createClassificationAction({
+        content,
+        media: [
+          [],
+          ...finalUploads,
+          ...(otherAssets || []).map((url) => ["http://...", "generated-id"]),
+          ...(Array.isArray(assetMentioned) ? assetMentioned : [assetMentioned]).map((id) => id && [id, "id"]),
+        ].filter(
+          (item): item is [string, string] =>
+            Array.isArray(item) && item.length === 2
+        ),
+        anomaly: anomalyId ? Number(anomalyId) : null,
+        classificationParent: classificationParent,
+        classificationtype: anomalyType || "Custom",
+        classificationConfiguration,
       });
 
-      if (!classificationResponse.ok) {
-        const payload = await classificationResponse.json().catch(() => ({}));
-        console.error("Error creating classification: ", payload?.error);
+      if (classificationResponse.error) {
+        console.error("Error creating classification: ", classificationResponse.error);
         alert("Failed to create classification. Please try again");
         return;
       }
-      const classificationData = await classificationResponse.json();
+      const classificationData = classificationResponse.data;
+
+      posthog?.capture("classification_submitted", {
+        classificationId: classificationData?.id,
+        classificationtype: anomalyType || "Custom",
+        anomalyId: anomalyId ? Number(anomalyId) : null,
+        annotationType,
+      });
+      if (isFirstClassificationEver) {
+        posthog?.capture("first_classification_ever", {
+          userId: session.user.id,
+          classificationId: classificationData?.id,
+        });
+      }
 
       // Create mineral deposit if this waypoint has one
       if (classificationData && hasMineralDeposit && anomalyId) {
@@ -228,27 +259,20 @@ export function useAnnotatorLogic({
           });
 
           // creating mineral deposit with computed config
-
-          const mineralResponse = await fetch("/api/gameplay/mineral-deposits", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              anomaly: parseInt(anomalyId),
-              discovery: classificationData.id,
-              mineral_configuration: mineralConfig,
-              location: "Mars",
-              rover_name: "Rover 1",
-              created_at: new Date().toISOString(),
-            }),
+          const mineralRes = await createMineralDepositAction({
+            anomaly: parseInt(anomalyId),
+            discovery: classificationData.id,
+            mineral_configuration: mineralConfig as any,
+            location: "Mars",
+            rover_name: "Rover 1",
+            created_at: new Date().toISOString(),
           });
-          if (!mineralResponse.ok) {
-            const payload = await mineralResponse.json().catch(() => ({}));
-            console.error("Error creating mineral deposit:", payload?.error);
+
+          if (mineralRes.error) {
+            console.error("Error creating mineral deposit:", mineralRes.error);
           } else {
-            const mineralData = await mineralResponse.json();
-            setMineralDepositId(mineralData.id);
+            const mineralData = mineralRes.data;
+            if (mineralData) setMineralDepositId(Number(mineralData.id));
           }
         } catch (err) {
           console.error("Error in mineral deposit creation:", err);
@@ -471,22 +495,8 @@ export function useAnnotatorLogic({
   const createPost = async () => {
     if (!session) return;
 
-    // Check if this anomaly is in the user's linked_anomalies and get the classification_id
-    let parentPlanetFromLinkedAnomaly = null;
-    if (session?.user?.id && anomalyId) {
-      try {
-        const response = await fetch(
-          `/api/gameplay/linked-anomalies?anomalyId=${anomalyId}&classificationIdOnly=true`,
-          { cache: "no-store" }
-        );
-        const payload = await response.json().catch(() => null);
-        if (response.ok && payload?.classification_id) {
-          parentPlanetFromLinkedAnomaly = payload.classification_id;
-        }
-      } catch (error) {
-        console.error("Error checking linked_anomalies:", error);
-      }
-    }
+    // Check if this anomaly is in the user's linked_anomalies and get the classificationId
+    const parentPlanetFromLinkedAnomaly = await getParentPlanetFromLinkedAnomaly();
 
     const classificationConfiguration = {
       annotationOptions,
@@ -497,36 +507,44 @@ export function useAnnotatorLogic({
     };
 
     try {
-      const classificationResponse = await fetch("/api/gameplay/classifications", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          content,
-          media: [
-            [],
-            ...uploads,
-            ...(otherAssets || []).map((url) => ["http://...", "generated-id"]),
-            ...(Array.isArray(assetMentioned) ? assetMentioned : [assetMentioned]).map((id) => id && [id, "id"]),
-          ].filter(
-            (item): item is [string, string] =>
-              Array.isArray(item) && item.length === 2
-          ),
-          anomaly: anomalyId,
-          classificationParent: classificationParent,
-          classificationtype: anomalyType,
-          classificationConfiguration,
-        }),
+      const isFirstClassificationEver = await checkFirstClassificationEver();
+
+      const classificationResponse = await createClassificationAction({
+        content,
+        media: [
+          [],
+          ...uploads,
+          ...(otherAssets || []).map((url) => ["http://...", "generated-id"]),
+          ...(Array.isArray(assetMentioned) ? assetMentioned : [assetMentioned]).map((id) => id && [id, "id"]),
+        ].filter(
+          (item): item is [string, string] =>
+            Array.isArray(item) && item.length === 2
+        ),
+        anomaly: anomalyId ? Number(anomalyId) : null,
+        classificationParent: classificationParent,
+        classificationtype: anomalyType || "Custom",
+        classificationConfiguration,
       });
 
-      if (!classificationResponse.ok) {
-        const payload = await classificationResponse.json().catch(() => ({}));
-        console.error("Error creating classification: ", payload?.error);
+      if (classificationResponse.error) {
+        console.error("Error creating classification: ", classificationResponse.error);
         alert("Failed to create classification. Please try again");
         return;
       }
-      const classificationData = await classificationResponse.json();
+      const classificationData = classificationResponse.data;
+
+      posthog?.capture("classification_submitted", {
+        classificationId: classificationData?.id,
+        classificationtype: anomalyType || "Custom",
+        anomalyId: anomalyId ? Number(anomalyId) : null,
+        annotationType,
+      });
+      if (isFirstClassificationEver) {
+        posthog?.capture("first_classification_ever", {
+          userId: session.user.id,
+          classificationId: classificationData?.id,
+        });
+      }
 
       setContent("");
       setAdditionalFields({});
@@ -542,27 +560,20 @@ export function useAnnotatorLogic({
           categories,
         });
 
-        const mineralResponse = await fetch("/api/gameplay/mineral-deposits", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            anomaly: anomalyId ? parseInt(anomalyId) : null,
-            discovery: classificationData.id,
-            mineral_configuration: mineralConfig,
-            location: "Mars",
-            rover_name: "Rover 1",
-            created_at: new Date().toISOString(),
-          }),
+        const mineralRes = await createMineralDepositAction({
+          anomaly: anomalyId ? parseInt(anomalyId) : 0,
+          discovery: classificationData.id,
+          mineral_configuration: mineralConfig as any,
+          location: "Mars",
+          rover_name: "Rover 1",
+          created_at: new Date().toISOString(),
         });
 
-        if (!mineralResponse.ok) {
-          const payload = await mineralResponse.json().catch(() => ({}));
-          console.error("Error creating mineral deposit:", payload?.error);
+        if (mineralRes.error) {
+          console.error("Error creating mineral deposit:", mineralRes.error);
         } else {
-          const mineralData = await mineralResponse.json();
-          setMineralDepositId(mineralData.id);
+          const mineralData = mineralRes.data;
+          if (mineralData) setMineralDepositId(Number(mineralData.id));
         }
       }
 

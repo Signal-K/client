@@ -341,7 +341,7 @@ export default function RoverViewportSection() {
 
     // Deploy handler
     const handleDeployRover = async () => {
-        router.push("/activity/deploy/roover");
+        router.push("/activity/deploy/rover");
     };
 
     // Return home handler - removes routes and linked_anomalies for this user's rover
@@ -378,7 +378,7 @@ export default function RoverViewportSection() {
             infoText={
                 "View and control your surface rovers to find and discover surface anomalies"
             }
-            expandLink={"/viewports/roover"}
+            expandLink={"/viewports/rover"}
             className="h-full"
         >
             <div className="relative w-full h-full flex items-center justify-center py-8 md:py-12">

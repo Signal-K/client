@@ -4,7 +4,8 @@ import React, { useEffect, useState } from "react";
 import { useSession } from "@/src/lib/auth/session-context";
 import MainHeader from "@/src/components/layout/Header/MainHeader";
 import UseDarkMode from "@/src/shared/hooks/useDarkMode";
-import { usePageData, useGroupedClassifications } from "@/hooks/usePageData";
+import { usePageData } from "@/hooks/usePageData";
+import { groupClassifications } from "@/hooks/useGroupedClassifications";
 import { ClassificationTypeIcon } from "@/src/components/classification/ClassificationTypeIcon";
 import { AnnotationOptionLabel } from "@/src/components/classification/AnnotationOptionLabel";
 import ActivityHeaderSection from "@/src/components/social/activity/ActivityHeaderSection";
@@ -41,7 +42,7 @@ export default function UserClassificationsInventoryPage() {
     }
     return { ...c, annotationOptions };
   });
-  const grouped = useGroupedClassifications(patchedClassifications);
+  const grouped = groupClassifications(patchedClassifications);
 
   if (!session) {
     return (

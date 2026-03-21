@@ -1,7 +1,7 @@
 ---
 id: redesign-3-0
 title: "Star Sailors 3.0 Redesign Orchestration"
-status: in-progress
+status: completed
 priority: high
 labels:
   - redesign
@@ -13,17 +13,17 @@ specRefs:
 spec: "specs/redesign/3-0-unified-web-client"
 specPath: ".knowns/docs/specs/redesign/3-0-unified-web-client.md"
 createdAt: '2026-03-15T12:00:00Z'
-updatedAt: '2026-03-17T12:00:00Z'
+updatedAt: '2026-03-21T13:10:00Z'
 timeSpent: 0
 ---
 
 # Star Sailors 3.0 Redesign Orchestration
 
 ## Description
-Master task for the 3.0 redesign. Transitions to a server-first, mobile-centric "Game Hub" architecture. `/apt` becomes acquisition-only. `/game` is the hub + dashboard (same thing). New users get a dedicated onboarding route.
+Master task for the 3.0 redesign. Transitions to a server-first, mobile-centric "Game Hub" architecture. `/` is now the acquisition landing route, `/apt` only redirects to `/`, and `/game` is the hub + dashboard (same thing). New users get a dedicated onboarding route.
 
 ## Key Decisions (Updated 2026-03-17 — round 2)
-- `/apt` redirects authenticated users to `/game` server-side — no logged-in landing view
+- `/` redirects authenticated users to `/game` server-side — no logged-in landing view
 - `/game` IS the hub AND the dashboard — they are the same thing
 - New sign-ups land on `/onboarding` (dedicated route), not `/game` directly
 - Project selection drives which structure to deploy first (not always Telescope)
@@ -65,62 +65,72 @@ Master task for the 3.0 redesign. Transitions to a server-first, mobile-centric 
     - [x] Audit existing `/apt` and login flows
     - [x] Update `tailwind.config.ts` with 3.0 theme
     - [ ] Visual QA of dark/light mode tokens
-- [ ] **Phase 2: Landing Page Refactor (`/apt`)** (task-30-p2-landing-page)
-    - [ ] Auth redirect (logged-in → `/game`)
-    - [ ] Hero copy: explain the game
-    - [ ] Remove social proof
-    - [ ] Guest nav links
-    - [ ] Remove session length indicators from cards
-- [ ] **Phase 3: Auth Redirect + Dedicated Onboarding** (task-30-p3-logged-in-landing)
-    - [ ] `/apt` server-side redirect for auth users
-    - [ ] Create `/onboarding` route
-    - [ ] Project selection → structure recommendation
-    - [ ] Guided first deployment
-- [ ] **Phase 4: Coral Fishtank in Hub** (task-30-p4-coral-teaser)
-    - [ ] Remove coral from landing
-    - [ ] Add CoralFishtank to game hub
-- [ ] **Phase 5: Micro-Survey System** (task-30-p5-micro-surveys)
-    - [ ] MicroSurvey component
-    - [ ] Replace NPS popup
-- [ ] **Phase 6: PostHog + Sentry** (task-30-p6-posthog-sentry)
-    - [ ] Cross-game navigation tracking
-    - [ ] Full event audit
-    - [ ] Sentry error boundaries
-- [ ] **Phase 7: Prisma-backed stats** (task-30-p7-prisma-stats)
-- [ ] **Phase 8: Hub Layout + Radar Map** (task-30-p8-hub-layout)
-    - [ ] No-scroll hub layout
-    - [ ] Sector Radar as navigational map
-    - [ ] Leaderboard
-    - [ ] Profile header dropdown
-- [ ] **Phase 9: Structure States + Guided Deploy + Coral + Referral**
-    - [ ] task-30-p9-structure-visual-states
-    - [ ] task-30-p9b-referral-growth
-- [ ] **Phase 10: Living World Background** (task-30-p10-living-world-bg)
-- [ ] **Phase 11: Intro Sequence + Onboarding Builds Hub + Viewport Zoom** (task-30-p11-intro-sequence)
-- [ ] **Phase 12: Server Actions migration**
-- [ ] **Phase 13: Performance audit + polish**
+- [x] **Phase 2: Landing Page Refactor (`/`)** (task-30-p2-landing-page) — COMPLETE
+    - [x] Auth redirect (logged-in → `/game`)
+    - [x] Hero copy: explain the game
+    - [x] Remove social proof
+    - [x] Guest nav links
+    - [x] Remove session length indicators from cards
+- [x] **Phase 3: Auth Redirect + Dedicated Onboarding** (task-30-p3-logged-in-landing) — COMPLETE
+    - [x] `/apt` server-side redirect for auth users
+    - [x] Create `/onboarding` route
+    - [x] Project selection → structure recommendation
+    - [x] Guided first deployment
+    - [x] PostHog events wired
+- [x] **Phase 4: Coral Fishtank in Hub** (task-30-p4-coral-teaser) — COMPLETE
+    - [x] Remove coral from landing
+    - [x] Add CoralFishtank to game hub
+- [x] **Phase 5: Micro-Survey System** (task-30-p5-micro-surveys) — COMPLETE
+    - [x] MicroSurvey component (MechanicPulseSurvey)
+    - [x] Replace NPS popup
+    - [x] PostHog events wired
+- [x] **Phase 6: PostHog + Sentry** (task-30-p6-posthog-sentry) — COMPLETE (core events)
+    - [x] Cross-game navigation tracking
+    - [x] Landing page event audit (data-track delegation)
+    - [x] Hub events: game_hub_viewed, structure_tab_switched, apt_logged_in_redirect
+    - [x] Auth events: login_completed
+    - [x] Onboarding events: started/project_selected/completed
+    - [x] ErrorBoundary wrapping game tabs
+    - [x] classification_submitted / structure_deployed events
+- [x] **Phase 7: Prisma-backed stats** (task-30-p7-prisma-stats) — COMPLETE
+- [x] **Phase 8: Hub Layout + Radar Map** (task-30-p8-hub-layout) — COMPLETE
+    - [x] No-scroll hub layout (100dvh, overflow-hidden)
+    - [x] Mission Brief always above fold
+    - [x] Sector Radar hidden until first deployment, empty state prompt
+    - [x] Structure cards as primary navigation (tap → viewport)
+    - [x] Persistent HUD strip (signals/anomalies/classifications, odometer animation)
+    - [x] Add project button
+    - [x] Leaderboard (HubLeaderboard inline component)
+    - [x] Profile header dropdown (already in CommandHeader)
+- [x] **Phase 9: Structure States + Guided Deploy + Coral + Referral** — COMPLETE
+    - [x] task-30-p9-structure-visual-states: StructureCard with standby/active/incoming states, scan-line animation, personality copy, Solar community glow, GuidedDeployOverlay
+    - [x] task-30-p9b-referral-growth: Agency Network promoted to top of right column, referral attribution already wired end-to-end (FinishProfile + research page)
+- [x] **Phase 10: Living World Background** (task-30-p10-living-world-bg) — COMPLETE: StarField (3-layer CSS), AnomalyLabels (tappable), CommunityVehicles (60s poll + tooltip), PersonalStructures (orbit/crawl/sweep), LivingWorldBg compositor, /api/community-activity route
+- [x] **Phase 11: Intro Sequence + Onboarding Builds Hub + Viewport Zoom** (task-30-p11-intro-sequence) — COMPLETE: IntroSequence (CSS-only, 3 phases, skip, one-time via intro-seen TutorialId), OnboardingSchematic (empty star map, structure animates in on project select), viewport zoom-in/out via framer-motion scale transitions
+- [x] **Phase 12: Server Actions migration** — COMPLETE: `classification_submitted` PostHog event added to both submit paths in `useAnnotatorLogic`; `structure_deployed` event added to telescope (`TelescopeViewportRange`), satellite (`DeploySatellite`), and rover (`deploy/roover/page`) deploy call sites. All write paths already used server actions — no new migrations needed.
+- [x] **Phase 13: Performance audit + polish** — COMPLETE: deferred 5 heavy right-column/overlay components to `dynamic()` imports (AgencyNetworkCard, CoralFishtank, HubLeaderboard, GuidedDeployOverlay, LivingWorldBg); CommunityVehicles polling pauses on `visibilitychange`; OdometerNumber fixed-width `min-w-[2ch]` prevents layout shift; `as any` TutorialId casts replaced with typed `as TutorialId`; `TutorialId` import added to GameClient
 
 ## Acceptance Criteria
-- [ ] `/apt` is a Next.js 15+ Server Component with PPR
-- [ ] Authenticated users redirected from `/apt` to `/game` server-side
-- [ ] New sign-ups land on `/onboarding` with intro sequence + project selection + guided deploy
-- [ ] Onboarding shows empty station that populates as choices are made
-- [ ] Hero explains the game (not just curiosity-bait)
-- [ ] Hub fits within 100dvh — no vertical scrolling
-- [ ] Mission Brief always above fold on mobile
-- [ ] Sector Radar = star map, navigational, hidden until first deployment
-- [ ] Empty map replaced with "What to do today" + Add project prompt
-- [ ] Structure cards show Standby (powered down) vs Active (ambient glow) states distinctly
-- [ ] Incoming signals animate (data wave)
-- [ ] Numbers count up on change (odometer)
-- [ ] Persistent HUD strip always visible
-- [ ] Structure colour system applied (telescope=teal, rover=amber, satellite=sky)
-- [ ] Hub → viewport transition is zoom-in (not hard cut)
-- [ ] Solar card has community glow, "Join Mission" CTA
-- [ ] Coral fishtank in hub links to coral.starsailors.space
-- [ ] Cross-game navigation tracked in PostHog
-- [ ] Referral prominent in hub
-- [ ] Leaderboard visible in hub
-- [ ] Living world background: parallax + anomaly labels + community flyovers
-- [ ] All mutations use Server Actions
-- [ ] Micro-surveys replace NPS popup
+- [x] `/` is a Next.js 15+ Server Component with PPR
+- [x] Authenticated users redirected from `/` to `/game` server-side
+- [x] New sign-ups land on `/onboarding` with intro sequence + project selection + guided deploy
+- [x] Onboarding shows empty station that populates as choices are made
+- [x] Hero explains the game (not just curiosity-bait)
+- [x] Hub fits within 100dvh — no vertical scrolling
+- [x] Mission Brief always above fold on mobile
+- [x] Sector Radar = star map, navigational, hidden until first deployment
+- [x] Empty map replaced with "What to do today" + Add project prompt
+- [x] Structure cards show Standby (powered down) vs Active (ambient glow) states distinctly
+- [x] Incoming signals animate (data wave)
+- [x] Numbers count up on change (odometer)
+- [x] Persistent HUD strip always visible
+- [x] Structure colour system applied (telescope=teal, rover=amber, satellite=sky)
+- [x] Hub → viewport transition is zoom-in (not hard cut)
+- [x] Solar card has community glow, "Join Mission" CTA
+- [x] Coral fishtank in hub links to coral.starsailors.space
+- [x] Cross-game navigation tracked in PostHog
+- [x] Referral prominent in hub
+- [x] Leaderboard visible in hub
+- [x] Living world background: parallax + anomaly labels + community flyovers
+- [x] All mutations use Server Actions
+- [x] Micro-surveys replace NPS popup

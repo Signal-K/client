@@ -25,10 +25,10 @@ ENV CYPRESS_CACHE_FOLDER=/root/.cache/Cypress
 # Copy package files
 COPY package.json yarn.lock ./
 
-# Install dependencies with retries to handle transient registry/cache failures
+# Install dependencies with retries to handle transient registry failures.
+# We remove 'yarn cache clean' as it invalidates the Docker layer cache locally.
 RUN set -eux; \
   for attempt in 1 2 3; do \
-    yarn cache clean || true; \
     if yarn install --frozen-lockfile --legacy-peer-deps; then \
       exit 0; \
     fi; \
@@ -39,11 +39,11 @@ RUN set -eux; \
   exit 1
 
 # Preinstall Cypress binary in image so CI-like runs do not depend on runtime download.
-RUN npx cypress install --force
+# Removed --force to allow caching of the binary.
+RUN npx cypress install
 
 # Copy the rest of the application code
 COPY . .
-
 # Generate Prisma client in image so tests do not depend on host-generated artifacts.
 RUN yarn prisma:generate
 

@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 
 import { prisma } from "@/lib/server/prisma";
-import { createSupabaseServerClient } from "@/lib/supabase/ssr";
+import { getRouteUser } from "@/lib/server/supabaseRoute";
 
 type VoteType = "up" | "down";
 
@@ -11,48 +11,35 @@ export async function toggleVoteAction(input: {
   classificationId: number;
   voteType: VoteType;
 }) {
-  const supabase = createSupabaseServerClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
+  const { user, authError } = await getRouteUser();
+  if (authError || !user) {
     return { ok: false as const, error: "Not signed in" };
   }
 
   const { classificationId, voteType } = input;
-  const existingVoteRows = await prisma.$queryRaw<Array<{ id: number; vote_type: VoteType }>>`
-    SELECT id, vote_type
-    FROM votes
-    WHERE user_id = ${user.id}
-      AND classification_id = ${classificationId}
-    LIMIT 1
-  `;
-  const existingVote = existingVoteRows[0];
+
+  const existingVote = await prisma.vote.findFirst({
+    where: { userId: user.id, classificationId },
+  });
 
   if (existingVote) {
-    if (existingVote.vote_type === voteType) {
-      await prisma.$executeRaw`
-        DELETE FROM votes
-        WHERE id = ${existingVote.id}
-      `;
+    if (existingVote.voteType === voteType) {
+      await prisma.vote.delete({ where: { id: existingVote.id } });
       revalidatePath(`/posts/${classificationId}`);
       return { ok: true as const, userVote: null as VoteType | null };
     }
 
-    await prisma.$executeRaw`
-      UPDATE votes
-      SET vote_type = ${voteType}
-      WHERE id = ${existingVote.id}
-    `;
+    await prisma.vote.update({
+      where: { id: existingVote.id },
+      data: { voteType },
+    });
     revalidatePath(`/posts/${classificationId}`);
     return { ok: true as const, userVote: voteType as VoteType };
   }
 
-  await prisma.$executeRaw`
-    INSERT INTO votes (user_id, classification_id, vote_type)
-    VALUES (${user.id}, ${classificationId}, ${voteType})
-  `;
+  await prisma.vote.create({
+    data: { userId: user.id, classificationId, voteType },
+  });
 
   revalidatePath(`/posts/${classificationId}`);
   return { ok: true as const, userVote: voteType as VoteType };
@@ -63,12 +50,8 @@ export async function submitCommentAction(input: {
   content: string;
   parentCommentId?: number;
 }) {
-  const supabase = createSupabaseServerClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
+  const { user, authError } = await getRouteUser();
+  if (authError || !user) {
     return { ok: false as const, error: "Not signed in" };
   }
 
@@ -78,10 +61,14 @@ export async function submitCommentAction(input: {
     return { ok: false as const, error: "Empty comment" };
   }
 
-  await prisma.$executeRaw`
-    INSERT INTO comments (content, author, classification_id, parent_comment_id)
-    VALUES (${trimmed}, ${user.id}, ${classificationId}, ${parentCommentId || null})
-  `;
+  await prisma.comment.create({
+    data: {
+      content: trimmed,
+      author: user.id,
+      classificationId,
+      parentCommentId: parentCommentId ?? null,
+    },
+  });
 
   revalidatePath(`/posts/${classificationId}`);
   return { ok: true as const };

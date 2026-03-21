@@ -81,14 +81,14 @@ export default function RoverSetupPage() {
           <div className="flex flex-wrap gap-3">
             <button
               type="button"
-              onClick={() => router.push("/activity/deploy/roover")}
+              onClick={() => router.push("/activity/deploy/rover")}
               className="rounded-lg bg-cyan-400 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-cyan-300"
             >
               Open Rover Planner
             </button>
             <button
               type="button"
-              onClick={() => router.push("/viewports/roover")}
+              onClick={() => router.push("/viewports/rover")}
               className="rounded-lg border border-slate-600 bg-slate-800/80 px-4 py-2 text-sm font-semibold text-slate-100 transition hover:border-slate-500 hover:bg-slate-700/80"
             >
               Open Rover Viewport

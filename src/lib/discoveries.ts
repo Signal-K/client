@@ -1,6 +1,6 @@
 import { getSupabaseBrowserClient } from './supabase/browser'
 
-export interface Classification {
+interface DiscoveryClassification {
   id: number
   created_at: string
   content: string | null
@@ -12,23 +12,10 @@ export interface Classification {
   } | null
 }
 
-// Type for the raw data returned from Supabase query
-interface SupabaseClassification {
-  id: any
-  created_at: any  
-  content: any
-  author: any
-  classificationtype: any
-  profiles: {
-    username: any
-    full_name: any
-  }[] | null
-}
-
 /**
  * Fetch recent classifications of specific types for the discoveries section
  */
-export async function getRecentDiscoveries(): Promise<Classification[]> {
+export async function getRecentDiscoveries(): Promise<DiscoveryClassification[]> {
   const supabase = getSupabaseBrowserClient();
   try {
     const { data, error } = await supabase
@@ -54,7 +41,7 @@ export async function getRecentDiscoveries(): Promise<Classification[]> {
     }
 
     // Transform the data to match our interface
-    const transformedData: Classification[] = (data || []).map((item: any) => ({
+    const transformedData: DiscoveryClassification[] = (data || []).map((item: any) => ({
       id: item.id,
       created_at: item.created_at,
       content: item.content,

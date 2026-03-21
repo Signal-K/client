@@ -4,7 +4,8 @@ import { prisma } from "@/lib/server/prisma";
 
 export const dynamic = "force-dynamic";
 
-export async function GET(_request: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(_request: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const id = Number(params.id);
   if (!Number.isFinite(id)) {
     return NextResponse.json({ error: "Invalid classification ID" }, { status: 400 });

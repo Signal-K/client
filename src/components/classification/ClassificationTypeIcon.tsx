@@ -6,7 +6,7 @@ interface Props {
 }
 
 // SVGs for each classification type
-const icons: Record<string, JSX.Element> = {
+const icons: Record<string, React.ReactElement> = {
   sunspot: (
     <svg viewBox="0 0 24 24" fill="none" className="w-6 h-6 text-yellow-400"><circle cx="12" cy="12" r="6" fill="currentColor" /><g stroke="currentColor" strokeWidth="2"><line x1="12" y1="2" x2="12" y2="6" /><line x1="12" y1="18" x2="12" y2="22" /><line x1="2" y1="12" x2="6" y2="12" /><line x1="18" y1="12" x2="22" y2="12" /><line x1="4.2" y1="4.2" x2="7.2" y2="7.2" /><line x1="16.8" y1="16.8" x2="19.8" y2="19.8" /><line x1="4.2" y1="19.8" x2="7.2" y2="16.8" /><line x1="16.8" y1="7.2" x2="19.8" y2="4.2" /></g></svg>
   ),
@@ -34,5 +34,5 @@ const icons: Record<string, JSX.Element> = {
 };
 
 export function ClassificationTypeIcon({ type, className }: Props) {
-  return icons[type] ? React.cloneElement(icons[type], { className }) : null;
+  return icons[type] ? React.cloneElement(icons[type], { className } as any) : null;
 }

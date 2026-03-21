@@ -9,7 +9,7 @@ labels:
   - developer-experience
   - sdd
 createdAt: '2026-02-23T11:31:00Z'
-updatedAt: '2026-03-06T08:55:25Z'
+updatedAt: '2026-03-21T01:40:00Z'
 timeSpent: 0
 ---
 
@@ -35,12 +35,12 @@ prioritising the most-called routes first.
 
 ## Acceptance Criteria
 <!-- AC:BEGIN -->
-- [ ] #1 All `$queryRaw` calls in `research/summary/route.ts` migrated to Prisma model queries
-- [ ] #2 All `$queryRaw` calls in `research/unlock/route.ts` migrated to Prisma model queries
-- [ ] #3 All `$queryRaw` calls in `gameplay/survey-reward/route.ts` migrated to Prisma model queries
-- [ ] #4 `classifications` queries in `page-data/route.ts` migrated
-- [ ] #5 `researched` queries (used in 4+ routes) centralised into a shared `lib/server/researched.ts` helper
-- [ ] #6 `yarn build` passes; all existing unit tests pass; no regression in API behaviour
+- [x] #1 All `$queryRaw` calls in `research/summary/route.ts` migrated to Prisma model queries
+- [x] #2 All `$queryRaw` calls in `research/unlock/route.ts` migrated to Prisma model queries
+- [x] #3 All `$queryRaw` calls in `gameplay/survey-reward/route.ts` migrated to Prisma model queries
+- [x] #4 `classifications` queries in `page-data/route.ts` migrated
+- [x] #5 `researched` queries (used in 4+ routes) centralised into a shared `lib/server/researched.ts` helper
+- [x] #6 `yarn build` passes; all existing unit tests pass; no regression in API behaviour
 <!-- AC:END -->
 
 ## Implementation Notes
@@ -149,6 +149,15 @@ API response shapes are unchanged.
   - `yarn lint` passed
   - `npm run test:unit` passed
   - `yarn build` passed
+
+### Completion notes (2026-03-21)
+
+- Added `src/lib/server/researched.ts` to centralise `researched` reads, survey bonus aggregation, and unlock writes.
+- Added `src/lib/server/game-page-data.ts` so both the `/api/gameplay/page-data` route and server-rendered `/game` entrypoint share the same Prisma-backed data path.
+- Migrated `research/summary`, `research/unlock`, `survey-reward`, and `page-data` away from route-local raw SQL for the acceptance-criteria scope.
+- Validation after migration:
+  - `yarn build` passed
+  - `npm run test:unit` passed
 <!-- SECTION:NOTES:END -->
 
 ## Spec References

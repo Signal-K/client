@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useSession } from "@/src/lib/auth/session-context";
 import MissionShell from "@/src/components/deployment/missions/structures/BasePlate";
 import { CloudCogIcon, FolderCog, HelpCircle, Paintbrush2Icon, PaintBucket, Vote } from "lucide-react";
@@ -17,7 +17,7 @@ interface Mission {
     icon: React.ElementType;
     points: number;
     completedCount: number;
-    internalComponent: React.ElementType | (() => JSX.Element);
+    internalComponent: React.ElementType | (() => React.ReactElement);
     color: string;
 };
 

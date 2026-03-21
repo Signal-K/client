@@ -1,10 +1,12 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { usePostHog } from "posthog-js/react";
 import { Share2, Copy, Check, Sparkles } from "lucide-react";
 import { cn } from "@/src/shared/utils";
+import { captureCrossGameNavigation } from "@/src/features/analytics/cross-game-navigation";
 import { getReferralProgress } from "@/src/features/referrals/referral-progress";
-import { buildClientReferralUrl, buildReferralShareText, buildSailyReferralUrl } from "@/src/features/referrals/referral-links";
+import { buildClientReferralUrl, buildReferralShareText, getSailyUrl } from "@/src/features/referrals/referral-links";
 
 interface ReferralBoostCardProps {
   referralCode: string | null;
@@ -17,6 +19,7 @@ export default function ReferralBoostCard({
   referralsCount,
   className,
 }: ReferralBoostCardProps) {
+  const posthog = usePostHog();
   const [copied, setCopied] = useState(false);
   const [shared, setShared] = useState(false);
 
@@ -27,7 +30,7 @@ export default function ReferralBoostCard({
     [referralCode]
   );
   const sailyReferralUrl = useMemo(
-    () => (referralCode ? buildSailyReferralUrl(referralCode) : ""),
+    () => (referralCode ? getSailyUrl(referralCode) : ""),
     [referralCode]
   );
 
@@ -144,6 +147,13 @@ export default function ReferralBoostCard({
             href={referralCode ? sailyReferralUrl : "#"}
             target="_blank"
             rel="noreferrer"
+            onClick={() => {
+              if (!referralCode) return;
+              captureCrossGameNavigation(posthog, {
+                destination: "saily",
+                source_section: "referral_boost_card",
+              });
+            }}
             className={cn(
               "inline-flex items-center gap-2 rounded-lg border px-3 py-2 text-sm font-medium transition-colors",
               referralCode

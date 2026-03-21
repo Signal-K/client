@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import { prisma } from "@/lib/server/prisma";
+import { isPrismaUniqueConstraintError } from "@/lib/server/researched";
 import { getRouteUser } from "@/lib/server/supabaseRoute";
 
 export const dynamic = "force-dynamic";
@@ -29,23 +30,21 @@ export async function POST(req: NextRequest) {
 
   const userId = user.id;
 
-  // Attempt INSERT — silently ignores duplicates via ON CONFLICT DO NOTHING.
-  // RETURNING id will be null if the row already existed.
-  const rows = await prisma.$queryRaw<Array<{ id: string }>>`
-    INSERT INTO survey_rewards (user_id, survey_id, survey_name, stardust_granted)
-    VALUES (
-      ${userId}::uuid,
-      ${surveyId},
-      ${surveyName ?? null},
-      ${SURVEY_STARDUST_REWARD}
-    )
-    ON CONFLICT (user_id, survey_id) DO NOTHING
-    RETURNING id
-  `;
+  try {
+    await prisma.surveyReward.create({
+      data: {
+        userId,
+        surveyId,
+        surveyName: surveyName ?? null,
+        stardustGranted: SURVEY_STARDUST_REWARD,
+      },
+    });
+  } catch (error) {
+    if (isPrismaUniqueConstraintError(error)) {
+      return NextResponse.json({ granted: false, alreadyGranted: true });
+    }
 
-  if (rows.length === 0) {
-    // Row already existed — reward was already granted
-    return NextResponse.json({ granted: false, alreadyGranted: true });
+    throw error;
   }
 
   return NextResponse.json({

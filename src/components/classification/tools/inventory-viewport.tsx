@@ -223,7 +223,7 @@ export default function InventoryViewport() {
                                     description="Orbital monitoring"
                                 />
                             </Link>
-                            <Link href="/viewports/roover" className="flex h-full">
+                            <Link href="/viewports/rover" className="flex h-full">
                                 <ToolCard
                                     icon={<RoverIcon level={state.roverLevel} />}
                                     name="Investigative Rover"

@@ -12,11 +12,12 @@ export async function GET() {
       return NextResponse.json({ authenticated: false, hasReferral: false }, { status: 200 });
     }
 
-    const data = await prisma.$queryRaw<Array<{ id: string }>>`
-      SELECT id FROM referrals WHERE referree_id::text = ${user.id} LIMIT 1
-    `;
+    const data = await prisma.referral.findFirst({
+      where: { referreeId: user.id },
+      select: { id: true },
+    });
 
-    return NextResponse.json({ authenticated: true, hasReferral: data.length > 0 });
+    return NextResponse.json({ authenticated: true, hasReferral: Boolean(data) });
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : String(err);
     console.error("[referral-status] GET error:", message);

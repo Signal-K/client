@@ -91,7 +91,7 @@ export function MissionBriefCard({
       <div className={cn("h-[2px] w-full", v.accentLine)} />
 
       {/* Header row */}
-      <div className={cn("flex items-center gap-2.5 px-4 py-2.5 border-b border-inherit", v.headerBg)}>
+      <div className={cn("flex items-center gap-2 border-b border-inherit px-3 py-2 sm:gap-2.5 sm:px-4 sm:py-2.5", v.headerBg)}>
         <div className={cn("h-2 w-2 rounded-full shrink-0", v.ledColor, v.ledGlow)} aria-hidden />
         <span className={cn("font-mono text-[8px] uppercase tracking-[0.28em] leading-none", v.labelColor)}>
           {v.label}
@@ -109,10 +109,10 @@ export function MissionBriefCard({
       </div>
 
       {/* Body */}
-      <div className={cn("px-4 pt-3 pb-4", v.innerBg)}>
-        <p className="text-xl font-black leading-tight text-foreground mb-1.5">{title}</p>
+      <div className={cn("px-3 pb-3 pt-2.5 sm:px-4 sm:pb-4 sm:pt-3", v.innerBg)}>
+        <p className="mb-1.5 text-lg font-black leading-tight text-foreground sm:text-xl">{title}</p>
         {subtitle && (
-          <p className="text-xs text-muted-foreground leading-relaxed mb-4">{subtitle}</p>
+          <p className="mb-3 text-[11px] leading-relaxed text-muted-foreground sm:mb-4 sm:text-xs">{subtitle}</p>
         )}
 
         {/* Progress bar */}
@@ -138,7 +138,7 @@ export function MissionBriefCard({
           <button
             onClick={onAction}
             className={cn(
-              "flex items-center gap-2 rounded-lg px-4 py-2 text-xs font-black uppercase tracking-wider transition-all duration-150 active:scale-95",
+              "flex items-center gap-2 rounded-lg px-3 py-2 text-[11px] font-black uppercase tracking-wider transition-all duration-150 active:scale-95 sm:px-4 sm:text-xs",
               v.actionStyle,
             )}
           >

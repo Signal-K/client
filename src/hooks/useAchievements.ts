@@ -28,9 +28,10 @@ export const useAchievements = () => {
       }
 
       setAchievements(payload as AchievementProgress);
-    } catch (err: any) {
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Failed to fetch achievements";
       console.error("Error fetching achievements:", err);
-      setError(err.message);
+      setError(message);
     } finally {
       setLoading(false);
     }

@@ -13,7 +13,7 @@ interface Mission {
     icon: React.ElementType;
     points: number;
     completedCount?: number;
-    internalComponent?: React.ElementType | (() => JSX.Element);
+    internalComponent?: React.ElementType | (() => React.ReactElement);
     color: string;
 };
 

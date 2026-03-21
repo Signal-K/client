@@ -1,6 +1,7 @@
 import { describe, expect, it, vi, beforeEach } from "vitest"
 import { renderHook, waitFor } from "@testing-library/react"
-import { useGroupedClassifications, usePageData } from "@/hooks/usePageData"
+import { usePageData } from "@/hooks/usePageData"
+import { groupClassifications } from "@/hooks/useGroupedClassifications"
 
 const mockUseSession = vi.hoisted(() => vi.fn())
 
@@ -8,9 +9,9 @@ vi.mock("@/src/lib/auth/session-context", () => ({
   useSession: mockUseSession,
 }))
 
-describe("useGroupedClassifications", () => {
+describe("groupClassifications", () => {
   it("groups by classification type and extracts annotation options", () => {
-    const result = useGroupedClassifications([
+    const result = groupClassifications([
       {
         id: 1,
         classificationtype: "planet",

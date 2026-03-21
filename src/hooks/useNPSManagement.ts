@@ -6,9 +6,13 @@ export function useNPSManagement() {
   const [showNpsModal, setShowNpsModal] = useState(false);
   const [hasCheckedNps, setHasCheckedNps] = useState(false);
 
-  const scheduleNpsCheck = () => {
-    if (hasCheckedNps || !session) return;
-    
+  const handleCloseNps = () => {
+    setShowNpsModal(false);
+  };
+
+  useEffect(() => {
+    if (!session || hasCheckedNps) return;
+
     const timer = setTimeout(async () => {
       try {
         const response = await fetch("/api/gameplay/nps/status", { cache: "no-store" });
@@ -21,19 +25,8 @@ export function useNPSManagement() {
       }
       setHasCheckedNps(true);
     }, 15000);
-    
+
     return () => clearTimeout(timer);
-  };
-
-  const handleCloseNps = () => {
-    setShowNpsModal(false);
-  };
-
-  useEffect(() => {
-    if (session) {
-      const cleanup = scheduleNpsCheck();
-      return cleanup;
-    }
   }, [session, hasCheckedNps]);
 
   return {

@@ -1,7 +1,7 @@
 ---
 id: task-30-p4-coral-teaser
 title: "3.0 Phase 4: Click-A-Coral Fishtank in Hub"
-status: todo
+status: completed
 priority: medium
 phase: "3.0-p4"
 specRefs:
@@ -23,14 +23,14 @@ Place the Click-A-Coral experience as a decorative fishtank element inside the g
 - No "coming soon" — the game exists, it's just separate
 
 ## Tasks
-- [ ] Create `CoralFishtank` client component in `src/components/game/`
+- [x] Create `CoralFishtank` client component in `src/features/game/components/station/`
   - Decorative animated fishtank (CSS animation, no Lottie)
   - Idle state: fish swimming, soft ambient animation
   - On click: modal/sheet slides up explaining Click-A-Coral
   - Modal contains: brief description of the Coral project + link to `coral.starsailors.space`
-- [ ] Place `CoralFishtank` in the game hub layout (ambient, non-intrusive placement TBD)
-- [ ] Remove any Click-A-Coral reference from `/apt/page.tsx`
-- [ ] PostHog events: `coral_fishtank_clicked`, `coral_external_link_clicked`
+- [x] Place `CoralFishtank` in the game hub layout (right column, below Agency Network)
+- [x] Remove any Click-A-Coral reference from `/apt/page.tsx` (was never there)
+- [x] PostHog events: `coral_fishtank_clicked`, `coral_external_link_clicked`
 
 ## Acceptance Criteria
 - Fishtank visible in game hub without disrupting main flow

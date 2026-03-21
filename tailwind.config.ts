@@ -157,6 +157,20 @@ const config: Config = {
           from: { transform: "rotate(0deg)" },
           to:   { transform: "rotate(360deg)" },
         },
+        "fish-swim": {
+          "0%":   { transform: "translateX(-10%)" },
+          "49%":  { transform: "translateX(110%)" },
+          "50%":  { transform: "translateX(110%) scaleX(-1)" },
+          "100%": { transform: "translateX(-10%) scaleX(-1)" },
+        },
+        "bubble-rise": {
+          "0%":   { transform: "translateY(0)", opacity: "0.6" },
+          "100%": { transform: "translateY(-24px)", opacity: "0" },
+        },
+        "vehicle-fly": {
+          "0%":   { transform: "translateX(0)" },
+          "100%": { transform: "translateX(calc(100vw + 4rem))" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -174,6 +188,7 @@ const config: Config = {
         "number-count": "number-count 0.4s ease-out",
         "scan-down": "scan-down 9s linear infinite",
         "radar-sweep": "radar-sweep 4s linear infinite",
+        "vehicle-fly": "vehicle-fly linear infinite",
       },
     },
   },

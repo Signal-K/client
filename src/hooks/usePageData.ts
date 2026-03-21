@@ -1,137 +1,81 @@
 import { useEffect, useState } from "react";
 import { useSession } from "@/src/lib/auth/session-context";
-import { useGroupedClassifications } from "@/hooks/useGroupedClassifications";
+import type {
+  CommentVote,
+  Classification,
+  LinkedAnomaly,
+  OtherClassification,
+  UserProfile,
+  VisibleStructures,
+} from "@/types/game";
 
-export { useGroupedClassifications };
+const CACHE_KEY = "pageDataCache";
+const DEFAULT_STRUCTURES: VisibleStructures = { telescope: true, satellites: true, rovers: false, balloons: false };
 
-const CACHE_KEY = 'pageDataCache';
-
-const getCachedData = () => {
-  if (typeof window === 'undefined') return null;
+function getCachedData() {
+  if (typeof window === "undefined") return null;
   try {
     const cached = localStorage.getItem(CACHE_KEY);
-    if (cached) {
-      try {
-        // Basic validation
-        const data = JSON.parse(cached);
-        if (data && typeof data === 'object') {
-          return data;
-        }
-      } catch (e) {
-        console.error("Failed to parse cached data", e);
-        localStorage.removeItem(CACHE_KEY);
-      }
-    }
-  } catch (e) {
-    console.error("Failed to read cached data", e);
+    if (!cached) return null;
+    const data = JSON.parse(cached);
+    return data && typeof data === "object" ? data : null;
+  } catch {
+    try { localStorage.removeItem(CACHE_KEY); } catch { /* ignore */ }
+    return null;
   }
-  return null;
-};
+}
 
-const setCachedData = (data: any) => {
-  if (typeof window === 'undefined') return;
+function setCachedData(data: PageData) {
+  if (typeof window === "undefined") return;
   try {
-    const dataToCache = {
-      linkedAnomalies: data.linkedAnomalies,
-      activityFeed: data.activityFeed,
-      profile: data.profile,
-      classifications: data.classifications,
-      otherClassifications: data.otherClassifications,
-      incompletePlanet: data.incompletePlanet,
-      planetTargets: data.planetTargets,
-      visibleStructures: data.visibleStructures,
-      hasRoverMineralDeposits: data.hasRoverMineralDeposits,
-      timestamp: new Date().toISOString(),
-    };
-    localStorage.setItem(CACHE_KEY, JSON.stringify(dataToCache));
-  } catch (e) {
-    console.error("Failed to set cached data", e);
-  }
+    localStorage.setItem(CACHE_KEY, JSON.stringify({ ...data, timestamp: new Date().toISOString() }));
+  } catch { /* ignore */ }
+}
+
+interface PageData {
+  linkedAnomalies: LinkedAnomaly[];
+  activityFeed: CommentVote[];
+  profile: UserProfile | null;
+  classifications: Classification[];
+  otherClassifications: OtherClassification[];
+  incompletePlanet: Classification | null;
+  planetTargets: { id: number; name: string }[];
+  visibleStructures: VisibleStructures;
+  hasRoverMineralDeposits: boolean;
+}
+
+const DEFAULT_DATA: PageData = {
+  linkedAnomalies: [],
+  activityFeed: [],
+  profile: null,
+  classifications: [],
+  otherClassifications: [],
+  incompletePlanet: null,
+  planetTargets: [],
+  visibleStructures: DEFAULT_STRUCTURES,
+  hasRoverMineralDeposits: false,
 };
-
-interface CommentVote {
-  type: "comment" | "vote";
-  created_at: string;
-  content?: string;
-  vote_type?: string;
-  classification_id: number;
-}
-
-interface Classification {
-  id: number;
-  classificationtype: string | null;
-  content: string | null;
-  created_at: string;
-  anomaly: {
-    content: string | null;
-  } | null;
-  classificationConfiguration?: {
-    annotationOptions?: string[];
-    [key: string]: any;
-  };
-}
-
-interface LinkedAnomaly {
-  id: number;
-  anomaly_id: number;
-  date: string;
-  automaton?: string; // Added automaton field
-  unlocked?: boolean; // Added unlocked field
-  anomaly: {
-    id: number | null; // Added id field
-    content: string | null;
-    anomalytype: string | null;
-    anomalySet: string | null;
-  } | null;
-}
-
-interface OtherClassification {
-  id: number;
-  classificationtype: string | null;
-  content: string | null;
-  author: string;
-  created_at: string;
-}
-
-interface Profile {
-  id: string;
-  username: string | null;
-  full_name: string | null;
-  classificationPoints: number | null;
-}
 
 export function usePageData() {
   const session = useSession();
-
-  const [linkedAnomalies, setLinkedAnomalies] = useState<LinkedAnomaly[]>([]);
-  const [activityFeed, setActivityFeed] = useState<CommentVote[]>([]);
-  const [profile, setProfile] = useState<Profile | null>(null);
-  const [classifications, setClassifications] = useState<Classification[]>([]);
-  const [otherClassifications, setOtherClassifications] = useState<OtherClassification[]>([]);
-  const [incompletePlanet, setIncompletePlanet] = useState<Classification | null>(null);
-  const [planetTargets, setPlanetTargets] = useState<{ id: number; name: string }[]>([]);
-  const [visibleStructures, setVisibleStructures] = useState({
-    telescope: true,
-    satellites: true,
-    rovers: false,
-    balloons: false
-  });
+  const [data, setData] = useState<PageData>(DEFAULT_DATA);
   const [loading, setLoading] = useState(true);
-  const [hasRoverMineralDeposits, setHasRoverMineralDeposits] = useState(false);
 
   useEffect(() => {
-    const cachedData = getCachedData();
-    if (cachedData) {
-      setLinkedAnomalies(cachedData.linkedAnomalies || []);
-      setActivityFeed(cachedData.activityFeed || []);
-      setProfile(cachedData.profile || null);
-      setClassifications(cachedData.classifications || []);
-      setOtherClassifications(cachedData.otherClassifications || []);
-      setIncompletePlanet(cachedData.incompletePlanet || null);
-      setPlanetTargets(cachedData.planetTargets || []);
-      setVisibleStructures(cachedData.visibleStructures || { telescope: true, satellites: true, rovers: false, balloons: false });
-      setHasRoverMineralDeposits(cachedData.hasRoverMineralDeposits || false);
-      setLoading(false); // We have data, so not loading anymore
+    const cached = getCachedData();
+    if (cached) {
+      setData({
+        linkedAnomalies: cached.linkedAnomalies ?? [],
+        activityFeed: cached.activityFeed ?? [],
+        profile: cached.profile ?? null,
+        classifications: cached.classifications ?? [],
+        otherClassifications: cached.otherClassifications ?? [],
+        incompletePlanet: cached.incompletePlanet ?? null,
+        planetTargets: cached.planetTargets ?? [],
+        visibleStructures: cached.visibleStructures ?? DEFAULT_STRUCTURES,
+        hasRoverMineralDeposits: cached.hasRoverMineralDeposits ?? false,
+      });
+      setLoading(false);
     }
   }, []);
 
@@ -149,19 +93,7 @@ export function usePageData() {
         throw new Error(payload?.error || "Failed to fetch page data");
       }
 
-      setProfile(payload.profile ?? null);
-      setClassifications(payload.classifications ?? []);
-      setLinkedAnomalies(payload.linkedAnomalies ?? []);
-      setActivityFeed(payload.activityFeed ?? []);
-      setOtherClassifications(payload.otherClassifications ?? []);
-      setIncompletePlanet(payload.incompletePlanet ?? null);
-      setPlanetTargets(payload.planetTargets ?? []);
-      setVisibleStructures(
-        payload.visibleStructures ?? { telescope: true, satellites: true, rovers: false, balloons: false }
-      );
-      setHasRoverMineralDeposits(Boolean(payload.hasRoverMineralDeposits));
-
-      setCachedData({
+      const next: PageData = {
         linkedAnomalies: payload.linkedAnomalies ?? [],
         activityFeed: payload.activityFeed ?? [],
         profile: payload.profile ?? null,
@@ -169,10 +101,12 @@ export function usePageData() {
         otherClassifications: payload.otherClassifications ?? [],
         incompletePlanet: payload.incompletePlanet ?? null,
         planetTargets: payload.planetTargets ?? [],
-        visibleStructures:
-          payload.visibleStructures ?? { telescope: true, satellites: true, rovers: false, balloons: false },
+        visibleStructures: payload.visibleStructures ?? DEFAULT_STRUCTURES,
         hasRoverMineralDeposits: Boolean(payload.hasRoverMineralDeposits),
-      });
+      };
+
+      setData(next);
+      setCachedData(next);
     } catch (e) {
       console.error("usePageData fetchData failed", e);
     } finally {
@@ -186,20 +120,8 @@ export function usePageData() {
   }, [session]);
 
   return {
-    // Data
-    linkedAnomalies,
-    activityFeed,
-    profile,
-    classifications,
-    otherClassifications,
-    incompletePlanet,
-    planetTargets,
-    visibleStructures,
+    ...data,
     loading,
-    hasRoverMineralDeposits,
-    
-    // Functions
     refetchData: fetchData,
-    refetchPlanets: fetchData,
   };
 }

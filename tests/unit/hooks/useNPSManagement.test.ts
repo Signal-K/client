@@ -59,8 +59,12 @@ describe("useNPSManagement", () => {
     expect(result.current.showNpsModal).toBe(false)
   })
 
-  it("does not show NPS modal when session is null", async () => {
-    vi.mocked(useSession).mockReturnValue(null)
+  it("does not show NPS modal when shouldShowNps is false", async () => {
+    vi.spyOn(globalThis, "fetch").mockResolvedValue({
+      ok: true,
+      json: async () => ({ shouldShowNps: false }),
+    } as Response)
+    vi.mocked(useSession).mockReturnValue({ user: { id: "user-1" } } as any)
 
     const { result } = renderHook(() => useNPSManagement())
 
@@ -69,5 +73,18 @@ describe("useNPSManagement", () => {
     })
 
     expect(result.current.showNpsModal).toBe(false)
+  })
+
+  it("does not fetch when session is null", async () => {
+    const fetchSpy = vi.spyOn(globalThis, "fetch")
+    vi.mocked(useSession).mockReturnValue(null)
+
+    renderHook(() => useNPSManagement())
+
+    await act(async () => {
+      await vi.runOnlyPendingTimersAsync()
+    })
+
+    expect(fetchSpy).not.toHaveBeenCalled()
   })
 })

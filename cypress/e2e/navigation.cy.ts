@@ -5,10 +5,7 @@ describe('Navigation', () => {
   })
 
   it('should load the home page', () => {
-    // Unauthenticated landings can stay on "/" or redirect to "/apt".
-    cy.url().should('satisfy', (url) => {
-      return url.endsWith('/') || url.includes('/apt')
-    })
+    cy.url().should('match', /\/$/)
     cy.get('body').should('be.visible')
   })
 

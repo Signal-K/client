@@ -1,14 +1,14 @@
 import { describe, it, expect } from "vitest";
-import { useGroupedClassifications } from "@/hooks/useGroupedClassifications";
+import { groupClassifications } from "@/hooks/useGroupedClassifications";
 
-describe("useGroupedClassifications", () => {
+describe("groupClassifications", () => {
   it("groups classifications by type", () => {
     const classifications = [
       { classificationtype: "planet", id: 1 },
       { classificationtype: "asteroid", id: 2 },
       { classificationtype: "planet", id: 3 },
     ];
-    const result = useGroupedClassifications(classifications);
+    const result = groupClassifications(classifications);
     expect(result).toHaveLength(2);
 
     const planetGroup = result.find((g) => g.type === "planet");
@@ -23,35 +23,29 @@ describe("useGroupedClassifications", () => {
       { classificationtype: null, id: 1 },
       { classificationtype: null, id: 2 },
     ];
-    const result = useGroupedClassifications(classifications);
+    const result = groupClassifications(classifications);
     expect(result).toHaveLength(1);
     expect(result[0].type).toBe("unknown");
     expect(result[0].entries).toHaveLength(2);
   });
 
   it("returns empty array for empty input", () => {
-    const result = useGroupedClassifications([]);
-    expect(result).toEqual([]);
+    expect(groupClassifications([])).toEqual([]);
   });
 
   it("extracts annotationOptions from classificationConfiguration", () => {
     const classifications = [
       {
         classificationtype: "planet",
-        classificationConfiguration: {
-          annotationOptions: ["option1", "option2"],
-        },
+        classificationConfiguration: { annotationOptions: ["option1", "option2"] },
       },
     ];
-    const result = useGroupedClassifications(classifications);
+    const result = groupClassifications(classifications);
     expect(result[0].entries[0].annotationOptions).toEqual(["option1", "option2"]);
   });
 
   it("defaults annotationOptions to empty array when not present", () => {
-    const classifications = [
-      { classificationtype: "planet" },
-    ];
-    const result = useGroupedClassifications(classifications);
+    const result = groupClassifications([{ classificationtype: "planet" }]);
     expect(result[0].entries[0].annotationOptions).toEqual([]);
   });
 
@@ -59,12 +53,10 @@ describe("useGroupedClassifications", () => {
     const classifications = [
       {
         classificationtype: "planet",
-        classificationConfiguration: {
-          annotationOptions: "not-an-array" as any,
-        },
+        classificationConfiguration: { annotationOptions: "not-an-array" as any },
       },
     ];
-    const result = useGroupedClassifications(classifications);
+    const result = groupClassifications(classifications);
     expect(result[0].entries[0].annotationOptions).toEqual([]);
   });
 
@@ -77,9 +69,9 @@ describe("useGroupedClassifications", () => {
         classificationConfiguration: { annotationOptions: ["bright"] },
       },
     ];
-    const result = useGroupedClassifications(classifications);
+    const result = groupClassifications(classifications);
     expect(result[0].entries[0].id).toBe(42);
-    expect(result[0].entries[0].name).toBe("Betelgeuse");
+    expect((result[0].entries[0] as any).name).toBe("Betelgeuse");
   });
 
   it("handles mixed types correctly", () => {
@@ -90,10 +82,13 @@ describe("useGroupedClassifications", () => {
       { classificationtype: "star", id: 4 },
       { classificationtype: null, id: 5 },
     ];
-    const result = useGroupedClassifications(classifications);
+    const result = groupClassifications(classifications);
     expect(result).toHaveLength(3);
+    expect(result.map((g) => g.type).sort()).toEqual(["planet", "star", "unknown"]);
+  });
 
-    const types = result.map((g) => g.type).sort();
-    expect(types).toEqual(["planet", "star", "unknown"]);
+  it("useGroupedClassifications alias is removed — groupClassifications is the canonical export", () => {
+    const input = [{ classificationtype: "planet", id: 1 }];
+    expect(groupClassifications(input)).toHaveLength(1);
   });
 });

@@ -114,7 +114,7 @@ export default function CloudSignal({ classificationConfig, classificationId }: 
   const [clouds, setClouds] = useState<Cloud[]>(initialClouds);
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const cloudVisRef = useRef<HTMLCanvasElement>(null)
-  const animationRef = useRef<number>()
+  const animationRef = useRef<number>(undefined)
   const [time, setTime] = useState(0)
   const [exportedConfig, setExportedConfig] = useState('')
   const [importConfig, setImportConfig] = useState(JSON.stringify(initialClouds));

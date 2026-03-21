@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useSession } from "@/src/lib/auth/session-context";
 import { useParams } from "next/navigation";
 import { BarChartBigIcon, GlassWater, Guitar, HelpCircle, PenBoxIcon, RadioIcon, SpeechIcon, TelescopeIcon, VoteIcon } from "lucide-react";
@@ -16,7 +16,7 @@ interface Mission {
   icon: React.ElementType;
   points?: number;
   completedCount?: number;
-  internalComponent: React.ElementType | (() => JSX.Element);
+  internalComponent: React.ElementType | (() => React.ReactElement);
   color: string; 
 };
 

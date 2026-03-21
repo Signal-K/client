@@ -191,7 +191,7 @@ export async function POST(request: NextRequest) {
     revalidatePath("/research");
     revalidatePath("/viewports/satellite");
     revalidatePath("/viewports/solar");
-    revalidatePath("/viewports/roover");
+    revalidatePath("/viewports/rover");
     revalidatePath(`/next/${String(data.id)}`);
 
     // Serialize BigInts to strings for JSON response

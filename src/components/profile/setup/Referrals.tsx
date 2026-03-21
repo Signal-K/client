@@ -1,11 +1,13 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { usePostHog } from "posthog-js/react";
 import { Button } from "@/src/components/ui/button";
 import { getReferralPanelDataAction } from "./actions";
 import { Check, Copy, Share2, Sparkles } from "lucide-react";
+import { captureCrossGameNavigation } from "@/src/features/analytics/cross-game-navigation";
 import { getReferralProgress, REFERRAL_TIERS } from "@/src/features/referrals/referral-progress";
-import { buildClientReferralUrl, buildReferralShareText, buildSailyReferralUrl } from "@/src/features/referrals/referral-links";
+import { buildClientReferralUrl, buildReferralShareText, getSailyUrl } from "@/src/features/referrals/referral-links";
 
 interface ReferredUser {
   id: string;
@@ -14,6 +16,7 @@ interface ReferredUser {
 }
 
 export default function ReferralCodePanel() {
+  const posthog = usePostHog();
   const [referralCode, setReferralCode] = useState<string | null>(null);
   const [referredUsers, setReferredUsers] = useState<ReferredUser[]>([]);
   const [loading, setLoading] = useState(false);
@@ -174,9 +177,16 @@ export default function ReferralCodePanel() {
             {shared ? "Shared" : "Share Invite"}
           </Button>
           <a
-            href={referralCode ? buildSailyReferralUrl(referralCode) : "#"}
+            href={referralCode ? getSailyUrl(referralCode) : "#"}
             target="_blank"
             rel="noreferrer"
+            onClick={() => {
+              if (!referralCode || loading) return;
+              captureCrossGameNavigation(posthog, {
+                destination: "saily",
+                source_section: "referral_console",
+              });
+            }}
             className={`inline-flex items-center rounded-md border px-4 py-2 text-sm font-medium transition-colors ${
               referralCode && !loading
                 ? "border-amber-300/30 bg-amber-500/20 text-amber-100 hover:bg-amber-500/30"

@@ -110,7 +110,7 @@ export async function DELETE(request: NextRequest) {
 
   revalidatePath("/activity/deploy");
   revalidatePath("/viewports/satellite");
-  revalidatePath("/viewports/roover");
+  revalidatePath("/viewports/rover");
 
   return NextResponse.json({ success: true });
 }
@@ -147,7 +147,7 @@ export async function PATCH(request: NextRequest) {
   }
 
   revalidatePath("/viewports/satellite");
-  revalidatePath("/viewports/roover");
+  revalidatePath("/viewports/rover");
 
   return NextResponse.json({ success: true });
 }

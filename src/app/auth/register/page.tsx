@@ -14,10 +14,13 @@ function RegisterContent() {
     useEffect(() => {
       if (isLoading || !user) return;
       const nextPath = searchParams.get("next");
+      
+      // If next is specifically set, follow it. Otherwise, go to onboarding.
       const destination =
         nextPath && nextPath.startsWith("/") && !nextPath.startsWith("//")
           ? nextPath
-          : "/game";
+          : "/onboarding";
+          
       router.replace(destination);
     }, [isLoading, user, router, searchParams]);
 

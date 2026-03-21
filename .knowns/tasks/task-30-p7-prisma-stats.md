@@ -1,7 +1,7 @@
 ---
 id: task-30-p7-prisma-stats
 title: "3.0 Phase 7: Prisma-Backed Live Stats"
-status: todo
+status: completed
 priority: medium
 phase: "3.0-p7"
 specRefs:
@@ -16,13 +16,14 @@ updatedAt: '2026-03-15T00:00:00Z'
 Replace hardcoded stats ("11+ projects", "3 structures") with real Prisma-backed numbers. Focus on Active Sailors (last 24h) as the primary social proof stat.
 
 ## Tasks
-- [ ] Add `getActiveSailors()` server function: count users with a classification in last 24h
-- [ ] Add `getTotalDiscoveries()` server function: count all classifications
-- [ ] `ActiveSailorsCount` Server Component: fetches + renders with revalidation every 5 min
+- [x] Add `getActiveSailors()` server function: count users with a classification in last 24h
+- [x] Add `getTotalDiscoveries()` server function: count all classifications
+- [x] `LandingStats` Server Component: fetches + renders with revalidation every 5 min
   - `export const revalidate = 300`
-  - Animated number with CSS counter animation on mount
-- [ ] Replace hardcoded stat blocks in `/apt` with dynamic versions
-- [ ] Add `getActiveProjects()` count (projects with classifications in last 7d)
+  - Animated number with CSS fade-up on mount
+  - `LandingStatsFallback` for Suspense (no spinner, static values)
+- [x] Replace hardcoded stat blocks in `/apt` with `<Suspense fallback={<LandingStatsFallback />}><LandingStats /></Suspense>`
+- [x] Add `getActiveProjects()` count (projects with classifications in last 7d)
 
 ## Schema Check
 - Verify `classifications` table has `createdAt` and `userId` — should already exist

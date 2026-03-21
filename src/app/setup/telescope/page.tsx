@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { SetupCard, SetupScaffold } from "@/src/features/setup/components/SetupScaffold";
+import { getTelescopeStatus } from "@/src/features/gameplay/actions/deploy-actions";
 
 type TelescopeStatusPayload = {
   alreadyDeployed?: boolean;
@@ -20,24 +21,20 @@ export default function TelescopeSetupPage() {
 
     async function loadStatus() {
       setIsLoading(true);
-      const response = await fetch("/api/gameplay/deploy/telescope?action=status", { cache: "no-store" });
-      const payload = await response.json().catch(() => null);
-
-      if (!mounted) return;
-
-      if (response.status === 401) {
-        router.replace("/auth");
-        return;
+      try {
+        const payload = await getTelescopeStatus();
+        if (!mounted) return;
+        setStatus(payload);
+      } catch (err: any) {
+        if (!mounted) return;
+        if (err.message === "Unauthorized") {
+          router.replace("/auth");
+          return;
+        }
+        setError(err.message || "Failed to load telescope status.");
+      } finally {
+        if (mounted) setIsLoading(false);
       }
-
-      if (!response.ok) {
-        setError(payload?.error || "Failed to load telescope status.");
-        setIsLoading(false);
-        return;
-      }
-
-      setStatus(payload || {});
-      setIsLoading(false);
     }
 
     loadStatus();

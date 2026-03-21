@@ -24,22 +24,7 @@ import ProjectPreferencesModal from "@/src/components/onboarding/ProjectPreferen
 import { useUserPreferences, ProjectType } from "@/src/hooks/useUserPreferences";
 import Link from "next/link";
 import { useAuthUser } from "@/src/hooks/useAuthUser";
-
-interface CommentVote {
-  type: "comment" | "vote";
-  created_at: string;
-  content?: string;
-  vote_type?: string;
-  classification_id: number;
-}
-
-interface OtherClassification {
-  id: number;
-  classificationtype: string | null;
-  content: string | null;
-  author: string;
-  created_at: string;
-}
+import type { CommentVote, OtherClassification } from "@/types/game";
 
 interface MainHeaderProps {
   isDark: boolean;

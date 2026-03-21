@@ -1,10 +1,11 @@
 import ClientClassificationPage from "@/src/components/projects/(classifications)/NextScene";
 
 type Props = {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 };
 
-export default function Page({ params }: Props) {
+export default async function Page(props: Props) {
+  const params = await props.params;
   const { id } = params;
 
   if (!id) return null; // or trigger notFound();

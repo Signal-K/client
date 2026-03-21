@@ -46,7 +46,8 @@ export type TutorialId =
   | "leaderboard-page"       // Leaderboard explanation
   // Feature tutorials
   | "mineral-guide"          // Where do minerals come from
-  | "stardust-guide";        // What is stardust
+  | "stardust-guide"         // What is stardust
+  | "intro-seen";            // One-time intro sequence on first onboarding visit
 
 // Track which tutorials have been completed
 interface TutorialCompletion {
@@ -88,48 +89,32 @@ interface UserPreferences {
 const STORAGE_KEY = "star-sailors-preferences";
 const DEVICE_ID_KEY = "star-sailors-device-id";
 
-function storageGetItem(key: string): string | null {
+function storageGet(key: string): string | null {
   if (typeof window === "undefined") return null;
-  try {
-    return localStorage.getItem(key);
-  } catch {
-    return null;
-  }
+  try { return localStorage.getItem(key); } catch { return null; }
 }
 
-function storageSetItem(key: string, value: string) {
+function storageSet(key: string, value: string) {
   if (typeof window === "undefined") return;
-  try {
-    localStorage.setItem(key, value);
-  } catch {
-    // Ignore storage write errors in restricted contexts.
-  }
+  try { localStorage.setItem(key, value); } catch { /* ignore */ }
 }
 
-function storageRemoveItem(key: string) {
+function storageRemove(key: string) {
   if (typeof window === "undefined") return;
-  try {
-    localStorage.removeItem(key);
-  } catch {
-    // Ignore storage delete errors in restricted contexts.
-  }
+  try { localStorage.removeItem(key); } catch { /* ignore */ }
 }
 
-// Generate a random device ID
 function generateDeviceId(): string {
   return `device-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
 }
 
-// Get or create device ID
 function getDeviceId(): string {
   if (typeof window === "undefined") return "";
-  
-  let deviceId = storageGetItem(DEVICE_ID_KEY);
-  if (!deviceId) {
-    deviceId = generateDeviceId();
-    storageSetItem(DEVICE_ID_KEY, deviceId);
-  }
-  return deviceId;
+  return storageGet(DEVICE_ID_KEY) ?? (() => {
+    const id = generateDeviceId();
+    storageSet(DEVICE_ID_KEY, id);
+    return id;
+  })();
 }
 
 const defaultPreferences: UserPreferences = {
@@ -155,7 +140,7 @@ export function useUserPreferences() {
     if (typeof window === "undefined") return;
 
     try {
-      const stored = storageGetItem(STORAGE_KEY);
+      const stored = storageGet(STORAGE_KEY);
       const currentDeviceId = getDeviceId();
       
       if (stored) {
@@ -207,7 +192,7 @@ export function useUserPreferences() {
     setPreferences((prev) => {
       const updated = { ...prev, ...newPreferences };
       
-      storageSetItem(STORAGE_KEY, JSON.stringify(updated));
+      storageSet(STORAGE_KEY, JSON.stringify(updated));
       
       return updated;
     });
@@ -279,7 +264,7 @@ export function useUserPreferences() {
           [tutorialId]: true,
         },
       };
-      storageSetItem(STORAGE_KEY, JSON.stringify(updated));
+      storageSet(STORAGE_KEY, JSON.stringify(updated));
       return updated;
     });
   }, []);
@@ -295,14 +280,14 @@ export function useUserPreferences() {
       const updated = { ...prev.completedTutorials };
       delete updated[tutorialId];
       const newPrefs = { ...prev, completedTutorials: updated };
-      storageSetItem(STORAGE_KEY, JSON.stringify(newPrefs));
+      storageSet(STORAGE_KEY, JSON.stringify(newPrefs));
       return newPrefs;
     });
   }, []);
 
   // Reset all preferences (for testing)
   const resetPreferences = useCallback(() => {
-    storageRemoveItem(STORAGE_KEY);
+    storageRemove(STORAGE_KEY);
     setPreferences({
       ...defaultPreferences,
       deviceId: getDeviceId(),

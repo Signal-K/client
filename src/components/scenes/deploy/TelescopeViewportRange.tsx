@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react"
 import { useSession } from "@/src/lib/auth/session-context"
 import { useRouter } from "next/navigation"
+import { usePostHog } from "posthog-js/react"
 import { TelescopeView } from "@/src/components/classification/telescope/telescope-view"
 import type { Anomaly, Star } from "@/types/Structures/telescope"
 import { generateSectorName, generateStars } from "@/src/components/classification/telescope/utils/sector-utils"
@@ -22,8 +23,8 @@ export type DeploymentType = "stellar" | "planetary";
 
 export default function DeployTelescopeViewport() {
   const session = useSession();
-
   const router = useRouter()
+  const posthog = usePostHog();
   
   // Get stored telescope focus preference
   const { preferences, setTelescopeFocus, isLoading: prefsLoading } = useUserPreferences();
@@ -83,6 +84,7 @@ export default function DeployTelescopeViewport() {
   const handleDeploy = async () => {
     if (!selectedSector || alreadyDeployed) return
     await handleDeployAction({ userId: session?.user?.id, selectedSector, deploymentType, tessAnomalies, setDeploying, setDeploymentResult, setShowConfirmation, setDeploymentMessage, setAlreadyDeployed, generateSectorName })
+    posthog?.capture("structure_deployed", { structure: "telescope", deploymentType, sector: selectedSector });
   }
 
   const handleAnomalyClick = (a: Anomaly) => setFocusedAnomaly(a)

@@ -8,6 +8,7 @@ export interface DatabaseAnomaly {
   avatar_url: string | null
   created_at: string
   configuration: any
+  type?: string
   parentAnomaly: number | null
   anomalyConfiguration?: string | null;
   anomalySet: string | null

@@ -104,7 +104,7 @@ export async function POST(request: NextRequest) {
   const data = rows[0];
 
   revalidatePath("/inventory");
-  revalidatePath("/viewports/roover");
+  revalidatePath("/viewports/rover");
   revalidatePath(`/next/${discovery}`);
 
   return NextResponse.json(data);

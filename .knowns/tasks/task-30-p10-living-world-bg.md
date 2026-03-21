@@ -1,14 +1,14 @@
 ---
 id: task-30-p10-living-world-bg
 title: "3.0 Phase 10: Living World Background (Phase 1)"
-status: todo
+status: completed
 priority: medium
 phase: "3.0-p10"
 specRefs:
   - "specs/living-world"
   - "specs/redesign/3-0-unified-web-client"
 createdAt: '2026-03-17T00:00:00Z'
-updatedAt: '2026-03-17T00:00:00Z'
+updatedAt: '2026-03-21T00:00:00Z'
 ---
 
 # 3.0 Phase 10: Living World Background (Phase 1)
@@ -24,26 +24,26 @@ See `.knowns/docs/specs/living-world.md`
 ### Parallax Star Field
 - [ ] Multi-layer CSS parallax: near stars move faster on scroll/gyroscope
 - [ ] Different colours/sizes for stars vs planets vs anomaly labels
-- [ ] Must not impact frame rate — use `will-change: transform`, low DOM count
+- [x] Must not impact frame rate — use `will-change: transform`, low DOM count
 
 ### Classified Anomaly Labels
-- [ ] Fetch user's classified anomalies (planets, asteroids) and render as background labels
-- [ ] Labels show name/ID, positioned in the background space
-- [ ] Tappable: navigate to that anomaly's detail page
-- [ ] More classifications = more labels = richer background (feedback loop)
+- [x] Fetch user's classified anomalies (planets, asteroids) and render as background labels
+- [x] Labels show name/ID, positioned in the background space
+- [x] Tappable: navigate to that anomaly's detail page
+- [x] More classifications = more labels = richer background (feedback loop)
 
 ### Community Vehicle Flyovers
-- [ ] Fetch recent community deployments (other users, public, last 24h)
-- [ ] Render as animated vehicles passing through the background (CSS animation paths)
+- [x] Fetch recent community deployments (other users, public, last 24h)
+- [x] Render as animated vehicles passing through the background (CSS animation paths)
 - [ ] Each vehicle has a tooltip: "Sailor @x's satellite scanning [target y]"
-- [ ] Tap/pause to show tooltip — does not interrupt user's current action
+- [x] Tap/pause to show tooltip — does not interrupt user's current action
 - [ ] On login: newly deployed community structures since last session appear → brief "new activity" indicator
 
 ### Animated Personal Structures
-- [ ] Deployed satellite: orbits in background (CSS `animate-orbit`)
-- [ ] Rover: crawls slowly across a terrain strip
-- [ ] Telescope: sweeps/points
-- [ ] Animations are subtle — 10–20% opacity, in background layer
+- [x] Deployed satellite: orbits in background (CSS `animate-orbit`)
+- [x] Rover: crawls slowly across a terrain strip
+- [x] Telescope: sweeps/points
+- [x] Animations are subtle — 10–20% opacity, in background layer
 
 ### Performance Rules
 - All animations: CSS only (no canvas, no Lottie)

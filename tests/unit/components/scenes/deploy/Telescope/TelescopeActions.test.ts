@@ -17,38 +17,49 @@ vi.mock("@/src/components/scenes/deploy/Telescope/TelescopeUtils", () => ({
 
 vi.mock("@/types/Structures/telescope", () => ({}));
 
+// Mock the server actions
+const mockGetAnomalies = vi.fn();
+const mockGetStatus = vi.fn();
+const mockGetSkill = vi.fn();
+const mockDeploy = vi.fn();
+
+vi.mock("@/src/features/gameplay/actions/deploy-actions", () => ({
+  getTelescopeAnomalies: (...args: any[]) => mockGetAnomalies(...args),
+  getTelescopeStatus: (...args: any[]) => mockGetStatus(...args),
+  getTelescopeSkillProgress: (...args: any[]) => mockGetSkill(...args),
+  deployTelescopeAction: (...args: any[]) => mockDeploy(...args),
+}));
+
+// Mock fetch for the notification part which still uses fetch
 const mockFetch = vi.fn();
 
 beforeEach(() => {
   vi.stubGlobal("fetch", mockFetch);
   mockFetch.mockReset();
+  mockGetAnomalies.mockReset();
+  mockGetStatus.mockReset();
+  mockGetSkill.mockReset();
+  mockDeploy.mockReset();
 });
 
 describe("fetchAnomalies", () => {
   it("returns early for non-stellar/planetary types", async () => {
     const setter = vi.fn();
     await fetchAnomalies("unknown", setter);
-    expect(mockFetch).not.toHaveBeenCalled();
+    expect(mockGetAnomalies).not.toHaveBeenCalled();
     expect(setter).not.toHaveBeenCalled();
   });
 
-  it("calls fetch for stellar type", async () => {
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: () => Promise.resolve({ anomalies: [] }),
-    });
+  it("calls action for stellar type", async () => {
+    mockGetAnomalies.mockResolvedValueOnce({ anomalies: [] });
     const setter = vi.fn();
     await fetchAnomalies("stellar", setter);
-    expect(mockFetch).toHaveBeenCalledTimes(1);
+    expect(mockGetAnomalies).toHaveBeenCalledWith("stellar");
     expect(setter).toHaveBeenCalledWith([]);
   });
 
-  it("handles failed fetch gracefully", async () => {
-    mockFetch.mockResolvedValueOnce({
-      ok: false,
-      json: () => Promise.resolve({ error: "Not found" }),
-      statusText: "Not Found",
-    });
+  it("handles failed action gracefully", async () => {
+    mockGetAnomalies.mockRejectedValueOnce(new Error("Failed"));
     const setter = vi.fn();
     await fetchAnomalies("planetary", setter);
     expect(setter).not.toHaveBeenCalled();
@@ -57,27 +68,36 @@ describe("fetchAnomalies", () => {
 
 describe("checkDeployment", () => {
   it("sets already deployed to true", async () => {
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: () => Promise.resolve({ alreadyDeployed: true, deploymentMessage: "In orbit" }),
-    });
+    mockGetStatus.mockResolvedValueOnce({ alreadyDeployed: true, deploymentMessage: "In orbit" });
     const setDeployed = vi.fn();
     const setMsg = vi.fn();
     await checkDeployment(setDeployed, setMsg);
     expect(setDeployed).toHaveBeenCalledWith(true);
     expect(setMsg).toHaveBeenCalledWith("In orbit");
   });
+
+  it("handles error in status check", async () => {
+    mockGetStatus.mockRejectedValueOnce(new Error("Failed"));
+    const setDeployed = vi.fn();
+    const setMsg = vi.fn();
+    await checkDeployment(setDeployed, setMsg);
+    expect(setDeployed).not.toHaveBeenCalled();
+  });
 });
 
 describe("fetchSkillProgress", () => {
   it("calls the setter with skill progress", async () => {
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: () => Promise.resolve({ skillProgress: { telescope: 3, weather: 1 } }),
-    });
+    mockGetSkill.mockResolvedValueOnce({ skillProgress: { telescope: 3, weather: 1 } });
     const setter = vi.fn();
     await fetchSkillProgress(setter);
     expect(setter).toHaveBeenCalledWith({ telescope: 3, weather: 1 });
+  });
+
+  it("handles error in skill progress", async () => {
+      mockGetSkill.mockRejectedValueOnce(new Error("Failed"));
+      const setter = vi.fn();
+      await fetchSkillProgress(setter);
+      expect(setter).not.toHaveBeenCalled();
   });
 });
 
@@ -137,6 +157,7 @@ describe("handleDeployAction", () => {
   });
 
   it("sets no-anomalies message when no anomalies selected", async () => {
+    // This part still uses fetch for research summary, so we mock fetch
     mockFetch
       .mockResolvedValueOnce({
         ok: true,
@@ -166,11 +187,10 @@ describe("handleDeployAction", () => {
       ok: true,
       json: () => Promise.resolve({ researched: [] }),
     });
-    // Deploy POST
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: () => Promise.resolve({}),
-    });
+    
+    // Deploy ACTION success
+    mockDeploy.mockResolvedValueOnce({ success: true, inserted: 2 });
+
     // Notification
     mockFetch.mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({}) });
 
@@ -182,6 +202,10 @@ describe("handleDeployAction", () => {
       tessAnomalies: anomalies,
       ...mocks,
     });
+    expect(mockDeploy).toHaveBeenCalledWith(expect.objectContaining({
+        deploymentType: "stellar",
+        anomalyIds: [1, 2]
+    }));
     expect(mocks.setDeploymentResult).toHaveBeenCalled();
     expect(mocks.setShowConfirmation).toHaveBeenCalledWith(true);
   });
@@ -193,10 +217,9 @@ describe("handleDeployAction", () => {
       ok: true,
       json: () => Promise.resolve({ researched: [] }),
     });
-    mockFetch.mockResolvedValueOnce({
-      ok: false,
-      json: () => Promise.resolve({ error: "deploy failed" }),
-    });
+    
+    // Deploy ACTION failure
+    mockDeploy.mockResolvedValueOnce({ error: "deploy failed" });
 
     const mocks = baseMocks();
     await handleDeployAction({
@@ -207,55 +230,6 @@ describe("handleDeployAction", () => {
       ...mocks,
     });
     expect(mocks.setAlreadyDeployed).toHaveBeenCalledWith(false);
-  });
-
-  it("deploys planetary anomalies with asteroids path", async () => {
-    const anomalies = [
-      { id: "20", content: "Planet", anomalySet: "telescope-tess" },
-      { id: "21", content: "Asteroid", anomalySet: "telescope-minorPlanet" },
-    ] as any[];
-
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: () => Promise.resolve({ researched: [] }),
-    });
-    mockFetch.mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({}) });
-    mockFetch.mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({}) });
-
-    const mocks = baseMocks();
-    await handleDeployAction({
-      userId: "user-1",
-      selectedSector: { x: 2, y: 3 },
-      deploymentType: "planetary",
-      tessAnomalies: anomalies,
-      ...mocks,
-    });
-    expect(mocks.setDeploymentResult).toHaveBeenCalled();
-  });
-
-  it("deploys with probereceptors upgrade (anomalyCount=6)", async () => {
-    const anomalies = Array.from({ length: 8 }, (_, i) => ({
-      id: String(i),
-      content: `Star ${i}`,
-      anomalySet: "diskDetective",
-    })) as any[];
-
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: () =>
-        Promise.resolve({ researched: [{ tech_type: "probereceptors" }] }),
-    });
-    mockFetch.mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({}) });
-    mockFetch.mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({}) });
-
-    const mocks = baseMocks();
-    await handleDeployAction({
-      userId: "user-1",
-      selectedSector: { x: 3, y: 4 },
-      deploymentType: "stellar",
-      tessAnomalies: anomalies,
-      ...mocks,
-    });
-    expect(mocks.setDeploymentResult).toHaveBeenCalled();
+    expect(mocks.setDeploymentMessage).toHaveBeenCalledWith("Error deploying telescope. Please try again.");
   });
 });

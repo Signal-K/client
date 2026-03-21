@@ -89,16 +89,25 @@ setup:
 # Help
 help:
 	@echo "Available commands:"
-	@echo "  dev          - Start development server locally (recommended)"
+	@echo "  dev          - Start development server locally"
 	@echo "  up           - Start with Docker"
+	@echo "  test-docker  - Run unit & E2E tests in headless Docker (GitHub Actions style)"
+	@echo "  sync-surveys - Sync micro-surveys to PostHog using .env.posthog"
 	@echo "  down         - Stop Docker containers"
-	@echo "  build        - Build Docker image"
-	@echo "  db-studio    - Start Prisma Studio (database UI)"
-	@echo "  db-generate  - Generate Prisma client"
-	@echo "  db-push      - Deploy Prisma migrations"
+	@echo "  db-studio    - Start Prisma Studio"
 	@echo "  setup        - Setup for new developers"
-	@echo "  clean        - Clean up Docker containers and images"
-	@echo "  supabase-*   - Supabase CLI commands (if installed)"
+
+# Docker Testing (Headless E2E + Unit)
+# Note: Use 'make build' first if you've changed dependencies or the Dockerfile.
+test-docker:
+	@if [ ! -f .env.posthog ]; then echo "Warning: .env.posthog not found. PostHog specific tests might fail."; fi
+	docker-compose -f ops/compose/docker-compose.test.yml --profile all up --abort-on-container-exit
+
+# PostHog Survey Sync
+sync-surveys:
+	@if [ ! -f .env.posthog ]; then echo "Error: .env.posthog required for survey sync."; exit 1; fi
+	@echo "Syncing surveys to PostHog..."
+	@export $$(cat .env.posthog | xargs) && node --experimental-strip-types scripts/sync-posthog-surveys.ts
 
 deploy-test:
 	docker-compose -f ops/compose/compose.yml build && yarn build && vercel

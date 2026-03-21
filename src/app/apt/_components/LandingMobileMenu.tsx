@@ -46,7 +46,14 @@ export function LandingMobileMenu() {
               href={SAILY_URL}
               target="_blank"
               rel="noreferrer"
-              onClick={() => { setOpen(false); posthog?.capture("nav_cta_clicked", { destination: "saily" }); }}
+              onClick={() => {
+                setOpen(false);
+                posthog?.capture("nav_cta_clicked", { destination: "saily" });
+                posthog?.capture("cross_game_navigation", {
+                  destination: "saily",
+                  source_section: "landing_mobile_menu",
+                });
+              }}
             >
               <Button variant="outline" className="w-full rounded-full">
                 Open Saily <ExternalLink className="ml-1.5 h-3.5 w-3.5" aria-hidden />

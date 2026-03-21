@@ -35,6 +35,10 @@ model Anomaly {
   anomalySet           String?   @map("anomalySet")
   anomalyConfiguration Json?     @map("anomalyConfiguration")
 
+  classifications Classification[]
+  linkedAnomalies LinkedAnomaly[]
+  votes           Vote[]
+
   @@map("anomalies")
 }
 
@@ -47,6 +51,11 @@ model Classification {
   media                     Json?
   classificationtype        String?
   classificationConfiguration Json?  @map("classificationConfiguration")
+
+  anomalyRef       Anomaly?        @relation(fields: [anomaly], references: [id])
+  comments         Comment[]
+  votes            Vote[]
+  linkedAnomalies  LinkedAnomaly[]
 
   @@map("classifications")
 }
@@ -64,6 +73,8 @@ model Comment {
   confirmed        Boolean?
   value            String?
   category         String?
+
+  classification   Classification? @relation(fields: [classificationId], references: [id])
 
   @@map("comments")
 }
@@ -91,6 +102,9 @@ model Vote {
   createdAt        DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
   upload           BigInt?
   voteType         String?   @map("vote_type")
+
+  classification   Classification? @relation(fields: [classificationId], references: [id])
+  anomaly          Anomaly?        @relation(fields: [anomalyId], references: [id])
 
   @@map("votes")
 }
@@ -167,6 +181,9 @@ model LinkedAnomaly {
   automaton        String?
   unlocked         Boolean?
   unlockTime       DateTime? @map("unlock_time") @db.Timestamptz(6)
+
+  anomaly          Anomaly         @relation(fields: [anomalyId], references: [id])
+  classification   Classification? @relation(fields: [classificationId], references: [id])
 
   @@map("linked_anomalies")
 }

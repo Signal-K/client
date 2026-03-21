@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { cn } from "@/src/shared/utils";
 import { Button } from "@/src/components/ui/button";
 import {
@@ -126,6 +126,12 @@ export default function ProjectPreferencesModal({
   const [selectedProjects, setSelectedProjects] = useState<ProjectType[]>(initialInterests);
   const [expandedProject, setExpandedProject] = useState<ProjectType | null>(null);
 
+  useEffect(() => {
+    if (!isOpen) return;
+    setSelectedProjects(initialInterests);
+    setExpandedProject(null);
+  }, [initialInterests, isOpen]);
+
   const toggleProject = (projectId: ProjectType) => {
     setSelectedProjects((prev) =>
       prev.includes(projectId)
@@ -147,123 +153,155 @@ export default function ProjectPreferencesModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 text-xl">
-            <Sparkles className="w-5 h-5 text-primary" />
-            What interests you most?
-          </DialogTitle>
-          <DialogDescription>
-            Choose the projects you'd like to focus on. We'll highlight these on your
-            dashboard and tailor your experience. You can change this anytime.
-          </DialogDescription>
-        </DialogHeader>
+      <DialogContent className="max-h-[90vh] max-w-4xl overflow-hidden border-border/60 bg-background/95 p-0 shadow-2xl">
+        <div className="relative overflow-hidden">
+          <div className="pointer-events-none absolute inset-0 star-field opacity-25" />
+          <div className="pointer-events-none absolute inset-0 sunburst-bg opacity-30" />
 
-        <div className="mt-4 space-y-3">
-          {PROJECTS.map((project) => {
-            const isSelected = selectedProjects.includes(project.id);
-            const isExpanded = expandedProject === project.id;
+          <DialogHeader className="relative border-b border-border/40 px-6 pb-5 pt-6">
+            <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-primary">
+              Mission Focus
+            </span>
+            <DialogTitle className="mt-2 flex items-center gap-2 text-2xl font-black tracking-tight">
+              <Sparkles className="h-5 w-5 text-primary" />
+              Select your project roster
+            </DialogTitle>
+            <DialogDescription className="max-w-2xl text-sm leading-relaxed text-muted-foreground">
+              Choose the science tracks you want surfaced in the hub. We will use these
+              preferences to keep deployments and prompts aligned with your current mission goals.
+            </DialogDescription>
+          </DialogHeader>
 
-            return (
-              <div
-                key={project.id}
-                className={cn(
-                  "relative rounded-xl border-2 transition-all cursor-pointer overflow-hidden",
-                  isSelected
-                    ? project.bgColor
-                    : "bg-card/50 border-border/50 hover:border-border"
-                )}
+          <div className="relative max-h-[calc(90vh-180px)] overflow-y-auto px-6 py-5">
+            <div className="mb-4 flex flex-wrap items-center gap-2">
+              <span className="rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-primary">
+                {selectedProjects.length || PROJECTS.length} tracks armed
+              </span>
+              <button
+                type="button"
+                onClick={selectAll}
+                className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground transition-colors hover:text-foreground"
               >
-                {/* Main row */}
-                <div
-                  className="flex items-center gap-4 p-4"
-                  onClick={() => toggleProject(project.id)}
-                >
-                  {/* Icon */}
-                  <div
-                    className={cn(
-                      "flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center transition-colors",
-                      isSelected ? project.bgColor : "bg-muted"
-                    )}
-                  >
-                    <span className={isSelected ? project.color : "text-muted-foreground"}>
-                      {project.icon}
-                    </span>
-                  </div>
+                Select all projects
+              </button>
+            </div>
 
-                  {/* Content */}
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-foreground">{project.title}</h3>
-                    <p className="text-sm text-muted-foreground">{project.description}</p>
-                  </div>
+            <div className="grid gap-4 md:grid-cols-2">
+              {PROJECTS.map((project) => {
+                const isSelected = selectedProjects.includes(project.id);
+                const isExpanded = expandedProject === project.id;
 
-                  {/* Checkbox */}
+                return (
                   <div
+                    key={project.id}
                     className={cn(
-                      "flex-shrink-0 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors",
+                      "sci-fi-panel relative overflow-hidden p-0 transition-all duration-300",
                       isSelected
-                        ? "bg-primary border-primary"
-                        : "border-muted-foreground/30"
+                        ? "border-primary/60 bg-primary/10 shadow-[0_0_0_1px_rgba(129,161,193,0.4)]"
+                        : "hover:border-primary/30 hover:bg-muted/20"
                     )}
                   >
-                    {isSelected && <Check className="w-4 h-4 text-primary-foreground" />}
-                  </div>
-                </div>
+                    <button
+                      type="button"
+                      className="w-full px-5 py-4 text-left"
+                      onClick={() => toggleProject(project.id)}
+                    >
+                      <div className="flex items-start gap-4">
+                        <div
+                          className={cn(
+                            "flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border",
+                            isSelected ? project.bgColor : "border-border/50 bg-background/50"
+                          )}
+                        >
+                          <span className={isSelected ? project.color : "text-muted-foreground"}>
+                            {project.icon}
+                          </span>
+                        </div>
 
-                {/* Learn more button */}
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setExpandedProject(isExpanded ? null : project.id);
-                  }}
-                  className="w-full px-4 py-2 text-xs text-muted-foreground hover:text-foreground hover:bg-background/50 transition-colors border-t border-border/30"
-                >
-                  {isExpanded ? "Show less" : "Learn more about this project"}
-                </button>
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-start justify-between gap-3">
+                            <div>
+                              <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-muted-foreground/70">
+                                {project.structure}
+                              </p>
+                              <h3 className="mt-1 text-base font-bold text-foreground">
+                                {project.title}
+                              </h3>
+                            </div>
 
-                {/* Expanded content */}
-                {isExpanded && (
-                  <div className="px-4 pb-4 text-sm text-muted-foreground leading-relaxed border-t border-border/30 pt-3 bg-background/30">
-                    {project.detailedDescription}
-                    <div className="mt-2 text-xs">
-                      <span className="text-muted-foreground">Uses: </span>
-                      <span className={project.color}>
-                        {project.structure.charAt(0).toUpperCase() + project.structure.slice(1)}
-                      </span>
+                            <div
+                              className={cn(
+                                "mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border transition-colors",
+                                isSelected
+                                  ? "border-primary bg-primary text-primary-foreground"
+                                  : "border-border/50 text-transparent"
+                              )}
+                            >
+                              <Check className="h-3.5 w-3.5" />
+                            </div>
+                          </div>
+
+                          <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                            {project.description}
+                          </p>
+
+                          <div className="mt-3 flex items-center justify-between gap-3">
+                            <span className={cn("text-[11px] font-semibold", project.color)}>
+                              {project.shortTitle}
+                            </span>
+                            <span className="rounded-full border border-border/40 bg-background/40 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/70">
+                              {isSelected ? "Selected" : "Optional"}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </button>
+
+                    <div className="border-t border-border/30 px-5 py-3">
+                      <button
+                        type="button"
+                        onClick={() => setExpandedProject(isExpanded ? null : project.id)}
+                        className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.18em] text-muted-foreground transition-colors hover:text-foreground"
+                      >
+                        {isExpanded ? "Hide mission brief" : "Open mission brief"}
+                        <ArrowRight
+                          className={cn(
+                            "h-3.5 w-3.5 transition-transform",
+                            isExpanded && "rotate-90"
+                          )}
+                        />
+                      </button>
+
+                      {isExpanded && (
+                        <div className="mt-3 rounded-xl border border-border/40 bg-background/50 p-4 text-sm leading-relaxed text-muted-foreground">
+                          {project.detailedDescription}
+                        </div>
+                      )}
                     </div>
                   </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
+                );
+              })}
+            </div>
+          </div>
 
-        {/* Actions */}
-        <div className="flex items-center justify-between mt-6 pt-4 border-t border-border">
-          <button
-            onClick={selectAll}
-            className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-          >
-            Select all projects
-          </button>
+          <div className="relative flex items-center justify-between gap-3 border-t border-border/40 bg-background/90 px-6 py-4">
+            <div className="text-xs text-muted-foreground">
+              {selectedProjects.length > 0
+                ? `${selectedProjects.length} projects selected`
+                : "No project selected. Saving now will arm all tracks by default."}
+            </div>
 
-          <div className="flex items-center gap-3">
-            <Button variant="ghost" onClick={onClose}>
-              Skip for now
-            </Button>
-            <Button onClick={handleSave} className="gap-2">
-              Continue
-              <ArrowRight className="w-4 h-4" />
-            </Button>
+            <div className="flex items-center gap-3">
+              <Button variant="ghost" onClick={onClose}>
+                Skip for now
+              </Button>
+              <Button onClick={handleSave} className="btn-glow gap-2 rounded-full px-5 font-black uppercase tracking-[0.18em]">
+                Save preferences
+                <ArrowRight className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
         </div>
-
-        {/* Selection summary */}
-        {selectedProjects.length > 0 && (
-          <p className="text-center text-sm text-muted-foreground mt-2">
-            {selectedProjects.length} project{selectedProjects.length !== 1 ? "s" : ""} selected
-          </p>
-        )}
       </DialogContent>
     </Dialog>
   );

@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useSession } from "@/src/lib/auth/session-context";
+import { usePostHog } from "posthog-js/react";
 import { PlanetGeneratorMinimal } from "@/src/components/discovery/data-sources/Astronomers/PlanetHunters/PlanetGenerator";
 import PlanetFocusView from "./PlanetFocusView";
 import DeploySidebar from "./DeploySidebar";
@@ -25,6 +26,7 @@ export type EnrichedDatabaseAnomaly = {
 
 export default function DeploySatelliteViewport() {
   const session = useSession();
+  const posthog = usePostHog();
 
   const [mode, setMode] = useState<InvestigationMode>("planets");
   const [duration, setDuration] = useState(7);
@@ -140,6 +142,7 @@ export default function DeploySatelliteViewport() {
       const payload = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(payload?.error || "Failed to deploy satellite");
       setMessage(`Deployment successful (${mode})`);
+      posthog?.capture("structure_deployed", { structure: "satellite", mode, planetId: selectedPlanetId });
     } catch (error: any) {
       setMessage(error?.message || "Deployment failed");
     } finally {

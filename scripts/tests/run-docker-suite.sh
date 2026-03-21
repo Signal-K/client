@@ -53,4 +53,4 @@ export SUPABASE_SERVICE_ROLE_KEY="${SUPABASE_SERVICE_ROLE_KEY:-${LOCAL_SERVICE_R
 export SUPABASE_SECRET_KEY="${SUPABASE_SECRET_KEY:-${LOCAL_SECRET_KEY:-${LOCAL_SERVICE_ROLE_KEY}}}"
 
 echo "Running docker test profile: ${PROFILE}"
-docker compose -f ops/compose/docker-compose.test.yml --profile "${PROFILE}" up --build --abort-on-container-exit
+docker compose -f ops/compose/docker-compose.test.yml --profile "${PROFILE}" up --abort-on-container-exit

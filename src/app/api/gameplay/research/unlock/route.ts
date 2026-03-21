@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 
 import { prisma } from "@/lib/server/prisma";
+import { getResearchedProgressForUser, getSurveyBonusForUser, unlockTechForUser } from "@/lib/server/researched";
 import { getRouteUser } from "@/lib/server/supabaseRoute";
 
 export const dynamic = "force-dynamic";
@@ -57,24 +58,16 @@ export async function POST(request: NextRequest) {
   }
 
   const userId = user.id;
-  const [researched, classificationCountRows, surveyRewards] = await Promise.all([
-    prisma.$queryRaw<Array<{ tech_type: string }>>`
-      SELECT tech_type FROM researched WHERE user_id = ${userId}
-    `,
-    prisma.$queryRaw<Array<{ count: bigint }>>`
-      SELECT COUNT(*)::bigint AS count
-      FROM classifications
-      WHERE author = ${userId}
-    `,
-    prisma.$queryRaw<Array<{ stardust_granted: number }>>`
-      SELECT stardust_granted FROM survey_rewards WHERE user_id = ${userId}::uuid
-    `,
+  const [researchProgress, classificationCount, surveyBonus] = await Promise.all([
+    getResearchedProgressForUser(userId),
+    prisma.classification.count({
+      where: { author: userId },
+    }),
+    getSurveyBonusForUser(userId),
   ]);
-  const classificationCount = Number(classificationCountRows[0]?.count ?? 0);
-  const surveyBonus = surveyRewards.reduce((sum, r) => sum + (r.stardust_granted ?? 0), 0);
 
-  const researchedRows = researched;
-  const researchedSet = new Set(researchedRows.map((r) => r.tech_type));
+  const researchedRows = researchProgress.entries;
+  const researchedSet = researchProgress.techSet;
 
   const existingCount = researchedRows.filter((r) => r.tech_type === techType).length;
   if (ONE_TIME_UPGRADES.has(techType) && existingCount > 0) {
@@ -91,19 +84,18 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Requires p4Minerals first" }, { status: 400 });
   }
   if (techType === "ngtsAccess") {
-    const planetCountRows = await prisma.$queryRaw<Array<{ count: bigint }>>`
-      SELECT COUNT(*)::bigint AS count
-      FROM classifications
-      WHERE author = ${userId}
-        AND classificationtype = 'planet'
-    `;
-    const planetCount = Number(planetCountRows[0]?.count ?? 0);
+    const planetCount = await prisma.classification.count({
+      where: {
+        author: userId,
+        classificationtype: "planet",
+      },
+    });
     if ((planetCount || 0) < 4) {
       return NextResponse.json({ error: "Requires 4 planet classifications" }, { status: 400 });
     }
   }
 
-  const spent = researchedRows.reduce((total, row) => total + techCost(row.tech_type), 0);
+  const spent = researchProgress.spent;
   const availableStardust = Math.max(0, classificationCount + surveyBonus - spent);
   const cost = techCost(techType);
 
@@ -114,10 +106,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  await prisma.$executeRaw`
-    INSERT INTO researched (user_id, tech_type)
-    VALUES (${userId}, ${techType})
-  `;
+  await unlockTechForUser(userId, techType);
 
   revalidatePath("/research");
   revalidatePath("/game");
