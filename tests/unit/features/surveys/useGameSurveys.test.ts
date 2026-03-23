@@ -8,6 +8,12 @@ vi.mock("next/navigation", () => ({
 import { useGameSurveys } from "@/features/surveys/hooks/useGameSurveys";
 import { surveyStorageKey } from "@/features/surveys/mechanic-surveys";
 
+const TELESCOPE_CLASSIFICATIONS = [
+  { classificationtype: "telescope-tess" },
+  { classificationtype: "telescope-tess" },
+  { classificationtype: "planet" },
+];
+
 describe("useGameSurveys", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -55,7 +61,9 @@ describe("useGameSurveys", () => {
     const key = surveyStorageKey("mechanic_telescope_loop_v1", "user-1");
     localStorage.setItem(key, "completed");
 
-    const { result } = renderHook(() => useGameSurveys("user-1"));
+    const { result } = renderHook(() =>
+      useGameSurveys("user-1", TELESCOPE_CLASSIFICATIONS)
+    );
     act(() => { vi.runAllTimers(); });
 
     expect(result.current.activeSurvey).toBeNull();
@@ -68,21 +76,48 @@ describe("useGameSurveys", () => {
     const key = surveyStorageKey("mechanic_rover_loop_v1", "user-1");
     localStorage.setItem(key, "dismissed");
 
-    const { result } = renderHook(() => useGameSurveys("user-1"));
+    const { result } = renderHook(() =>
+      useGameSurveys("user-1", [{ classificationtype: "rover" }, { classificationtype: "rover" }, { classificationtype: "rover" }])
+    );
     act(() => { vi.runAllTimers(); });
 
     expect(result.current.activeSurvey).toBeNull();
   });
 
-  it("shows survey after delay when view matches and not yet completed", async () => {
+  it("does not show mechanic survey when user has too few relevant classifications", async () => {
     const { useSearchParams } = await import("next/navigation");
     vi.mocked(useSearchParams).mockReturnValue({ get: () => "telescope" } as any);
 
-    const { result } = renderHook(() => useGameSurveys("user-1"));
+    // Only 1 classification — below the 3 minimum
+    const { result } = renderHook(() =>
+      useGameSurveys("user-1", [{ classificationtype: "telescope-tess" }])
+    );
+    act(() => { vi.runAllTimers(); });
+
+    expect(result.current.activeSurvey).toBeNull();
+  });
+
+  it("shows survey after delay when view matches and user has enough classifications", async () => {
+    const { useSearchParams } = await import("next/navigation");
+    vi.mocked(useSearchParams).mockReturnValue({ get: () => "telescope" } as any);
+
+    const { result } = renderHook(() =>
+      useGameSurveys("user-1", TELESCOPE_CLASSIFICATIONS)
+    );
     expect(result.current.activeSurvey).toBeNull();
 
     act(() => { vi.runAllTimers(); });
 
     expect(result.current.activeSurvey?.id).toBe("mechanic_telescope_loop_v1");
+  });
+
+  it("does not show telescope survey with no classifications at all", async () => {
+    const { useSearchParams } = await import("next/navigation");
+    vi.mocked(useSearchParams).mockReturnValue({ get: () => "telescope" } as any);
+
+    const { result } = renderHook(() => useGameSurveys("user-1", []));
+    act(() => { vi.runAllTimers(); });
+
+    expect(result.current.activeSurvey).toBeNull();
   });
 });

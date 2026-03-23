@@ -11,6 +11,10 @@ export type MechanicMicroSurvey = {
   subtitle: string;
   triggerSurface: "game" | "ecosystem";
   questions: readonly [MicroSurveyQuestion, MicroSurveyQuestion?];
+  /** Minimum number of relevant classifications before this survey is shown. */
+  minClassificationsRequired?: number;
+  /** Which classification types count toward minClassificationsRequired. */
+  relevantClassificationTypes?: readonly string[];
 };
 
 export type ProjectType =

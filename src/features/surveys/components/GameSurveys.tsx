@@ -4,6 +4,7 @@ import { usePostHog } from "posthog-js/react";
 import { useGameSurveys } from "../hooks/useGameSurveys";
 import { useProjectEngagementSurveys } from "../hooks/useProjectEngagementSurveys";
 import type { ClassificationForSurvey } from "../hooks/useProjectEngagementSurveys";
+import type { ClassificationForMechanicSurvey } from "../hooks/useGameSurveys";
 import MechanicPulseSurvey from "./MechanicPulseSurvey";
 
 interface GameSurveysProps {
@@ -18,7 +19,7 @@ export function GameSurveys({ userId, classifications = [] }: GameSurveysProps) 
     activeSurvey: activeMechanicSurvey,
     dismissSurvey: dismissMechanic,
     completeSurvey: completeMechanic,
-  } = useGameSurveys(userId);
+  } = useGameSurveys(userId, classifications as ClassificationForMechanicSurvey[]);
 
   const {
     activeSurvey: activeEngagementSurvey,
