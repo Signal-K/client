@@ -81,4 +81,33 @@ describe("middleware", () => {
     expect(mockRedirect).not.toHaveBeenCalled();
     expect(mockNext).toHaveBeenCalled();
   });
+
+  // ── Landing page (/) redirect for authenticated users ────────────────────
+
+  it("redirects authenticated user from '/' to '/game?from=landing'", () => {
+    const req = makeRequest("/", "http://localhost:3000", [
+      { name: "sb-abc-auth-token", value: "token" },
+    ]);
+    middleware(req);
+    expect(mockRedirect).toHaveBeenCalledWith(
+      expect.objectContaining({ pathname: "/game", search: "?from=landing" })
+    );
+  });
+
+  it("passes through unauthenticated user on '/' (shows landing page)", () => {
+    const req = makeRequest("/", "http://localhost:3000", []);
+    middleware(req);
+    expect(mockRedirect).not.toHaveBeenCalled();
+    expect(mockNext).toHaveBeenCalled();
+  });
+
+  it("redirects authenticated user on '/' with chunked cookie to '/game?from=landing'", () => {
+    const req = makeRequest("/", "http://localhost:3000", [
+      { name: "sb-abc-auth-token.0", value: "chunk" },
+    ]);
+    middleware(req);
+    expect(mockRedirect).toHaveBeenCalledWith(
+      expect.objectContaining({ pathname: "/game", search: "?from=landing" })
+    );
+  });
 });

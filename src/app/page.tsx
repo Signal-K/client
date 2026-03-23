@@ -10,8 +10,6 @@ import { LandingAnalytics } from "./apt/_components/LandingAnalytics";
 import { LandingMobileMenu } from "./apt/_components/LandingMobileMenu";
 import { LandingStats, LandingStatsFallback } from "./apt/_components/LandingStats";
 
-export const experimental_ppr = true;
-
 export const metadata: Metadata = {
   title: "Star Sailors — Real astronomy. Your kind of game.",
   description:
@@ -117,7 +115,15 @@ export default async function HomePage() {
           </Link>
         </div>
 
-        <div className="relative md:hidden">
+        <div className="flex items-center gap-2 md:hidden">
+          <Link
+            href="/auth"
+            data-track="hero_cta_clicked"
+            data-track-props='{"source":"mobile_header"}'
+            className="rounded-full bg-primary px-4 py-2 text-xs font-black uppercase tracking-wider text-primary-foreground"
+          >
+            Launch →
+          </Link>
           <LandingMobileMenu />
         </div>
       </header>

@@ -64,6 +64,8 @@ export const MECHANIC_SURVEYS: readonly MechanicMicroSurvey[] = [
     title: "Telescope Debrief",
     subtitle: "How did the detection loop feel this run?",
     triggerSurface: "game",
+    minClassificationsRequired: 3,
+    relevantClassificationTypes: ["planet", "telescope-tess", "telescope-minorPlanet"],
     questions: [
       {
         id: "pace",
@@ -84,6 +86,8 @@ export const MECHANIC_SURVEYS: readonly MechanicMicroSurvey[] = [
     title: "Rover Debrief",
     subtitle: "Quick systems check from your terrain run.",
     triggerSurface: "game",
+    minClassificationsRequired: 3,
+    relevantClassificationTypes: ["rover"],
     questions: [
       {
         id: "control",
@@ -104,6 +108,8 @@ export const MECHANIC_SURVEYS: readonly MechanicMicroSurvey[] = [
     title: "Satellite Ops",
     subtitle: "Feedback on cloud tracking.",
     triggerSurface: "game",
+    minClassificationsRequired: 3,
+    relevantClassificationTypes: ["cloud", "lidar-jovianVortexHunter"],
     questions: [
       {
         id: "ui",
@@ -118,6 +124,8 @@ export const MECHANIC_SURVEYS: readonly MechanicMicroSurvey[] = [
     title: "Solar Array",
     subtitle: "Energy collection efficiency.",
     triggerSurface: "game",
+    minClassificationsRequired: 3,
+    relevantClassificationTypes: ["telescope-sunspot"],
     questions: [
       {
         id: "complexity",

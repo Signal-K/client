@@ -11,10 +11,21 @@ function hasSupabaseAuthCookie(req: NextRequest) {
 }
 
 export function middleware(req: NextRequest) {
-  if (!hasSupabaseAuthCookie(req) && req.nextUrl.pathname.startsWith("/game")) {
+  const isAuthenticated = hasSupabaseAuthCookie(req);
+  const { pathname } = req.nextUrl;
+
+  // Authenticated users visiting the landing page → send straight to the game.
+  // Cookie presence is sufficient here: if the access token is expired but the
+  // refresh token is still valid, /game will resolve correctly. If both are
+  // expired the game's own auth guard will redirect to /auth.
+  if (isAuthenticated && pathname === "/") {
+    return NextResponse.redirect(new URL("/game?from=landing", req.url));
+  }
+
+  // Unauthenticated users trying to access the game → send to login.
+  if (!isAuthenticated && pathname.startsWith("/game")) {
     const loginUrl = new URL("/auth", req.url);
-    const nextPath = `${req.nextUrl.pathname}${req.nextUrl.search}`;
-    loginUrl.searchParams.set("next", nextPath);
+    loginUrl.searchParams.set("next", `${pathname}${req.nextUrl.search}`);
     return NextResponse.redirect(loginUrl);
   }
 
@@ -22,5 +33,6 @@ export function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/game/:path*"],
+  // Run on the landing page and all game routes.
+  matcher: ["/", "/game/:path*"],
 };

@@ -453,7 +453,7 @@ export default function GameClient({ initialData, user }: GameClientProps) {
               <div className="grid h-full grid-cols-1 gap-0 lg:grid-cols-[1fr_300px] lg:overflow-hidden">
 
                 {/* ── Left / Main column ── */}
-                <div className="flex h-full flex-col gap-3 p-3 sm:gap-4 sm:p-4 lg:overflow-y-auto">
+                <div className="flex h-full flex-col gap-2 overflow-y-auto p-2 sm:gap-4 sm:p-4 lg:gap-4 lg:p-4">
 
                   {/* Mission Brief — always above fold */}
                   <MissionBriefCard
@@ -492,8 +492,8 @@ export default function GameClient({ initialData, user }: GameClientProps) {
                     }
                   />
 
-                  {/* Sector Radar — hidden until first deployment */}
-                  {Object.values(radarStations).some(r => r.deployed) ? (
+                  {/* Sector Radar — only shown once structures are deployed */}
+                  {Object.values(radarStations).some(r => r.deployed) && (
                     <>
                       <SectionLabel text="Sector Radar" />
                       <SectorRadar
@@ -503,54 +503,24 @@ export default function GameClient({ initialData, user }: GameClientProps) {
                         className="origin-top justify-center scale-[0.94] sm:scale-100 lg:justify-start"
                       />
                     </>
-                  ) : (
-                    <div className="rounded-xl border border-border/20 p-4 text-center sm:p-6">
-                      <p className="text-sm font-bold text-foreground/60">What do you want to do today?</p>
-                      <p className="mt-1 text-xs text-muted-foreground/50">Deploy a structure to start scanning your sector.</p>
-                      <div className="mt-4 grid grid-cols-2 gap-2 text-left">
-                        {[
-                          { id: "telescope" as const, label: "Hunt planets", accent: "border-teal-500/30 text-teal-300 hover:bg-teal-500/10" },
-                          { id: "satellite" as const, label: "Track weather", accent: "border-sky-500/30 text-sky-300 hover:bg-sky-500/10" },
-                          { id: "rover" as const, label: "Train rovers", accent: "border-amber-500/30 text-amber-300 hover:bg-amber-500/10" },
-                          { id: "solar" as const, label: "Join solar", accent: "border-orange-500/30 text-orange-300 hover:bg-orange-500/10" },
-                        ].map((option) => (
-                          <button
-                            key={option.id}
-                            type="button"
-                            onClick={() => handleStructureClick(option.id)}
-                            className={cn(
-                              "rounded-lg border px-3 py-2 text-xs font-semibold transition-colors",
-                              option.accent,
-                            )}
-                          >
-                            {option.label}
-                          </button>
-                        ))}
-                      </div>
-                      <button
-                        onClick={() => setShowPreferencesModal(true)}
-                        className="mt-4 rounded-full border border-teal-500/40 px-5 py-2 text-xs font-bold text-teal-400 hover:bg-teal-500/10 transition-colors"
-                      >
-                        + Add project
-                      </button>
-                    </div>
                   )}
 
-                  {/* Structure cards — primary navigation */}
+                  {/* Structure cards — horizontal scroll on mobile, 4-col grid on sm+ */}
                   <SectionLabel text="Station Systems" />
-                  <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-3">
+                  <div className="flex gap-2 overflow-x-auto pb-1 sm:grid sm:grid-cols-4 sm:overflow-x-visible sm:pb-0 sm:gap-3">
                     {(["telescope","satellite","rover","solar"] as const).map((id) => {
                       const station = radarStations[id];
                       const state = structureStates[id];
                       return (
-                        <StructureCard
-                          key={id}
-                          id={id}
-                          state={state}
-                          signals={station.signals}
-                          isSolar={id === "solar"}
-                          onClick={() => handleStructureClick(id)}
-                        />
+                        <div key={id} className="min-w-[calc(50%-4px)] sm:min-w-0">
+                          <StructureCard
+                            id={id}
+                            state={state}
+                            signals={station.signals}
+                            isSolar={id === "solar"}
+                            onClick={() => handleStructureClick(id)}
+                          />
+                        </div>
                       );
                     })}
                   </div>
