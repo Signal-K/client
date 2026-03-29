@@ -22,13 +22,19 @@ RUN set -eux; \
 
 # Copy the rest of the application code
 COPY . .
-# Generate Prisma client in image so fresh CI-like containers have it available.
-RUN yarn prisma:generate
+
+# Set default environment variables for the build phase to prevent prerendering errors.
+# These will be baked into the client-side bundle if not overridden during build.
+# At runtime, the server-side will use the actual environment variables.
+ENV NEXT_PUBLIC_SUPABASE_URL=http://localhost:54321
+ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=dummy-key-for-build
+
+# Generate Prisma client and build app into the image layer.
+RUN yarn prisma:generate && yarn build
 
 # Expose the port the app runs on
 EXPOSE 3000
 
 ENV NEXT_TELEMETRY_DISABLED=1
 
-# Run production server; compose overrides this to include build step.
 CMD ["yarn", "start"]

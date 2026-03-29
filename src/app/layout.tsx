@@ -1,14 +1,14 @@
 import { ReactNode } from "react";
 import type { Metadata, Viewport } from "next";
-import { Nunito } from "next/font/google";
+import { Syne_Mono } from "next/font/google";
 import RootLayoutClient from "@/src/components/layout/RootLayoutClient";
 import { PostHogProvider } from "@/src/components/providers/PostHogProvider";
 
-const nunito = Nunito({
+const syneMono = Syne_Mono({
   subsets: ["latin"],
-  variable: "--font-nunito",
+  variable: "--font-syne-mono",
   display: "swap",
-  weight: ["400", "500", "600", "700", "800", "900"],
+  weight: ["400"],
 });
 
 export const metadata: Metadata = {
@@ -78,7 +78,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       projectId={posthogProjectId}
       region={posthogRegion}
     >
-      <RootLayoutClient fontClassName={nunito.variable}>{children}</RootLayoutClient>
+      <RootLayoutClient fontClassName={syneMono.variable}>{children}</RootLayoutClient>
     </PostHogProvider>
   );
 };

@@ -18,15 +18,11 @@ services:
       - NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY:-}
       - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY:-}
       - SUPABASE_SECRET_KEY=${SUPABASE_SECRET_KEY:-}
-    volumes:
-      - ../../:/app
-      - /app/node_modules
-    working_dir: /app
     networks:
       - test-network
     extra_hosts:
       - "host.docker.internal:host-gateway"
-    command: "sh -c 'yarn build && yarn start'"
+    command: "yarn start"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3000/auth"]
       interval: 30s

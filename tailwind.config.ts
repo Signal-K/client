@@ -67,8 +67,9 @@ const config: Config = {
         sm: "calc(var(--radius) - 4px)",
       },
       fontFamily: {
-        display: ["var(--font-nunito)", "ui-rounded", "sans-serif"],
-        sans: ["var(--font-nunito)", "ui-sans-serif", "system-ui", "sans-serif"],
+        display: ["var(--font-syne-mono)", "ui-monospace", "monospace"],
+        sans: ["var(--font-syne-mono)", "ui-monospace", "monospace"],
+        mono: ["var(--font-syne-mono)", "ui-monospace", "monospace"],
       },
       backgroundImage: {
         "star-pattern": "radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px)",
