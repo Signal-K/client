@@ -101,8 +101,8 @@ function ConsoleButton({
       {!isHome && (
         <span
           className={cn(
-            "font-mono text-[7px] uppercase tracking-[0.15em] leading-none transition-colors duration-150",
-            isActive ? color : "text-muted-foreground/25",
+            "font-mono text-[9px] uppercase tracking-[0.15em] leading-none transition-colors duration-150",
+            isActive ? color : "text-muted-foreground/35",
           )}
         >
           {label}
@@ -120,21 +120,21 @@ export function StationNav({ active, onSelect, alerts }: StationNavProps) {
     >
       {/* Console housing */}
       <div
-        className="mx-2 mb-2 rounded-2xl overflow-hidden"
+        className="mx-2 mb-3 rounded-2xl overflow-hidden"
         style={{
-          background: "linear-gradient(180deg, rgba(20,28,42,0.97) 0%, rgba(12,18,28,0.99) 100%)",
-          boxShadow: "0 -1px 0 rgba(255,255,255,0.06), inset 0 1px 0 rgba(255,255,255,0.04), 0 -8px 32px rgba(0,0,0,0.6)",
-          border: "1px solid rgba(255,255,255,0.06)",
+          background: "linear-gradient(180deg, rgba(20,28,42,0.98) 0%, rgba(12,18,28,1) 100%)",
+          boxShadow: "0 -2px 10px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.08)",
+          border: "1px solid rgba(255,255,255,0.08)",
         }}
       >
         {/* Top rule — console edge light */}
         <div
-          className="h-px w-full"
-          style={{ background: "linear-gradient(90deg, transparent, rgba(136,192,208,0.3) 20%, rgba(136,192,208,0.3) 80%, transparent)" }}
+          className="h-[2px] w-full"
+          style={{ background: "linear-gradient(90deg, transparent, rgba(136,192,208,0.4) 20%, rgba(136,192,208,0.4) 80%, transparent)" }}
         />
 
         {/* Button row */}
-        <div className="flex items-stretch gap-1.5 px-2 pt-2 pb-safe-bottom pb-2">
+        <div className="flex items-stretch gap-2 px-2.5 pt-3 pb-safe-bottom pb-3">
           {/* Left cluster: scope + satellite */}
           {sideItems.slice(0, 2).map((item) => (
             <ConsoleButton
@@ -147,7 +147,7 @@ export function StationNav({ active, onSelect, alerts }: StationNavProps) {
           ))}
 
           {/* Center: HOME — raised elevated button */}
-          <div className="flex items-end justify-center pb-0.5 px-1">
+          <div className="flex items-end justify-center pb-0.5 px-2">
             <button
               onClick={() => onSelect("base")}
               onPointerDown={(e) => (e.currentTarget.style.transform = "translateY(2px)")}
@@ -156,30 +156,30 @@ export function StationNav({ active, onSelect, alerts }: StationNavProps) {
               aria-label="Base"
               aria-pressed={active === "base"}
               className={cn(
-                "relative w-14 h-14 rounded-full flex items-center justify-center -mt-4 transition-all duration-100",
+                "relative w-16 h-16 rounded-full flex items-center justify-center -mt-6 transition-all duration-100",
               )}
               style={{
                 background:
                   active === "base"
-                    ? "radial-gradient(ellipse at 40% 30%, rgba(136,192,208,0.25) 0%, rgba(5,20,35,0.95) 70%)"
-                    : "radial-gradient(ellipse at 40% 30%, rgba(255,255,255,0.08) 0%, rgba(10,18,30,0.98) 70%)",
+                    ? "radial-gradient(ellipse at 40% 30%, rgba(136,192,208,0.3) 0%, rgba(5,20,35,0.98) 70%)"
+                    : "radial-gradient(ellipse at 40% 30%, rgba(255,255,255,0.1) 0%, rgba(10,18,30,1) 70%)",
                 boxShadow: active === "base"
-                  ? "3px 3px 6px rgba(0,0,0,0.7), -1px -1px 0 rgba(255,255,255,0.12), 0 0 0 2px rgba(136,192,208,0.3), 0 0 16px rgba(136,192,208,0.2)"
-                  : "3px 3px 6px rgba(0,0,0,0.6), -1px -1px 0 rgba(255,255,255,0.1), 0 0 0 1px rgba(255,255,255,0.08)",
+                  ? "4px 4px 8px rgba(0,0,0,0.8), -1px -1px 0 rgba(255,255,255,0.15), 0 0 0 2px rgba(136,192,208,0.4), 0 0 20px rgba(136,192,208,0.3)"
+                  : "4px 4px 8px rgba(0,0,0,0.7), -1px -1px 0 rgba(255,255,255,0.12), 0 0 0 1px rgba(255,255,255,0.1)",
                 border: "none",
               }}
             >
               <Home
                 className={cn(
-                  "h-5 w-5 transition-colors",
-                  active === "base" ? "text-teal-300" : "text-muted-foreground/50",
+                  "h-6 w-6 transition-colors",
+                  active === "base" ? "text-teal-300" : "text-muted-foreground/60",
                 )}
               />
               {/* Ring around home button */}
               <div
                 className={cn(
-                  "absolute inset-[-3px] rounded-full border transition-all",
-                  active === "base" ? "border-teal-400/40" : "border-white/5",
+                  "absolute inset-[-4px] rounded-full border-2 transition-all",
+                  active === "base" ? "border-teal-400/50" : "border-white/10",
                 )}
               />
             </button>

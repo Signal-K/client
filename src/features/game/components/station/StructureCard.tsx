@@ -74,9 +74,10 @@ interface StructureCardProps {
   signals?: number;
   isSolar?: boolean;
   onClick: () => void;
+  onQuickDeploy?: (e: React.MouseEvent) => void;
 }
 
-export function StructureCard({ id, state, signals = 0, isSolar = false, onClick }: StructureCardProps) {
+export function StructureCard({ id, state, signals = 0, isSolar = false, onClick, onQuickDeploy }: StructureCardProps) {
   const cfg = STRUCTURE_CONFIG[id];
   const [showScanLine, setShowScanLine] = useState(false);
   const prevState = useRef(state);
@@ -177,10 +178,27 @@ export function StructureCard({ id, state, signals = 0, isSolar = false, onClick
           {signals > 0 ? `${signals} signal${signals !== 1 ? "s" : ""} awaiting` : isStandby ? "Standby" : isUndeployed ? (isSolar ? "Join Mission" : "Deploy") : "Clear"}
         </div>
 
+        {/* Quick Deploy Action (Mobile-friendly) */}
+        {isUndeployed && onQuickDeploy && (
+          <div className="mt-3">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onQuickDeploy(e);
+              }}
+              className="w-full py-2 px-2 rounded bg-primary hover:bg-primary/90 text-[10px] font-black uppercase tracking-wider text-primary-foreground transition-all active:scale-95 shadow-lg shadow-primary/20"
+            >
+              Quick Deploy
+            </button>
+          </div>
+        )}
+
         {/* Personality copy */}
-        <p className={cn("mt-2 text-[9px] leading-relaxed sm:text-[10px]", isStandby ? "text-muted-foreground/20" : "text-muted-foreground/45")}>
-          {cfg.personality[state]}
-        </p>
+        {!isUndeployed && (
+          <p className={cn("mt-2 text-[9px] leading-relaxed sm:text-[10px]", isStandby ? "text-muted-foreground/20" : "text-muted-foreground/45")}>
+            {cfg.personality[state]}
+          </p>
+        )}
       </div>
     </button>
   );

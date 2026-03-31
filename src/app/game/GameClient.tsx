@@ -203,6 +203,11 @@ export default function GameClient({ initialData, user }: GameClientProps) {
     router.replace(`/game?${params.toString()}`, { scroll: false });
   }, [router, posthog, activeView]);
 
+  const handleQuickDeploy = useCallback((id: StructureId) => {
+    posthog?.capture("quick_deploy_used", { structure: id });
+    markTutorialComplete(`${id}-deploy` as TutorialId);
+  }, [markTutorialComplete, posthog]);
+
   const handleStructureClick = useCallback((id: StructureId) => {
     const tutorialKey = `${id}-deploy` as TutorialId;
     if (!hasTutorialCompleted(tutorialKey)) {
@@ -432,6 +437,9 @@ export default function GameClient({ initialData, user }: GameClientProps) {
         agencyId={data.profile?.username || data.profile?.id}
       />
 
+      {/* Header Spacer to prevent overlap */}
+      <div className="h-14 shrink-0" />
+
       {/* ─── Persistent HUD Strip ─── */}
       <HUDStrip
         signals={Object.values(radarStations).reduce((s, r) => s + r.signals, 0)}
@@ -439,7 +447,7 @@ export default function GameClient({ initialData, user }: GameClientProps) {
         classifications={data.classifications?.length ?? 0}
       />
 
-      <main className="relative flex-1 overflow-hidden">
+      <main className="relative flex-1 overflow-hidden pb-[80px] md:pb-0">
         <AnimatePresence mode="wait">
           {activeView === "base" ? (
             <motion.div 
@@ -519,6 +527,7 @@ export default function GameClient({ initialData, user }: GameClientProps) {
                             signals={station.signals}
                             isSolar={id === "solar"}
                             onClick={() => handleStructureClick(id)}
+                            onQuickDeploy={() => handleQuickDeploy(id)}
                           />
                         </div>
                       );
@@ -659,6 +668,12 @@ export default function GameClient({ initialData, user }: GameClientProps) {
       <PWAPrompt />
       <PushNotificationPrompt />
       <GameSurveys userId={user?.id} classifications={data.classifications ?? []} />
+
+      <StationNav 
+        active={activeView} 
+        onSelect={handleViewChange} 
+        alerts={signalCounts} 
+      />
     </div>
   );
 }
