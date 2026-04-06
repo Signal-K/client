@@ -178,6 +178,14 @@
     background-image: radial-gradient(ellipse 120% 80% at 50% 100%, rgba(0, 161, 228, 0.25) 0%, rgba(1, 47, 107, 0.08) 45%, transparent 70%);
   }
 
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
   /* Glow CTA button state */
   .btn-glow {
     box-shadow: var(--glow-primary-sm);

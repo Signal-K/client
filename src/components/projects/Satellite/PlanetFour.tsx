@@ -215,7 +215,6 @@ export function PlanetFourProject() {
 
     const [anomaly, setAnomaly] = useState<Anomaly | null>(null);
     const [imageUrl, setImageUrl] = useState<string | null>(null);
-    const [parentClassificationId, setParentClassificationId] = useState<number | null>(null);
     const [loading, setLoading] = useState(true);
     const [showTutorial, setShowTutorial] = useState(false);
     const [hasMineralResearch, setHasMineralResearch] = useState<boolean>(false);

@@ -4,8 +4,8 @@ import { useParams } from "next/navigation";
 import { BarChartBigIcon, GlassWater, Guitar, HelpCircle, PenBoxIcon, RadioIcon, SpeechIcon, TelescopeIcon, VoteIcon } from "lucide-react";
 import MissionShell from "../../BasePlate";
 import { DailyMinorPlanetWithId, StarterDailyMinorPlanet } from "@/src/components/projects/Telescopes/DailyMinorPlanet";
-import VoteDMPClassifications from "./DMPVote";
-import DMPGenerator from "./AsteroidMaker";
+import VotePanel from "@/src/components/social/posts/VotePanel";
+import ClassificationList from "@/src/components/social/posts/ClassificationList";
 import { ActiveAsteroidWithId } from "@/src/components/projects/Telescopes/ActiveAsteroids";
 
 interface Mission {
@@ -68,7 +68,7 @@ const DailyMinorPlanetMissions = () => {
       icon: SpeechIcon,
       points: 1,
       completedCount: 0,
-      internalComponent: () => <VoteDMPClassifications />,
+      internalComponent: () => <VotePanel classificationType="telescope-minorPlanet" getImages={(m) => { if (Array.isArray(m) && m.length > 1 && Array.isArray(m[1])) return m[1]; if (m?.uploadUrl) return [m.uploadUrl]; return []; }} />,
       color: "text-cyan-600",
       shadow: true,
       action: () => {},
@@ -102,41 +102,6 @@ const DailyMinorPlanetMissions = () => {
       shadow: true,
       action: () => {},
     },
-    // {
-    //   id: 6,
-    //   chapter: 2,
-    //   title: "Compare AA & DMP Classification",
-    //   description:
-    //     "Pick out classifications you've made from both datasets and compare the differences and potential validity",
-    //   icon: BarChartBigIcon,
-    //   points: 2,
-    //   color: 'text-green-700',
-    //   shadow: true,
-    //   action: () => {},
-    // },
-    // {
-    //   id: 7,
-    //   chapter: 2,
-    //   title: "Comment & Vote on AA candidates",
-    //   description: "Work with other players to confirm classifications and provide feedback & consensus",
-    //   icon: PenBoxIcon,
-    //   points: 1,
-    //   color: 'text-blue-300',
-    //   shadow: true,
-    //   action: () => [],
-    // },
-    // {
-    //   id: 8,
-    //   chapter: 2,
-    //   title: "Propose tail, dust cloud, or null value",
-    //   description:
-    //     "Go through verified AA & DMP anomalies and propose what's going on specifically",
-    //   icon: GlassWater,
-    //   points: 1,
-    //   color: 'text-blue-700',
-    //   shadow: true,
-    //   action: () => {},
-    // },
   ]);
 
   const tutorialMission: Mission = {

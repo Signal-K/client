@@ -22,16 +22,16 @@ export function OnboardingSchematic({ selected }: OnboardingSchematicProps) {
 
   return (
     <div
-      className="relative w-full rounded-2xl border border-border/30 overflow-hidden"
-      style={{ height: 140, background: "rgba(4,10,22,0.7)" }}
+      className="relative w-full rounded-2xl border border-border/50 overflow-hidden shadow-inner bg-slate-50/80 dark:bg-slate-900/40 mb-6"
+      style={{ height: 160 }}
     >
       {/* Grid lines */}
-      <svg className="absolute inset-0 w-full h-full opacity-10" aria-hidden>
-        {Array.from({ length: 6 }, (_, i) => (
-          <line key={`v${i}`} x1={`${i * 20}%`} y1="0" x2={`${i * 20}%`} y2="100%" stroke="currentColor" strokeWidth="0.5" />
+      <svg className="absolute inset-0 w-full h-full opacity-[0.08]" aria-hidden>
+        {Array.from({ length: 11 }, (_, i) => (
+          <line key={`v${i}`} x1={`${i * 10}%`} y1="0" x2={`${i * 10}%`} y2="100%" stroke="currentColor" strokeWidth="0.5" />
         ))}
-        {Array.from({ length: 4 }, (_, i) => (
-          <line key={`h${i}`} x1="0" y1={`${i * 33}%`} x2="100%" y2={`${i * 33}%`} stroke="currentColor" strokeWidth="0.5" />
+        {Array.from({ length: 6 }, (_, i) => (
+          <line key={`h${i}`} x1="0" y1={`${i * 20}%`} x2="100%" y2={`${i * 20}%`} stroke="currentColor" strokeWidth="0.5" />
         ))}
       </svg>
 

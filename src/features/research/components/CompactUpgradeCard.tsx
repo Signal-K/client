@@ -1,7 +1,7 @@
 "use client";
 
-import { Button } from "../ui/button";
-import { Badge } from "../ui/badge";
+import { Button } from "@/src/components/ui/button";
+import { Badge } from "@/src/components/ui/badge";
 
 interface CompactUpgradeCardProps {
   title: string;

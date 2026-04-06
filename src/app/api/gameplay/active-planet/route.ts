@@ -12,7 +12,7 @@ async function resolveLocation(
   if (Number.isFinite(requestedLocation)) {
     const { error: updateError } = await supabase
       .from("profiles")
-      .update({ location: requestedLocation })
+      .update({ location: BigInt(requestedLocation) })
       .eq("id", userId);
 
     if (updateError) {
@@ -32,7 +32,7 @@ async function resolveLocation(
     throw new Error(profileError.message);
   }
 
-  const location = profile?.location ?? 30;
+  const location = profile?.location ?? BigInt(30);
   if (profile?.location == null) {
     const { error: updateError } = await supabase
       .from("profiles")
@@ -58,7 +58,7 @@ async function fetchActivePlanetPayload(userId: string, requestedLocation?: numb
     const { data: planet, error: planetError } = await supabase
       .from("anomalies")
       .select("*")
-      .eq("id", location)
+      .eq("id", BigInt(location))
       .maybeSingle();
 
     if (planetError) {
@@ -69,7 +69,7 @@ async function fetchActivePlanetPayload(userId: string, requestedLocation?: numb
       .from("classifications")
       .select("*")
       .eq("author", userId)
-      .eq("anomaly", location)
+      .eq("anomaly", BigInt(location))
       .eq("classificationtype", "lightcurve");
 
     if (classificationsError) {
@@ -77,9 +77,13 @@ async function fetchActivePlanetPayload(userId: string, requestedLocation?: numb
     }
 
     return NextResponse.json({
-      location,
-      planet: planet ?? null,
-      classifications: classifications ?? [],
+      location: location.toString(),
+      planet: planet ? { ...planet, id: planet.id.toString() } : null,
+      classifications: (classifications ?? []).map((c: any) => ({
+        ...c,
+        id: c.id.toString(),
+        anomaly: c.anomaly?.toString(),
+      })),
     });
   } catch (error: any) {
     return NextResponse.json(

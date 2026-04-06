@@ -167,7 +167,7 @@ function ReplayButton({ position, onReplay, title }: ReplayButtonProps) {
 // Pre-built tutorial step sets for common scenarios
 // These tutorials guide users through actual interactions with the interface
 
-const TELESCOPE_INTRO_STEPS: TutorialStep[] = [
+export const TELESCOPE_INTRO_STEPS: TutorialStep[] = [
   {
     id: "telescope-welcome",
     title: "Welcome to Your Telescope! 🔭",
@@ -203,7 +203,7 @@ const TELESCOPE_INTRO_STEPS: TutorialStep[] = [
   },
 ];
 
-const TELESCOPE_DEPLOY_STEPS: TutorialStep[] = [
+export const TELESCOPE_DEPLOY_STEPS: TutorialStep[] = [
   {
     id: "deploy-intro",
     title: "Choose Your Observation",
@@ -294,7 +294,7 @@ export const ROVER_INTRO_STEPS: TutorialStep[] = [
   },
 ];
 
-const SOLAR_INTRO_STEPS: TutorialStep[] = [
+export const SOLAR_INTRO_STEPS: TutorialStep[] = [
   {
     id: "solar-welcome",
     title: "Solar Observatory ☀️",

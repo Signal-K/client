@@ -135,7 +135,7 @@ export default function ClientClassificationPage({ id }: Props) {
   if (!classification) return null;
 
   const type = classification.classificationtype;
-  let viewportUrl = telescopeTypes.includes(type) ? "/structures/telescope" : balloonTypes.includes(type) ? "/viewports/satellite" : roverTypes.includes(type) ? "/viewports/rover" : "/";
+  const viewportUrl = telescopeTypes.includes(type) ? "/structures/telescope" : balloonTypes.includes(type) ? "/viewports/satellite" : roverTypes.includes(type) ? "/viewports/rover" : "/";
   
   const mediaUrl = Array.isArray(classification.media) ? classification.media.find((m: any) => Array.isArray(m) && typeof m[0] === "string" && m[0].startsWith("http"))?.[0] : undefined;
   const annotationBadges = Object.entries((classification?.classificationConfiguration?.annotationOptions ?? []).reduce((acc: any, l: string) => {

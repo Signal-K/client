@@ -17,9 +17,10 @@ export async function GET() {
       username: string | null;
       full_name: string | null;
       referral_code: string | null;
+      location: bigint | null;
     }>
   >`
-    SELECT avatar_url, username, full_name, referral_code
+    SELECT avatar_url, username, full_name, referral_code, location
     FROM profiles
     WHERE id::text = ${user.id}
     LIMIT 1
@@ -30,5 +31,6 @@ export async function GET() {
     username: rows[0]?.username ?? null,
     full_name: rows[0]?.full_name ?? null,
     referral_code: rows[0]?.referral_code ?? null,
+    location: rows[0]?.location ? rows[0].location.toString() : null,
   });
 }

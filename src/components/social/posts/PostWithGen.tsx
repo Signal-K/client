@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { useImageCarousel } from "@/src/hooks/useImageCarousel";
 import { Avatar, AvatarFallback, AvatarImage } from "@/src/components/ui/avatar";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/src/components/ui/card";
 import { Button } from "@/src/components/ui/button";
@@ -125,10 +126,6 @@ export function PostCardSingleWithGenerator({
         return <CloudSignal classificationConfig={classificationConfig} classificationId={String(classificationId)} />
       case "planet":
         return null; // Planet visualisation deactivated for performance sweep.
-      // case "telescope-minorPlanet":
-      //   return <AsteroidViewer classificationId={String(classificationId)} classificationConfig={classificationConfig} />;
-      // case "lidar-jovianVortexHunter":
-      //   return <CloudClassifier classificationId={String(classificationId)} classificationConfig={classificationConfig} />;
       default:
         return (
           <div>
@@ -236,7 +233,6 @@ export function PostCardSingleWithGeneratorEditMode({
   classificationConfig,
   images,
   classificationType,
-  // commentStatus,
   onVote,
 }: PostCardSingleProps) {
   const session = useSession();
@@ -288,17 +284,7 @@ export function PostCardSingleWithGeneratorEditMode({
     setVoteCount((prev) => prev + 1);
   };
 
-    const [currentIndex, setCurrentIndex] = React.useState(0);
-  
-    const goToNextImage = () => {
-      setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
-    };
-  
-    const goToPreviousImage = () => {
-      setCurrentIndex((prevIndex) =>
-        prevIndex === 0 ? images.length - 1 : prevIndex - 1
-      );
-    };
+    const { currentIndex, next: goToNextImage, prev: goToPreviousImage, goTo: setCurrentIndex } = useImageCarousel(images);
 
   const handleAddComment = async () => {
     if (!newComment.trim()) return;
@@ -332,16 +318,6 @@ export function PostCardSingleWithGeneratorEditMode({
 
         case "planet":
           return null; // Planet visualisation deactivated for performance sweep.
-      // case "telescope-minorPlanet":
-      //   return <AsteroidViewer 
-      //     classificationId={String(classificationId)} 
-      //     classificationConfig={classificationConfig}
-      //   />;
-      // case "lidar-jovianVortexHunter":
-      //   return <CloudClassifier
-      //     classificationId={String(classificationId)} 
-      //     classificationConfig={classificationConfig}
-      //   />;
       default:
         return (
           <div>
@@ -423,12 +399,6 @@ export function PostCardSingleWithGeneratorEditMode({
                         )}
                       </div>
           
-                      {/* Grid cell for the PlanetTempCalculator */}
-                      {/* {classificationType === 'planet' && (
-                        <div className="col-span-1">
-                          <PlanetTempCalculator />
-                        </div>
-                      )} */}
                     </div>
                   )}
         {images.length > 0 && (

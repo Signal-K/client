@@ -110,9 +110,6 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({
         return [roverImgClassificationOptions];
       case "cloud":
         return [
-          // cloudClassificationOptionsOne,
-          // cloudClassificationOptionsTwo,
-          // cloudClassificationOptionsThree,
           initialCloudClassificationOptions,
           cloudSpottingOnMarsShapesOptions,
         ];
@@ -465,12 +462,8 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({
         };
       case "cloud":
         return {
-          count: 1, // 3,
-          placeholders: [
-            "Cloud type",
-            // "Weather conditions",
-            // "Time of observation",
-          ],
+          count: 1,
+          placeholders: ["Cloud type"],
         };
       case "DiskDetective":
         return { count: 1, placeholders: ["Details about the disk detection"] };
@@ -511,30 +504,7 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({
         <div className="flex flex-col gap-6">
           {classificationOptions.length > 0 ? (
             <>
-              {/* <div className="flex flex-col gap-2">
-                {classificationOptions.map((optionSet, setIndex) => (
-                  <div key={setIndex} className="flex flex-col gap-4">
-                    <h3 className="font-bold text-sm">Option Set {setIndex + 1}</h3>
-                    <div className="grid grid-cols-2 gap-2">
-                      {optionSet.map((option) => (
-                        <button
-                          key={option.id}
-                          onClick={() => handleOptionClick(setIndex, option.id)}
-                          className={`p-2 rounded text-xs ${
-                            selectedOptions[setIndex]?.[option.id]
-                              ? "bg-blue-500"
-                              : "bg-gray-300"
-                          }`}
-                        >
-                          {option.text}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </div> */}
-  
-              <div className="flex flex-col gap-4">
+                  <div className="flex flex-col gap-4">
                 <textarea
                   value={content}
                   onChange={(e) => setContent(e.target.value)}

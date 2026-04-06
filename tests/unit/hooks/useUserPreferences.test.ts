@@ -88,7 +88,7 @@ describe("useUserPreferences", () => {
   it("detects new device when stored deviceId differs from current", async () => {
     const stored = {
       projectInterests: ["planet-hunting"],
-      hasCompletedOnboarding: true,
+      hasCompletedOnboarding: false,
       hasSeenStructureGuide: false,
       hasSeenDeploymentTutorial: false,
       hasSeenMineralGuide: false,
