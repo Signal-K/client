@@ -1,7 +1,7 @@
 ---
 id: task-ob4-missing-onboarding-projects
 title: "Onboarding: Solar Monitoring and Asteroid Hunting absent from project selection"
-status: open
+status: done
 priority: medium
 createdAt: '2026-04-07T00:00:00Z'
 ---

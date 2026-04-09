@@ -1,7 +1,7 @@
 ---
 id: 9ztpbl
 title: Decide the persistent HUD strip composition for the game hub
-status: todo
+status: done
 priority: high
 labels: []
 createdAt: '2026-04-01T11:56:01.878Z'

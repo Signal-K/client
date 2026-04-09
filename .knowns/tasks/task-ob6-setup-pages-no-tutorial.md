@@ -1,8 +1,9 @@
 ---
 id: task-ob6-setup-pages-no-tutorial
 title: "Onboarding: setup pages don't invoke tutorial system — first action is unaided"
-status: open
+status: done
 priority: medium
+parent: task-sxdk5w
 createdAt: '2026-04-07T00:00:00Z'
 ---
 

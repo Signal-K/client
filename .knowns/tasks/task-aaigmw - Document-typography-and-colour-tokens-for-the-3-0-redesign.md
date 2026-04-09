@@ -1,7 +1,7 @@
 ---
 id: aaigmw
 title: Document typography and colour tokens for the 3.0 redesign
-status: todo
+status: done
 priority: high
 assignee: Liam
 labels:

@@ -1,8 +1,9 @@
 ---
 id: task-ob2-missing-tutorial-selectors
 title: "Onboarding: data-tutorial selectors referenced in TutorialWrapper steps don't exist in DOM"
-status: open
+status: done
 priority: high
+parent: task-sxdk5w
 createdAt: '2026-04-07T00:00:00Z'
 ---
 

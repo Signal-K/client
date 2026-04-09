@@ -1,8 +1,9 @@
 ---
 id: task-30-p1-design-tokens
 title: "3.0 Phase 1: Design Tokens, Fonts & Theme"
-status: in-progress
+status: done
 priority: high
+parent: task-sxdk5w
 phase: "3.0-p1"
 specRefs:
   - "specs/redesign/3-0-unified-web-client"

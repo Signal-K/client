@@ -1,8 +1,9 @@
 ---
 id: task-ob5-no-reentry-path
 title: "Onboarding: no re-entry context when user bounces mid-flow"
-status: open
+status: done
 priority: medium
+parent: task-sxdk5w
 createdAt: '2026-04-07T00:00:00Z'
 ---
 

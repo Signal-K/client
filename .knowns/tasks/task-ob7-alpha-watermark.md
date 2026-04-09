@@ -1,8 +1,9 @@
 ---
 id: task-ob7-alpha-watermark
 title: "Onboarding: remove v3.0.0-alpha version watermark from footer"
-status: open
+status: done
 priority: low
+parent: task-sxdk5w
 createdAt: '2026-04-07T00:00:00Z'
 ---
 

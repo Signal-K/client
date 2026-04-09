@@ -1,8 +1,9 @@
 ---
 id: task-ob1-galaxyzoo-branch-bug
 title: "Onboarding: Fix GalaxyZoo showTutorial branch renders same component"
-status: open
+status: done
 priority: high
+parent: task-sxdk5w
 createdAt: '2026-04-07T00:00:00Z'
 ---
 

@@ -1,8 +1,9 @@
 ---
 id: task-ob3-tutorial-never-instantiated
 title: "Onboarding: TutorialWrapper + step sets defined but never used in routing"
-status: open
+status: done
 priority: high
+parent: task-sxdk5w
 createdAt: '2026-04-07T00:00:00Z'
 ---
 
