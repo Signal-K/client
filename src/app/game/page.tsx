@@ -23,23 +23,34 @@ function ControlStationSkeleton() {
 }
 
 export default async function GamePage() {
-  const supabase = createSupabaseServerClient();
+  console.log("[GamePage] render start");
+  try {
+    const supabase = createSupabaseServerClient();
+    console.log("[GamePage] supabase client created");
 
-  // Middleware already ran getUser() and refreshed the token, writing fresh
-  // cookies onto the response before this component runs. So getUser() here
-  // reads a fresh session from cookies — no refresh needed, no setAll() call,
-  // safe to use in a Server Component.
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+    console.log("[GamePage] getSession done", { hasSession: !!session, sessionError });
 
-  if (!user) {
-    redirect("/auth");
+    if (sessionError) {
+      console.error("[GamePage] getSession error:", sessionError);
+    }
+
+    if (!session) {
+      console.log("[GamePage] no session, redirecting to /auth");
+      redirect("/auth");
+    }
+
+    console.log("[GamePage] rendering GameClient for user", session.user.id);
+    return (
+      <Suspense fallback={<ControlStationSkeleton />}>
+        <GameClient initialData={null} user={session.user} />
+      </Suspense>
+    );
+  } catch (err) {
+    // Log the real error — visible in Vercel function logs
+    console.error("[GamePage] FATAL ERROR:", err);
+    console.error("[GamePage] error message:", err instanceof Error ? err.message : String(err));
+    console.error("[GamePage] error stack:", err instanceof Error ? err.stack : "no stack");
+    throw err;
   }
-
-  return (
-    <Suspense fallback={<ControlStationSkeleton />}>
-      <GameClient initialData={null} user={user} />
-    </Suspense>
-  );
 }
