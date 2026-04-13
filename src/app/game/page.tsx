@@ -25,21 +25,21 @@ function ControlStationSkeleton() {
 export default async function GamePage() {
   const supabase = createSupabaseServerClient();
 
-  // getSession() reads the cookie that middleware already refreshed.
-  // No network call, no cookie writes — safe to use in a Server Component.
-  // (getUser() makes a network call and tries to write cookies on refresh,
-  // which Next.js blocks in Server Components and causes a 408.)
+  // Middleware already ran getUser() and refreshed the token, writing fresh
+  // cookies onto the response before this component runs. So getUser() here
+  // reads a fresh session from cookies — no refresh needed, no setAll() call,
+  // safe to use in a Server Component.
   const {
-    data: { session },
-  } = await supabase.auth.getSession();
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  if (!session) {
+  if (!user) {
     redirect("/auth");
   }
 
   return (
     <Suspense fallback={<ControlStationSkeleton />}>
-      <GameClient initialData={null} user={session.user} />
+      <GameClient initialData={null} user={user} />
     </Suspense>
   );
 }
