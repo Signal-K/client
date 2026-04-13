@@ -1,38 +1,55 @@
-import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
+import { NextResponse, type NextRequest } from "next/server";
+import { createServerClient } from "@supabase/ssr";
 
-function hasSupabaseAuthCookie(req: NextRequest) {
-  const cookies = req.cookies.getAll();
-  return cookies.some(({ name, value }) => {
-    if (!value) return false;
-    if (name === "supabase-auth-token") return true;
-    return /^sb-.*-auth-token(?:\.\d+)?$/.test(name);
-  });
-}
+export async function middleware(request: NextRequest) {
+  // Must be declared before createServerClient so setAll can close over it
+  let response = NextResponse.next({ request });
 
-export function middleware(req: NextRequest) {
-  const isAuthenticated = hasSupabaseAuthCookie(req);
-  const { pathname } = req.nextUrl;
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return request.cookies.getAll();
+        },
+        setAll(cookiesToSet) {
+          // Write into the request so downstream server components see the update,
+          // and into the response so the browser receives the refreshed token.
+          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
+          response = NextResponse.next({ request });
+          cookiesToSet.forEach(({ name, value, options }) =>
+            response.cookies.set(name, value, options)
+          );
+        },
+      },
+    }
+  );
 
-  // Authenticated users visiting the landing page → send straight to the game.
-  // Cookie presence is sufficient here: if the access token is expired but the
-  // refresh token is still valid, /game will resolve correctly. If both are
-  // expired the game's own auth guard will redirect to /auth.
-  if (isAuthenticated && pathname === "/") {
-    return NextResponse.redirect(new URL("/game?from=landing", req.url));
+  // getUser() validates the JWT and refreshes if expired.
+  // Middleware runs at the edge and CAN write cookies — this is the only
+  // place the refresh should happen. Server Components must NOT call getUser().
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const { pathname } = request.nextUrl;
+
+  // Authenticated users on the landing page → game hub
+  if (user && pathname === "/") {
+    return NextResponse.redirect(new URL("/game?from=landing", request.url));
   }
 
-  // Unauthenticated users trying to access the game → send to login.
-  if (!isAuthenticated && pathname.startsWith("/game")) {
-    const loginUrl = new URL("/auth", req.url);
-    loginUrl.searchParams.set("next", `${pathname}${req.nextUrl.search}`);
+  // Unauthenticated users trying to reach the game → login
+  if (!user && pathname.startsWith("/game")) {
+    const loginUrl = new URL("/auth", request.url);
+    loginUrl.searchParams.set("next", `${pathname}${request.nextUrl.search}`);
     return NextResponse.redirect(loginUrl);
   }
 
-  return NextResponse.next({ request: { headers: req.headers } });
+  return response;
 }
 
 export const config = {
-  // Run on the landing page and all game routes.
   matcher: ["/", "/game/:path*"],
 };

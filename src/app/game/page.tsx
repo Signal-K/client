@@ -5,8 +5,6 @@ import GameClient from "./GameClient";
 
 export const dynamic = "force-dynamic";
 
-// ─── Loading skeleton ───────────────────────────────────────────────────────
-
 function ControlStationSkeleton() {
   return (
     <div className="min-h-screen w-full bg-background">
@@ -26,18 +24,22 @@ function ControlStationSkeleton() {
 
 export default async function GamePage() {
   const supabase = createSupabaseServerClient();
-  const { data: { user } } = await supabase.auth.getUser();
 
-  if (!user) {
+  // getSession() reads the cookie that middleware already refreshed.
+  // No network call, no cookie writes — safe to use in a Server Component.
+  // (getUser() makes a network call and tries to write cookies on refresh,
+  // which Next.js blocks in Server Components and causes a 408.)
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+
+  if (!session) {
     redirect("/auth");
   }
 
-  // Data is fetched client-side via /api/gameplay/page-data to avoid
-  // hitting Vercel's serverless timeout with 13+ sequential Prisma queries
-  // on cold starts. The skeleton shows while the client fetches.
   return (
     <Suspense fallback={<ControlStationSkeleton />}>
-      <GameClient initialData={null} user={user} />
+      <GameClient initialData={null} user={session.user} />
     </Suspense>
   );
 }
