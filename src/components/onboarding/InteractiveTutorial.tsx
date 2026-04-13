@@ -162,9 +162,12 @@ export default function InteractiveTutorial({
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [goNext, goPrev, onSkip]);
 
-  // Tooltip position calculation
+  // Tooltip position calculation — mobile-first: always centered on small viewports
   const getTooltipStyle = (): React.CSSProperties => {
-    if (!highlightRect || step?.position === "center") {
+    const isMobile = typeof window !== "undefined" && window.innerWidth < 480;
+
+    // On mobile or center-positioned steps, always center the card
+    if (!highlightRect || step?.position === "center" || isMobile) {
       return {
         position: "fixed",
         top: "50%",
@@ -174,21 +177,28 @@ export default function InteractiveTutorial({
     }
 
     const padding = 16;
-    const tooltipWidth = 400;
+    const tooltipWidth = Math.min(400, window.innerWidth - padding * 2);
     const tooltipHeight = 300;
+    const centeredLeft = Math.max(
+      padding,
+      Math.min(
+        highlightRect.left + highlightRect.width / 2 - tooltipWidth / 2,
+        window.innerWidth - tooltipWidth - padding,
+      ),
+    );
 
     switch (step?.position) {
       case "top":
         return {
           position: "fixed",
           bottom: window.innerHeight - highlightRect.top + padding,
-          left: Math.max(padding, highlightRect.left + highlightRect.width / 2 - tooltipWidth / 2),
+          left: centeredLeft,
         };
       case "bottom":
         return {
           position: "fixed",
           top: highlightRect.bottom + padding,
-          left: Math.max(padding, highlightRect.left + highlightRect.width / 2 - tooltipWidth / 2),
+          left: centeredLeft,
         };
       case "left":
         return {
@@ -200,7 +210,7 @@ export default function InteractiveTutorial({
         return {
           position: "fixed",
           top: Math.max(padding, highlightRect.top + highlightRect.height / 2 - tooltipHeight / 2),
-          left: highlightRect.right + padding,
+          left: Math.min(highlightRect.right + padding, window.innerWidth - tooltipWidth - padding),
         };
       default:
         return {
@@ -240,8 +250,12 @@ export default function InteractiveTutorial({
 
       {/* Tutorial card */}
       <div
-        className="z-50 w-full max-w-md bg-card border border-border rounded-2xl shadow-2xl overflow-hidden pointer-events-auto"
-        style={getTooltipStyle() as React.CSSProperties}
+        className="z-50 bg-card border border-border rounded-2xl shadow-2xl overflow-hidden pointer-events-auto"
+        style={{
+          ...(getTooltipStyle() as React.CSSProperties),
+          width: "calc(100vw - 32px)",
+          maxWidth: "28rem",
+        }}
       >
         {/* Header */}
         <div className="px-6 py-4 border-b border-border bg-muted/30">

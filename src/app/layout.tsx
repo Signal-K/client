@@ -1,14 +1,13 @@
 import { ReactNode } from "react";
 import type { Metadata, Viewport } from "next";
-import { Syne_Mono } from "next/font/google";
+import localFont from "next/font/local";
 import RootLayoutClient from "@/src/components/layout/RootLayoutClient";
 import { PostHogProvider } from "@/src/components/providers/PostHogProvider";
 
-const syneMono = Syne_Mono({
-  subsets: ["latin"],
+const syneMono = localFont({
+  src: "../../public/fonts/SyneMono-Regular.woff2",
   variable: "--font-syne-mono",
   display: "swap",
-  weight: ["400"],
 });
 
 export const metadata: Metadata = {

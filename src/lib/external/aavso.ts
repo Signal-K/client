@@ -177,12 +177,14 @@ export async function fetchStarChart(
     star: data.star ?? starName,
     ra: data.ra ?? "",
     dec: data.dec ?? "",
-    compStars: (data.photometry ?? []).map((s: Record<string, string>) => ({
+    compStars: (data.photometry ?? []).map((s: Record<string, unknown>) => ({
       auid: s.auid,
       label: s.label,
       ra: s.ra,
       dec: s.dec,
-      vmag: s.bands?.find?.((b: Record<string, string>) => b.band === "V")?.mag ?? "",
+      vmag: Array.isArray(s.bands)
+        ? (s.bands as Record<string, string>[]).find((b) => b.band === "V")?.mag ?? ""
+        : "",
     })),
   };
 }

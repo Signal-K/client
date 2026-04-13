@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/src/lib/supabase/ssr";
-import { getGamePageData } from "@/src/features/gameplay/actions/game-actions";
+import { getGamePageDataForUser } from "@/lib/server/game-page-data";
 import GameClient from "./GameClient";
 
 export const dynamic = "force-dynamic";
@@ -27,23 +27,29 @@ function ControlStationSkeleton() {
 
 export default async function GamePage() {
   const supabase = createSupabaseServerClient();
-  const { data: { session } } = await supabase.auth.getSession();
+  // getUser() validates the token server-side and refreshes cookies atomically.
+  // getSession() returns a cached session that may be stale after OAuth, causing
+  // downstream auth calls (e.g. inside server actions) to see a null user.
+  const { data: { user } } = await supabase.auth.getUser();
 
-  if (!session) {
+  if (!user) {
     redirect("/auth");
   }
 
   try {
-    const initialData = await getGamePageData();
-    
+    // Call the data function directly with the already-authenticated user id.
+    // Previously this went through getGamePageData() which called getUser() a
+    // second time — a new OAuth token refresh would write cookies in the wrong
+    // scope, causing the second call to return null and throw Unauthorized.
+    const initialData = await getGamePageDataForUser(user.id);
+
     return (
       <Suspense fallback={<ControlStationSkeleton />}>
-        <GameClient initialData={initialData} user={session.user} />
+        <GameClient initialData={initialData} user={user} />
       </Suspense>
     );
   } catch (error) {
     console.error("[Game Page] Critical Error:", error);
-    // You could redirect to an error page or a custom error state
-    throw error; // Let the Next.js error boundary handle it
+    throw error;
   }
 }

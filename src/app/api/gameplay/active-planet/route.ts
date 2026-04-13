@@ -9,7 +9,7 @@ async function resolveLocation(
   userId: string,
   requestedLocation?: number
 ) {
-  if (Number.isFinite(requestedLocation)) {
+  if (requestedLocation !== undefined && Number.isFinite(requestedLocation)) {
     const { error: updateError } = await supabase
       .from("profiles")
       .update({ location: BigInt(requestedLocation) })

@@ -12,12 +12,25 @@ import { SETUP_MAP } from "@/src/components/onboarding/onboarding-data";
 
 type Step = "intro" | "project-selection" | "structure-intro";
 
+const SS_ONBOARDING_STEP = "ss_onboarding_step";
+const SS_ONBOARDING_PROJECT = "ss_onboarding_project";
+
+function safeGet(key: string): string | null {
+  try { return localStorage.getItem(key); } catch { return null; }
+}
+function safeSet(key: string, value: string) {
+  try { localStorage.setItem(key, value); } catch { /* ignore */ }
+}
+function safeClear(...keys: string[]) {
+  try { keys.forEach((k) => localStorage.removeItem(k)); } catch { /* ignore */ }
+}
+
 export default function OnboardingPage() {
   const router = useRouter();
   const posthog = usePostHog();
   const { user, isLoading: authLoading } = useAuthUser();
   const { preferences, isLoading: prefsLoading, setProjectInterests, completeOnboarding, hasTutorialCompleted, markTutorialComplete } = useUserPreferences();
-  
+
   const [showIntro, setShowIntro] = useState(false);
   const [step, setStep] = useState<Step>("intro");
   const [selectedProject, setSelectedProject] = useState<ProjectType | null>(null);
@@ -62,12 +75,22 @@ export default function OnboardingPage() {
     }
   }, [prefsLoading, preferences.hasCompletedOnboarding, router]);
 
-  // Show intro sequence on first visit only
+  // Restore in-progress step from localStorage on mount
   useEffect(() => {
-    if (!prefsLoading && !preferences.hasCompletedOnboarding) {
-      if (!hasTutorialCompleted("intro-seen")) {
-        setShowIntro(true);
+    if (prefsLoading || preferences.hasCompletedOnboarding) return;
+    const savedStep = safeGet(SS_ONBOARDING_STEP) as Step | null;
+    const savedProject = safeGet(SS_ONBOARDING_PROJECT) as ProjectType | null;
+    if (savedStep && savedStep !== "intro") {
+      if (savedStep === "structure-intro" && !savedProject) {
+        setStep("project-selection");
+      } else {
+        setStep(savedStep);
+        if (savedProject) setSelectedProject(savedProject);
       }
+      return; // skip intro sequence when resuming
+    }
+    if (!hasTutorialCompleted("intro-seen")) {
+      setShowIntro(true);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [prefsLoading]);
@@ -92,12 +115,14 @@ export default function OnboardingPage() {
     setIsPoweringUp(true);
     setTimeout(() => {
       setStep("project-selection");
+      safeSet(SS_ONBOARDING_STEP, "project-selection");
       setIsPoweringUp(false);
     }, 2000);
   };
 
   const handleFinalise = () => {
     if (!selectedProject) return;
+    safeClear(SS_ONBOARDING_STEP, SS_ONBOARDING_PROJECT);
     setProjectInterests([selectedProject]);
     completeOnboarding();
     posthog?.capture("onboarding_completed", { userId: user.id, project: selectedProject });
@@ -127,10 +152,16 @@ export default function OnboardingPage() {
         )}
 
         {step === "project-selection" && (
-          <ProjectSelectionStep 
+          <ProjectSelectionStep
             selectedProject={selectedProject}
-            onSelectProject={setSelectedProject}
-            onContinue={() => setStep("structure-intro")}
+            onSelectProject={(p) => {
+              setSelectedProject(p);
+              safeSet(SS_ONBOARDING_PROJECT, p);
+            }}
+            onContinue={() => {
+              setStep("structure-intro");
+              safeSet(SS_ONBOARDING_STEP, "structure-intro");
+            }}
           />
         )}
 

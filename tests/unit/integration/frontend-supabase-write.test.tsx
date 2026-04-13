@@ -1,3 +1,4 @@
+import { describe, it, expect } from "vitest";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { createClient } from "@supabase/supabase-js";
 import React, { useState } from "react";

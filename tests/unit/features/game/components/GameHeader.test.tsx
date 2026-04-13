@@ -6,7 +6,7 @@ const { mockSignOut, mockSavePreferences, mockUseAuthUser } = vi.hoisted(() => (
   mockSignOut: vi.fn().mockResolvedValue({ error: null }),
   mockSavePreferences: vi.fn(),
   mockUseAuthUser: vi.fn(() => ({
-    user: { id: "user-1", email: "test@test.com", is_anonymous: false },
+    user: { id: "user-1", email: "test@test.com" as string | undefined, is_anonymous: false },
     supabase: { auth: { signOut: vi.fn().mockResolvedValue({ error: null }) } },
   })),
 }));

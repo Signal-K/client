@@ -7,6 +7,7 @@ import {
   getWeekStart,
   isInCurrentWeek,
 } from "@/src/utils/solarEventUtils"
+import { describe, it, expect } from "vitest"
 
 describe("solarEventUtils", () => {
   it("calculates week start and week end boundaries", () => {

@@ -379,6 +379,13 @@ export default function GameClient({ initialData, user }: GameClientProps) {
     };
   }, []);
 
+  const alerts = useMemo<Partial<Record<ViewMode, boolean>>>(() => ({
+    telescope: signalCounts.telescope > 0,
+    satellite: signalCounts.satellite > 0,
+    rover: signalCounts.rover > 0,
+    solar: signalCounts.solar > 0,
+  }), [signalCounts]);
+
   return (
     <div className="relative flex h-[100dvh] w-full flex-col overflow-hidden bg-background text-foreground selection:bg-primary/30">
       {showAmbientLayers && ambientReady ? (
@@ -644,7 +651,7 @@ export default function GameClient({ initialData, user }: GameClientProps) {
       <StationNav 
         active={activeView} 
         onSelect={handleViewChange} 
-        alerts={signalCounts} 
+        alerts={alerts} 
       />
     </div>
   );

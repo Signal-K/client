@@ -28,7 +28,7 @@ vi.mock("nanoid", () => ({
 
 import { prisma } from "@/lib/server/prisma";
 
-const mockPrisma = prisma as {
+const mockPrisma = prisma as unknown as {
   profile: { findFirst: ReturnType<typeof vi.fn>; findUnique: ReturnType<typeof vi.fn>; update: ReturnType<typeof vi.fn> };
   referral: { findFirst: ReturnType<typeof vi.fn>; count: ReturnType<typeof vi.fn>; create: ReturnType<typeof vi.fn> };
   surveyReward: { create: ReturnType<typeof vi.fn> };
@@ -153,10 +153,10 @@ describe("ReferralService", () => {
 
       expect(txSurveyCreate).toHaveBeenCalledTimes(2);
       const calls = txSurveyCreate.mock.calls;
-      const referrerCall = calls.find((c: [{ data: { userId: string } }]) => c[0].data.userId === "referrer-id");
-      const referreeCall = calls.find((c: [{ data: { userId: string } }]) => c[0].data.userId === "user-new");
-      expect(referrerCall[0].data.stardustGranted).toBe(25);
-      expect(referreeCall[0].data.stardustGranted).toBe(10);
+      const referrerCall = calls.find((c: unknown[]) => (c[0] as { data: { userId: string } }).data.userId === "referrer-id");
+      const referreeCall = calls.find((c: unknown[]) => (c[0] as { data: { userId: string } }).data.userId === "user-new");
+      expect((referrerCall![0] as any).data.stardustGranted).toBe(25);
+      expect((referreeCall![0] as any).data.stardustGranted).toBe(10);
     });
   });
 

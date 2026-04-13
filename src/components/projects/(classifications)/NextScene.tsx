@@ -138,9 +138,11 @@ export default function ClientClassificationPage({ id }: Props) {
   const viewportUrl = telescopeTypes.includes(type) ? "/structures/telescope" : balloonTypes.includes(type) ? "/viewports/satellite" : roverTypes.includes(type) ? "/viewports/rover" : "/";
   
   const mediaUrl = Array.isArray(classification.media) ? classification.media.find((m: any) => Array.isArray(m) && typeof m[0] === "string" && m[0].startsWith("http"))?.[0] : undefined;
-  const annotationBadges = Object.entries((classification?.classificationConfiguration?.annotationOptions ?? []).reduce((acc: any, l: string) => {
-    const k = l.trim(); acc[k] = (acc[k] || 0) + 1; return acc;
-  }, {})).map(([label, count], idx) => (
+  const annotationBadges = Object.entries(
+    ((classification?.classificationConfiguration?.annotationOptions ?? []) as string[]).reduce<Record<string, number>>((acc, l) => {
+      const k = l.trim(); acc[k] = (acc[k] || 0) + 1; return acc;
+    }, {})
+  ).map(([label, count], idx) => (
     <span key={label} className={`inline-block px-3 py-1 rounded-full text-xs font-medium mr-2 mb-2 ${badgeColors[idx % badgeColors.length]}`}>
       {count > 1 ? `${label} (${count})` : label}
     </span>

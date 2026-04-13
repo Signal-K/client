@@ -109,7 +109,7 @@ describe("loadSector", () => {
       id: a.id,
       x,
       y,
-    }));
+    })) as unknown as Parameters<typeof loadSector>[5];
 
     const tessAnomalies = [
       { id: "1", content: "Anomaly 1", anomalySet: "telescope-tess" },
