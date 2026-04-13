@@ -144,8 +144,25 @@ export default function GameClient({ initialData, user }: GameClientProps) {
   const [guidedDeployTarget, setGuidedDeployTarget] = useState<StructureId | null>(null);
   const [ambientReady, setAmbientReady] = useState(false);
 
+  const EMPTY_DATA = {
+    profile: null,
+    classifications: [],
+    linkedAnomalies: [],
+    activityFeed: [],
+    otherClassifications: [],
+    visibleStructures: { telescope: true, satellites: false, rovers: false, balloons: false },
+    hubLeaderboard: { entries: [], currentUser: null },
+    referralCode: null,
+    referralCount: 0,
+    hasReferral: false,
+    hasRoverMineralDeposits: false,
+    incompletePlanet: null,
+    planetTargets: [],
+  };
+
   // Use initialData as state so it can be updated if needed (optimistic updates or refetch)
-  const [data, setData] = useState(initialData);
+  const [data, setData] = useState(initialData ?? EMPTY_DATA);
+  const [isLoadingData, setIsLoadingData] = useState(initialData === null);
   const [incomingStructures, setIncomingStructures] = useState<Set<StructureId>>(new Set());
   const previousSignalCountsRef = useRef<StructureSignalMap | null>(null);
   const incomingTimeoutsRef = useRef<Partial<Record<StructureId, ReturnType<typeof setTimeout>>>>({});
@@ -271,6 +288,13 @@ export default function GameClient({ initialData, user }: GameClientProps) {
     } catch {
       // Keep the hub stable if background refresh fails.
     }
+  }, []);
+
+  // If server passed no initialData (cold start / timeout protection), fetch immediately
+  useEffect(() => {
+    if (!isLoadingData) return;
+    refreshGameData().finally(() => setIsLoadingData(false));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {

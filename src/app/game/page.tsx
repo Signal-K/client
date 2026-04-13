@@ -1,7 +1,6 @@
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/src/lib/supabase/ssr";
-import { getGamePageDataForUser } from "@/lib/server/game-page-data";
 import GameClient from "./GameClient";
 
 export const dynamic = "force-dynamic";
@@ -27,29 +26,18 @@ function ControlStationSkeleton() {
 
 export default async function GamePage() {
   const supabase = createSupabaseServerClient();
-  // getUser() validates the token server-side and refreshes cookies atomically.
-  // getSession() returns a cached session that may be stale after OAuth, causing
-  // downstream auth calls (e.g. inside server actions) to see a null user.
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
     redirect("/auth");
   }
 
-  try {
-    // Call the data function directly with the already-authenticated user id.
-    // Previously this went through getGamePageData() which called getUser() a
-    // second time — a new OAuth token refresh would write cookies in the wrong
-    // scope, causing the second call to return null and throw Unauthorized.
-    const initialData = await getGamePageDataForUser(user.id);
-
-    return (
-      <Suspense fallback={<ControlStationSkeleton />}>
-        <GameClient initialData={initialData} user={user} />
-      </Suspense>
-    );
-  } catch (error) {
-    console.error("[Game Page] Critical Error:", error);
-    throw error;
-  }
+  // Data is fetched client-side via /api/gameplay/page-data to avoid
+  // hitting Vercel's serverless timeout with 13+ sequential Prisma queries
+  // on cold starts. The skeleton shows while the client fetches.
+  return (
+    <Suspense fallback={<ControlStationSkeleton />}>
+      <GameClient initialData={null} user={user} />
+    </Suspense>
+  );
 }
