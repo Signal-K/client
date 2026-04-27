@@ -1,0 +1,36 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find /Users/scroobz/Navigation/client/tests/unit -name \"*.test.tsx\" -exec wc -l {} +)",
+      "Bash(npx vitest run --reporter=verbose)",
+      "Bash(npx cypress run --spec \"cypress/e2e/smoke-critical.cy.ts\" --headless)",
+      "Bash(npx cypress verify)",
+      "Bash(npx cypress install)",
+      "Bash(npx cypress install --force)",
+      "Bash(python3 -c \"import sys,json; p=json.load\\(sys.stdin\\); print\\(p.get\\(''scripts'',{}\\).get\\(''test:all'',''''\\)\\)\")",
+      "Bash(/Users/scroobz/Library/Caches/Cypress/14.5.4/Cypress.app/Contents/MacOS/Cypress --smoke-test --ping=514)",
+      "Bash(git -C /Users/scroobz/Navigation/client log --oneline -5 -- cypress.config.ts package.json)",
+      "Bash(python3 -c \"import sys,json; p=json.load\\(sys.stdin\\); deps=p.get\\(''devDependencies'',{}\\); print\\(''cypress:'', deps.get\\(''cypress'',''not found''\\)\\)\")",
+      "Read(//Users/scroobz/Library/Caches/Cypress/**)",
+      "Bash(yarn add cypress@^15.10.0 --dev)",
+      "Bash(CYPRESS_INSTALL_BINARY=/Users/scroobz/Library/Caches/Cypress/15.10.0/Cypress.app npx cypress verify)",
+      "Bash(CYPRESS_INSTALL_BINARY=/Users/scroobz/Library/Caches/Cypress/15.10.0/Cypress.app yarn add cypress@15.10.0 --dev)",
+      "WebSearch",
+      "WebFetch(domain:store.steampowered.com)",
+      "WebFetch(domain:localhost)",
+      "WebFetch(domain:zooniverse.github.io)",
+      "WebFetch(domain:api.nasa.gov)",
+      "WebFetch(domain:panoptes.docs.apiary.io)",
+      "WebFetch(domain:exoplanetarchive.ipac.caltech.edu)",
+      "WebFetch(domain:www.minorplanetcenter.net)",
+      "WebFetch(domain:www.aavso.org)",
+      "WebFetch(domain:seti.berkeley.edu)",
+      "WebFetch(domain:www.swpc.noaa.gov)",
+      "WebFetch(domain:api.helioviewer.org)",
+      "WebFetch(domain:alerce.science)",
+      "WebFetch(domain:science.alerce.online)",
+      "WebFetch(domain:alerce.readthedocs.io)",
+      "WebFetch(domain:developer.zooniverse.org)"
+    ]
+  }
+}
