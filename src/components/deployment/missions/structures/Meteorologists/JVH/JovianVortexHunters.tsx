@@ -4,9 +4,9 @@ import MissionShell from "../../BasePlate";
 import { LidarJVHSatelliteWithId } from "@/src/components/projects/Lidar/JovianVortexHunter";
 import { CloudCogIcon, CloudHail, HelpCircle, ShovelIcon } from "lucide-react";
 import { StarterJovianVortexHunter } from "@/src/components/projects/Lidar/JovianVortexHunter";
-import VoteJVH from "./JVHVote";
+import VotePanel from "@/src/components/social/posts/VotePanel";
 // import CloudClassifier from "@/src/components/discovery/data-sources/Meteorologists/JVH/cloud-classifier";
-import JVHCloudClassificationGenerator from "./GaseousPlanetCloudMaker";
+import ClassificationList from "@/src/components/social/posts/ClassificationList";
 import ClassificationOptionsCounter from "@/src/components/social/posts/ClassificationOptionsCounter";
 // import { PreferredGaseousClassifications } from "../../PickPlanet";
 
@@ -55,7 +55,7 @@ const JovianVortexHunters = () => {
             icon: CloudCogIcon,
             points: 2,
             completedCount: 0,
-            internalComponent: () => <VoteJVH />,
+            internalComponent: () => <VotePanel classificationType="lidar-jovianVortexHunter" />,
             color: "text-green-500",
         },
         {
@@ -67,7 +67,7 @@ const JovianVortexHunters = () => {
             icon: CloudHail,
             points: 1,
             completedCount: 0,
-            internalComponent: () => <JVHCloudClassificationGenerator />,
+            internalComponent: () => <ClassificationList classificationType="lidar-jovianVortexHunter" />,
             color: 'text-green-700',
         },
         {
@@ -82,62 +82,25 @@ const JovianVortexHunters = () => {
             internalComponent: () => <ClassificationOptionsCounter />,
             color: 'text-red-500',
         },
-        // {
-        //     id: 3,
-        //     chapter: 1,
-        //     title: "Find a turbulent system",
-        //     description: "Identify and classify a turbulent atmospheric system.",
-        //     icon: CloudCogIcon,
-        //     points: 3,
-        //     completedCount: 0,
-        //     internalComponent: () => <LidarJVHSatellite />,
-        //     color: "text-red-500",
-        // },
-        // {
-        //     id: 4,
-        //     chapter: 1,
-        //     title: "Find a vortex",
-        //     description: "Locate and mark a vortex in the atmosphere of a gaseous planet.",
-        //     icon: CloudCogIcon,
-        //     points: 3,
-        //     completedCount: 0,
-        //     internalComponent: () => <LidarJVHSatellite />,
-        //     color: "text-purple-500",
-        // },
-        // {
-        //     id: 5,
-        //     chapter: 1,
-        //     title: "Find a cloud band",
-        //     description: "Detect and analyze a cloud band in the data set.",
-        //     icon: CloudCogIcon,
-        //     points: 4,
-        //     completedCount: 0,
-        //     internalComponent: () => <LidarJVHSatellite />,
-        //     color: "text-orange-500",
-        // },
         {
             id: 7,
             chapter: 2,
             title: " - COMING SOON - ",
-            // title: "Map a cloud to a region on a gaseous planet candidate - COMING SOON",
             description: "Assign a detected cloud to a specific region on a gaseous planet.",
             icon: CloudCogIcon,
             points: 5,
             completedCount: 0,
-            // internalComponent: () => <LidarJVHSatellite />,
             color: "text-teal-500",
         },
         {
             id: 8,
             chapter: 2,
             title: " - COMING SOON - ",
-            // description: "Analyze and classify cloud regions based on temperature data.",
             description:
                 "Classify cloud regions (original data points) to specific atmospheric regions, indicating temperature",
             icon: CloudCogIcon,
             points: 6,
             completedCount: 0,
-            // internalComponent: () => <LidarJVHSatellite />,
             color: "text-pink-500",
         },
     ];

@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { SetupCard, SetupScaffold } from "@/src/features/setup/components/SetupScaffold";
+import TutorialWrapper, { ROVER_INTRO_STEPS } from "@/src/components/onboarding/TutorialWrapper";
 
 type RoverSetupPayload = {
   maxWaypoints?: number;
@@ -56,46 +57,54 @@ export default function RoverSetupPage() {
   }, [isLoading, setup]);
 
   return (
-    <SetupScaffold
-      title="Rover Setup"
-      subtitle="Plan rover waypoints for this cycle. Your rover follows your route and surfaces classification targets along the path."
+    <TutorialWrapper
+      tutorialId="rover-intro"
+      steps={ROVER_INTRO_STEPS}
+      title="Rover Introduction"
+      showReplayButton={false}
     >
-      <div className="grid gap-6 md:grid-cols-2">
-        <SetupCard title="Mission Flow">
-          <ol className="list-decimal space-y-2 pl-5">
-            <li>Open route planner and place waypoints.</li>
-            <li>Deploy rover to start traversal.</li>
-            <li>Return to Rover Viewport to classify findings at each stop.</li>
-          </ol>
-        </SetupCard>
+      <SetupScaffold
+        title="Rover Setup"
+        subtitle="Plan rover waypoints for this cycle. Your rover follows your route and surfaces classification targets along the path."
+      >
+        <div className="grid gap-6 md:grid-cols-2">
+          <SetupCard title="Mission Flow">
+            <ol className="list-decimal space-y-2 pl-5">
+              <li>Open route planner and place waypoints.</li>
+              <li>Deploy rover to start traversal.</li>
+              <li>Return to Rover Viewport to classify findings at each stop.</li>
+            </ol>
+          </SetupCard>
 
-        <SetupCard title="What You Should Do Now">
-          <p className="mb-2">{statusText}</p>
-          {setup && (
-            <ul className="mb-3 space-y-1 text-slate-300">
-              <li>Waypoint capacity: {setup.maxWaypoints ?? 4}</li>
-              <li>Fast deploy active: {setup.isFastDeployEnabled ? "Yes" : "No"}</li>
-            </ul>
-          )}
-          {error && <p className="mb-3 rounded-lg border border-red-500/40 bg-red-950/40 p-2 text-red-200">{error}</p>}
-          <div className="flex flex-wrap gap-3">
-            <button
-              type="button"
-              onClick={() => router.push("/activity/deploy/rover")}
-              className="rounded-lg bg-cyan-400 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-cyan-300"
-            >
-              Open Rover Planner
-            </button>
-            <button
-              type="button"
-              onClick={() => router.push("/viewports/rover")}
-              className="rounded-lg border border-slate-600 bg-slate-800/80 px-4 py-2 text-sm font-semibold text-slate-100 transition hover:border-slate-500 hover:bg-slate-700/80"
-            >
-              Open Rover Viewport
-            </button>
-          </div>
-        </SetupCard>
-      </div>
-    </SetupScaffold>
+          <SetupCard title="What You Should Do Now">
+            <p className="mb-2">{statusText}</p>
+            {setup && (
+              <ul className="mb-3 space-y-1 text-slate-300">
+                <li>Waypoint capacity: {setup.maxWaypoints ?? 4}</li>
+                <li>Fast deploy active: {setup.isFastDeployEnabled ? "Yes" : "No"}</li>
+              </ul>
+            )}
+            {error && <p className="mb-3 rounded-lg border border-red-500/40 bg-red-950/40 p-2 text-red-200">{error}</p>}
+            <div className="flex flex-wrap gap-3">
+              <button
+                type="button"
+                data-tutorial="deploy-rover"
+                onClick={() => router.push("/activity/deploy/rover")}
+                className="rounded-lg bg-cyan-400 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-cyan-300"
+              >
+                Open Rover Planner
+              </button>
+              <button
+                type="button"
+                onClick={() => router.push("/viewports/rover")}
+                className="rounded-lg border border-slate-600 bg-slate-800/80 px-4 py-2 text-sm font-semibold text-slate-100 transition hover:border-slate-500 hover:bg-slate-700/80"
+              >
+                Open Rover Viewport
+              </button>
+            </div>
+          </SetupCard>
+        </div>
+      </SetupScaffold>
+    </TutorialWrapper>
   );
 }

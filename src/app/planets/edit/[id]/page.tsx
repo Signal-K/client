@@ -5,7 +5,21 @@ import { useSession } from "@/src/lib/auth/session-context";
 import Navbar from "@/src/components/layout/Navbar";
 import { PostCardSingleWithGeneratorEditMode } from "@/src/components/social/posts/PostWithGen";
 
-import { Classification } from "../../[id]/page";
+interface Classification {
+  id: number;
+  content: string | null;
+  author: string | null;
+  anomaly?: { id: number; content: string | null } | null;
+  media?: (string | { uploadUrl?: string })[] | null;
+  classificationtype: string | null;
+  classificationConfiguration?: any;
+  created_at: string;
+  title?: string;
+  votes?: number;
+  category?: string;
+  tags?: string[];
+  images?: string[];
+};
 
 export default function EditPlanetAnomaly(props: { params: Promise<{ id: string }> }) {
   const params = use(props.params);

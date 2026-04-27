@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { SetupCard, SetupScaffold } from "@/src/features/setup/components/SetupScaffold";
+import TutorialWrapper, { SATELLITE_INTRO_STEPS } from "@/src/components/onboarding/TutorialWrapper";
 
 type PlanetTarget = { id: number; name: string };
 type DeployMode = "weather" | "planets" | "p-4";
@@ -93,6 +94,12 @@ export default function SatelliteSetupPage() {
   }
 
   return (
+    <TutorialWrapper
+      tutorialId="satellite-intro"
+      steps={SATELLITE_INTRO_STEPS}
+      title="Satellite Introduction"
+      showReplayButton={false}
+    >
     <SetupScaffold
       title="Satellite Setup"
       subtitle="Choose a target planet and mission mode, deploy satellite coverage, then review and classify returned anomaly data."
@@ -127,6 +134,7 @@ export default function SatelliteSetupPage() {
             <label className="text-slate-200">
               <span className="mb-1 block text-xs uppercase tracking-wide text-slate-400">Target Planet</span>
               <select
+                data-tutorial="planet-select"
                 value={planetId ?? ""}
                 onChange={(e) => setPlanetId(Number(e.target.value))}
                 disabled={!hasTargets}
@@ -148,6 +156,7 @@ export default function SatelliteSetupPage() {
           <div className="flex flex-wrap gap-3">
             <button
               type="button"
+              data-tutorial="deploy-satellite"
               onClick={handleDeploy}
               disabled={deploying || !hasTargets || !planetId}
               className="rounded-lg bg-cyan-400 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-cyan-300 disabled:cursor-not-allowed disabled:opacity-60"
@@ -174,5 +183,6 @@ export default function SatelliteSetupPage() {
         </SetupCard>
       </div>
     </SetupScaffold>
+    </TutorialWrapper>
   );
 }

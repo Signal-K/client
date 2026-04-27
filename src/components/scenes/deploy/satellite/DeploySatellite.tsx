@@ -3,7 +3,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useSession } from "@/src/lib/auth/session-context";
 import { usePostHog } from "posthog-js/react";
-import { PlanetGeneratorMinimal } from "@/src/components/discovery/data-sources/Astronomers/PlanetHunters/PlanetGenerator";
 import PlanetFocusView from "./PlanetFocusView";
 import DeploySidebar from "./DeploySidebar";
 
@@ -171,8 +170,9 @@ export default function DeploySatelliteViewport() {
             />
 
             {selectedClassificationId ? (
-              <div className="pointer-events-none absolute right-2 top-2 h-28 w-28 overflow-hidden rounded-lg border border-white/20 bg-black/40">
-                <PlanetGeneratorMinimal classificationId={selectedClassificationId} hideBackground hideSky />
+              <div className="pointer-events-none absolute right-2 top-2 flex h-28 w-28 flex-col items-center justify-center overflow-hidden rounded-lg border border-white/20 bg-black/40 shadow-inner">
+                <div className="h-16 w-16 animate-pulse rounded-full bg-gradient-to-br from-cyan-500/40 via-blue-500/30 to-purple-600/40 shadow-[0_0_20px_rgba(59,130,246,0.2)]" />
+                <span className="mt-2 text-[8px] font-mono uppercase tracking-[0.2em] text-white/40">Visualising</span>
               </div>
             ) : null}
           </div>

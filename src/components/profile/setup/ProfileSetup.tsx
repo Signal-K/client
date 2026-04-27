@@ -36,8 +36,8 @@ export default function ProfileSetupForm({
 
       if (!ignore && result.ok && result.data) {
         setUsername(result.data.username || "");
-        setFirstName(result.data.full_name || "");
-        setAvatarPreview(result.data.avatar_url || null);
+        setFirstName(result.data.fullName || "");
+        setAvatarPreview(result.data.avatarUrl || null);
       } else if (!result.ok) {
         console.warn(result.error);
       }

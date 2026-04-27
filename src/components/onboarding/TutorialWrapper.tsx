@@ -167,7 +167,7 @@ function ReplayButton({ position, onReplay, title }: ReplayButtonProps) {
 // Pre-built tutorial step sets for common scenarios
 // These tutorials guide users through actual interactions with the interface
 
-const TELESCOPE_INTRO_STEPS: TutorialStep[] = [
+export const TELESCOPE_INTRO_STEPS: TutorialStep[] = [
   {
     id: "telescope-welcome",
     title: "Welcome to Your Telescope! 🔭",
@@ -203,7 +203,7 @@ const TELESCOPE_INTRO_STEPS: TutorialStep[] = [
   },
 ];
 
-const TELESCOPE_DEPLOY_STEPS: TutorialStep[] = [
+export const TELESCOPE_DEPLOY_STEPS: TutorialStep[] = [
   {
     id: "deploy-intro",
     title: "Choose Your Observation",
@@ -241,26 +241,25 @@ export const SATELLITE_INTRO_STEPS: TutorialStep[] = [
   },
   {
     id: "satellite-explore",
-    title: "Explore the View",
+    title: "Choose a Mission Mode",
     description:
-      "This view shows planets you can observe. Take a moment to look around - you'll see the planet details and navigation controls.",
+      "Select a mission mode from the dropdown — Weather Analysis, Planetary Survey, or Wind Survey. Each focuses on different science.",
     action: { type: "wait", waitMs: 3000 },
     position: "center",
   },
   {
-    id: "satellite-navigate",
-    title: "Navigate Between Planets",
+    id: "satellite-pick-planet",
+    title: "Pick Your Target Planet",
     description:
-      "Use the arrow buttons to browse through available planets. Each planet has different characteristics to study.",
-    highlightSelector: "[data-tutorial='planet-nav-next']",
-    action: { type: "click", targetSelector: "[data-tutorial='planet-nav-next']" },
+      "Choose a planet to orbit from the Target Planet dropdown. You need to have classified a planet first for it to appear here.",
+    highlightSelector: "[data-tutorial='planet-select']",
     position: "center",
   },
   {
     id: "satellite-deploy",
     title: "Deploy Satellite",
     description:
-      "Click the Deploy Satellite button to launch your satellite into orbit around this planet.",
+      "Click the Deploy Satellite button to launch your satellite into orbit and begin the mission.",
     highlightSelector: "[data-tutorial='deploy-satellite']",
     action: { type: "click", targetSelector: "[data-tutorial='deploy-satellite']" },
     position: "center",
@@ -294,7 +293,7 @@ export const ROVER_INTRO_STEPS: TutorialStep[] = [
   },
 ];
 
-const SOLAR_INTRO_STEPS: TutorialStep[] = [
+export const SOLAR_INTRO_STEPS: TutorialStep[] = [
   {
     id: "solar-welcome",
     title: "Solar Observatory ☀️",

@@ -15,6 +15,7 @@ const VALID_TYPES = new Set([
   "planet-inspection",
   "sunspot",
   "satellite-planetFour",
+  "galaxyZoo",
 ]);
 
 function createEmptyAchievements() {

@@ -4,7 +4,7 @@ import React, { Suspense, useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import ActivityHeaderSection from "@/src/components/social/activity/ActivityHeaderSection";
 import { Button } from "@/src/components/ui/button";
-import CompactResearchPanel from "@/src/components/research/CompactResearchPanel";
+import CompactResearchPanel from "@/src/features/research/components/CompactResearchPanel";
 import ReferralCodePanel from "@/src/components/profile/setup/Referrals";
 import UseDarkMode from "@/src/shared/hooks/useDarkMode";
 import MainHeader from "@/src/components/layout/Header/MainHeader";

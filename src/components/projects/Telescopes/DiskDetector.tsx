@@ -1,9 +1,10 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { useImageCarousel } from "@/src/hooks/useImageCarousel";
 import { useSession } from "@/src/lib/auth/session-context";
 import { useRouter } from "next/navigation";
-import { useActivePlanet } from "@/src/core/context/ActivePlanet";
+
 import ClassificationForm from "../(classifications)/PostForm";
 import { Button } from "@/src/components/ui/button";
 import TutorialContentBlock, { createTutorialSlides } from "../TutorialContentBlock";
@@ -25,27 +26,16 @@ export const DiskDetectorTutorial: React.FC<TelescopeProps> = ({
   const session = useSession();
   const router = useRouter();
 
-  const { activePlanet } = useActivePlanet();
-
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   
   const [imageUrls, setImageUrls] = useState<string[]>([]);
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [showClassification, setShowClassification] = useState(false);
   const [selectedOptions, setSelectedOptions] = useState<boolean[]>(new Array(7).fill(false));
   const [comments, setComments] = useState("");
   const [loadingImages, setLoadingImages] = useState(true);
   const [submitting, setSubmitting] = useState(false);
 
-  const nextImage = () => {
-    setCurrentImageIndex((prevIndex) => (prevIndex + 1) % imageUrls.length);
-  };
-
-  const prevImage = () => {
-    setCurrentImageIndex((prevIndex) =>
-      prevIndex === 0 ? imageUrls.length - 1 : prevIndex - 1
-    );
-  };
+  const { currentIndex: currentImageIndex, next: nextImage, prev: prevImage, goTo: setCurrentImageIndex } = useImageCarousel(imageUrls);
 
   // Function to detect how many images are available for this anomaly
   const detectAvailableImages = async () => {
@@ -453,8 +443,6 @@ export const DiskDetectorTutorial: React.FC<TelescopeProps> = ({
 
 export function TelescopeDiskDetector() {
   const session = useSession();
-
-  const { activePlanet } = useActivePlanet();
 
   const [anomaly, setAnomaly] = useState<Anomaly | null>(null);
   const [imageUrl, setImageUrl] = useState<string | null>(null);

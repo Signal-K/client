@@ -5,7 +5,6 @@ import { ChevronUp, ChevronDown, Satellite } from 'lucide-react';
 import { useSession } from '@/src/lib/auth/session-context';
 import { useRouter } from 'next/navigation';
 import { DatabaseAnomaly } from '../Telescope/TelescopeUtils';
-import { PlanetGeneratorMinimal } from '@/src/components/discovery/data-sources/Astronomers/PlanetHunters/PlanetGenerator';
 
 interface SatelliteSpiderScanProps {
   anomalies: (DatabaseAnomaly & { linked_anomaly_id: number; classification_id: number | string | null; date: string; })[];
@@ -295,13 +294,9 @@ const SatelliteSpiderScan: React.FC<SatelliteSpiderScanProps> = ({ anomalies }) 
        style={{ minHeight: isMobileExpanded ? '30vh' : '400px' }}>
         {primaryClassificationId ? (
           <div className="w-full h-full relative min-h-0 flex items-center justify-center">
-            <div style={{ transform: 'translateY(100px)' }}>
-              <PlanetGeneratorMinimal
-                classificationId={primaryClassificationId}
-                hideBackground={true}
-                hideSky={true}
-                cameraZoom={12}
-              />
+            <div className="flex flex-col items-center justify-center" style={{ transform: 'translateY(100px)' }}>
+              <div className="h-64 w-64 animate-pulse rounded-full border border-white/5 bg-gradient-to-br from-cyan-900/40 via-blue-900/30 to-purple-900/40 shadow-[0_0_50px_rgba(59,130,246,0.1)]" />
+              <span className="mt-4 font-mono text-[10px] uppercase tracking-[0.4em] text-white/20">Orbital Target Lock</span>
             </div>
             <OrbitalPaths anomalies={anomalies} />
 

@@ -145,18 +145,19 @@ export function useUserPreferences() {
       
       if (stored) {
         const parsed = JSON.parse(stored) as UserPreferences;
+        const isCompleted = parsed.hasCompletedOnboarding;
         
         // Check if this is a new device (different device ID)
         if (parsed.deviceId && parsed.deviceId !== currentDeviceId) {
           // New device - need to ask preferences again
-          setNeedsPreferencesPrompt(true);
+          if (!isCompleted) setNeedsPreferencesPrompt(true);
           setPreferences({
             ...parsed,
             deviceId: currentDeviceId,
           });
         } else if (!parsed.projectInterests || parsed.projectInterests.length === 0) {
           // No preferences set yet
-          setNeedsPreferencesPrompt(true);
+          if (!isCompleted) setNeedsPreferencesPrompt(true);
           setPreferences({
             ...parsed,
             deviceId: currentDeviceId,

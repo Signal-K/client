@@ -18,9 +18,6 @@ const TelescopeBackground = dynamic(
     ),
   }
 );
-const NPSPopup = dynamic(() => import("@/src/components/ui/helpers/nps-popup"), {
-  loading: () => null,
-});
 const CompleteProfileForm = dynamic(
   () => import("@/src/components/profile/setup/FinishProfile"),
   {
@@ -74,14 +71,11 @@ import { ErrorBoundary } from "@/src/components/ui/ErrorBoundary";
 
 // Station UI components — critical path (statically imported)
 import { CommandHeader }    from "@/src/features/game/components/station/CommandHeader";
-import { SectorBar }        from "@/src/features/game/components/station/SectorBar";
 import { MissionBriefCard } from "@/src/features/game/components/station/MissionBriefCard";
-import { StationCard }      from "@/src/features/game/components/station/StationCard";
 import { StationNav }       from "@/src/features/game/components/station/StationNav";
 import { ViewportHeader }   from "@/src/features/game/components/station/ViewportHeader";
 import { SectionLabel }     from "@/src/features/game/components/station/SectionLabel";
 import { MissionLogPanel, buildLogEntries } from "@/src/features/game/components/station/MissionLogPanel";
-import { StationSchematic } from "@/src/features/game/components/station/StationSchematic";
 import { SectorRadar }     from "@/src/features/game/components/station/SectorRadar";
 import { HUDStrip }        from "@/src/features/game/components/station/HUDStrip";
 import { StructureCard, StructureState, StructureId } from "@/src/features/game/components/station/StructureCard";
@@ -97,7 +91,6 @@ const LivingWorldBg      = dynamic(() => import("@/src/features/game/components/
 import RecentActivity from "@/src/components/social/activity/RecentActivity";
 import ProjectPreferencesModal from "@/src/components/onboarding/ProjectPreferencesModal";
 import PushNotificationPrompt from "@/src/features/notifications/components/PushNotificationPrompt";
-import ActivityHeader from "@/src/components/scenes/deploy/ActivityHeader";
 import { GameSurveys } from "@/src/features/surveys/components/GameSurveys";
 import ReferralMissionPrompt from "@/src/features/game/components/ReferralMissionPrompt";
 
@@ -108,28 +101,15 @@ import UseDarkMode from "@/src/shared/hooks/useDarkMode";
 
 // Types / utils
 import { cn } from "@/src/shared/utils";
-import { getOrCreateAnalyticsSessionToken } from "@/src/lib/analytics/session-token";
-import {
-  MECHANIC_SURVEYS,
-  SURVEY_DISPLAY_DELAY_MS,
-  surveyStorageKey,
-} from "@/src/features/surveys/mechanic-surveys";
-import type { MechanicMicroSurvey } from "@/src/features/surveys/types";
-import { ProjectType } from "@/src/hooks/useUserPreferences";
+
 import { buildClientReferralUrl } from "@/src/features/referrals/referral-links";
 
 // Icons
-import { Telescope, Satellite, Car, Package, Sun, FlaskConical, AlertTriangle } from "lucide-react";
+import { Telescope, Satellite, Car, Package, Sun, FlaskConical } from "lucide-react";
 
 type ViewMode = "base" | "telescope" | "satellite" | "rover" | "solar" | "inventory";
 type StructureSignalMap = Record<StructureId, number>;
 
-const POSTHOG_SURVEY_ID = "019c83d3-d0a5-0000-4e8f-5b7fd8794666";
-const POSTHOG_SURVEY_SHOWN_KEY = "posthog_survey_webapp_22_shown_v1";
-const POSTHOG_SURVEY_LAST_SHOWN_AT_KEY = "posthog_survey_webapp_22_last_shown_at_v1";
-const POSTHOG_SURVEY_COOLDOWN_MS = 14 * 24 * 60 * 60 * 1000;
-const SURVEY_REWARD_GRANTED_KEY = "posthog_survey_webapp_22_reward_granted_v1";
-const SURVEY_REWARD_STARDUST = 5;
 const REFERRAL_MISSION_DISMISSED_KEY = "referral_mission_prompt_dismissed_v1";
 const GAME_DATA_REFRESH_MS = 60_000;
 const INCOMING_SIGNAL_WINDOW_MS = 1_600;
@@ -160,20 +140,29 @@ export default function GameClient({ initialData, user }: GameClientProps) {
   const [showPreferencesModal, setShowPreferencesModal] = useState(false);
   const [openedViewports, setOpenedViewports] = useState<Set<ViewMode>>(new Set());
   const [referralMissionDismissed, setReferralMissionDismissed] = useState(true);
-  const [surveyRewardToast, setSurveyRewardToast] = useState<{
-    variant: "success" | "error" | "info";
-    title: string;
-    description: string;
-  } | null>(null);
-  const [activeMechanicSurvey, setActiveMechanicSurvey] = useState<MechanicMicroSurvey | null>(null);
-  const [analyticsSessionToken] = useState<string | null>(() => getOrCreateAnalyticsSessionToken());
-
   // Guided deploy overlay
   const [guidedDeployTarget, setGuidedDeployTarget] = useState<StructureId | null>(null);
   const [ambientReady, setAmbientReady] = useState(false);
 
+  const EMPTY_DATA = {
+    profile: null,
+    classifications: [],
+    linkedAnomalies: [],
+    activityFeed: [],
+    otherClassifications: [],
+    visibleStructures: { telescope: true, satellites: false, rovers: false, balloons: false },
+    hubLeaderboard: { entries: [], currentUser: null },
+    referralCode: null,
+    referralCount: 0,
+    hasReferral: false,
+    hasRoverMineralDeposits: false,
+    incompletePlanet: null,
+    planetTargets: [],
+  };
+
   // Use initialData as state so it can be updated if needed (optimistic updates or refetch)
-  const [data, setData] = useState(initialData);
+  const [data, setData] = useState(initialData ?? EMPTY_DATA);
+  const [isLoadingData, setIsLoadingData] = useState(initialData === null);
   const [incomingStructures, setIncomingStructures] = useState<Set<StructureId>>(new Set());
   const previousSignalCountsRef = useRef<StructureSignalMap | null>(null);
   const incomingTimeoutsRef = useRef<Partial<Record<StructureId, ReturnType<typeof setTimeout>>>>({});
@@ -202,6 +191,11 @@ export default function GameClient({ initialData, user }: GameClientProps) {
     params.delete("from");
     router.replace(`/game?${params.toString()}`, { scroll: false });
   }, [router, posthog, activeView]);
+
+  const handleQuickDeploy = useCallback((id: StructureId) => {
+    posthog?.capture("quick_deploy_used", { structure: id });
+    markTutorialComplete(`${id}-deploy` as TutorialId);
+  }, [markTutorialComplete, posthog]);
 
   const handleStructureClick = useCallback((id: StructureId) => {
     const tutorialKey = `${id}-deploy` as TutorialId;
@@ -294,6 +288,13 @@ export default function GameClient({ initialData, user }: GameClientProps) {
     } catch {
       // Keep the hub stable if background refresh fails.
     }
+  }, []);
+
+  // If server passed no initialData (cold start / timeout protection), fetch immediately
+  useEffect(() => {
+    if (!isLoadingData) return;
+    refreshGameData().finally(() => setIsLoadingData(false));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -402,6 +403,13 @@ export default function GameClient({ initialData, user }: GameClientProps) {
     };
   }, []);
 
+  const alerts = useMemo<Partial<Record<ViewMode, boolean>>>(() => ({
+    telescope: signalCounts.telescope > 0,
+    satellite: signalCounts.satellite > 0,
+    rover: signalCounts.rover > 0,
+    solar: signalCounts.solar > 0,
+  }), [signalCounts]);
+
   return (
     <div className="relative flex h-[100dvh] w-full flex-col overflow-hidden bg-background text-foreground selection:bg-primary/30">
       {showAmbientLayers && ambientReady ? (
@@ -432,6 +440,9 @@ export default function GameClient({ initialData, user }: GameClientProps) {
         agencyId={data.profile?.username || data.profile?.id}
       />
 
+      {/* Header Spacer to prevent overlap */}
+      <div className="h-14 shrink-0" />
+
       {/* ─── Persistent HUD Strip ─── */}
       <HUDStrip
         signals={Object.values(radarStations).reduce((s, r) => s + r.signals, 0)}
@@ -439,7 +450,7 @@ export default function GameClient({ initialData, user }: GameClientProps) {
         classifications={data.classifications?.length ?? 0}
       />
 
-      <main className="relative flex-1 overflow-hidden">
+      <main className="relative flex-1 overflow-hidden pb-[80px] md:pb-0">
         <AnimatePresence mode="wait">
           {activeView === "base" ? (
             <motion.div 
@@ -519,6 +530,7 @@ export default function GameClient({ initialData, user }: GameClientProps) {
                             signals={station.signals}
                             isSolar={id === "solar"}
                             onClick={() => handleStructureClick(id)}
+                            onQuickDeploy={() => handleQuickDeploy(id)}
                           />
                         </div>
                       );
@@ -659,6 +671,12 @@ export default function GameClient({ initialData, user }: GameClientProps) {
       <PWAPrompt />
       <PushNotificationPrompt />
       <GameSurveys userId={user?.id} classifications={data.classifications ?? []} />
+
+      <StationNav 
+        active={activeView} 
+        onSelect={handleViewChange} 
+        alerts={alerts} 
+      />
     </div>
   );
 }

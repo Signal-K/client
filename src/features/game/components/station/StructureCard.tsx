@@ -74,9 +74,10 @@ interface StructureCardProps {
   signals?: number;
   isSolar?: boolean;
   onClick: () => void;
+  onQuickDeploy?: (e: React.MouseEvent) => void;
 }
 
-export function StructureCard({ id, state, signals = 0, isSolar = false, onClick }: StructureCardProps) {
+export function StructureCard({ id, state, signals = 0, isSolar = false, onClick, onQuickDeploy }: StructureCardProps) {
   const cfg = STRUCTURE_CONFIG[id];
   const [showScanLine, setShowScanLine] = useState(false);
   const prevState = useRef(state);
@@ -96,11 +97,19 @@ export function StructureCard({ id, state, signals = 0, isSolar = false, onClick
   const isUndeployed = state === "undeployed";
 
   return (
-    <button
+    <div
       onClick={onClick}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onClick();
+        }
+      }}
       aria-label={`${cfg.label} — ${cfg.personality[state]}`}
       className={cn(
-        "relative w-full rounded-xl border overflow-hidden text-left transition-all duration-300 active:scale-95",
+        "relative w-full rounded-xl border overflow-hidden text-left transition-all duration-300 active:scale-[0.98] cursor-pointer",
         // Standby: greyscale, cold, clearly off
         isStandby && "border-border/20 grayscale opacity-50",
         // Active: accent border + ambient glow
@@ -177,11 +186,28 @@ export function StructureCard({ id, state, signals = 0, isSolar = false, onClick
           {signals > 0 ? `${signals} signal${signals !== 1 ? "s" : ""} awaiting` : isStandby ? "Standby" : isUndeployed ? (isSolar ? "Join Mission" : "Deploy") : "Clear"}
         </div>
 
+        {/* Quick Deploy Action (Mobile-friendly) */}
+        {isUndeployed && onQuickDeploy && (
+          <div className="mt-3">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onQuickDeploy(e);
+              }}
+              className="w-full py-2 px-2 rounded bg-primary hover:bg-primary/90 text-[10px] font-black uppercase tracking-wider text-primary-foreground transition-all active:scale-95 shadow-lg shadow-primary/20"
+            >
+              Quick Deploy
+            </button>
+          </div>
+        )}
+
         {/* Personality copy */}
-        <p className={cn("mt-2 text-[9px] leading-relaxed sm:text-[10px]", isStandby ? "text-muted-foreground/20" : "text-muted-foreground/45")}>
-          {cfg.personality[state]}
-        </p>
+        {!isUndeployed && (
+          <p className={cn("mt-2 text-[9px] leading-relaxed sm:text-[10px]", isStandby ? "text-muted-foreground/20" : "text-muted-foreground/45")}>
+            {cfg.personality[state]}
+          </p>
+        )}
       </div>
-    </button>
+    </div>
   );
 }

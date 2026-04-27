@@ -1,6 +1,6 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
-import { CompactUpgradeCard } from "@/src/components/research/CompactUpgradeCard";
+import { CompactUpgradeCard } from "@/features/research/components/CompactUpgradeCard";
 
 const defaults = {
   title: "Probe Range",

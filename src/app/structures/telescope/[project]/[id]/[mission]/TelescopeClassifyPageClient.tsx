@@ -11,7 +11,6 @@ import { StarterTelescopeTess, TelescopeTessWithId } from "@/src/components/proj
 import MainHeader from "@/src/components/layout/Header/MainHeader"
 import PlanetTypeCommentForm from "@/src/components/deployment/missions/structures/Astronomers/PlanetHunters/PlanetType"
 import VotePlanetClassifications from "@/src/components/deployment/missions/structures/Astronomers/PlanetHunters/PHVote"
-import PlanetGenerator from "@/src/components/discovery/data-sources/Astronomers/PlanetHunters/PlanetGenerator"
 import { DailyMinorPlanetWithId } from "@/src/components/projects/Telescopes/DailyMinorPlanet"
 import { TelescopeBackground } from "@/src/components/classification/telescope/telescope-background"
 import { DiskDetectorTutorial } from "@/src/components/projects/Telescopes/DiskDetector"
@@ -73,7 +72,18 @@ export default function TelescopeClassifyPage() {
               break;
             case "paint":
               component = (
-                <PlanetGenerator classificationId={classificationId || '8'} />
+                <div className="flex h-full flex-col items-center justify-center space-y-4 p-8 text-center text-white">
+                  <h2 className="text-2xl font-bold text-cyan-400">Surface Visualisation Offline</h2>
+                  <p className="max-w-md text-slate-400">
+                    The advanced planetary surface imaging suite has been decommissioned for station maintenance. Please focus on core classification tasks.
+                  </p>
+                  <button
+                    onClick={() => router.push("/game")}
+                    className="mt-4 rounded-lg bg-cyan-600 px-6 py-2 transition-colors hover:bg-cyan-700"
+                  >
+                    Return to Station
+                  </button>
+                </div>
               );
               break;
             default:

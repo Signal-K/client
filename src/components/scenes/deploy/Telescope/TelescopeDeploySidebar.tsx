@@ -159,7 +159,7 @@ const TelescopeDeploySidebar: React.FC<TelescopeDeploySidebarProps> = ({
 
         {/* Mission Type Display */}
         {deploymentType && (
-          <div className={`${isMobile ? 'p-1.5' : 'p-2.5 sm:p-3'} rounded-lg border ${
+          <div data-tutorial="project-options" className={`${isMobile ? 'p-1.5' : 'p-2.5 sm:p-3'} rounded-lg border ${
             isDarkMode 
               ? 'bg-[#005066]/30 border-[#78cce2]/30' 
               : 'bg-indigo-50 border-indigo-200'

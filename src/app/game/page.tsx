@@ -1,12 +1,9 @@
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/src/lib/supabase/ssr";
-import { getGamePageData } from "@/src/features/gameplay/actions/game-actions";
 import GameClient from "./GameClient";
 
 export const dynamic = "force-dynamic";
-
-// ─── Loading skeleton ───────────────────────────────────────────────────────
 
 function ControlStationSkeleton() {
   return (
@@ -26,24 +23,34 @@ function ControlStationSkeleton() {
 }
 
 export default async function GamePage() {
-  const supabase = createSupabaseServerClient();
-  const { data: { session } } = await supabase.auth.getSession();
-
-  if (!session) {
-    redirect("/auth");
-  }
-
+  console.log("[GamePage] render start");
   try {
-    const initialData = await getGamePageData();
-    
+    const supabase = createSupabaseServerClient();
+    console.log("[GamePage] supabase client created");
+
+    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+    console.log("[GamePage] getSession done", { hasSession: !!session, sessionError });
+
+    if (sessionError) {
+      console.error("[GamePage] getSession error:", sessionError);
+    }
+
+    if (!session) {
+      console.log("[GamePage] no session, redirecting to /auth");
+      redirect("/auth");
+    }
+
+    console.log("[GamePage] rendering GameClient for user", session.user.id);
     return (
       <Suspense fallback={<ControlStationSkeleton />}>
-        <GameClient initialData={initialData} user={session.user} />
+        <GameClient initialData={null} user={session.user} />
       </Suspense>
     );
-  } catch (error) {
-    console.error("[Game Page] Critical Error:", error);
-    // You could redirect to an error page or a custom error state
-    throw error; // Let the Next.js error boundary handle it
+  } catch (err) {
+    // Log the real error — visible in Vercel function logs
+    console.error("[GamePage] FATAL ERROR:", err);
+    console.error("[GamePage] error message:", err instanceof Error ? err.message : String(err));
+    console.error("[GamePage] error stack:", err instanceof Error ? err.stack : "no stack");
+    throw err;
   }
 }

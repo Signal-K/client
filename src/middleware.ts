@@ -1,38 +1,62 @@
-import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
+import { NextResponse, type NextRequest } from "next/server";
+import { createServerClient } from "@supabase/ssr";
 
-function hasSupabaseAuthCookie(req: NextRequest) {
-  const cookies = req.cookies.getAll();
-  return cookies.some(({ name, value }) => {
-    if (!value) return false;
-    if (name === "supabase-auth-token") return true;
-    return /^sb-.*-auth-token(?:\.\d+)?$/.test(name);
-  });
-}
+export async function middleware(request: NextRequest) {
+  // supabaseResponse must be returned or have its cookies copied to any
+  // response you return — see Supabase SSR docs.
+  let supabaseResponse = NextResponse.next({ request });
 
-export function middleware(req: NextRequest) {
-  const isAuthenticated = hasSupabaseAuthCookie(req);
-  const { pathname } = req.nextUrl;
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return request.cookies.getAll();
+        },
+        setAll(cookiesToSet) {
+          // Update request cookies so the server component sees them,
+          // and update supabaseResponse so the browser gets them.
+          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
+          supabaseResponse = NextResponse.next({ request });
+          cookiesToSet.forEach(({ name, value, options }) =>
+            supabaseResponse.cookies.set(name, value, options)
+          );
+        },
+      },
+    }
+  );
 
-  // Authenticated users visiting the landing page → send straight to the game.
-  // Cookie presence is sufficient here: if the access token is expired but the
-  // refresh token is still valid, /game will resolve correctly. If both are
-  // expired the game's own auth guard will redirect to /auth.
-  if (isAuthenticated && pathname === "/") {
-    return NextResponse.redirect(new URL("/game?from=landing", req.url));
+  // getUser() validates + refreshes the token. Cookie writes land on
+  // supabaseResponse — the only safe place for them.
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const { pathname } = request.nextUrl;
+
+  // Helper: build a redirect that carries any refreshed auth cookies.
+  function redirectWithCookies(url: URL) {
+    const redirect = NextResponse.redirect(url);
+    supabaseResponse.cookies.getAll().forEach(({ name, value, ...rest }) => {
+      redirect.cookies.set(name, value, rest as Parameters<typeof redirect.cookies.set>[2]);
+    });
+    return redirect;
   }
 
-  // Unauthenticated users trying to access the game → send to login.
-  if (!isAuthenticated && pathname.startsWith("/game")) {
-    const loginUrl = new URL("/auth", req.url);
-    loginUrl.searchParams.set("next", `${pathname}${req.nextUrl.search}`);
-    return NextResponse.redirect(loginUrl);
+  if (user && pathname === "/") {
+    return redirectWithCookies(new URL("/game?from=landing", request.url));
   }
 
-  return NextResponse.next({ request: { headers: req.headers } });
+  if (!user && pathname.startsWith("/game")) {
+    const loginUrl = new URL("/auth", request.url);
+    loginUrl.searchParams.set("next", `${pathname}${request.nextUrl.search}`);
+    return redirectWithCookies(loginUrl);
+  }
+
+  return supabaseResponse;
 }
 
 export const config = {
-  // Run on the landing page and all game routes.
   matcher: ["/", "/game/:path*"],
 };

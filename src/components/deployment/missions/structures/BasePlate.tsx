@@ -6,6 +6,7 @@ import { EarthViewLayout } from "@/src/components/scenes/planetScene/layout";
 import Navbar from "@/src/components/layout/Navbar";
 import Link from "next/link";
 import ProfileSetupForm from "@/src/components/profile/setup/ProfileSetup";
+import { getLevelProgress, getXPForNextChapter } from "@/src/utils/gameplay/leveling";
 
 interface MissionConfig {
   id: number;
@@ -149,7 +150,8 @@ const renderMission = (mission: MissionConfig, index: number, total: number) => 
     );
   };
 
-  const pointsForNextChapter = currentChapter * 9;
+  const pointsForNextChapter = getXPForNextChapter(currentChapter);
+  const progressPercent = getLevelProgress(experiencePoints);
 
   if (!firstName) {
     return (
@@ -185,7 +187,7 @@ const renderMission = (mission: MissionConfig, index: number, total: number) => 
           <div className="w-full bg-gray-300 rounded-full h-4 mb-2">
             <div
               className="bg-[#5FCBC3] h-4 rounded-full"
-              style={{ width: `${(experiencePoints % 9) * 10.5}%` }}
+              style={{ width: `${progressPercent}%` }}
             ></div>
           </div>
 

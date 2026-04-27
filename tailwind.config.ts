@@ -87,13 +87,13 @@ const config: Config = {
         "grid-size": "40px 40px",
       },
       boxShadow: {
-        "glow-teal": "0 0 20px rgba(var(--primary-rgb), 0.4), 0 0 40px rgba(var(--primary-rgb), 0.15)",
-        "glow-teal-sm": "0 0 8px rgba(var(--primary-rgb), 0.5)",
-        "glow-amber": "0 0 20px rgba(251, 191, 36, 0.4), 0 0 40px rgba(251, 191, 36, 0.15)",
-        "glow-sky": "0 0 20px rgba(56, 189, 248, 0.4), 0 0 40px rgba(56, 189, 248, 0.15)",
-        "glow-violet": "0 0 20px rgba(167,139,250,0.4), 0 0 40px rgba(167,139,250,0.15)",
-        "panel": "0 0 0 1px rgba(var(--primary-rgb), 0.15), 0 4px 24px rgba(0,0,0,0.2)",
-        "panel-hover": "0 0 0 1px rgba(var(--primary-rgb), 0.35), 0 8px 32px rgba(0,0,0,0.3)",
+        "glow-teal": "0 0 12px rgba(45, 212, 191, 0.3), 0 0 24px rgba(45, 212, 191, 0.1)",
+        "glow-teal-sm": "0 0 6px rgba(45, 212, 191, 0.4)",
+        "glow-amber": "0 0 12px rgba(251, 191, 36, 0.3), 0 0 24px rgba(251, 191, 36, 0.1)",
+        "glow-sky": "0 0 12px rgba(56, 189, 248, 0.3), 0 0 24px rgba(56, 189, 248, 0.1)",
+        "glow-violet": "0 0 12px rgba(167, 139, 250, 0.3), 0 0 24px rgba(167, 139, 250, 0.1)",
+        "panel": "0 0 0 1px rgba(var(--primary-rgb), 0.1), 0 4px 16px rgba(0,0,0,0.1)",
+        "panel-hover": "0 0 0 1px rgba(var(--primary-rgb), 0.25), 0 8px 24px rgba(0,0,0,0.15)",
       },
       keyframes: {
         "accordion-down": {

@@ -8,7 +8,7 @@ describe("useAchievements", () => {
   });
 
   it("should initialize with loading state", () => {
-    global.fetch = vi.fn(() => new Promise(() => {})); // Never resolves to keep it in loading state
+    global.fetch = vi.fn(() => new Promise(() => {})) as unknown as typeof fetch; // Never resolves to keep it in loading state
     const { result } = renderHook(() => useAchievements());
 
     expect(result.current.loading).toBe(true);

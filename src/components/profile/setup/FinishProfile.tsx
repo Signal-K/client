@@ -55,7 +55,6 @@ export default function CompleteProfileForm({ onSuccess }: { onSuccess: () => vo
     const result = await completeProfileAction({
       username,
       fullName,
-      ownReferralCode,
       referrerCodeInput,
     });
     if (!result.ok) {

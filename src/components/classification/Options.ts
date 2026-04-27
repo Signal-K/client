@@ -165,29 +165,6 @@ export const initialCloudClassificationOptions: ClassificationOption[] = [
     { id: 9, text: "Very distinct cloud" },
 ];
 export const cloudSpottingOnMarsShapesOptions: ClassificationOption[] = [
-    // Cloudspotting on Mars: Shapes classifications
-    // { id: 1, text: "Long and straight" },
-    // { id: 2, text: "Curved" },
-    // { id: 3, text: "Wavy" },
-    // { id: 4, text: "Blob" },
-    // { id: 5, text: "Streaky" },
-    // { id: 6, text: "Multiple shapes" },
-    // {
-    //     id: 1,
-    //     text: "Cloudy region",
-    // },
-    // {
-    //     id: 2,
-    //     text: "Other cloud type",
-    // },
-    // {
-    //     id: 3,
-    //     text: "Canyon/Crater",
-    // },
-    // {
-    //     id: 4,
-    //     text: ""
-    // }
     {
         id: 1,
         text: "Cloudy region",
@@ -197,18 +174,6 @@ export const cloudSpottingOnMarsShapesOptions: ClassificationOption[] = [
         text: "Other clouds",
     },
 ];
-
-
-// export const ClickACoralClassificationOptions: ClassificationOption[] = [
-//     {
-//         id: 1,
-//         text: "Coral",
-//     },
-//     {
-//         id: 2,
-//         text: "Fish/Animals"
-//     },
-// ];
 
 
 export const lidarEarthCloudsReadClassificationOptions: ClassificationOption[] = [
@@ -311,29 +276,6 @@ export const diskDetectorClassificationOptions: ClassificationOption[] = [
         text: "None of the above",
     },
 ];
-
-// export const penguinWatchClassificationOptions: ClassificationOption[] = [
-//     {
-//         id: 1,
-//         text: "Adult penguin",
-//     },
-//     {
-//         id: 2,
-//         text: "Penguin chicks",
-//     },
-//     {
-//         id: 3,
-//         text: "Penguin eggs",
-//     },
-//     {
-//         id: 4,
-//         text: "Nesting pair with eggs",
-//     },
-//     {
-//         id: 5,
-//         text: "No penguins/too blurry"
-//     },
-// ];
 
 export const zoodexBurrowingOwlClassificationOptions: ClassificationOption[] = [
     {

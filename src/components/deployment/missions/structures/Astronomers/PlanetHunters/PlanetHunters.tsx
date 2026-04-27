@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useSession } from "@/src/lib/auth/session-context";
 import { useRouter } from "next/navigation";
 import MissionShell from "../../BasePlate";
+import { calculateLevel, getMaxUnlockedChapter } from "@/src/utils/gameplay/leveling";
 import {
   TelescopeIcon,
   SpeakerIcon,
@@ -85,7 +86,7 @@ const PlanetHuntersSteps = () => {
   const [currentChapter, setCurrentChapter] = useState<number>(1);
 
   const maxUnlockedChapter = Math.max(
-    Math.floor(experiencePoints / 5) + 1,
+    getMaxUnlockedChapter(experiencePoints),
     Math.max(...missions.map((m) => m.chapter))
   );
 
@@ -137,7 +138,7 @@ const PlanetHuntersSteps = () => {
 
         setMissions(updatedMissions);
         setExperiencePoints(totalPoints);
-        setLevel(Math.floor(totalPoints / 9) + 1);
+        setLevel(calculateLevel(totalPoints));
       } catch (err) {
         console.error("Failed to load planet data:", err);
       }

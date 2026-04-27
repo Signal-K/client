@@ -215,63 +215,11 @@ export const milestones = [
                 value: "planet",
                 requiredCount: 2,
             },
-            // {
-            //     name: "Create a storm on a gas giant",
-            //     structure: "WeatherBalloon",
-            //     icon: "SnowflakeIcon",
-            //     xp: 1,
-            //     extendedDescription: "",
-            //     completionInfo: "",
-            //     rewardInfo: "",
-            //     table: 'events',
-            //     field: 'eventtype',
-            //     value: 'vortex-storm',
-            //     requiredCount: 1,
-            // },
-            // {
-            //     name: 'Make 3 Temperature Classifications',
-            //     structure: 'Telescope',
-            //     icon: "Telescope",
-            //     extendedDescription: "",
-            //     xp: 3,
-            //     completionInfo: '',
-            //     rewardInfo: '',
-            //     table: "comments",
-            //     field: "category",
-            //     value: "Temperature",
-            //     requiredCount: 3,
-            // },
         ],
     },
     {
         weekStart: '2025-04-21',
         data: [
-            // {
-            //     name: 'Make 3 Temperature Classifications',
-            //     structure: 'Telescope',
-            //     icon: "Telescope",
-            //     extendedDescription: "",
-            //     xp: 3,
-            //     completionInfo: '',
-            //     rewardInfo: '',
-            //     table: "comments",
-            //     field: "category",
-            //     value: "Temperature",
-            //     requiredCount: 3,
-            // },
-            // {
-            //     name: 'Discover 2 planets',
-            //     structure: "Telescope",
-            //     icon: "PawPrintIcon",
-            //     extendedDescription: '',
-            //     xp: 2,
-            //     completionInfo: '',
-            //     rewardInfo: '',
-            //     table: "classifications",
-            //     field: "classificationtype",
-            //     value: "planet",
-            //     requiredCount: 2,
-            // },
             {
                 name: "Create a storm on a gas giant",
                 structure: "WeatherBalloon",
@@ -291,19 +239,6 @@ export const milestones = [
     {
         weekStart: '2025-04-14',
         data: [
-            // {
-            //     name: 'Make 3 Temperature Classifications',
-            //     structure: 'Telescope',
-            //     icon: "Telescope",
-            //     extendedDescription: "",
-            //     xp: 3,
-            //     completionInfo: '',
-            //     rewardInfo: '',
-            //     table: "comments",
-            //     field: "category",
-            //     value: "Temperature",
-            //     requiredCount: 3,
-            // },
             {
                 name: 'Discover 2 planets',
                 structure: "Telescope",
@@ -318,85 +253,8 @@ export const milestones = [
                 value: "planet",
                 requiredCount: 2,
             },
-            // {
-            //     name: "Create a storm on a gas giant",
-            //     structure: "WeatherBalloon",
-            //     icon: "SnowflakeIcon",
-            //     xp: 1,
-            //     extendedDescription: "",
-            //     completionInfo: "",
-            //     rewardInfo: "",
-            //     table: 'events',
-            //     field: 'eventtype',
-            //     value: 'vortex-storm',
-            //     requiredCount: 1,
-            // },
         ],
     },
-    // {
-    //     weekStart: "2025-02-18",
-    //     data: [
-    //         { 
-    //             name: "Find 3 desert creatures", 
-    //             structure: "Greenhouse", 
-    //             icon: "PawPrintIcon",
-    //             extendedDescription: "",
-    //             xp: null,
-    //             completionInfo: "",
-    //             rewardInfo: ""
-    //         },
-    //         { 
-    //             name: "Find ice on a planet", 
-    //             structure: "WeatherBalloon", 
-    //             icon: "SnowflakeIcon",
-    //             extendedDescription: "",
-    //             xp: null,
-    //             completionInfo: "",
-    //             rewardInfo: ""
-    //         },
-    //         { 
-    //             name: "Find a planet in the habitable zone", 
-    //             structure: "Telescope", 
-    //             icon: "GlassWaterIcon",
-    //             extendedDescription: "",
-    //             xp: null,
-    //             completionInfo: "",
-    //             rewardInfo: ""
-    //         },
-    //     ],
-    // },
-    // {
-    //     weekStart: "2025-02-11",
-    //     data: [
-    //         { 
-    //             name: "Discover a new microbial species", 
-    //             structure: "Greenhouse", 
-    //             icon: "PawPrintIcon",
-    //             extendedDescription: "",
-    //             xp: null,
-    //             completionInfo: "",
-    //             rewardInfo: ""
-    //         },
-    //         { 
-    //             name: "Detect a storm with a weather balloon", 
-    //             structure: "WeatherBalloon", 
-    //             icon: "SnowflakeIcon",
-    //             extendedDescription: "",
-    //             xp: null,
-    //             completionInfo: "",
-    //             rewardInfo: ""
-    //         },
-    //         { 
-    //             name: "Observe a distant exoplanet", 
-    //             structure: "Telescope", 
-    //             icon: "GlassWaterIcon",
-    //             extendedDescription: "",
-    //             xp: null,
-    //             completionInfo: "",
-    //             rewardInfo: ""
-    //         },
-    //     ],
-    // },
 ];
 
 export const communityMilestones = [
@@ -432,36 +290,4 @@ export const communityMilestones = [
             },
         ],
     },
-    // {
-    //     weekStart: "2025-02-11",
-    //     data: [
-    //         { 
-    //             name: "Community discovers 50 new microbial species", 
-    //             structure: "Greenhouse", 
-    //             icon: "PawPrintIcon",
-    //             extendedDescription: "The community works together to discover a total of 50 new microbial species.",
-    //             xp: null,
-    //             completionInfo: "The community has collectively discovered 50 microbial species.",
-    //             rewardInfo: "Unlocks the 'Microbial Pioneer' badge for all players."
-    //         },
-    //         { 
-    //             name: "Community detects 30 storms with weather balloons", 
-    //             structure: "WeatherBalloon", 
-    //             icon: "SnowflakeIcon",
-    //             extendedDescription: "The community makes groundbreaking discoveries, detecting 30 storms across planets.",
-    //             xp: null,
-    //             completionInfo: "30 storms detected by the collective community.",
-    //             rewardInfo: "Unlocks the 'Storm Tracker' badge for all players."
-    //         },
-    //         { 
-    //             name: "Community observes 100 distant exoplanets", 
-    //             structure: "Telescope", 
-    //             icon: "GlassWaterIcon",
-    //             extendedDescription: "The community works to observe and catalog 100 distant exoplanets.",
-    //             xp: null,
-    //             completionInfo: "A total of 100 exoplanets observed by the community.",
-    //             rewardInfo: "Unlocks the 'Exoplanet Explorer' badge for all players."
-    //         },
-    //     ],
-    // },
 ];

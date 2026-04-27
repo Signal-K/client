@@ -1,43 +1,26 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-
 import { prisma } from "@/lib/server/prisma";
 import { createSupabaseServerClient } from "@/lib/supabase/ssr";
-
-function generateReferralCode(length = 8) {
-  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-  let code = "";
-  for (let i = 0; i < length; i++) {
-    code += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-  return code;
-}
+import { ReferralService } from "@/src/features/referrals/referral-service";
 
 export async function getCurrentProfileAction() {
   const supabase = createSupabaseServerClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
+  const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { ok: false as const, error: "Unauthorized" };
 
-  const rows = await prisma.$queryRaw<Array<{ username: string | null; full_name: string | null; avatar_url: string | null }>>`
-    SELECT username, full_name, avatar_url
-    FROM profiles
-    WHERE id::text = ${user.id}
-    LIMIT 1
-  `;
+  const profile = await prisma.profile.findUnique({
+    where: { id: user.id },
+    select: { username: true, fullName: true, avatarUrl: true, referralCode: true }
+  });
 
-  return { ok: true as const, data: rows[0] ?? null };
+  return { ok: true as const, data: profile ?? null };
 }
 
 export async function updateProfileSetupAction(formData: FormData) {
   const supabase = createSupabaseServerClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
+  const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { ok: false as const, error: "Unauthorized" };
 
   const username = String(formData.get("username") || "").trim();
@@ -61,16 +44,25 @@ export async function updateProfileSetupAction(formData: FormData) {
   }
 
   try {
-    await prisma.$executeRaw`
-      INSERT INTO profiles (id, username, full_name, avatar_url, updated_at)
-      VALUES (${user.id}::uuid, ${username}, ${firstName}, ${avatar_url}, NOW())
-      ON CONFLICT (id)
-      DO UPDATE SET
-        username = EXCLUDED.username,
-        full_name = EXCLUDED.full_name,
-        avatar_url = EXCLUDED.avatar_url,
-        updated_at = EXCLUDED.updated_at
-    `;
+    const referralCode = await ReferralService.ensureReferralCode(user.id);
+    
+    await prisma.profile.upsert({
+      where: { id: user.id },
+      update: {
+        username,
+        fullName: firstName,
+        avatarUrl: avatar_url,
+        updatedAt: new Date(),
+      },
+      create: {
+        id: user.id,
+        username,
+        fullName: firstName,
+        avatarUrl: avatar_url,
+        referralCode,
+        updatedAt: new Date(),
+      }
+    });
   } catch (error) {
     return { ok: false as const, error: String(error) };
   }
@@ -84,13 +76,10 @@ export async function updateProfileSetupAction(formData: FormData) {
 export async function completeProfileAction(input: {
   username: string;
   fullName: string;
-  ownReferralCode?: string;
   referrerCodeInput?: string;
 }) {
   const supabase = createSupabaseServerClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { ok: false as const, error: "Unauthorized" };
 
   const username = input.username.trim();
@@ -98,63 +87,40 @@ export async function completeProfileAction(input: {
     return { ok: false as const, error: "Username must be at least 3 characters." };
   }
 
-  const ownReferralCode = (input.ownReferralCode || generateReferralCode()).trim();
-
   try {
-    await prisma.$executeRaw`
-      INSERT INTO profiles (id, username, full_name, referral_code, updated_at)
-      VALUES (${user.id}::uuid, ${username}, ${input.fullName.trim()}, ${ownReferralCode}, NOW())
-      ON CONFLICT (id)
-      DO UPDATE SET
-        username = EXCLUDED.username,
-        full_name = EXCLUDED.full_name,
-        referral_code = EXCLUDED.referral_code,
-        updated_at = EXCLUDED.updated_at
-    `;
+    const referralCode = await ReferralService.ensureReferralCode(user.id);
+
+    await prisma.profile.upsert({
+      where: { id: user.id },
+      update: {
+        username,
+        fullName: input.fullName.trim(),
+        updatedAt: new Date(),
+      },
+      create: {
+        id: user.id,
+        username,
+        fullName: input.fullName.trim(),
+        referralCode,
+        updatedAt: new Date(),
+      }
+    });
+
+    const referrerCode = (input.referrerCodeInput || "").trim();
+    if (referrerCode) {
+      try {
+        await ReferralService.applyReferral(user.id, referrerCode);
+      } catch (e) {
+        console.warn("Failed to apply referral code during profile completion:", e);
+        // We don't block profile completion if referral fails
+      }
+    }
   } catch (error) {
     const message = String(error);
     if (message.includes("profiles_username_key")) {
-      return { ok: false as const, error: "That username is already taken. Please choose another one." };
+      return { ok: false as const, error: "That username is already taken." };
     }
-    if (message.includes("profiles_referral_code_key")) {
-      return { ok: false as const, error: "Referral code already exists. Please try again." };
-    }
-    return { ok: false as const, error: message || "Failed to update profile." };
-  }
-
-  const referrerCode = (input.referrerCodeInput || "").trim();
-  if (referrerCode) {
-    const existingReferral = (
-      await prisma.$queryRaw<Array<{ id: number }>>`
-      SELECT id
-      FROM referrals
-      WHERE referree_id::text = ${user.id}
-      LIMIT 1
-      `
-    )[0];
-    const referralCheckError = null;
-
-    if (!referralCheckError && !existingReferral) {
-      const referrerProfile = (
-        await prisma.$queryRaw<Array<{ id: string; referral_code: string | null }>>`
-          SELECT id, referral_code
-          FROM profiles
-          WHERE lower(referral_code) = lower(${referrerCode})
-          LIMIT 1
-        `
-      )[0];
-
-      if (
-        referrerProfile &&
-        referrerProfile.id !== user.id &&
-        referrerProfile.referral_code
-      ) {
-        await prisma.$executeRaw`
-          INSERT INTO referrals (referree_id, referral_code)
-          VALUES (${user.id}::uuid, ${referrerProfile.referral_code})
-        `;
-      }
-    }
+    return { ok: false as const, error: "Failed to update profile." };
   }
 
   revalidatePath("/game");
@@ -165,140 +131,44 @@ export async function completeProfileAction(input: {
 
 export async function getReferralPanelDataAction() {
   const supabase = createSupabaseServerClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { ok: false as const, error: "Unauthorized" };
 
-  const profileData = (
-    await prisma.$queryRaw<Array<{ referral_code: string | null }>>`
-      SELECT referral_code
-      FROM profiles
-      WHERE id::text = ${user.id}
-      LIMIT 1
-    `
-  )[0];
-  const profileError = null;
+  const profile = await prisma.profile.findUnique({
+    where: { id: user.id },
+    select: { referralCode: true }
+  });
 
-  if (profileError) return { ok: false as const, error: "Failed to load your referral code." };
-  if (!profileData?.referral_code) return { ok: false as const, error: "No referral code found for your account." };
-
-  const userReferralCode = profileData.referral_code;
-  const referralsData = await prisma.$queryRaw<Array<{ referree_id: string }>>`
-    SELECT referree_id
-    FROM referrals
-    WHERE referral_code = ${userReferralCode}
-  `;
-  const referralsError = null;
-
-  if (referralsError) return { ok: false as const, error: "Failed to load referred users." };
-
-  const referredUserIds = referralsData?.map((r: any) => r.referree_id) || [];
-  if (referredUserIds.length === 0) {
-    return { ok: true as const, data: { referralCode: userReferralCode, referredUsers: [] } };
+  if (!profile?.referralCode) {
+    const newCode = await ReferralService.ensureReferralCode(user.id);
+    return { ok: true as const, data: { referralCode: newCode, referredUsers: [] } };
   }
 
-  const usersData = await prisma.$queryRaw<Array<{ id: string; username: string | null }>>`
-    SELECT id, username
-    FROM profiles
-    WHERE id::text = ANY(${referredUserIds}::text[])
-  `;
-  const usersError = null;
+  const referrals = await prisma.referral.findMany({
+    where: { referralCode: profile.referralCode },
+    select: { referreeId: true }
+  });
 
-  if (usersError) return { ok: false as const, error: "Failed to load referred users' profiles." };
+  const referreeIds = referrals.map(r => r.referreeId);
+  const referreeProfiles = await prisma.profile.findMany({
+    where: { id: { in: referreeIds } },
+    select: { id: true, username: true }
+  });
 
-  const authUsers = await prisma.$queryRaw<Array<{ id: string; email: string | null }>>`
-    SELECT id, email
-    FROM users
-    WHERE id = ANY(${referredUserIds}::text[])
-  `;
-
-  const referredUsers = (usersData || []).map((u: any) => ({
-    ...u,
-    email: authUsers?.find((a: any) => a.id === u.id)?.email ?? null,
-  }));
-
-  return { ok: true as const, data: { referralCode: userReferralCode, referredUsers } };
+  return { ok: true as const, data: { referralCode: profile.referralCode, referredUsers: referreeProfiles } };
 }
 
 export async function submitReferralCodeAction(referralCode: string) {
   const supabase = createSupabaseServerClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { ok: false as const, error: "You must be logged in to submit a referral code." };
-
-  const code = referralCode.trim();
-  if (!code) return { ok: false as const, error: "Please enter a valid referral code." };
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { ok: false as const, error: "You must be logged in." };
 
   try {
-    const ownProfile = (
-      await prisma.$queryRaw<Array<{ id: string; referral_code: string | null }>>`
-        SELECT id::text AS id, referral_code
-        FROM profiles
-        WHERE id::text = ${user.id}
-        LIMIT 1
-      `
-    )[0];
-
-    if (!ownProfile) {
-      return { ok: false as const, error: "Create your profile before applying a referral code." };
-    }
-
-    if (
-      ownProfile.referral_code &&
-      ownProfile.referral_code.toLowerCase() === code.toLowerCase()
-    ) {
-      return { ok: false as const, error: "You cannot use your own referral code." };
-    }
-
-    const existingReferral = (
-      await prisma.$queryRaw<Array<{ id: string }>>`
-        SELECT id::text AS id
-        FROM referrals
-        WHERE referree_id::text = ${user.id}
-        LIMIT 1
-      `
-    )[0];
-    if (existingReferral) {
-      return { ok: false as const, error: "You have already used a referral code." };
-    }
-
-    const referrerProfile = (
-      await prisma.$queryRaw<Array<{ id: string; referral_code: string | null }>>`
-        SELECT id::text AS id, referral_code
-        FROM profiles
-        WHERE lower(referral_code) = lower(${code})
-        LIMIT 1
-      `
-    )[0];
-
-    if (!referrerProfile) {
-      return { ok: false as const, error: "Referral code not found." };
-    }
-
-    if (referrerProfile.id === user.id) {
-      return { ok: false as const, error: "You cannot use your own referral code." };
-    }
-    if (!referrerProfile.referral_code) {
-      return { ok: false as const, error: "Referral code not found." };
-    }
-
-    await prisma.$executeRaw`
-      INSERT INTO referrals (referree_id, referral_code)
-      VALUES (${user.id}::uuid, ${referrerProfile.referral_code})
-    `;
-  } catch (error) {
-    return {
-      ok: false as const,
-      error:
-        error instanceof Error
-          ? error.message
-          : "Failed to submit referral code. Please try again.",
-    };
+    await ReferralService.applyReferral(user.id, referralCode);
+    revalidatePath("/research");
+    revalidatePath("/game");
+    return { ok: true as const };
+  } catch (error: any) {
+    return { ok: false as const, error: error.message || "Failed to submit referral code." };
   }
-
-  revalidatePath("/research");
-  revalidatePath("/game");
-  return { ok: true as const };
 }

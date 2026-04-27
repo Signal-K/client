@@ -6,6 +6,7 @@ import { Button } from "@/src/components/ui/button";
 import { Textarea } from "@/src/components/ui/textarea";
 import { useRouter } from "next/navigation";
 import { CommentCard } from "@/src/components/social/comments/CommentSingle";
+import { SuccessPopup } from "@/src/components/ui/SuccessPopup";
 
 interface CommentProps {
   id: number;
@@ -351,46 +352,12 @@ export function SurveyorComments({
         </>
       )}
 
-      {/* Success Popup */}
       {showSuccessPopup && (
-        <>
-          
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-            <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full mx-4 text-center">
-              <div className="mb-4">
-                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                </div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                  Proposal Submitted!
-                </h3>
-                <p className="text-gray-600 mb-4">
-                  Your proposal has been entered into the research database. Redirecting you to the dashboard...
-                </p>
-                <button 
-                  onClick={() => {
-                    try {
-                      router.push('/');
-                    } catch (error) {
-                      console.error('Manual redirect error:', error);
-                      if (typeof window !== "undefined") {
-                        window.location.href = '/';
-                      }
-                    }
-                  }}
-                  className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 mb-4"
-                >
-                  Go to Dashboard Now
-                </button>
-              </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
-                <div className="bg-green-600 h-2 rounded-full animate-pulse" style={{width: '100%'}}></div>
-              </div>
-            </div>
-          </div>
-        </>
+        <SuccessPopup
+          title="Proposal Submitted!"
+          message="Your proposal has been entered into the research database. Redirecting you to the dashboard..."
+          onDismiss={() => router.push('/')}
+        />
       )}
     </Card>
   );

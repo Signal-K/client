@@ -3,8 +3,8 @@ import { useSession } from "@/src/lib/auth/session-context";
 import MissionShell from "@/src/components/deployment/missions/structures/BasePlate";
 import { CloudCogIcon, FolderCog, HelpCircle, Paintbrush2Icon, PaintBucket, Vote } from "lucide-react";
 import { CloudspottingOnMarsWithId } from "@/src/components/projects/Lidar/Clouds";
-import VoteCoMClassifications from "./CoMVote";
-import CloudClassificationGenerator from "./CloudMaker";
+import VotePanel from "@/src/components/social/posts/VotePanel";
+import ClassificationList from "@/src/components/social/posts/ClassificationList";
 import { CloudspottingOnMarsTutorial } from "@/src/components/projects/Lidar/cloudspottingOnMars";
 import { StarterCoMShapes } from "@/src/components/projects/Lidar/CloudspottingOnMarsShapes";
 // import { CloudspottingShapesWrapper } from "@/src/components/research/projects/Lidar/CloudspottingOnMarsShapes";
@@ -56,7 +56,7 @@ const CloudspottingOnMars = () => {
                 icon: Vote,
                 points: 1,
                 completedCount: 0,
-                internalComponent: () => <VoteCoMClassifications />,
+                internalComponent: () => <VotePanel classificationType="cloud" />,
                 color: "text-green-700",
             },
             {
@@ -68,7 +68,7 @@ const CloudspottingOnMars = () => {
                 icon: PaintBucket,
                 points: 1,
                 completedCount: 0,
-                internalComponent: () => <CloudClassificationGenerator />,
+                internalComponent: () => <ClassificationList classificationType="cloud" />,
                 color: 'text-green-300',
             },
             {

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import TotalPoints from './Total';
-import { ChevronDown, ChevronRight, Award, Star } from 'lucide-react';
-import { Category, Project, Mission } from '@/types/journal';
+import { ChevronDown, Award, Star } from 'lucide-react';
+import { Category } from '@/types/journal';
 import { JournalProgressBar } from "@/src/components/ui/progress";
 
 function OverallCategoryPoints({
@@ -77,7 +77,6 @@ export default function JournalPage() {
           <TotalPoints onExport={handleExport} />
           
           {pointsData && (
-            // <JournalAchievement
             <><MinimalJournalPage
               planetHuntersPoints={pointsData.planetHuntersPoints}
               dailyMinorPlanetPoints={pointsData.dailyMinorPlanetPoints}
@@ -356,134 +355,6 @@ const categories: Category[] = [
       ],
     },
 ];  
-
-function JournalAchievement({
-  planetHuntersPoints,
-  dailyMinorPlanetPoints,
-  ai4mPoints,
-  planetFourPoints,
-  jvhPoints,
-  cloudspottingPoints,
-}: {
-  planetHuntersPoints: number;
-  dailyMinorPlanetPoints: number;
-  ai4mPoints: number;
-  planetFourPoints: number;
-  jvhPoints: number;
-  cloudspottingPoints: number;
-}) {
-  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
-  const [openCategories, setOpenCategories] = useState<number[]>([]); // Track open categories
-
-  const projectPoints: { [key: string]: number } = {
-    "1": planetHuntersPoints,
-    "3": dailyMinorPlanetPoints,
-    "7": ai4mPoints,
-    "5": planetFourPoints,
-    "8": jvhPoints,
-    "6": cloudspottingPoints,
-  };
-
-  const toggleCategory = (categoryId: number) => {
-    setOpenCategories((prev) =>
-      prev.includes(categoryId)
-        ? prev.filter((id) => id !== categoryId)
-        : [...prev, categoryId]
-    );
-  };
-
-  const selectProject = (project: Project) => {
-    setSelectedProject(project);
-  };
-
-  return (
-    <div className="flex w-full h-full">
-      {/* Left Panel: Categories and Projects */}
-      <div className="flex-1 p-6 bg-gradient-to-b from-[#1D2833] to-[#2C4F64]/10 overflow-y-auto">
-        <h2 className="text-2xl font-bold mb-6 text-[#2C4F64] flex items-center gap-2">
-          <Award className="w-6 h-6 text-[#FF695D]" />
-          Journal & Achievements
-        </h2>
-        {categories.map((category) => (
-          <div key={category.id} className="mb-4">
-            <button
-              className="flex items-center justify-between w-full p-3 bg-[#2C4F64]/5 rounded-lg shadow-sm border border-[#2C4F64]/20 hover:bg-[#2C4F64]/20 transition-colors"
-              onClick={() => toggleCategory(Number(category.id))} 
-            >
-              <div className="flex items-center gap-2">
-                <span className="font-semibold text-[#2C4F64]">{category.name}</span>
-              </div>
-              <ChevronDown
-                className={`transition-transform ${
-                  openCategories.includes(Number(category.id)) ? "rotate-180" : ""
-                }`}
-              />
-              </button>
-              <div
-                className={`mt-4 space-y-3 transition-all duration-300 ease-in-out ${
-                  openCategories.includes(Number(category.id)) ? "max-h-screen" : "max-h-0"
-                } overflow-hidden`}
-              >
-              {category.projects.map((project) => (
-                <button
-                  key={project.id}
-                  className={`w-full p-3 bg-[#2C4F64]/10 rounded-lg shadow-sm border ${
-                    selectedProject?.id === project.id
-                      ? "border-[#5FCBC3]"
-                      : "border-[#2C4F64]/20"
-                  } hover:bg-[#2C4F64]/20 transition-colors`}
-                  onClick={() => selectProject(project)}
-                >
-                  <div className="flex justify-between items-center">
-                    <span className="font-semibold text-[#5FCBC3]">
-                      {project.name}
-                    </span>
-                    <span className="text-sm text-[#FFD700]">
-                      Points: {projectPoints[project.id] || 0}
-                    </span>
-                  </div>
-                </button>
-              ))}
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* Right Panel: Selected Project Details */}
-      <div className="flex-1 p-6 bg-gradient-to-b from-[#2C4F64]/10 to-[#1D2833] overflow-y-auto">
-        {selectedProject ? (
-          <>
-            <h3 className="text-xl font-bold mb-4 text-[#FFD700]">
-              {selectedProject.name}
-            </h3>
-            <ul className="space-y-3">
-              {selectedProject?.missions?.map((mission) => (
-                <li
-                  key={mission.id}
-                  className="p-3 bg-[#1D2833] rounded-lg shadow-sm border border-[#2C4F64]/20"
-                >
-                  <div className="flex justify-between items-center">
-                    <span className="text-[#5FCBC3] font-semibold">
-                      {mission.name}
-                    </span>
-                  </div>
-                  <JournalProgressBar
-                    progress={mission.progress}
-                    total={mission.totalSteps}
-                  />
-                </li>
-              ))}
-            </ul>
-          </>
-        ) : (
-          <div className="flex items-center justify-center h-full text-[#5FCBC3]">
-            <span>Select a project to see details</span>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-};
 
 function MinimalJournalPage({
     planetHuntersPoints,

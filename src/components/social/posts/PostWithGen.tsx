@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { useImageCarousel } from "@/src/hooks/useImageCarousel";
 import { Avatar, AvatarFallback, AvatarImage } from "@/src/components/ui/avatar";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/src/components/ui/card";
 import { Button } from "@/src/components/ui/button";
@@ -10,11 +11,6 @@ import { useSession } from "@/src/lib/auth/session-context";
 import { CommentCard } from "../comments/CommentSingle";
 
 import CloudSignal from "@/src/components/deployment/missions/structures/Meteorologists/Cloudspotting/CloudSignal";
-// import { PlanetGenerator } from "@/src/components/discovery/data-sources/Astronomers/PlanetHunters/PlanetGenerator";
-// import AsteroidViewer from "@/src/components/discovery/data-sources/Astronomers/DailyMinorPlanet/asteroid-viewer";
-// import CloudClassifier from "@/src/components/discovery/data-sources/Meteorologists/JVH/cloud-classifier";
-// import { PlanetScene } from "@/src/components/discovery/data-sources/Astronomers/PlanetHunters/V2/planet-scene";
-// import { FullPlanetGenerator } from "@/src/components/discovery/data-sources/Astronomers/PlanetHunters/V2/full-planet-generator";
 import Link from "next/link";
 import { Textarea } from "@/src/components/ui/textarea";
 import { SurveyorComments } from "./Surveyor/SurveyorPostCard";
@@ -129,25 +125,7 @@ export function PostCardSingleWithGenerator({
       case "cloud":
         return <CloudSignal classificationConfig={classificationConfig} classificationId={String(classificationId)} />
       case "planet":
-        return (
-          <></>
-          // <PlanetGenerator
-          //   classificationId={String(classificationId)}
-          //   classificationConfig={classificationConfig}
-          //   author={author}
-          //   biome={biome}
-          // />
-          // <SimplePlanetGenerator
-
-          //   classificationId={String(classificationId)}
-          //   classificationConfig={classificationConfig}
-          //   author={author}
-          //   />
-        );
-      // case "telescope-minorPlanet":
-      //   return <AsteroidViewer classificationId={String(classificationId)} classificationConfig={classificationConfig} />;
-      // case "lidar-jovianVortexHunter":
-      //   return <CloudClassifier classificationId={String(classificationId)} classificationConfig={classificationConfig} />;
+        return null; // Planet visualisation deactivated for performance sweep.
       default:
         return (
           <div>
@@ -255,7 +233,6 @@ export function PostCardSingleWithGeneratorEditMode({
   classificationConfig,
   images,
   classificationType,
-  // commentStatus,
   onVote,
 }: PostCardSingleProps) {
   const session = useSession();
@@ -307,17 +284,7 @@ export function PostCardSingleWithGeneratorEditMode({
     setVoteCount((prev) => prev + 1);
   };
 
-    const [currentIndex, setCurrentIndex] = React.useState(0);
-  
-    const goToNextImage = () => {
-      setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
-    };
-  
-    const goToPreviousImage = () => {
-      setCurrentIndex((prevIndex) =>
-        prevIndex === 0 ? images.length - 1 : prevIndex - 1
-      );
-    };
+    const { currentIndex, next: goToNextImage, prev: goToPreviousImage, goTo: setCurrentIndex } = useImageCarousel(images);
 
   const handleAddComment = async () => {
     if (!newComment.trim()) return;
@@ -350,37 +317,7 @@ export function PostCardSingleWithGeneratorEditMode({
         />
 
         case "planet":
-          return (
-            <>
-              {/* {session?.user?.id === author && (
-                // <PlanetGenerator classificationId={""} author={""}                  // classificationId={String(classificationId)} 
-                
-                  // classificationConfig={classificationConfig}
-                  // author={author}
-                /> */}
-                        {/* //   // <FullPlanetGenerator /> --> we need to be able to pass the stats in, too (as a prop) */}
-              {/* )} */}
-              {session?.user?.id !== author && (
-                // <SimplePlanetGenerator
-                //   classificationId={String(classificationId)}
-                //   classificationConfig={classificationConfig}
-                //   author={author}
-                // <PlanetGenerator classificationId={""} author={""}                />
-                <></>
-                // <FullPlanetGeneratorNoControl />
-              )}
-            </>
-          );
-      // case "telescope-minorPlanet":
-      //   return <AsteroidViewer 
-      //     classificationId={String(classificationId)} 
-      //     classificationConfig={classificationConfig}
-      //   />;
-      // case "lidar-jovianVortexHunter":
-      //   return <CloudClassifier
-      //     classificationId={String(classificationId)} 
-      //     classificationConfig={classificationConfig}
-      //   />;
+          return null; // Planet visualisation deactivated for performance sweep.
       default:
         return (
           <div>
@@ -462,12 +399,6 @@ export function PostCardSingleWithGeneratorEditMode({
                         )}
                       </div>
           
-                      {/* Grid cell for the PlanetTempCalculator */}
-                      {/* {classificationType === 'planet' && (
-                        <div className="col-span-1">
-                          <PlanetTempCalculator />
-                        </div>
-                      )} */}
                     </div>
                   )}
         {images.length > 0 && (
