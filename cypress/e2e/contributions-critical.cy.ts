@@ -53,7 +53,7 @@ describe("Contributions Critical", () => {
       return true
     })
 
-    // Pre-check: dev server must be reachable (/ returns 307 → /apt which returns 200)
+    // Pre-check: dev server must be reachable (/ returns 200)
     cy.request({ url: "/", failOnStatusCode: false, timeout: 10_000 }).its("status").should("be.lessThan", 500)
     cy.waitForSupabase()
   })
