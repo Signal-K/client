@@ -6,6 +6,7 @@ import {
   SheetContent,
   SheetHeader,
   SheetTitle,
+  SheetDescription,
   SheetFooter,
 } from "@/src/components/ui/sheet";
 
@@ -16,6 +17,7 @@ describe("Sheet", () => {
         <SheetTrigger>Open Sheet</SheetTrigger>
         <SheetContent>
           <SheetTitle>Sheet Title</SheetTitle>
+          <SheetDescription>Description</SheetDescription>
         </SheetContent>
       </Sheet>
     );
@@ -27,6 +29,7 @@ describe("Sheet", () => {
       <Sheet open>
         <SheetContent>
           <SheetTitle>Visible Title</SheetTitle>
+          <SheetDescription>Description</SheetDescription>
           <p>Sheet body text</p>
         </SheetContent>
       </Sheet>
@@ -41,6 +44,7 @@ describe("Sheet", () => {
         <SheetContent>
           <SheetHeader>
             <SheetTitle>Header Title</SheetTitle>
+            <SheetDescription>Description</SheetDescription>
           </SheetHeader>
         </SheetContent>
       </Sheet>
@@ -53,6 +57,7 @@ describe("Sheet", () => {
       <Sheet open>
         <SheetContent className="custom-sheet">
           <SheetTitle>Title</SheetTitle>
+          <SheetDescription>Description</SheetDescription>
           <p>Content</p>
         </SheetContent>
       </Sheet>
@@ -65,6 +70,7 @@ describe("Sheet", () => {
       <Sheet open>
         <SheetContent>
           <SheetTitle>My Title</SheetTitle>
+          <SheetDescription>Description</SheetDescription>
         </SheetContent>
       </Sheet>
     );

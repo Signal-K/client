@@ -18,6 +18,7 @@ describe("Dialog", () => {
         <DialogTrigger>Open Dialog</DialogTrigger>
         <DialogContent>
           <DialogTitle>Title</DialogTitle>
+          <DialogDescription>Description</DialogDescription>
         </DialogContent>
       </Dialog>
     );
@@ -38,6 +39,7 @@ describe("Dialog", () => {
       <Dialog open>
         <DialogContent>
           <DialogTitle>My Dialog Title</DialogTitle>
+          <DialogDescription>Description</DialogDescription>
         </DialogContent>
       </Dialog>
     );
@@ -61,6 +63,7 @@ describe("Dialog", () => {
       <Dialog open>
         <DialogContent>
           <DialogTitle>Title</DialogTitle>
+          <DialogDescription>Description</DialogDescription>
           <DialogClose>Close me</DialogClose>
         </DialogContent>
       </Dialog>

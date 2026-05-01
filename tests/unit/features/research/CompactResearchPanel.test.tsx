@@ -30,10 +30,12 @@ describe("CompactResearchPanel", () => {
     vi.restoreAllMocks();
   });
 
-  it("shows loading state initially", () => {
+  it("shows loading state initially", async () => {
     global.fetch = mockFetch(mockSummary);
     render(<CompactResearchPanel />);
     expect(screen.getByText("Loading upgrades...")).toBeInTheDocument();
+    // Wait for the next state update to settle to avoid 'act' warning
+    await waitFor(() => expect(screen.getByText("Research Lab")).toBeInTheDocument());
   });
 
   it("renders Research Lab heading after load", async () => {
