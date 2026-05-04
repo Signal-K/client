@@ -42,6 +42,93 @@ type LinkedAnomalyEntry = {
   } | null;
 };
 
+type RecentClassificationRow = {
+  id: bigint;
+  classificationtype: string | null;
+  content: string | null;
+  createdAt: Date;
+  classificationConfiguration?: unknown;
+  anomalyRef: {
+    content: string | null;
+  } | null;
+};
+
+async function safeQuery<T>(label: string, query: () => Promise<T>, fallback: T): Promise<T> {
+  try {
+    return await query();
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    console.warn(`[game-page-data] ${label} unavailable: ${message}`);
+    return fallback;
+  }
+}
+
+async function getProfileForUser(userId: string) {
+  try {
+    return await prisma.profile.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        username: true,
+        fullName: true,
+        classificationPoints: true,
+        referralCode: true,
+      },
+    });
+  } catch {
+    const profile = await prisma.profile.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        username: true,
+        fullName: true,
+        classificationPoints: true,
+      },
+    });
+    return profile ? { ...profile, referralCode: null } : null;
+  }
+}
+
+async function getRecentClassificationsForUser(userId: string): Promise<RecentClassificationRow[]> {
+  try {
+    return await prisma.classification.findMany({
+      where: { author: userId },
+      orderBy: { createdAt: "desc" },
+      take: 10,
+      select: {
+        id: true,
+        classificationtype: true,
+        content: true,
+        createdAt: true,
+        classificationConfiguration: true,
+        anomalyRef: {
+          select: { content: true },
+        },
+      },
+    });
+  } catch {
+    const rows = await prisma.classification.findMany({
+      where: { author: userId },
+      orderBy: { createdAt: "desc" },
+      take: 10,
+      select: {
+        id: true,
+        classificationtype: true,
+        content: true,
+        createdAt: true,
+        anomalyRef: {
+          select: { content: true },
+        },
+      },
+    });
+
+    return rows.map((row) => ({
+      ...row,
+      classificationConfiguration: null,
+    }));
+  }
+}
+
 export async function getGamePageDataForUser(userId: string) {
   const oneWeekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
 
@@ -54,26 +141,8 @@ export async function getGamePageDataForUser(userId: string) {
     roverDeposits,
     hubLeaderboard,
   ] = await Promise.all([
-    prisma.profile.findUnique({
-      where: { id: userId },
-      select: {
-        id: true,
-        username: true,
-        fullName: true,
-        classificationPoints: true,
-        referralCode: true,
-      },
-    }),
-    prisma.classification.findMany({
-      where: { author: userId },
-      include: {
-        anomalyRef: {
-          select: { content: true },
-        },
-      },
-      orderBy: { createdAt: "desc" },
-      take: 10,
-    }),
+    safeQuery("profile", () => getProfileForUser(userId), null),
+    getRecentClassificationsForUser(userId),
     prisma.classification.findMany({
       where: { author: userId },
       select: { anomaly: true },
@@ -94,11 +163,20 @@ export async function getGamePageDataForUser(userId: string) {
         createdAt: true,
       },
     }),
-    prisma.mineralDeposit.findFirst({
-      where: { owner: userId, roverName: { not: null } },
-      select: { id: true },
-    }),
-    getHubLeaderboard(userId),
+    safeQuery(
+      "roverDeposits",
+      () =>
+        prisma.mineralDeposit.findFirst({
+          where: { owner: userId, roverName: { not: null } },
+          select: { id: true },
+        }),
+      null
+    ),
+    safeQuery(
+      "hubLeaderboard",
+      () => getHubLeaderboard(userId),
+      { entries: [], currentUser: null }
+    ),
   ]);
 
   const classifiedAnomalyIds = new Set(
@@ -179,17 +257,31 @@ export async function getGamePageDataForUser(userId: string) {
     rovers: planetClassifications.length >= 5,
     balloons: transformedClassifications.length >= 10,
   };
+  const referralCode =
+    typeof profile?.referralCode === "string" && profile.referralCode.length > 0
+      ? profile.referralCode
+      : null;
 
   const [referralCount, hasReferralRecord] = await Promise.all([
-    profile?.referralCode
-      ? prisma.referral.count({
-          where: { referralCode: profile.referralCode },
-        })
+    referralCode
+      ? safeQuery(
+          "referralCount",
+          () =>
+            prisma.referral.count({
+              where: { referralCode },
+            }),
+          0
+        )
       : Promise.resolve(0),
-    prisma.referral.findFirst({
-      where: { referreeId: userId },
-      select: { id: true },
-    }),
+    safeQuery(
+      "hasReferralRecord",
+      () =>
+        prisma.referral.findFirst({
+          where: { referreeId: userId },
+          select: { id: true },
+        }),
+      null
+    ),
   ]);
 
   return {
@@ -215,7 +307,7 @@ export async function getGamePageDataForUser(userId: string) {
     planetTargets,
     visibleStructures,
     hasRoverMineralDeposits: Boolean(roverDeposits),
-    referralCode: profile?.referralCode ?? null,
+    referralCode,
     referralCount,
     hasReferral: Boolean(hasReferralRecord),
     hubLeaderboard,

@@ -153,16 +153,16 @@ export default function ProjectPreferencesModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-h-[90vh] max-w-4xl overflow-hidden border-border/60 bg-background/95 p-0 shadow-2xl">
+      <DialogContent className="max-h-[88vh] w-[calc(100vw-1rem)] max-w-[58rem] overflow-hidden border-border/60 bg-background/95 p-0 shadow-2xl sm:w-full">
         <div className="relative overflow-hidden">
           <div className="pointer-events-none absolute inset-0 star-field opacity-25" />
           <div className="pointer-events-none absolute inset-0 sunburst-bg opacity-30" />
 
-          <DialogHeader className="relative border-b border-border/40 px-6 pb-5 pt-6">
+          <DialogHeader className="relative border-b border-border/40 px-4 pb-4 pt-5 sm:px-6 sm:pb-5 sm:pt-6">
             <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-primary">
               Mission Focus
             </span>
-            <DialogTitle className="mt-2 flex items-center gap-2 text-2xl font-black tracking-tight">
+            <DialogTitle className="mt-2 flex items-center gap-2 pr-8 text-xl font-black tracking-tight sm:text-2xl">
               <Sparkles className="h-5 w-5 text-primary" />
               Select your project roster
             </DialogTitle>
@@ -172,7 +172,7 @@ export default function ProjectPreferencesModal({
             </DialogDescription>
           </DialogHeader>
 
-          <div className="relative max-h-[calc(90vh-180px)] overflow-y-auto px-6 py-5">
+          <div className="relative max-h-[calc(88vh-172px)] overflow-y-auto px-4 py-4 sm:px-6 sm:py-5">
             <div className="mb-4 flex flex-wrap items-center gap-2">
               <span className="rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-primary">
                 {selectedProjects.length || PROJECTS.length} tracks armed
@@ -203,7 +203,7 @@ export default function ProjectPreferencesModal({
                   >
                     <button
                       type="button"
-                      className="w-full px-5 py-4 text-left"
+                      className="w-full px-4 py-4 text-left sm:px-5"
                       onClick={() => toggleProject(project.id)}
                     >
                       <div className="flex items-start gap-4">
@@ -284,18 +284,18 @@ export default function ProjectPreferencesModal({
             </div>
           </div>
 
-          <div className="relative flex items-center justify-between gap-3 border-t border-border/40 bg-background/90 px-6 py-4">
+          <div className="relative flex flex-col gap-3 border-t border-border/40 bg-background/90 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
             <div className="text-xs text-muted-foreground">
               {selectedProjects.length > 0
                 ? `${selectedProjects.length} projects selected`
                 : "No project selected. Saving now will arm all tracks by default."}
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex w-full items-center justify-end gap-3 sm:w-auto">
               <Button variant="ghost" onClick={onClose}>
                 Skip for now
               </Button>
-              <Button onClick={handleSave} className="btn-glow gap-2 rounded-full px-5 font-black uppercase tracking-[0.18em]">
+              <Button onClick={handleSave} className="btn-glow gap-2 rounded-full px-4 text-xs font-black uppercase tracking-[0.18em] sm:px-5 sm:text-sm">
                 Save preferences
                 <ArrowRight className="h-4 w-4" />
               </Button>

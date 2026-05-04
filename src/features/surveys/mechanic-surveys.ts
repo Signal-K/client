@@ -140,6 +140,7 @@ export const MECHANIC_SURVEYS: readonly MechanicMicroSurvey[] = [
     title: "Cargo Bay",
     subtitle: "Inventory management feedback.",
     triggerSurface: "game",
+    minClassificationsRequired: 1,
     questions: [
       {
         id: "organization",
@@ -154,6 +155,7 @@ export const MECHANIC_SURVEYS: readonly MechanicMicroSurvey[] = [
     title: "Profile Card",
     subtitle: "Your sailor identity.",
     triggerSurface: "game",
+    minClassificationsRequired: 1,
     questions: [
       {
         id: "customization",

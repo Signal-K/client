@@ -40,7 +40,7 @@ export function GameSurveys({ userId, classifications = [] }: GameSurveysProps) 
     // Responsive positioning:
     // Mobile  — full-width minus 12px gutters, 80px above the bottom edge
     // sm+     — pinned to bottom-right corner, capped at max-w-sm
-    <div className="fixed bottom-20 left-3 right-3 z-50 mx-auto max-w-sm animate-in slide-in-from-bottom-4 fade-in duration-500 sm:bottom-24 sm:left-auto sm:right-6 sm:w-full">
+    <div className="fixed bottom-20 left-2 right-2 z-50 mx-auto max-w-[22rem] animate-in slide-in-from-bottom-4 fade-in duration-500 sm:bottom-24 sm:left-auto sm:right-4 sm:w-full sm:max-w-sm">
       <MechanicPulseSurvey
         survey={activeSurvey}
         onDismiss={handleDismiss}

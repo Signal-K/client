@@ -256,6 +256,10 @@ export default function GameClient({ initialData, user }: GameClientProps) {
   const userHasReferral = Boolean(data.hasReferral);
   const showReferralMission = !referralMissionDismissed && !userHasReferral;
   const showAmbientLayers = activeView === "base";
+  const activeProjectCount = preferences?.projectInterests?.length ?? 0;
+  const missionFocusLabel = activeProjectCount > 0
+    ? `Mission focus: ${activeProjectCount} track${activeProjectCount === 1 ? "" : "s"}`
+    : "+ Select mission focus";
 
   const structureStates = useMemo<Record<StructureId, StructureState>>(() => ({
     telescope: !radarStations.telescope.deployed ? "undeployed" : incomingStructures.has("telescope") ? "incoming" : radarStations.telescope.signals > 0 ? "active" : "standby",
@@ -542,7 +546,7 @@ export default function GameClient({ initialData, user }: GameClientProps) {
                     onClick={() => setShowPreferencesModal(true)}
                     className="self-start rounded-full border border-border/30 px-4 py-1.5 text-[11px] font-bold text-muted-foreground/60 transition-colors hover:border-border/60 hover:text-foreground"
                   >
-                    + Add project
+                    {missionFocusLabel}
                   </button>
                 </div>
 
@@ -649,6 +653,7 @@ export default function GameClient({ initialData, user }: GameClientProps) {
         onSave={(prefs) => {
           setProjectInterests(prefs);
           setShowPreferencesModal(false);
+          void refreshGameData();
         }}
       />
 

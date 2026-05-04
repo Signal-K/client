@@ -24,6 +24,9 @@ export function useGameSurveys(
     // Reset when view changes
     setActiveSurvey(null);
 
+    // Do not surface surveys to users with no activity yet.
+    if (classifications.length === 0) return;
+
     const timer = setTimeout(() => {
       // Find a relevant survey for the current view
       const candidate = MECHANIC_SURVEYS.find(s => {
@@ -34,7 +37,6 @@ export function useGameSurveys(
           "satellite": "mechanic_satellite_loop_v1",
           "solar": "mechanic_solar_loop_v1",
           "inventory": "feature_inventory_v1",
-          "base": "feature_profile_v1",
         };
 
         if (s.id !== viewMap[view]) return false;

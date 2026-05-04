@@ -146,6 +146,10 @@ jobs:
       - name: Run lint
         run: yarn lint
 
+      - name: Run E2E push flow against fresh local Supabase
+        if: github.event_name == 'push'
+        run: yarn test:e2e:push:local-supabase
+
       - name: Run E2E tests (minimal smoke for regular pushes)
         if: github.event_name == 'push' && github.ref_name != 'main'
         run: yarn test:e2e:smoke:minimal
