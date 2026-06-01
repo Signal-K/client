@@ -21,11 +21,11 @@ export function IntroStep({ isPoweringUp, onPowerUp }: IntroStepProps) {
         <Shield className="h-8 w-8 text-primary" />
       </div>
       <h1 className="text-4xl font-black tracking-tight sm:text-5xl">
-        Station<br />Arrival.
+        System<br />Online.
       </h1>
       <p className="mt-6 text-lg leading-relaxed text-muted-foreground">
-        Welcome, Sailor. Your operator station is currently in standby mode. 
-        We need to initialise your primary mission protocol.
+        Operator console is in standby. 
+        Initialize core protocols to begin data acquisition.
       </p>
       
       <div className="mt-12">

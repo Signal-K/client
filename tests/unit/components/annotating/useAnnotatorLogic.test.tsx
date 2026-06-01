@@ -97,6 +97,15 @@ describe("useAnnotatorLogic – state & config", () => {
     expect(result.current.uploads).toEqual([]);
     expect(result.current.hasMineralDeposit).toBe(false);
     expect(result.current.content).toBe("");
+    expect(result.current.guidedMode).toBe(false);
+    expect(result.current.hints).toEqual([]);
+  });
+
+  it("accepts guidedMode and hints props", () => {
+    const hints = [{ x: 10, y: 10, width: 100, height: 100, label: "Hint 1" }];
+    const { result } = renderHook(() => useAnnotatorLogic(p({ guidedMode: true, hints })));
+    expect(result.current.guidedMode).toBe(true);
+    expect(result.current.hints).toEqual(hints);
   });
 
   // ... (keep unchanged tests) ...

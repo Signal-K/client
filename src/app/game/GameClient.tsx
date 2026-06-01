@@ -79,6 +79,7 @@ import { MissionLogPanel, buildLogEntries } from "@/src/features/game/components
 import { SectorRadar }     from "@/src/features/game/components/station/SectorRadar";
 import { HUDStrip }        from "@/src/features/game/components/station/HUDStrip";
 import { StructureCard, StructureState, StructureId } from "@/src/features/game/components/station/StructureCard";
+import { ResearchBriefCard } from "@/src/features/game/components/station/ResearchBriefCard";
 
 // Station UI components — deferred (right column / overlays)
 const AgencyNetworkCard  = dynamic(() => import("@/src/features/game/components/station/AgencyNetworkCard").then(m => ({ default: m.AgencyNetworkCard })), { ssr: false });
@@ -507,6 +508,14 @@ export default function GameClient({ initialData, user }: GameClientProps) {
                     }
                   />
 
+                  {/* Research Entry — visible as soon as user has any stardust or is past boot */}
+                  {(data.profile?.classificationPoints > 0 || Object.values(radarStations).some(r => r.deployed)) && (
+                    <ResearchBriefCard 
+                      availableStardust={Number(data.profile?.classificationPoints || 0)}
+                      onNavigate={() => router.push("/research")}
+                    />
+                  )}
+
                   {/* Sector Radar — only shown once structures are deployed */}
                   {Object.values(radarStations).some(r => r.deployed) && (
                     <>
@@ -553,7 +562,7 @@ export default function GameClient({ initialData, user }: GameClientProps) {
                 {/* ── Right column (desktop only) ── */}
                 <div className="hidden lg:flex flex-col gap-4 p-4 border-l border-border/20 overflow-y-auto">
                   {/* Referral — primary growth mechanic, top of right column */}
-                  <SectionLabel text="Recruit New Sailors" />
+                  <SectionLabel text="Invite Contributors" />
                   {showReferralMission && (
                     <ReferralMissionPrompt
                       referralCode={referralCode}
@@ -626,7 +635,7 @@ export default function GameClient({ initialData, user }: GameClientProps) {
       <Dialog open={showProfileModal} onOpenChange={setShowProfileModal}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle>Sailor Profile</DialogTitle>
+            <DialogTitle>User Profile</DialogTitle>
           </DialogHeader>
           <CompleteProfileForm onSuccess={() => setShowProfileModal(false)} />
         </DialogContent>

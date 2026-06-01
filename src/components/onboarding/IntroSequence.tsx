@@ -9,9 +9,9 @@ interface IntroSequenceProps {
 // 3-phase CSS-only intro: power-up → signal wave → fade to onboarding
 // Total: ~4s. Skip always visible.
 const PHASES = [
-  { label: "Powering up station…",  duration: 1400 },
-  { label: "First signals arriving…", duration: 1400 },
-  { label: "Initialising mission…",  duration: 800  },
+  { label: "Initializing console…",  duration: 1400 },
+  { label: "Establishing uplink…", duration: 1400 },
+  { label: "Finalizing mission parameters…",  duration: 800  },
 ] as const;
 
 export function IntroSequence({ onComplete }: IntroSequenceProps) {

@@ -21,10 +21,10 @@ const STRUCTURE_CONFIG: Record<StructureId, {
     glow: "shadow-[0_0_20px_rgba(45,212,191,0.25)]",
     glowRgb: "45,212,191",
     personality: {
-      undeployed: "Awaiting deployment orders.",
-      standby:    "Scanning the void. Patience is a virtue.",
-      active:     "Signals detected — awaiting your analysis.",
-      incoming:   "New data arriving from deep space...",
+      undeployed: "System offline. Awaiting parameters.",
+      standby:    "Scanning sector. Data accumulation in progress.",
+      active:     "Classification pending. High-confidence signals identified.",
+      incoming:   "Data stream active. Processing signal packets...",
     },
   },
   satellite: {
@@ -34,10 +34,10 @@ const STRUCTURE_CONFIG: Record<StructureId, {
     glow: "shadow-[0_0_20px_rgba(56,189,248,0.25)]",
     glowRgb: "56,189,248",
     personality: {
-      undeployed: "Ready for orbital insertion.",
-      standby:    "In orbit. Nothing to report.",
-      active:     "Cloud patterns logged. Ready for review.",
-      incoming:   "Orbital imagery incoming...",
+      undeployed: "Awaiting orbital insertion.",
+      standby:    "Maintaining orbit. Surface telemetry nominal.",
+      active:     "Atmospheric data available for analysis.",
+      incoming:   "Downlinking orbital imagery...",
     },
   },
   rover: {
@@ -47,10 +47,10 @@ const STRUCTURE_CONFIG: Record<StructureId, {
     glow: "shadow-[0_0_20px_rgba(251,191,36,0.25)]",
     glowRgb: "251,191,36",
     personality: {
-      undeployed: "Sitting in the garage. Bored.",
-      standby:    "Idling on the plateau. Could use a mission.",
-      active:     "Terrain data queued. Let's roll.",
-      incoming:   "New terrain images downloading...",
+      undeployed: "Surface asset docked.",
+      standby:    "Traversal in progress. Analyzing local terrain.",
+      active:     "Geological features identified. Awaiting labels.",
+      incoming:   "Telemetry synchronized. Syncing surface data...",
     },
   },
   solar: {
@@ -60,10 +60,10 @@ const STRUCTURE_CONFIG: Record<StructureId, {
     glow: "shadow-[0_0_24px_rgba(251,146,60,0.3)]",
     glowRgb: "251,146,60",
     personality: {
-      undeployed: "Community mission — always joinable.",
-      standby:    "Solar activity nominal.",
-      active:     "Sunspot data ready for classification.",
-      incoming:   "Solar event detected...",
+      undeployed: "Observatory protocol available.",
+      standby:    "Solar monitoring active. All arrays nominal.",
+      active:     "Active regions identified for count.",
+      incoming:   "High-energy event detected. Capturing...",
     },
   },
 };
@@ -73,11 +73,12 @@ interface StructureCardProps {
   state: StructureState;
   signals?: number;
   isSolar?: boolean;
+  waitTime?: string;
   onClick: () => void;
   onQuickDeploy?: (e: React.MouseEvent) => void;
 }
 
-export function StructureCard({ id, state, signals = 0, isSolar = false, onClick, onQuickDeploy }: StructureCardProps) {
+export function StructureCard({ id, state, signals = 0, isSolar = false, waitTime, onClick, onQuickDeploy }: StructureCardProps) {
   const cfg = STRUCTURE_CONFIG[id];
   const [showScanLine, setShowScanLine] = useState(false);
   const prevState = useRef(state);
@@ -182,8 +183,14 @@ export function StructureCard({ id, state, signals = 0, isSolar = false, onClick
         </div>
 
         {/* Status label */}
-        <div className={cn("text-[9px] font-mono uppercase tracking-widest leading-tight", isStandby ? "text-muted-foreground/25" : isActive ? "text-foreground/60" : "text-muted-foreground/20")}>
-          {signals > 0 ? `${signals} signal${signals !== 1 ? "s" : ""} awaiting` : isStandby ? "Standby" : isUndeployed ? (isSolar ? "Join Mission" : "Deploy") : "Clear"}
+        <div className={cn("text-[9px] font-mono uppercase tracking-widest leading-tight", isStandby ? "text-muted-foreground/40" : isActive ? "text-foreground/60" : "text-muted-foreground/20")}>
+          {signals > 0 
+            ? `${signals} signal${signals !== 1 ? "s" : ""} awaiting` 
+            : isStandby 
+              ? (waitTime ? `Next Data: ${waitTime}` : "Monitoring...") 
+              : isUndeployed 
+                ? (isSolar ? "Initialize" : "Initialize") 
+                : "Nominal"}
         </div>
 
         {/* Quick Deploy Action (Mobile-friendly) */}

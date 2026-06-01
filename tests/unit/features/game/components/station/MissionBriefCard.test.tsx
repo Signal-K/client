@@ -13,24 +13,24 @@ describe("MissionBriefCard", () => {
       }
     );
 
-    it('renders "INCOMING TRANSMISSION" label for alert variant', () => {
+    it('renders "DATA PENDING ANALYSIS" label for alert variant', () => {
       render(<MissionBriefCard variant="alert" title="Alert Mission" />);
-      expect(screen.getByText("INCOMING TRANSMISSION")).toBeInTheDocument();
+      expect(screen.getByText("DATA PENDING ANALYSIS")).toBeInTheDocument();
     });
 
-    it('renders "MISSION IN PROGRESS" label for progress variant', () => {
+    it('renders "ACQUISITION IN PROGRESS" label for progress variant', () => {
       render(<MissionBriefCard variant="progress" title="Progress Mission" />);
-      expect(screen.getByText("MISSION IN PROGRESS")).toBeInTheDocument();
+      expect(screen.getByText("ACQUISITION IN PROGRESS")).toBeInTheDocument();
     });
 
-    it('renders "SYSTEMS NOMINAL" label for nominal variant', () => {
+    it('renders "OPERATIONAL NOMINAL" label for nominal variant', () => {
       render(<MissionBriefCard variant="nominal" title="Nominal Mission" />);
-      expect(screen.getByText("SYSTEMS NOMINAL")).toBeInTheDocument();
+      expect(screen.getByText("OPERATIONAL NOMINAL")).toBeInTheDocument();
     });
 
-    it('renders "AWAITING DEPLOYMENT" label for boot variant', () => {
+    it('renders "AWAITING INITIALIZATION" label for boot variant', () => {
       render(<MissionBriefCard variant="boot" title="Boot Mission" />);
-      expect(screen.getByText("AWAITING DEPLOYMENT")).toBeInTheDocument();
+      expect(screen.getByText("AWAITING INITIALIZATION")).toBeInTheDocument();
     });
   });
 

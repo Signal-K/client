@@ -367,7 +367,7 @@ export function SectorRadar({ telescope, satellite, rover, solar, className, onS
                       : "rgba(255,255,255,0.12)",
                 }}
               >
-                {!s?.deployed ? "——" : s.signals > 0 ? `${s.signals} SIG` : "CLEAR"}
+                {!s?.deployed ? "——" : s.signals > 0 ? `${s.signals} SIGNALS` : "CLEAR"}
               </span>
             </button>
           );

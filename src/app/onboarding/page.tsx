@@ -89,7 +89,7 @@ export default function OnboardingPage() {
       }
       return; // skip intro sequence when resuming
     }
-    if (!hasTutorialCompleted("intro-seen")) {
+    if (!hasTutorialCompleted("init-seen")) {
       setShowIntro(true);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -134,7 +134,7 @@ export default function OnboardingPage() {
       {showIntro && (
         <IntroSequence
           onComplete={() => {
-            markTutorialComplete("intro-seen");
+            markTutorialComplete("init-seen");
             setShowIntro(false);
           }}
         />

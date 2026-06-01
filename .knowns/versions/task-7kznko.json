@@ -1,1 +1,53 @@
-{"id":"7kznko","versions":[]}
+{
+  "taskId": "7kznko",
+  "currentVersion": 1,
+  "versions": [
+    {
+      "id": "v1",
+      "taskId": "7kznko",
+      "version": 1,
+      "timestamp": "2026-05-31T14:20:00.000Z",
+      "changes": [
+        {
+          "field": "status",
+          "newValue": "done"
+        },
+        {
+          "field": "implementationNotes",
+          "newValue": "Refactored onboarding tone to be professional/neutral. Integrated ResearchBriefCard into Hub for progression visibility. Implemented guided classification mode with interactive hints."
+        }
+      ],
+      "snapshot": {
+        "title": "Onboarding UX and Progression Visibility Improvements",
+        "description": "Improve onboarding clarity, neutralize tone, and surface research progression on the main hub.",
+        "status": "done",
+        "priority": "medium",
+        "labels": [
+          "ux",
+          "onboarding",
+          "research",
+          "gameplay"
+        ],
+        "acceptanceCriteria": [
+          {
+            "completed": true,
+            "text": "Neutralize conversational tone in onboarding and tutorials"
+          },
+          {
+            "completed": true,
+            "text": "Add Research/Stardust entry point to the main Hub column"
+          },
+          {
+            "completed": true,
+            "text": "Provide wait-time feedback for scanning structures"
+          },
+          {
+            "completed": true,
+            "text": "Implement interactive guided classification mode with hints"
+          }
+        ],
+        "implementationNotes": "Refactored onboarding tone to be professional/neutral. Integrated ResearchBriefCard into Hub for progression visibility. Implemented guided classification mode with interactive hints."
+      }
+    }
+  ]
+}

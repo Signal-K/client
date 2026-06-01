@@ -37,6 +37,8 @@ export default function AnnotatorView(props: ImageAnnotatorProps) {
     hasMineralDeposit,
     useHorizontalLayout,
     isActiveAsteroids,
+    guidedMode,
+    hints,
   } = useAnnotatorLogic(props as ImageAnnotatorProps) as any;
 
   const isNGTS = props.annotationType === "NGTS";
@@ -121,7 +123,7 @@ export default function AnnotatorView(props: ImageAnnotatorProps) {
           {useHorizontalLayout && (
             <div className="flex-1 min-h-0 flex flex-col md:flex-row gap-3 overflow-hidden px-2 pb-2">
               <div
-                className={`annotation-canvas-container ${isDrawing ? "drawing" : ""} flex-1 min-h-0 overflow-hidden flex items-center justify-center bg-gray-900 rounded-lg`}
+                className={`annotation-canvas-container ${isDrawing ? "drawing" : ""} flex-1 min-h-0 overflow-hidden flex items-center justify-center bg-gray-900 rounded-lg relative`}
               >
                 <AnnotationCanvas
                   canvasRef={canvasRef}
@@ -141,6 +143,36 @@ export default function AnnotatorView(props: ImageAnnotatorProps) {
                   setCurrentDrawing={setCurrentDrawing}
                   currentCategory={currentCategory}
                 />
+                {guidedMode && hints && (
+                  <div className="absolute inset-0 pointer-events-none z-10">
+                    <svg className="w-full h-full" viewBox="0 0 1000 1000" preserveAspectRatio="none">
+                      {hints.map((hint: any, idx: number) => (
+                        <g key={idx}>
+                          <rect
+                            x={hint.x}
+                            y={hint.y}
+                            width={hint.width}
+                            height={hint.height}
+                            fill="none"
+                            stroke="#4cc9f0"
+                            strokeWidth="2"
+                            strokeDasharray="5,5"
+                            className="animate-pulse"
+                          />
+                          <text
+                            x={hint.x}
+                            y={hint.y - 10}
+                            fill="#4cc9f0"
+                            fontSize="16"
+                            className="font-mono font-bold"
+                          >
+                            {hint.label}
+                          </text>
+                        </g>
+                      ))}
+                    </svg>
+                  </div>
+                )}
               </div>
 
               <div className="w-full md:w-72 md:min-w-72 flex flex-col gap-2 overflow-y-auto max-h-[calc(100vh-8rem)]">
@@ -178,7 +210,7 @@ export default function AnnotatorView(props: ImageAnnotatorProps) {
           {!useHorizontalLayout && (
             <>
               <div
-                className={`annotation-canvas-container ${isDrawing ? "drawing" : ""} w-full text-center ${isActiveAsteroids ? "min-h-[40vh] max-h-[45vh]" : "max-h-[40vh] md:max-h-[45vh]"} overflow-auto`}
+                className={`annotation-canvas-container ${isDrawing ? "drawing" : ""} w-full text-center ${isActiveAsteroids ? "min-h-[40vh] max-h-[45vh]" : "max-h-[40vh] md:max-h-[45vh]"} overflow-auto relative`}
               >
                 <AnnotationCanvas
                   canvasRef={canvasRef}
@@ -198,6 +230,36 @@ export default function AnnotatorView(props: ImageAnnotatorProps) {
                   setCurrentDrawing={setCurrentDrawing}
                   currentCategory={currentCategory}
                 />
+                {guidedMode && hints && (
+                  <div className="absolute inset-0 pointer-events-none z-10">
+                    <svg className="w-full h-full" viewBox="0 0 1000 1000" preserveAspectRatio="none">
+                      {hints.map((hint: any, idx: number) => (
+                        <g key={idx}>
+                          <rect
+                            x={hint.x}
+                            y={hint.y}
+                            width={hint.width}
+                            height={hint.height}
+                            fill="none"
+                            stroke="#4cc9f0"
+                            strokeWidth="2"
+                            strokeDasharray="5,5"
+                            className="animate-pulse"
+                          />
+                          <text
+                            x={hint.x}
+                            y={hint.y - 10}
+                            fill="#4cc9f0"
+                            fontSize="16"
+                            className="font-mono font-bold"
+                          >
+                            {hint.label}
+                          </text>
+                        </g>
+                      ))}
+                    </svg>
+                  </div>
+                )}
               </div>
 
               {isActiveAsteroids ? (

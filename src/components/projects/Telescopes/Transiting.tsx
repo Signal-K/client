@@ -80,7 +80,7 @@ export function TelescopeTessWithId({ anomalyId }: { anomalyId: string }) {
       {showNGTSTutorial && <NGTSTutorial onClose={() => setShowNGTSTutorial(false)} />}
       <div className="w-full rounded-xl backdrop-blur-md bg-white/10 shadow-md p-2 flex justify-center items-center gap-4 flex-shrink-0">
         <Button variant="outline" onClick={() => setShowTutorial(true)}>
-          Want a walkthrough? Start the tutorial
+          Initialize Classification Tutorial
         </Button>
         {isNGTSAnomaly && (
           <Button
@@ -88,7 +88,7 @@ export function TelescopeTessWithId({ anomalyId }: { anomalyId: string }) {
             onClick={() => setShowNGTSTutorial(true)}
             className="border-purple-500/50 text-purple-300 hover:bg-purple-500/20"
           >
-            View NGTS Tutorial
+            NGTS Protocol
           </Button>
         )}
       </div>
@@ -136,9 +136,9 @@ const FirstTelescopeClassification: React.FC<TelescopeProps> = ({ anomalyid, onT
   const nextPart = () => setPart(2);
 
   const tutorialSlides = [
-    { title: "Planet Discovery Journey", text: "Start by discovering your first planet.", image: "/assets/Template.png" },
-    { title: "Examine Lightcurves", text: "Look for dips and recurring patterns.", image: "/assets/Docs/Curves/Step2.png" },
-    { title: "Ready to Analyze", text: "Classify this target to continue.", image: "/assets/Docs/Curves/Step4.png" },
+    { title: "System Overview", text: "Process starlight data to identify planetary candidates.", image: "/assets/Template.png" },
+    { title: "Data Analysis", text: "Analyze lightcurves for recurring transit signatures.", image: "/assets/Docs/Curves/Step2.png" },
+    { title: "Submission", text: "Finalize classification to transmit data to the hub.", image: "/assets/Docs/Curves/Step4.png" },
   ];
 
   return (
@@ -158,6 +158,11 @@ const FirstTelescopeClassification: React.FC<TelescopeProps> = ({ anomalyid, onT
               annotationType="PH"
               anomalyId={anomalyid}
               className="h-full w-full"
+              guidedMode={true}
+              hints={[
+                { x: 450, y: 300, width: 100, height: 400, label: "Significant dip detected" },
+                { x: 150, y: 300, width: 100, height: 400, label: "Potential transit signature" }
+              ]}
               onClassificationComplete={() => {
                 if (onTutorialComplete) onTutorialComplete();
               }}

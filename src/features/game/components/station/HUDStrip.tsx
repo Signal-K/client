@@ -36,9 +36,9 @@ function OdometerNumber({ value }: { value: number }) {
 
 export function HUDStrip({ signals, anomalies, classifications }: HUDStripProps) {
   const metrics = [
-    { icon: Radio,        label: "Signals",         value: signals,         color: "text-amber-400",  glow: "rgba(251,191,36,0.7)"  },
-    { icon: FlaskConical, label: "Pending",          value: anomalies,       color: "text-sky-400",    glow: "rgba(56,189,248,0.7)"  },
-    { icon: Zap,          label: "Classifications",  value: classifications, color: "text-teal-400",   glow: "rgba(136,192,208,0.7)" },
+    { icon: Radio,        label: "Signal Stream",   value: signals,         color: "text-amber-400",  glow: "rgba(251,191,36,0.7)"  },
+    { icon: FlaskConical, label: "Unprocessed",      value: anomalies,       color: "text-sky-400",    glow: "rgba(56,189,248,0.7)"  },
+    { icon: Zap,          label: "Data Logs",        value: classifications, color: "text-teal-400",   glow: "rgba(136,192,208,0.7)" },
   ];
 
   return (

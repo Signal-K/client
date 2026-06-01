@@ -389,11 +389,11 @@ export default function InteractiveTutorial({
 // Preset tutorial flows
 const ONBOARDING_STEPS: TutorialStep[] = [
   {
-    id: "welcome",
-    title: "Welcome to Star Sailors! 🚀",
+    id: "system-init",
+    title: "System Initialization",
     description:
-      "You're about to become a citizen scientist! Your discoveries will contribute to real space research and help us understand our universe.",
-    tip: "Everything you do here uses real data from NASA and other space agencies.",
+      "Your station contributes to actual research. Data you process helps identify planetary candidates and other cosmic phenomena.",
+    tip: "Classifications are integrated with databases from NASA and other research partners.",
     position: "center",
   },
   {

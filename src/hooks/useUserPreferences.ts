@@ -47,7 +47,7 @@ export type TutorialId =
   // Feature tutorials
   | "mineral-guide"          // Where do minerals come from
   | "stardust-guide"         // What is stardust
-  | "intro-seen";            // One-time intro sequence on first onboarding visit
+  | "init-seen";            // One-time initialization sequence on first visit
 
 // Track which tutorials have been completed
 interface TutorialCompletion {

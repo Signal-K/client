@@ -60,6 +60,8 @@ export interface ImageAnnotatorProps {
     | "Sunspots"
     | "Custom";
   className?: string;
+  guidedMode?: boolean;
+  hints?: Array<{ x: number; y: number; width: number; height: number; label: string }>;
   onClassificationComplete?: () => void | Promise<void>;
 }
 
@@ -76,6 +78,8 @@ export function useAnnotatorLogic({
   structureItemId,
   annotationType,
   className = "",
+  guidedMode = false,
+  hints = [],
   onClassificationComplete,
 }: ImageAnnotatorProps) {
   const router = useRouter();
@@ -665,5 +669,7 @@ export function useAnnotatorLogic({
     isActiveAsteroids,
     currentCategory,
     setCurrentCategory,
+    guidedMode,
+    hints,
   };
 };

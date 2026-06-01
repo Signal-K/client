@@ -169,34 +169,34 @@ function ReplayButton({ position, onReplay, title }: ReplayButtonProps) {
 
 export const TELESCOPE_INTRO_STEPS: TutorialStep[] = [
   {
-    id: "telescope-welcome",
-    title: "Welcome to Your Telescope! 🔭",
+    id: "telescope-init",
+    title: "Telescope Protocol",
     description:
-      "Your telescope connects you to real space observatories like NASA's TESS satellite. Let's get you started with your first deployment!",
-    tip: "Citizen scientists have discovered over 100 exoplanets using telescope data just like this.",
+      "Initialize your connection to orbital observatories. Deployments target specific sectors to identify anomalies in starlight data.",
+    tip: "Multiple exoplanets have been identified using these specific data sets.",
     position: "center",
   },
   {
-    id: "telescope-look-around",
-    title: "Look Around",
+    id: "telescope-view-scan",
+    title: "Sensor View",
     description:
-      "Take a moment to explore this view. You can see the starfield background - this represents the sector of space your telescope can observe.",
+      "This viewport displays the current sector. Active stars are marked for observation.",
     action: { type: "wait", waitMs: 3000 },
     position: "center",
   },
   {
     id: "telescope-find-deploy",
-    title: "Find the Deploy Button",
+    title: "Deployment Control",
     description:
-      "Look for the 'Deploy Telescope' button below. This is how you'll point your telescope at a new sector of space each week.",
+      "Locate the deployment control to target a new sector for the current cycle.",
     highlightSelector: "[data-tutorial='deploy-telescope']",
     position: "bottom",
   },
   {
     id: "telescope-click-deploy",
-    title: "Click Deploy Telescope",
+    title: "Initialize Deployment",
     description:
-      "Go ahead and click the Deploy button to choose where to point your telescope!",
+      "Activate the deployment sequence to begin data acquisition.",
     highlightSelector: "[data-tutorial='deploy-telescope']",
     action: { type: "click", targetSelector: "[data-tutorial='deploy-telescope']" },
     position: "bottom",
@@ -205,26 +205,26 @@ export const TELESCOPE_INTRO_STEPS: TutorialStep[] = [
 
 export const TELESCOPE_DEPLOY_STEPS: TutorialStep[] = [
   {
-    id: "deploy-intro",
-    title: "Choose Your Observation",
+    id: "deploy-init",
+    title: "Target Parameters",
     description:
-      "You're about to deploy your telescope! Different projects focus on different discoveries.",
+      "Select a mission objective. Different focus areas yield different anomaly types.",
     position: "center",
   },
   {
     id: "deploy-select-project",
-    title: "Select a Project",
+    title: "Select Objective",
     description:
-      "Click on one of the project options to choose what you'll be searching for this week.",
+      "Assign the telescope to a research track for the current cycle.",
     highlightSelector: "[data-tutorial='project-options']",
     action: { type: "click", targetSelector: "[data-tutorial='project-options']" },
     position: "center",
   },
   {
     id: "deploy-confirm",
-    title: "Confirm Your Choice",
+    title: "Confirm Deployment",
     description:
-      "Great choice! Now click the Confirm button to start your telescope scanning the sky.",
+      "Finalize the deployment sequence to begin scanning.",
     highlightSelector: "[data-tutorial='confirm-deploy']",
     action: { type: "click", targetSelector: "[data-tutorial='confirm-deploy']" },
     position: "center",
@@ -233,33 +233,33 @@ export const TELESCOPE_DEPLOY_STEPS: TutorialStep[] = [
 
 export const SATELLITE_INTRO_STEPS: TutorialStep[] = [
   {
-    id: "satellite-welcome",
-    title: "Your Orbital Satellite 🛰️",
+    id: "satellite-init",
+    title: "Satellite Operations",
     description:
-      "Satellites orbit planets to capture images of surfaces and atmospheres. Let's learn how to use yours!",
+      "Orbital assets capture planetary surface and atmospheric data. Select a mission mode to begin.",
     position: "center",
   },
   {
     id: "satellite-explore",
-    title: "Choose a Mission Mode",
+    title: "Mission Mode",
     description:
-      "Select a mission mode from the dropdown — Weather Analysis, Planetary Survey, or Wind Survey. Each focuses on different science.",
+      "Configuration options: Weather Analysis, Planetary Survey, or Wind Survey.",
     action: { type: "wait", waitMs: 3000 },
     position: "center",
   },
   {
     id: "satellite-pick-planet",
-    title: "Pick Your Target Planet",
+    title: "Target Selection",
     description:
-      "Choose a planet to orbit from the Target Planet dropdown. You need to have classified a planet first for it to appear here.",
+      "Assign an orbital target. Available targets depend on previous planetary classifications.",
     highlightSelector: "[data-tutorial='planet-select']",
     position: "center",
   },
   {
     id: "satellite-deploy",
-    title: "Deploy Satellite",
+    title: "Execute Deployment",
     description:
-      "Click the Deploy Satellite button to launch your satellite into orbit and begin the mission.",
+      "Initiate orbital insertion and begin data collection.",
     highlightSelector: "[data-tutorial='deploy-satellite']",
     action: { type: "click", targetSelector: "[data-tutorial='deploy-satellite']" },
     position: "center",
@@ -268,25 +268,25 @@ export const SATELLITE_INTRO_STEPS: TutorialStep[] = [
 
 export const ROVER_INTRO_STEPS: TutorialStep[] = [
   {
-    id: "rover-welcome",
-    title: "Meet Your Rover 🚗",
+    id: "rover-init",
+    title: "Rover Operations",
     description:
-      "Your rover explores Mars! You'll set waypoints and it will traverse the terrain, finding objects for you to classify.",
+      "Surface assets traverse Martian terrain to identify geological features. Waypoints determine the path of travel.",
     position: "center",
   },
   {
     id: "rover-look-surface",
-    title: "Survey the Surface",
+    title: "Terrain Survey",
     description:
-      "Look at the Martian surface below. The terrain varies - sand, rocks, and geological features are all waiting to be explored.",
+      "Initial terrain analysis. Surface features will be queued for manual classification during traversal.",
     action: { type: "wait", waitMs: 3000 },
     position: "center",
   },
   {
     id: "rover-deploy-button",
-    title: "Deploy Your Rover",
+    title: "Initialize Rover",
     description:
-      "Click the Deploy Rover button to set waypoints for your rover's journey across Mars.",
+      "Activate the rover and define travel parameters.",
     highlightSelector: "[data-tutorial='deploy-rover']",
     action: { type: "click", targetSelector: "[data-tutorial='deploy-rover']" },
     position: "center",
@@ -295,26 +295,26 @@ export const ROVER_INTRO_STEPS: TutorialStep[] = [
 
 export const SOLAR_INTRO_STEPS: TutorialStep[] = [
   {
-    id: "solar-welcome",
-    title: "Solar Observatory ☀️",
+    id: "solar-init",
+    title: "Solar Observatory",
     description:
-      "Your solar observatory monitors our Sun! You'll count sunspots and track solar activity.",
+      "Observatory systems monitor solar activity and classify sunspot formations.",
     position: "center",
   },
   {
     id: "solar-observe-sun",
-    title: "Observe the Sun",
+    title: "Solar Analysis",
     description:
-      "Look at the 3D model of the Sun. Can you see any dark spots? Those are sunspots - areas of intense magnetic activity.",
+      "Magnetic activity is represented in the 3D model. Identify sunspot groups for classification.",
     action: { type: "wait", waitMs: 3000 },
-    tip: "Try rotating the Sun to see it from different angles!",
+    tip: "The solar model can be rotated to view all active regions.",
     position: "center",
   },
   {
     id: "solar-participate",
-    title: "Join the Mission",
+    title: "Join Mission",
     description:
-      "Click the Participate button to join this week's sunspot counting mission.",
+      "Contribute data to the current solar monitoring cycle.",
     highlightSelector: "[data-tutorial='participate-solar']",
     action: { type: "click", targetSelector: "[data-tutorial='participate-solar']" },
     position: "center",
