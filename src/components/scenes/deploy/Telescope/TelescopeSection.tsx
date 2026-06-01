@@ -106,7 +106,7 @@ export default function TelescopeViewportSection() {
         {!hasTelescopeDeployed ? (
           <div className="absolute inset-0 flex flex-col items-center justify-center z-20 px-4">
             <div className="mb-6 w-full max-w-lg text-xs md:text-sm text-center text-zinc-300 leading-relaxed">
-              <p className="mb-3 font-semibold text-cyan-400">Welcome to the Telescope!</p>
+              <p className="mb-3 font-semibold text-cyan-400">Telescope Interface Active</p>
               <p className="mb-3">Each week, you can point and deploy your telescope in a certain direction. Over the course of the week, new anomalous objects (referred to as "anomalies") will be identified and become available for study.</p>
               <p className="text-xs text-zinc-400">💡 Tip: You can start exploring right away, even without previous classifications!</p>
             </div>

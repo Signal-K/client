@@ -37,7 +37,7 @@ export const GalaxyZooTutorial: React.FC<GalaxyZooProps> = ({
   const tutorialSlides = createTutorialSlides([
     {
       title: "Galaxy Zoo classification",
-      text: "Welcome to Galaxy Zoo. You are helping scientists understand how galaxies form and evolve by classifying their shapes.",
+      text: "Galaxy Zoo Interface. You are helping scientists understand how galaxies form and evolve by classifying their shapes.",
     },
     {
       title: "Smooth vs Features",

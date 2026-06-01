@@ -43,7 +43,7 @@ export async function getHubLeaderboard(userId: string): Promise<HubLeaderboardD
 
   const entries = topProfiles.map((profile, index) => ({
     rank: index + 1,
-    username: profile.username || `Sailor ${profile.id.slice(0, 6)}`,
+    username: profile.username || `User ${profile.id.slice(0, 6)}`,
     score: Number(profile.classificationPoints ?? 0),
     isCurrentUser: profile.id === userId,
   }));
@@ -51,7 +51,7 @@ export async function getHubLeaderboard(userId: string): Promise<HubLeaderboardD
   const currentUserEntry: HubLeaderboardEntry | null = me
     ? {
         rank: higherCount + 1,
-        username: me.username || `Sailor ${me.id.slice(0, 6)}`,
+        username: me.username || `User ${me.id.slice(0, 6)}`,
         score: myScore,
         isCurrentUser: true,
       }

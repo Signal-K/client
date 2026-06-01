@@ -4,6 +4,7 @@ import { Prisma } from "@prisma/client";
 
 import { prisma } from "@/lib/server/prisma";
 import { getRouteUser } from "@/lib/server/supabaseRoute";
+import { recursiveSerialize } from "@/utils/serialization";
 
 export const dynamic = "force-dynamic";
 
@@ -43,6 +44,6 @@ export async function GET(request: NextRequest) {
     LIMIT ${Math.max(1, Math.min(limit, 2000))}
   `);
 
-  return NextResponse.json({ inventory: rows });
+  return NextResponse.json(recursiveSerialize({ inventory: rows }));
 }
 

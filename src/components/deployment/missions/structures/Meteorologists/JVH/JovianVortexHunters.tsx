@@ -149,7 +149,7 @@ const JovianVortexHunters = () => {
     const tutorialMission: Mission = {
         id: 1000,
         chapter: 1,
-        title: "Welcome to Jovian Vortex Hunters",
+        title: "Jovian Vortex Hunters",
         description: 
             'This mission gets you started with classifying and tracking storms on gaseous planets',
         icon: HelpCircle,

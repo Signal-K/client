@@ -3,6 +3,7 @@ import { revalidatePath } from "next/cache";
 
 import { prisma } from "@/lib/server/prisma";
 import { getRouteUser } from "@/lib/server/supabaseRoute";
+import { recursiveSerialize } from "@/utils/serialization";
 
 export const dynamic = "force-dynamic";
 
@@ -74,7 +75,7 @@ export async function GET(request: NextRequest) {
     `;
     const rows = await prisma.$queryRawUnsafe<Array<Record<string, unknown>>>(query, ...params);
 
-    return NextResponse.json({ anomalies: rows });
+    return NextResponse.json({ anomalies: recursiveSerialize(rows) });
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : String(err);
     if (message.includes("Can't reach database server") || message.includes("PrismaClient")) {
@@ -112,7 +113,7 @@ export async function POST(request: NextRequest) {
     revalidatePath("/game");
     revalidatePath("/viewports/rover");
 
-    return NextResponse.json(data);
+    return NextResponse.json(recursiveSerialize(data));
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : String(err);
     if (message.includes("Can't reach database server") || message.includes("PrismaClient")) {

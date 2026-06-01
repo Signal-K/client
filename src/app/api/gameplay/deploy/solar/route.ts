@@ -3,6 +3,7 @@ import { revalidatePath } from "next/cache";
 
 import { prisma } from "@/lib/server/prisma";
 import { getRouteUser } from "@/lib/server/supabaseRoute";
+import { recursiveSerialize } from "@/utils/serialization";
 
 export const dynamic = "force-dynamic";
 
@@ -40,7 +41,7 @@ export async function POST() {
   ]);
 
   if ((existing || []).length > 0) {
-    return NextResponse.json({ success: true, inserted: 0 });
+    return NextResponse.json(recursiveSerialize({ success: true, inserted: 0 }));
   }
 
   const rows = anomalies.map((anomaly) => ({
@@ -65,5 +66,5 @@ export async function POST() {
   revalidatePath("/viewports/solar");
   revalidatePath("/game");
 
-  return NextResponse.json({ success: true, inserted: rows.length });
+  return NextResponse.json(recursiveSerialize({ success: true, inserted: rows.length }));
 }

@@ -29,7 +29,7 @@ export function StarterJovianVortexHunter({
     const tutorialSlides = createTutorialSlides([
         {
             title: "Jovian Vortex Hunter - Gas Giant Atmosphere Analysis",
-            text: "Welcome! In this workflow, you will be identifying the type of atmosphere feature visible in satellite images of gas giants in your network. The images you will see are cropped from your automated satellite data, and correspond to an area of ~7000x7000km on nearby gaseous planets.",
+            text: "In this workflow, you will be identifying the type of atmosphere feature visible in satellite images of gas giants in your network. The images you will see are cropped from your automated satellite data, and correspond to an area of ~7000x7000km on nearby gaseous planets.",
             image: "/assets/Docs/Satellites/JovianVortexHunter/Step1.png"
         },
         {

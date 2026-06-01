@@ -2,13 +2,14 @@ import { NextResponse } from "next/server";
 
 import { prisma } from "@/lib/server/prisma";
 import { getRouteUser } from "@/lib/server/supabaseRoute";
+import { recursiveSerialize } from "@/utils/serialization";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
   const { user, authError } = await getRouteUser();
   if (authError || !user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return NextResponse.json(recursiveSerialize({ error: "Unauthorized" }), { status: 401 });
   }
 
   const [latestPlanetRows, classificationCountRows, upgrades, existingDeployRows] = await Promise.all([
@@ -45,7 +46,7 @@ export async function GET() {
   const hasFindMinerals = upgrades.some((u: any) => u.tech_type === "findMinerals");
   const classificationCount = Number(classificationCountRows[0]?.count ?? 0);
 
-  return NextResponse.json({
+  return NextResponse.json(recursiveSerialize({
     planetClassification: latestPlanet,
     planetAnomaly: latestPlanet?.anomaly || null,
     userClassificationCount: classificationCount,
@@ -56,5 +57,5 @@ export async function GET() {
     },
     maxWaypoints: hasRoverWaypoints ? 6 : 4,
     hasExistingRoverDeployment: Number(existingDeployRows[0]?.count ?? 0) > 0,
-  });
+  }));
 }

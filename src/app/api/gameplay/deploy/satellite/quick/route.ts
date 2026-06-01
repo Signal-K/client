@@ -3,6 +3,7 @@ import { revalidatePath } from "next/cache";
 
 import { prisma } from "@/lib/server/prisma";
 import { getRouteUser } from "@/lib/server/supabaseRoute";
+import { recursiveSerialize } from "@/utils/serialization";
 
 export const dynamic = "force-dynamic";
 
@@ -13,14 +14,14 @@ type Body = {
 export async function POST(request: NextRequest) {
   const { user, authError } = await getRouteUser();
   if (authError || !user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return NextResponse.json(recursiveSerialize({ error: "Unauthorized" }), { status: 401 });
   }
 
   const body = (await request.json().catch(() => ({}))) as Body;
   const planetClassificationId = Number(body?.planetClassificationId);
 
   if (!Number.isFinite(planetClassificationId)) {
-    return NextResponse.json({ error: "Invalid planet classification id" }, { status: 400 });
+    return NextResponse.json(recursiveSerialize({ error: "Invalid planet classification id" }), { status: 400 });
   }
 
   const cloudAnomalies = await prisma.$queryRaw<Array<{ id: number }>>`
@@ -30,7 +31,7 @@ export async function POST(request: NextRequest) {
   `;
 
   if (cloudAnomalies.length === 0) {
-    return NextResponse.json({ error: "No cloud anomalies available" }, { status: 500 });
+    return NextResponse.json(recursiveSerialize({ error: "No cloud anomalies available" }), { status: 500 });
   }
 
   const randomIndex = Math.floor(Math.random() * cloudAnomalies.length);
@@ -61,5 +62,5 @@ export async function POST(request: NextRequest) {
   revalidatePath("/activity/deploy");
   revalidatePath("/game");
 
-  return NextResponse.json({ success: true });
+  return NextResponse.json(recursiveSerialize({ success: true }));
 }

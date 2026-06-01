@@ -4,6 +4,7 @@ import { Prisma } from "@prisma/client";
 
 import { prisma } from "@/lib/server/prisma";
 import { getRouteUser } from "@/lib/server/supabaseRoute";
+import { recursiveSerialize } from "@/utils/serialization";
 
 export const dynamic = "force-dynamic";
 
@@ -89,5 +90,5 @@ export async function GET(request: NextRequest) {
     relatedClassifications: row.anomaly ? relatedByParent.get(Number(row.anomaly)) || [] : [],
   }));
 
-  return NextResponse.json({ locations: payload });
+  return NextResponse.json(recursiveSerialize({ locations: payload }));
 }

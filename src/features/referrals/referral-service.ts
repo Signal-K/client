@@ -100,7 +100,7 @@ export class ReferralService {
         data: {
           userId: referreeId,
           surveyId: `referred-by-${referrer.id}`,
-          surveyName: "Welcome Bonus",
+          surveyName: "Acquisition Bonus",
           stardustGranted: 10
         }
       });

@@ -1,7 +1,9 @@
 {
+  "name": "Knowns",
+  "id": "",
+  "createdAt": "0001-01-01T00:00:00Z",
   "settings": {
     "defaultPriority": "medium",
-    "defaultLabels": [],
     "statuses": [
       "todo",
       "in-progress",
@@ -17,8 +19,6 @@
       "done",
       "in-review"
     ],
-    "statusColors": {},
     "serverPort": 6420
-  },
-  "name": "Knowns"
+  }
 }

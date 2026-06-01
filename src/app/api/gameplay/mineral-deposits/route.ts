@@ -3,13 +3,14 @@ import { revalidatePath } from "next/cache";
 
 import { prisma } from "@/lib/server/prisma";
 import { getRouteUser } from "@/lib/server/supabaseRoute";
+import { recursiveSerialize } from "@/utils/serialization";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(request: NextRequest) {
   const { user, authError } = await getRouteUser();
   if (authError || !user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return NextResponse.json(recursiveSerialize({ error: "Unauthorized" }), { status: 401 });
   }
 
   const discoveryParam = request.nextUrl.searchParams.get("discovery");
@@ -17,7 +18,7 @@ export async function GET(request: NextRequest) {
   if (discoveryParam) {
     const discovery = Number(discoveryParam);
     if (!Number.isFinite(discovery)) {
-      return NextResponse.json({ error: "Invalid discovery" }, { status: 400 });
+      return NextResponse.json(recursiveSerialize({ error: "Invalid discovery" }), { status: 400 });
     }
     rows = await prisma.$queryRaw<Array<Record<string, unknown>>>`
       SELECT id, mineral_configuration, location, rover_name, created_at, discovery
@@ -37,7 +38,7 @@ export async function GET(request: NextRequest) {
     `;
   }
 
-  return NextResponse.json({ deposits: rows });
+  return NextResponse.json(recursiveSerialize({ deposits: rows }));
 }
 
 type MineralDepositBody = {
@@ -56,7 +57,7 @@ type MineralDepositBody = {
 export async function POST(request: NextRequest) {
   const { user, authError } = await getRouteUser();
   if (authError || !user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return NextResponse.json(recursiveSerialize({ error: "Unauthorized" }), { status: 401 });
   }
 
   const body = (await request.json().catch(() => ({}))) as MineralDepositBody;
@@ -64,7 +65,7 @@ export async function POST(request: NextRequest) {
   const discovery = body?.discovery == null ? null : Number(body.discovery);
 
   if (!Number.isFinite(anomaly) || !Number.isFinite(discovery)) {
-    return NextResponse.json({ error: "Invalid anomaly or discovery value" }, { status: 400 });
+    return NextResponse.json(recursiveSerialize({ error: "Invalid anomaly or discovery value" }), { status: 400 });
   }
 
   const mineralConfiguration =
@@ -107,5 +108,5 @@ export async function POST(request: NextRequest) {
   revalidatePath("/viewports/rover");
   revalidatePath(`/next/${discovery}`);
 
-  return NextResponse.json(data);
+  return NextResponse.json(recursiveSerialize(data));
 }

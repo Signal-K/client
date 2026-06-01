@@ -50,8 +50,8 @@ export function AgencyNetworkCard({
   }> = [
     {
       icon: <Users className="h-3.5 w-3.5" />,
-      label: "Recruit Sailors",
-      sublabel: referralsCount > 0 ? `${referralsCount} sailors recruited` : "Copy your invite route",
+      label: "Invite Contributors",
+      sublabel: referralsCount > 0 ? `${referralsCount} contributors invited` : "Copy your invite route",
       channelId: "CH-01",
       action: () => onCopyInvite(),
     },
@@ -103,7 +103,7 @@ export function AgencyNetworkCard({
           <div className="h-1.5 w-1.5 rounded-full bg-teal-400 animate-pulse-slow shadow-[0_0_4px_rgba(136,192,208,0.8)]" aria-hidden />
           <div className="min-w-0">
             <div className="font-mono text-[8px] uppercase tracking-[0.25em] text-teal-400/60">
-              Recruit New Sailors
+              Invite Contributors
             </div>
             <div className="text-[11px] text-foreground/70">
               {referralsCount > 0 ? `${referralsCount} crew in your network` : "Your referral route is live"}

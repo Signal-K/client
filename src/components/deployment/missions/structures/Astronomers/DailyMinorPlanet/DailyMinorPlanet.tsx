@@ -107,7 +107,7 @@ const DailyMinorPlanetMissions = () => {
   const tutorialMission: Mission = {
     id: 1000,
     chapter: 1,
-    title: "Welcome to Daily Minor Planet",
+    title: "Daily Minor Planet",
     description: 
       "This mission will guide you through the basics of hunting and discovering asteroids",
     icon: HelpCircle,

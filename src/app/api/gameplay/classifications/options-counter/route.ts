@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { prisma } from "@/lib/server/prisma";
 import { getRouteUser } from "@/lib/server/supabaseRoute";
+import { recursiveSerialize } from "@/utils/serialization";
 
 export const dynamic = "force-dynamic";
 
@@ -58,8 +59,10 @@ export async function GET(request: NextRequest) {
     }
   }
 
-  return NextResponse.json({
-    totalClassifications: rows.length,
-    counts,
-  });
+  return NextResponse.json(
+    recursiveSerialize({
+      totalClassifications: rows.length,
+      counts,
+    })
+  );
 }

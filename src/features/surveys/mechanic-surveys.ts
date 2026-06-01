@@ -46,7 +46,7 @@ export const MECHANIC_SURVEYS: readonly MechanicMicroSurvey[] = [
   },
   {
     id: "trigger_return_visit_3d_v1",
-    title: "Welcome Back",
+    title: "Session Resumed",
     subtitle: "What brings you back?",
     triggerSurface: "game",
     questions: [
@@ -153,7 +153,7 @@ export const MECHANIC_SURVEYS: readonly MechanicMicroSurvey[] = [
   {
     id: "feature_profile_v1",
     title: "Profile Card",
-    subtitle: "Your sailor identity.",
+    subtitle: "User Identity Profile.",
     triggerSurface: "game",
     minClassificationsRequired: 1,
     questions: [

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import { getRouteSupabaseWithUser } from "@/lib/server/supabaseRoute";
+import { recursiveSerialize } from "@/utils/serialization";
 
 export const dynamic = "force-dynamic";
 
@@ -76,7 +77,7 @@ async function fetchActivePlanetPayload(userId: string, requestedLocation?: numb
       throw new Error(classificationsError.message);
     }
 
-    return NextResponse.json({
+    return NextResponse.json(recursiveSerialize({
       location: location.toString(),
       planet: planet ? { ...planet, id: planet.id.toString() } : null,
       classifications: (classifications ?? []).map((c: any) => ({
@@ -84,7 +85,7 @@ async function fetchActivePlanetPayload(userId: string, requestedLocation?: numb
         id: c.id.toString(),
         anomaly: c.anomaly?.toString(),
       })),
-    });
+    }));
   } catch (error: any) {
     return NextResponse.json(
       { error: error?.message || "Failed to load active planet data" },

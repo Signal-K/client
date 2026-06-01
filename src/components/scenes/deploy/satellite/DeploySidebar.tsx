@@ -127,12 +127,12 @@ const DeploySidebar: React.FC<DeploySidebarProps> = ({
           </Select>
         </div>
 
-        {/* Fast Deploy Welcome Message */}
+        {/* Fast Deploy Status Message */}
         {isFastDeployEnabled === true && (
           <div className={`p-2.5 sm:p-4 bg-gradient-to-br from-green-500/25 to-blue-500/25 rounded-lg border border-green-400/40 shadow-lg ${isMobile ? 'text-xs' : ''}`}>
             <div className="flex items-center gap-1.5 sm:gap-2 mb-1 sm:mb-2">
               <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-green-400 rounded-full animate-pulse"></div>
-              <span className={`text-green-300 font-semibold ${isMobile ? 'text-xs' : 'text-sm'}`}>🎁 Welcome Gift Active!</span>
+              <span className={`text-green-300 font-semibold ${isMobile ? 'text-xs' : 'text-sm'}`}>Deployment Bonus Active</span>
             </div>
             <p className={`text-green-200 leading-snug ${isMobile ? 'text-[10px]' : 'text-xs'}`}>
               🚀 As a new explorer, your satellite has a <strong>speed boost</strong>! 

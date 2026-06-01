@@ -4,6 +4,7 @@ import { Prisma } from "@prisma/client";
 
 import { prisma } from "@/lib/server/prisma";
 import { getRouteUser } from "@/lib/server/supabaseRoute";
+import { recursiveSerialize } from "@/utils/serialization";
 
 export const dynamic = "force-dynamic";
 
@@ -34,5 +35,5 @@ export async function GET(request: NextRequest) {
     WHERE ${Prisma.join(conditions, " AND ")}
   `);
 
-  return NextResponse.json({ count: Number(rows[0]?.count ?? 0) });
+  return NextResponse.json(recursiveSerialize({ count: Number(rows[0]?.count ?? 0) }));
 }

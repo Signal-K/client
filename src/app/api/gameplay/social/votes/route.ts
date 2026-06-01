@@ -3,13 +3,14 @@ import { revalidatePath } from "next/cache";
 
 import { prisma } from "@/lib/server/prisma";
 import { getRouteUser } from "@/lib/server/supabaseRoute";
+import { recursiveSerialize } from "@/utils/serialization";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(request: NextRequest) {
   const classificationId = Number(request.nextUrl.searchParams.get("classificationId"));
   if (!Number.isFinite(classificationId)) {
-    return NextResponse.json({ error: "classificationId is required" }, { status: 400 });
+    return NextResponse.json(recursiveSerialize({ error: "classificationId is required" }), { status: 400 });
   }
 
   const { user } = await getRouteUser();
@@ -27,12 +28,12 @@ export async function GET(request: NextRequest) {
     userVote = (mine?.vote_type as "up" | "down" | undefined) || null;
   }
 
-  return NextResponse.json({
+  return NextResponse.json(recursiveSerialize({
     voteTotal: upvotes - downvotes,
     userVote,
     upvotes,
     downvotes,
-  });
+  }));
 }
 
 type VoteBody = {
@@ -44,7 +45,7 @@ type VoteBody = {
 export async function POST(request: NextRequest) {
   const { user, authError } = await getRouteUser();
   if (authError || !user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return NextResponse.json(recursiveSerialize({ error: "Unauthorized" }), { status: 401 });
   }
 
   const body = (await request.json().catch(() => ({}))) as VoteBody;
@@ -52,7 +53,7 @@ export async function POST(request: NextRequest) {
   const voteType = body?.voteType === "down" ? "down" : "up";
 
   if (!Number.isFinite(classificationId)) {
-    return NextResponse.json({ error: "Invalid classificationId" }, { status: 400 });
+    return NextResponse.json(recursiveSerialize({ error: "Invalid classificationId" }), { status: 400 });
   }
 
   const existingVoteRows = await prisma.$queryRaw<Array<{ id: number }>>`
@@ -65,7 +66,7 @@ export async function POST(request: NextRequest) {
   const existingVote = existingVoteRows[0];
 
   if (existingVote?.id) {
-    return NextResponse.json({ success: true, alreadyVoted: true });
+    return NextResponse.json(recursiveSerialize({ success: true, alreadyVoted: true }));
   }
 
   const insertPayload: Record<string, unknown> = {
@@ -90,5 +91,5 @@ export async function POST(request: NextRequest) {
 
   revalidatePath(`/posts/${classificationId}`);
 
-  return NextResponse.json({ success: true, alreadyVoted: false });
+  return NextResponse.json(recursiveSerialize({ success: true, alreadyVoted: false }));
 }

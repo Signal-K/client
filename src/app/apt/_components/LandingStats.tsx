@@ -8,7 +8,7 @@ function fmt(n: number): string {
 }
 
 export async function LandingStats() {
-  const [sailors, discoveries, projects] = await Promise.all([
+  const [contributors, discoveries, projects] = await Promise.all([
     getActiveSailors().catch(() => 0),
     getTotalDiscoveries().catch(() => 0),
     getActiveProjects().catch(() => 0),
@@ -17,7 +17,7 @@ export async function LandingStats() {
   const stats = [
     { value: fmt(projects) || "11+", label: "Science projects" },
     { value: fmt(discoveries) || "100k+", label: "Classifications" },
-    { value: fmt(sailors) || "—", label: "Active sailors (24h)" },
+    { value: fmt(contributors) || "—", label: "Active Contributors (24h)" },
     { value: "1", label: "Open Source" },
   ];
 
@@ -42,7 +42,7 @@ export function LandingStatsFallback() {
   const stats = [
     { value: "11+", label: "Science projects" },
     { value: "100k+", label: "Classifications" },
-    { value: "—", label: "Active sailors (24h)" },
+    { value: "—", label: "Active Contributors (24h)" },
     { value: "1", label: "Open Source" },
   ];
   return (

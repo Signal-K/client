@@ -3,6 +3,7 @@ import { revalidatePath } from "next/cache";
 
 import { prisma } from "@/lib/server/prisma";
 import { getRouteUser } from "@/lib/server/supabaseRoute";
+import { recursiveSerialize } from "@/utils/serialization";
 
 export const dynamic = "force-dynamic";
 
@@ -13,7 +14,7 @@ type RoverDeployBody = {
 export async function POST(request: NextRequest) {
   const { user, authError } = await getRouteUser();
   if (authError || !user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return NextResponse.json(recursiveSerialize({ error: "Unauthorized" }), { status: 401 });
   }
 
   const body = (await request.json().catch(() => ({}))) as RoverDeployBody;
@@ -24,7 +25,7 @@ export async function POST(request: NextRequest) {
     : [];
 
   if (waypoints.length === 0) {
-    return NextResponse.json({ error: "At least one waypoint is required" }, { status: 400 });
+    return NextResponse.json(recursiveSerialize({ error: "At least one waypoint is required" }), { status: 400 });
   }
 
   const upgradeRows = await prisma.$queryRaw<Array<{ tech_type: string }>>`
@@ -38,7 +39,7 @@ export async function POST(request: NextRequest) {
 
   const maxWaypoints = (roverUpgradeRows || []).length > 0 ? 6 : 4;
   if (waypoints.length > maxWaypoints) {
-    return NextResponse.json({ error: `Too many waypoints for rover level (max ${maxWaypoints})` }, { status: 400 });
+    return NextResponse.json(recursiveSerialize({ error: `Too many waypoints for rover level (max ${maxWaypoints})` }), { status: 400 });
   }
 
   const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
@@ -52,7 +53,7 @@ export async function POST(request: NextRequest) {
   `;
 
   if ((recentDeployments || []).length > 0) {
-    return NextResponse.json({ error: "Rover deployment has already occurred this week" }, { status: 409 });
+    return NextResponse.json(recursiveSerialize({ error: "Rover deployment has already occurred this week" }), { status: 409 });
   }
 
   const [classifiedRes, anomalyRes, classificationCountRows] = await Promise.all([
@@ -84,7 +85,7 @@ export async function POST(request: NextRequest) {
 
   const selectedAnomalies = unclassified.slice(0, waypoints.length);
   if (selectedAnomalies.length === 0) {
-    return NextResponse.json({ error: "No rover anomalies available" }, { status: 400 });
+    return NextResponse.json(recursiveSerialize({ error: "No rover anomalies available" }), { status: 400 });
   }
 
   const isFastDeployEnabled = Number(classificationCountRows[0]?.count ?? 0) < 4;
@@ -151,5 +152,5 @@ export async function POST(request: NextRequest) {
   revalidatePath("/game");
   revalidatePath("/viewports/rover");
 
-  return NextResponse.json({ success: true, inserted: linkedRows.length });
+  return NextResponse.json(recursiveSerialize({ success: true, inserted: linkedRows.length }));
 }

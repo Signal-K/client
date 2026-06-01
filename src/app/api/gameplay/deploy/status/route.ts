@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 
 import { prisma } from "@/lib/server/prisma";
 import { getRouteUser } from "@/lib/server/supabaseRoute";
+import { recursiveSerialize } from "@/utils/serialization";
 
 export const dynamic = "force-dynamic";
 
@@ -28,7 +29,7 @@ export async function GET() {
   try {
     const { user, authError } = await getRouteUser();
     if (authError || !user) {
-      return NextResponse.json(EMPTY_DEPLOYMENT_STATUS);
+      return NextResponse.json(recursiveSerialize(EMPTY_DEPLOYMENT_STATUS));
     }
 
     const oneWeekAgo = new Date();
@@ -94,7 +95,7 @@ export async function GET() {
       (deployment: any) => !classifiedAnomalyIds.has(deployment.anomaly_id)
     ).length;
 
-    return NextResponse.json({
+    return NextResponse.json(recursiveSerialize({
       deploymentStatus: {
         telescope: {
           deployed: telescopeDeployments.length > 0,
@@ -111,10 +112,10 @@ export async function GET() {
         },
       },
       planetTargets,
-    });
+    }));
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : String(err);
     console.error("[deploy-status] GET error:", message);
-    return NextResponse.json({ error: "Internal server error", message }, { status: 500 });
+    return NextResponse.json(recursiveSerialize({ error: "Internal server error", message }), { status: 500 });
   }
 }

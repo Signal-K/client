@@ -5,6 +5,7 @@ import { Prisma } from "@prisma/client";
 
 import { prisma } from "@/lib/server/prisma";
 import { getRouteUser } from "@/lib/server/supabaseRoute";
+import { recursiveSerialize } from "@/utils/serialization";
 
 export const dynamic = "force-dynamic";
 
@@ -28,7 +29,7 @@ type CommentRow = {
 export async function GET(request: NextRequest) {
   const classificationId = Number(request.nextUrl.searchParams.get("classificationId"));
   if (!Number.isFinite(classificationId)) {
-    return NextResponse.json({ error: "classificationId is required" }, { status: 400 });
+    return NextResponse.json(recursiveSerialize({ error: "classificationId is required" }), { status: 400 });
   }
 
   const surveyorParam = request.nextUrl.searchParams.get("surveyor");
@@ -52,7 +53,7 @@ export async function GET(request: NextRequest) {
       WHERE ${Prisma.join(whereClauses, " AND ")}
       ORDER BY created_at ${Prisma.raw(order)}
     `);
-    return NextResponse.json({ comments: rows });
+    return NextResponse.json(recursiveSerialize({ comments: rows }));
   } catch (_error) {
     // Older DBs may not have the surveyor column; retry without surveyor filtering.
     const rows = await prisma.$queryRaw<CommentRow[]>`
@@ -61,14 +62,14 @@ export async function GET(request: NextRequest) {
       WHERE classification_id = ${classificationId}
       ORDER BY created_at ${Prisma.raw(order)}
     `;
-    return NextResponse.json({ comments: rows });
+    return NextResponse.json(recursiveSerialize({ comments: rows }));
   }
 }
 
 export async function POST(request: NextRequest) {
   const { user, authError } = await getRouteUser();
   if (authError || !user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return NextResponse.json(recursiveSerialize({ error: "Unauthorized" }), { status: 401 });
   }
 
   const body = (await request.json().catch(() => ({}))) as CommentBody;
@@ -76,7 +77,7 @@ export async function POST(request: NextRequest) {
   const content = typeof body?.content === "string" ? body.content.trim() : "";
 
   if (!Number.isFinite(classificationId) || !content) {
-    return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
+    return NextResponse.json(recursiveSerialize({ error: "Invalid payload" }), { status: 400 });
   }
 
   const insertPayload: Record<string, unknown> = {
@@ -105,5 +106,5 @@ export async function POST(request: NextRequest) {
   revalidatePath(`/posts/${classificationId}`);
   revalidatePath(`/planets/${classificationId}`);
 
-  return NextResponse.json({ success: true });
+  return NextResponse.json(recursiveSerialize({ success: true }));
 }

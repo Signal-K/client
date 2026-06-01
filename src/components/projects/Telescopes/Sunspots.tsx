@@ -29,7 +29,7 @@ const SunspotDetectorTutorial: React.FC<TelescopeProps> = ({
     const tutorialSlides = createTutorialSlides([
         {
             title: "Sunspot Classification",
-            text: "Hello, and welcome to the Sunspot Classification"
+            text: "Sunspot Classification Interface"
         },
         {
             title: "Counting Sunspots",

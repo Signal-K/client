@@ -88,7 +88,7 @@ const CloudspottingOnMars = () => {
     const tutorialMission: Mission = {
         id: 1000,
         chapter: 1,
-        title: "Welcome to Cloudspotting on Mars",
+        title: "Cloudspotting on Mars",
         description: "This mission will guide you through the basics of cloud classification. Let's get started!",
         icon: HelpCircle,
         points: 0,

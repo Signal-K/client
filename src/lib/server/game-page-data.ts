@@ -135,34 +135,30 @@ export async function getGamePageDataForUser(userId: string) {
   const [
     profile,
     myClassifications,
-    allUserClassifications,
-    cloudClassifications,
     otherClassifications,
     roverDeposits,
     hubLeaderboard,
+    linkedRows,
   ] = await Promise.all([
     safeQuery("profile", () => getProfileForUser(userId), null),
-    getRecentClassificationsForUser(userId),
-    prisma.classification.findMany({
-      where: { author: userId },
-      select: { anomaly: true },
-    }),
-    prisma.classification.findMany({
-      where: { author: userId, classificationtype: "cloud" },
-      select: { anomaly: true },
-    }),
-    prisma.classification.findMany({
-      where: { author: { not: userId } },
-      orderBy: { createdAt: "desc" },
-      take: 20,
-      select: {
-        id: true,
-        classificationtype: true,
-        content: true,
-        author: true,
-        createdAt: true,
-      },
-    }),
+    safeQuery("myClassifications", () => getRecentClassificationsForUser(userId), []),
+    safeQuery(
+      "otherClassifications",
+      () =>
+        prisma.classification.findMany({
+          where: { author: { not: userId } },
+          orderBy: { createdAt: "desc" },
+          take: 20,
+          select: {
+            id: true,
+            classificationtype: true,
+            content: true,
+            author: true,
+            createdAt: true,
+          },
+        }),
+      []
+    ),
     safeQuery(
       "roverDeposits",
       () =>
@@ -177,6 +173,34 @@ export async function getGamePageDataForUser(userId: string) {
       () => getHubLeaderboard(userId),
       { entries: [], currentUser: null }
     ),
+    safeQuery("linkedAnomalies", () => getLinkedAnomaliesForUser(userId), []),
+  ]);
+
+  const linkedAnomalyIds = linkedRows.map((row) => row.anomalyId);
+
+  const [allUserClassifications, cloudClassifications] = await Promise.all([
+    linkedAnomalyIds.length > 0
+      ? safeQuery(
+          "allUserClassifications",
+          () =>
+            prisma.classification.findMany({
+              where: { author: userId, anomaly: { in: linkedAnomalyIds } },
+              select: { anomaly: true },
+            }),
+          []
+        )
+      : Promise.resolve([]),
+    linkedAnomalyIds.length > 0
+      ? safeQuery(
+          "cloudClassifications",
+          () =>
+            prisma.classification.findMany({
+              where: { author: userId, classificationtype: "cloud", anomaly: { in: linkedAnomalyIds } },
+              select: { anomaly: true },
+            }),
+          []
+        )
+      : Promise.resolve([]),
   ]);
 
   const classifiedAnomalyIds = new Set(
@@ -190,8 +214,6 @@ export async function getGamePageDataForUser(userId: string) {
       .map((classification) => classification.anomaly)
       .filter((value): value is bigint => value !== null)
   );
-
-  const linkedRows = await getLinkedAnomaliesForUser(userId);
 
   const linkedAnomalies = linkedRows
     .filter((row) => {
@@ -216,7 +238,7 @@ export async function getGamePageDataForUser(userId: string) {
 
   const myClassificationIds = myClassifications.map((classification) => classification.id);
   const activityFeed = myClassificationIds.length
-    ? await getActivityFeed(myClassificationIds, oneWeekAgo)
+    ? await safeQuery("activityFeed", () => getActivityFeed(myClassificationIds, oneWeekAgo), [])
     : [];
 
   const transformedClassifications = myClassifications.map((classification) => ({

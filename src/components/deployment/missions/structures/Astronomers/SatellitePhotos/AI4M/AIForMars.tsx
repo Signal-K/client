@@ -119,7 +119,7 @@ const AI4M = () => {
     const tutorialMission: Mission = {
         id: 1000,
         chapter: 1,
-        title: "Welcome to AI For Mars",
+        title: "AI For Mars",
         description: 
             "This mission will get you up to speed with how your rovers should be trained and how we can find anomalies from their photos",
         icon: HelpCircle,

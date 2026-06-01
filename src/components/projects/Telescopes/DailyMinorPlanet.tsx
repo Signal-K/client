@@ -38,8 +38,8 @@ export function StarterDailyMinorPlanet({
 
     const tutorialSlides = [
         {
-            title: "Welcome to Asteroid Hunters",
-            text: "Welcome to the Asteroid Hunters project. In this project, you will be identifying minor planet candidates, like asteroids, around your local star.",
+            title: "Asteroid Hunters",
+            text: "Asteroid Hunters:  In this project, you will be identifying minor planet candidates, like asteroids, around your local star.",
             image: "/assets/Docs/Telescopes/DailyMinorPlanet/Step1.png"
         },
         {
@@ -281,8 +281,8 @@ const FirstMinorPlanetClassification: React.FC<MinorPlanetProps> = ({ anomalyid 
 
     const tutorialSlides = [
         {
-            title: "Welcome to Asteroid Hunters",
-            text: "Welcome to the Asteroid Hunters project. In this project, you will be identifying minor planet candidates, like asteroids, around your local star.",
+            title: "Asteroid Hunters",
+            text: "Asteroid Hunters:  In this project, you will be identifying minor planet candidates, like asteroids, around your local star.",
             image: "/assets/Docs/Telescopes/DailyMinorPlanet/Step1.png"
         },
         {

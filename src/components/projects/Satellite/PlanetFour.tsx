@@ -54,8 +54,8 @@ export function StarterPlanetFour({
     // Tutorial slides for Planet Four
     const tutorialSlides = createTutorialSlides([
         {
-            title: "Welcome to Planet Four Project",
-            text: "Welcome to P4 project. The images you're about to review come directly from the observation satellites orbiting your assigned planet. These satellites are critical for mapping the surface, assessing terrain, and collecting vital data to support future construction efforts on this planet and others like it.",
+            title: "Planet Four Interface",
+            text: "Data Analysis: Planet Four. The images you're about to review come directly from the observation satellites orbiting your assigned planet. These satellites are critical for mapping the surface, assessing terrain, and collecting vital data to support future construction efforts on this planet and others like it.",
             image: "/assets/Docs/Satellites/Planet-Four/Step1.jpeg"
         },
         {

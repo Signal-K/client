@@ -68,19 +68,19 @@ const DEPLOY_STEPS: Record<StructureId, TutorialStep[]> = {
     {
       id: "solar-what",
       title: "Joining the Solar Mission",
-      description: "The Solar Array is a community mission — all sailors contribute to the same dataset. You're classifying sunspot activity from real solar imagery.",
+      description: "The Solar Array is a community mission — all contributors contribute to the same dataset. You're classifying sunspot activity from real solar imagery.",
       position: "center",
     },
     {
       id: "solar-how",
       title: "How it works",
-      description: "Review solar images and mark sunspot groups. Your classifications are combined with other sailors' to produce consensus data for researchers.",
+      description: "Review solar images and mark sunspot groups. Your classifications are combined with other contributors' to produce consensus data for researchers.",
       position: "center",
     },
     {
       id: "solar-after",
       title: "You're part of the crew",
-      description: "The Solar card shows community activity. The more sailors classify, the stronger the signal.",
+      description: "The Solar card shows community activity. The more contributors classify, the stronger the signal.",
       position: "center",
     },
   ],

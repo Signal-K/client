@@ -3,6 +3,7 @@ import { revalidatePath } from "next/cache";
 
 import { prisma } from "@/lib/server/prisma";
 import { getRouteUser } from "@/lib/server/supabaseRoute";
+import { recursiveSerialize } from "@/utils/serialization";
 
 export const dynamic = "force-dynamic";
 
@@ -45,7 +46,7 @@ export async function POST(request: NextRequest) {
     const newEvent = rows[0];
 
     revalidatePath("/game");
-    return NextResponse.json(newEvent);
+    return NextResponse.json(recursiveSerialize(newEvent));
   }
 
   if (body?.action === "mark_defended") {
@@ -61,7 +62,7 @@ export async function POST(request: NextRequest) {
     `;
 
     revalidatePath("/game");
-    return NextResponse.json({ success: true });
+    return NextResponse.json(recursiveSerialize({ success: true }));
   }
 
   if (body?.action === "launch_probe") {
@@ -77,7 +78,7 @@ export async function POST(request: NextRequest) {
     `;
 
     revalidatePath("/game");
-    return NextResponse.json({ success: true });
+    return NextResponse.json(recursiveSerialize({ success: true }));
   }
 
   return NextResponse.json({ error: "Unsupported action" }, { status: 400 });

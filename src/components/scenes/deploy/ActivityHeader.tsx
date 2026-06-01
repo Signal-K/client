@@ -316,7 +316,7 @@ export default function ActivityHeader({
   const displayName =
     profile?.username ||
     (session?.user?.is_anonymous ? "Guest" : session?.user?.email?.split("@")[0]) ||
-    "Commander";
+    "Active User";
 
   const uid = session?.user?.id ?? "default";
   const ra  = ((uid.charCodeAt(0) * 137 + (uid.charCodeAt(1) || 65) * 31) % 3600) / 10;
@@ -628,7 +628,7 @@ export default function ActivityHeader({
                 className="font-mono text-[7px] uppercase tracking-[0.2em] mt-0.5"
                 style={{ color: "rgba(255,255,255,0.25)" }}
               >
-                Commander
+                Session Active
               </div>
             </div>
           </div>

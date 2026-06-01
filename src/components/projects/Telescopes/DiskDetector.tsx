@@ -82,7 +82,7 @@ export const DiskDetectorTutorial: React.FC<TelescopeProps> = ({
   const tutorialSlides = createTutorialSlides([
     {
       title: "Disk Detective Classification",
-      text: "Hello, and welcome to the Disk Detective Classification",
+      text: "Disk Detective Classification",
     },
     {
       title: "Finding Hidden Disks",

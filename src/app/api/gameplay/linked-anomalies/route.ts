@@ -5,6 +5,7 @@ import { Prisma } from "@prisma/client";
 
 import { prisma } from "@/lib/server/prisma";
 import { getRouteUser } from "@/lib/server/supabaseRoute";
+import { recursiveSerialize } from "@/utils/serialization";
 
 export const dynamic = "force-dynamic";
 
@@ -46,9 +47,9 @@ export async function GET(request: NextRequest) {
     `;
     const row = rows[0] ?? null;
     if (classificationIdOnly) {
-      return NextResponse.json({ classification_id: row?.classification_id ?? null });
+      return NextResponse.json(recursiveSerialize({ classification_id: row?.classification_id ?? null }));
     }
-    return NextResponse.json({ linkedAnomaly: row });
+    return NextResponse.json(recursiveSerialize({ linkedAnomaly: row }));
   }
 
   const conditions: Prisma.Sql[] = [Prisma.sql`author = ${user.id}`];
@@ -66,7 +67,7 @@ export async function GET(request: NextRequest) {
     ORDER BY id DESC
     LIMIT 500
   `);
-  return NextResponse.json({ linkedAnomalies: rows });
+  return NextResponse.json(recursiveSerialize({ linkedAnomalies: rows }));
 }
 
 export async function DELETE(request: NextRequest) {

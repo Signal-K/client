@@ -3,6 +3,7 @@ import { revalidatePath } from "next/cache";
 
 import { prisma } from "@/lib/server/prisma";
 import { getRouteUser } from "@/lib/server/supabaseRoute";
+import { recursiveSerialize } from "@/utils/serialization";
 
 export const dynamic = "force-dynamic";
 
@@ -65,9 +66,11 @@ export async function POST(request: NextRequest) {
   revalidatePath(`/planets/${classificationId}`);
   revalidatePath("/activity/deploy");
 
-  return NextResponse.json({
-    success: true,
-    classificationId,
-    classificationConfiguration: updatedConfiguration,
-  });
+  return NextResponse.json(
+    recursiveSerialize({
+      success: true,
+      classificationId,
+      classificationConfiguration: updatedConfiguration,
+    })
+  );
 }

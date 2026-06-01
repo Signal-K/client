@@ -78,7 +78,7 @@ export function CommunityVehicles() {
             <span className="text-base">{icon}</span>
             {isOpen && (
               <span className="absolute left-6 top-0 whitespace-nowrap rounded bg-background/90 border border-border/40 px-2 py-1 text-[10px] font-mono text-foreground/80 z-10">
-                Sailor {v.author} · {v.type ?? "unknown"}
+                User {v.author} · {v.type ?? "unknown"}
               </span>
             )}
           </button>

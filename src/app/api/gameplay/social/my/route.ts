@@ -4,13 +4,14 @@ import { Prisma } from "@prisma/client";
 
 import { prisma } from "@/lib/server/prisma";
 import { getRouteUser } from "@/lib/server/supabaseRoute";
+import { recursiveSerialize } from "@/utils/serialization";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(request: NextRequest) {
   const { user, authError } = await getRouteUser();
   if (authError || !user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return NextResponse.json(recursiveSerialize({ error: "Unauthorized" }), { status: 401 });
   }
 
   const idsParam = request.nextUrl.searchParams.get("classificationIds");
@@ -49,6 +50,6 @@ export async function GET(request: NextRequest) {
     `),
   ]);
 
-  return NextResponse.json({ comments, votes });
+  return NextResponse.json(recursiveSerialize({ comments, votes }));
 }
 

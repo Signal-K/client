@@ -119,7 +119,7 @@ const PlanetFour = () => {
     const tutorialMission: Mission = {
         id: 1000,
         chapter: 1,
-        title: "Welcome to Planet Four",
+        title: "Planet Four",
         description:
             "This mission will guide you through the basics of documenting & tracking anomalous behaviour on planetary surfaces",
         icon: HelpCircle,

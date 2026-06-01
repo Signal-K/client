@@ -5,6 +5,7 @@ import { Prisma } from "@prisma/client";
 
 import { prisma } from "@/lib/server/prisma";
 import { getRouteUser } from "@/lib/server/supabaseRoute";
+import { recursiveSerialize } from "@/utils/serialization";
 
 export const dynamic = "force-dynamic";
 
@@ -108,7 +109,7 @@ export async function GET(request: NextRequest) {
       ORDER BY c.${Prisma.raw(orderBy)} ${orderDirection}
       LIMIT ${validatedLimit}
     `);
-    return NextResponse.json({ classifications: rows });
+    return NextResponse.json({ classifications: recursiveSerialize(rows) });
   }
 
   const rows = await prisma.$queryRaw<Array<Record<string, unknown>>>(Prisma.sql`
@@ -118,7 +119,7 @@ export async function GET(request: NextRequest) {
     ORDER BY c.${Prisma.raw(orderBy)} ${orderDirection}
     LIMIT ${validatedLimit}
   `);
-  return NextResponse.json({ classifications: rows });
+  return NextResponse.json({ classifications: recursiveSerialize(rows) });
 }
 
 export async function POST(request: NextRequest) {

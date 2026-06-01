@@ -12,7 +12,7 @@ const NGTSTutorial: React.FC<NGTSTutorialProps> = ({ onClose }) => {
 
   const slides = [
     {
-      title: "Welcome to NGTS Planet Classification",
+      title: "NGTS Planet Classification",
       text: "The Next-Generation Transit Survey (NGTS) is a ground-based robotic search for exoplanets in Chile. You'll be analyzing real transit data from these observations.",
       image: "/assets/Template.png"
     },

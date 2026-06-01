@@ -3,6 +3,7 @@ import { revalidatePath } from "next/cache";
 
 import { prisma } from "@/lib/server/prisma";
 import { getRouteUser } from "@/lib/server/supabaseRoute";
+import { recursiveSerialize } from "@/utils/serialization";
 
 export const dynamic = "force-dynamic";
 
@@ -23,7 +24,7 @@ function sampleIds(input: Array<{ id: number }>, count: number) {
 export async function POST(request: NextRequest) {
   const { user, authError } = await getRouteUser();
   if (authError || !user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return NextResponse.json(recursiveSerialize({ error: "Unauthorized" }), { status: 401 });
   }
 
   const body = (await request.json().catch(() => ({}))) as SatelliteDeployBody;
@@ -31,11 +32,11 @@ export async function POST(request: NextRequest) {
   const planetId = Number(body?.planetId);
 
   if (!["weather", "p-4", "planets"].includes(String(investigationMode))) {
-    return NextResponse.json({ error: "Invalid investigation mode" }, { status: 400 });
+    return NextResponse.json(recursiveSerialize({ error: "Invalid investigation mode" }), { status: 400 });
   }
 
   if (!Number.isFinite(planetId)) {
-    return NextResponse.json({ error: "Invalid planet ID" }, { status: 400 });
+    return NextResponse.json(recursiveSerialize({ error: "Invalid planet ID" }), { status: 400 });
   }
 
   const [classificationCountRows, satelliteUpgradeRows, planetRows, planetClassifications] = await Promise.all([
@@ -68,7 +69,7 @@ export async function POST(request: NextRequest) {
 
   const planet = (planetRows || [])[0];
   if (!planet) {
-    return NextResponse.json({ error: "Planet not found" }, { status: 404 });
+    return NextResponse.json(recursiveSerialize({ error: "Planet not found" }), { status: 404 });
   }
 
   const userClassificationCount = Number(classificationCountRows[0]?.count ?? 0);
@@ -115,7 +116,7 @@ export async function POST(request: NextRequest) {
   }
 
   if (selectedIds.length === 0) {
-    return NextResponse.json({ error: "No anomalies available for this deployment" }, { status: 400 });
+    return NextResponse.json(recursiveSerialize({ error: "No anomalies available for this deployment" }), { status: 400 });
   }
 
   const rows = selectedIds.map((id) => ({
@@ -139,9 +140,9 @@ export async function POST(request: NextRequest) {
   revalidatePath("/viewports/satellite");
   revalidatePath("/game");
 
-  return NextResponse.json({
+  return NextResponse.json(recursiveSerialize({
     success: true,
     anomalyIds: selectedIds,
     sectorName: planet.content || `TIC ${planet.id}`,
-  });
+  }));
 }

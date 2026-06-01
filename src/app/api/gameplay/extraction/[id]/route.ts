@@ -3,6 +3,7 @@ import { revalidatePath } from "next/cache";
 
 import { prisma } from "@/lib/server/prisma";
 import { getRouteUser } from "@/lib/server/supabaseRoute";
+import { recursiveSerialize } from "@/utils/serialization";
 
 export const dynamic = "force-dynamic";
 
@@ -29,7 +30,7 @@ export async function GET(_request: NextRequest, props: { params: Promise<{ id: 
     return NextResponse.json({ error: "You don't have permission to extract this deposit" }, { status: 403 });
   }
 
-  return NextResponse.json({ deposit: data });
+  return NextResponse.json(recursiveSerialize({ deposit: data }));
 }
 
 export async function POST(request: NextRequest, props: { params: Promise<{ id: string }> }) {

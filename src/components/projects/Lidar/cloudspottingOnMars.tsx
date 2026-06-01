@@ -24,7 +24,7 @@ export const CloudspottingOnMarsTutorial: React.FC<LidarProps> = ({
     // Enhanced tutorial slides with tips and quizzes
     const tutorialSlides = createTutorialSlides([
         {
-            title: "Welcome to Cloudspotting on Mars! ☁️",
+            title: "Cloudspotting on Mars ☁️",
             text: "You're about to help NASA scientists study the Martian atmosphere! The Mars Climate Sounder on the Mars Reconnaissance Orbiter has captured incredible data about clouds high above the red planet, and we need your keen eyes to identify them.",
             tip: "Your classifications help scientists understand Martian weather patterns and track water and CO₂ in the atmosphere.",
         },

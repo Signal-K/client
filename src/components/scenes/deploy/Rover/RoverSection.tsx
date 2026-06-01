@@ -669,7 +669,7 @@ export default function RoverViewportSection() {
                                         <div className="text-blue-200 text-xs">Rover supports up to 6 waypoints</div>
                                     </div>
                                 )}
-                                {/* Fast Deploy Welcome Message */}
+                                {/* Fast Deploy Status Message */}
                                 {isFastDeployEnabled && (
                                     <div className="mb-2 p-2 bg-gradient-to-r from-green-500/30 to-blue-500/30 rounded border border-green-400/40">
                                         <div className="flex items-center gap-1 mb-1">
