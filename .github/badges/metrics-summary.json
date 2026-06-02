@@ -1,13 +1,13 @@
 {
-  "generatedAt": "2026-05-31T06:31:29.652Z",
+  "generatedAt": "2026-06-02T13:07:16.586Z",
   "codeCoverage": {
-    "percent": 28.28,
+    "percent": 31.06,
     "source": "coverage/coverage-summary.json"
   },
   "sddCoverage": {
     "percent": 0,
     "linked": 0,
-    "total": 6,
-    "source": "fallback-frontmatter-parser"
+    "total": 0,
+    "source": "fallback-no-knowns"
   }
 }
