@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import ClassificationForm from "../(classifications)/PostForm";
 import { Button } from "../../ui/button";
 import TutorialContentBlock, { createTutorialSlides } from "../TutorialContentBlock";
-import { useActivePlanet } from "@/src/core/context/ActivePlanet";
+import { useActivePlanet } from "@/src/lib/context/ActivePlanet";
 
 type Anomaly = {
   id: string;
@@ -223,7 +223,7 @@ export const SuperWASPTutorial: React.FC<TelescopeProps> = ({ anomalyId }) => {
       
       // Redirect to the classification page
       if (data?.id) {
-        router.push(`/next/${data.id}`);
+        router.push(`/classify/${data.id}`);
       }
       
     } catch (error) {

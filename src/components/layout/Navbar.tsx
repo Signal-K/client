@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Menu, Transition } from "@headlessui/react";
 import { Avatar } from "../profile/setup/Avatar";
 import Link from "next/link";
-import { useActivePlanet } from "@/src/core/context/ActivePlanet";
+import { useActivePlanet } from "@/src/lib/context/ActivePlanet";
 import MilestoneCard from "../deployment/missions/structures/Milestones/MilestoneCard";
 import JournalPage from "../deployment/missions/structures/Stardust/Journal";
 import { BellDotIcon, TrophyIcon } from "lucide-react";

@@ -5,7 +5,7 @@ import MainHeader from "@/src/components/layout/Header/MainHeader";
 import { Card, CardContent, CardHeader, CardTitle } from "@/src/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/src/components/ui/tabs";
 import { Trophy, Shield, SunIcon } from "lucide-react";
-import UseDarkMode from "@/src/shared/hooks/useDarkMode";
+import UseDarkMode from "@/src/hooks/useDarkMode";
 
 interface LeaderboardEntry {
   user_id: string;

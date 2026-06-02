@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Button } from "@/src/components/ui/button";
 import { Textarea } from "@/src/components/ui/textarea";
 import { useRouter } from "next/navigation";
-import { submitCommentAction } from "../actions";
+import { submitCommentAction } from "@/src/app/actions/social-actions";
 import {
     ToastProvider,
     Toast,

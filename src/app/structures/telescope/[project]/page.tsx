@@ -9,7 +9,7 @@ import { TelescopeDiskDetector } from "@/src/components/projects/Telescopes/Disk
 import DailyMinorPlanetMissions from "@/src/components/deployment/missions/structures/Astronomers/DailyMinorPlanet/DailyMinorPlanet";
 import SunspotSteps from "@/src/components/projects/Telescopes/Sunspots/SunspotShell";
 import MainHeader from "@/src/components/layout/Header/MainHeader";
-import UseDarkMode from "@/src/shared/hooks/useDarkMode";
+import UseDarkMode from "@/src/hooks/useDarkMode";
 import { TelescopeBackground } from "@/src/components/classification/telescope/telescope-background";
 
 export default function TelescopeProjectRoute() {

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { cn } from "@/src/shared/utils";
+import { cn } from "@/src/lib/utils";
 import type { StructureId, StructureState } from "./StructureCard";
 
 // ─── Blip positions — fixed orbital angles per station ───────────────────────

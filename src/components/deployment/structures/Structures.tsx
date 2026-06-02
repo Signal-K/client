@@ -2,7 +2,7 @@
 
 import React, { useCallback, useEffect, useState } from "react";
 import { useSession } from "@/src/lib/auth/session-context";
-import { useActivePlanet } from "@/src/core/context/ActivePlanet";
+import { useActivePlanet } from "@/src/lib/context/ActivePlanet";
 import { InventoryStructureItem, StructureItemDetail } from "@/types/Items";
 // import IndividualStructure, { IndividualStructureProps } from "./IndividualStructure";
 // import { StructuresConfig } from "@/src/features/structures/constants/Properties";

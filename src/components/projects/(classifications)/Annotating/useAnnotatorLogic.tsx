@@ -5,10 +5,10 @@ import { useSession } from "@/src/lib/auth/session-context";
 import { useRouter } from "next/navigation";
 import { usePostHog } from "posthog-js/react";
 import { determineMineralType } from "@/src/utils/mineralAnalysis";
-import { useActivePlanet } from "@/src/core/context/ActivePlanet";
-import { createClassificationAction } from "@/src/features/gameplay/actions/classification-actions";
-import { createMineralDepositAction } from "@/src/features/gameplay/actions/mineral-actions";
-import { getLinkedAnomaly } from "@/src/features/gameplay/actions/deploy-actions";
+import { useActivePlanet } from "@/src/lib/context/ActivePlanet";
+import { createClassificationAction } from "@/src/app/actions/classification-actions";
+import { createMineralDepositAction } from "@/src/app/actions/mineral-actions";
+import { getLinkedAnomaly } from "@/src/app/actions/deploy-actions";
 import {
   AI4MCATEGORIES,
   P4CATEGORIES,
@@ -34,7 +34,7 @@ import {
   type DrawingObject,
   type Tool,
   type CategoryConfig,
-} from "@/types/Annotation";
+} from "@/src/types/Annotation";
 
 export interface ImageAnnotatorProps {
   initialImageUrl: string;
@@ -294,7 +294,7 @@ export function useAnnotatorLogic({
       }
       
       // Always redirect after classification submission
-      router.push(`/next/${classificationData.id}`);
+      router.push(`/classify/${classificationData.id}`);
     } catch (err) {
       console.error("Error during classification submission:", err);
       alert("Failed to submit classification. Please try again.");
@@ -587,7 +587,7 @@ export function useAnnotatorLogic({
       }
       
       // Always redirect after classification submission
-      router.push(`/next/${classificationData.id}`);
+      router.push(`/classify/${classificationData.id}`);
     } catch (error: any) {
       console.error("Unexpected error: ", error);
       alert("Classification error occurred. Please try again");

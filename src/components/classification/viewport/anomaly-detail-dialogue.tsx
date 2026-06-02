@@ -6,7 +6,7 @@ import { Badge } from "@/src/components/ui/badge";
 import { Card, CardContent } from "@/src/components/ui/card";
 import { Star, Zap, Target, Disc, Calendar, Eye, Palette, Info, Hash } from "lucide-react";
 import type { Anomaly } from "@/types/Structures/telescope";
-import UseDarkMode from "@/src/shared/hooks/useDarkMode";
+import UseDarkMode from "@/src/hooks/useDarkMode";
 
 interface AnomalyDetailDialogProps {
   showDetailDialog: boolean

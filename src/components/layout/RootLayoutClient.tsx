@@ -3,7 +3,7 @@
 import "@/styles/globals.css";
 import { SessionContextProvider } from "@/src/lib/auth/session-context";
 import { useEffect, ReactNode, useState } from "react";
-import { ActivePlanetProvider } from "@/src/core/context/ActivePlanet";
+import { ActivePlanetProvider } from "@/src/lib/context/ActivePlanet";
 import { Analytics } from "@vercel/analytics/react";
 import { usePostHog } from "posthog-js/react";
 import { useAuthUser } from "@/src/hooks/useAuthUser";

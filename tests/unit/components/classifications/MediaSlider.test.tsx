@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
-import { MediaSlider } from "@/src/components/classifications/MediaSlider";
+import { MediaSlider } from "@/src/components/classification/MediaSlider";
 
 vi.mock("@/src/components/ui/dialog", () => ({
   Dialog: ({ children }: any) => <div>{children}</div>,

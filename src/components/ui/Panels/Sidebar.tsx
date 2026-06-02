@@ -23,7 +23,7 @@ import {
   Clock,
   ExternalLink,
 } from "lucide-react"
-import { cn } from "@/src/shared/utils"
+import { cn } from "@/src/lib/utils"
 
 interface ToolStatus {
   name: string

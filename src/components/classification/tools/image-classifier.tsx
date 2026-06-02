@@ -5,7 +5,7 @@ import type React from "react"
 import { useState, useRef, useEffect } from "react"
 import Webcam from "react-webcam"
 import axios from "axios"
-import { useActivePlanet } from "@/src/core/context/ActivePlanet"
+import { useActivePlanet } from "@/src/lib/context/ActivePlanet"
 
 export default function ChatGPTImageClassifier() {
   const { activePlanet } = useActivePlanet()

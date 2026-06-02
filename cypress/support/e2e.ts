@@ -13,9 +13,6 @@
 // https://on.cypress.io/configuration
 // ***********************************************************
 
-// Import code coverage support (disabled - incompatible with Cypress 14)
-// import '@cypress/code-coverage/support';
-
 // Import commands.ts using ES2015 syntax:
 import './commands'
 

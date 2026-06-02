@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import MainHeader from "@/src/components/layout/Header/MainHeader";
-import UseDarkMode from "@/src/shared/hooks/useDarkMode";
+import UseDarkMode from "@/src/hooks/useDarkMode";
 import { usePageData } from "@/hooks/usePageData";
 import { useSession } from "@/src/lib/auth/session-context";
 import { useRouter } from "next/navigation";

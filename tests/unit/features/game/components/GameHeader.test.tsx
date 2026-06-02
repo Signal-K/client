@@ -48,7 +48,7 @@ vi.mock("@/src/components/onboarding/ProjectPreferencesModal", () => ({
     ) : null,
 }));
 
-vi.mock("@/src/shared/utils", () => ({
+vi.mock("@/src/lib/utils", () => ({
   cn: (...args: any[]) => args.filter(Boolean).join(" "),
 }));
 

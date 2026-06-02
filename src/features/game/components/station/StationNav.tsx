@@ -1,7 +1,7 @@
 "use client";
 
 import { Telescope, Satellite, Home, Car, Sun } from "lucide-react";
-import { cn } from "@/src/shared/utils";
+import { cn } from "@/src/lib/utils";
 import { useState } from "react";
 
 type NavItem = "base" | "telescope" | "satellite" | "rover" | "solar" | "inventory";

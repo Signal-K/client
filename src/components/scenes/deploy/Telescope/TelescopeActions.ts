@@ -8,7 +8,7 @@ import {
   getTelescopeSkillProgress, 
   deployTelescopeAction,
   type DeploymentType 
-} from "@/src/features/gameplay/actions/deploy-actions"
+} from "@/src/app/actions/deploy-actions"
 
 export async function fetchAnomalies(deploymentType: string | null, setTessAnomalies: (a: DatabaseAnomaly[]) => void) {
   try {

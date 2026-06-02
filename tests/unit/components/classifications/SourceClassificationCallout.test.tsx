@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
-import { SourceClassificationCallout } from "@/src/components/classifications/SourceClassificationCallout";
+import { SourceClassificationCallout } from "@/src/components/classification/SourceClassificationCallout";
 
 beforeEach(() => {
   vi.stubGlobal("fetch", vi.fn(() =>

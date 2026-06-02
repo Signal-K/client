@@ -23,7 +23,7 @@ vi.mock("@headlessui/react", () => ({
   Transition: ({ children }: any) => <>{typeof children === "function" ? children({}) : children}</>,
 }));
 
-vi.mock("@/src/core/context/ActivePlanet", () => ({
+vi.mock("@/src/lib/context/ActivePlanet", () => ({
   useActivePlanet: () => ({ activePlanet: { id: 1, name: "Earth" } }),
 }));
 

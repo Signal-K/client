@@ -3,10 +3,10 @@
 import React, { useEffect, useState, use } from "react";
 import { SimplePostSingle } from "@/src/components/social/posts/SimplePostSingle";
 import { useRouter } from "next/navigation";
-import { SourceClassificationCallout } from "@/src/components/classifications/SourceClassificationCallout";
+import { SourceClassificationCallout } from "@/src/components/classification/SourceClassificationCallout";
 import MainHeader from "@/src/components/layout/Header/MainHeader";
 import { TelescopeBackground } from "@/src/components/classification/telescope/telescope-background";
-import UseDarkMode from "@/src/shared/hooks/useDarkMode";
+import UseDarkMode from "@/src/hooks/useDarkMode";
 
 interface Classification {
   id: number;

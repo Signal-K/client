@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { cn } from "@/src/shared/utils";
+import { cn } from "@/src/lib/utils";
 
 describe("cn (class name utility)", () => {
   it("returns a single class unchanged", () => {

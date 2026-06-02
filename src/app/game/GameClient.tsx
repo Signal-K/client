@@ -98,10 +98,10 @@ import ReferralMissionPrompt from "@/src/features/game/components/ReferralMissio
 // Hooks
 import { useUserPreferences } from "@/src/hooks/useUserPreferences";
 import type { TutorialId } from "@/src/hooks/useUserPreferences";
-import UseDarkMode from "@/src/shared/hooks/useDarkMode";
+import UseDarkMode from "@/src/hooks/useDarkMode";
 
 // Types / utils
-import { cn } from "@/src/shared/utils";
+import { cn } from "@/src/lib/utils";
 
 import { buildClientReferralUrl } from "@/src/features/referrals/referral-links";
 

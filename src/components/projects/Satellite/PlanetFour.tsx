@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import { useSession } from "@/src/lib/auth/session-context";
-import { useActivePlanet } from "@/src/core/context/ActivePlanet";
+import { useActivePlanet } from "@/src/lib/context/ActivePlanet";
 import ClassificationForm from "../(classifications)/PostForm";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/src/components/ui/card";
 import { Button } from "@/src/components/ui/button";
@@ -51,26 +51,25 @@ export function StarterPlanetFour({
         checkIfReturningUser();
     }, [session]);
 
-    // Tutorial slides for Planet Four
     const tutorialSlides = createTutorialSlides([
         {
-            title: "Planet Four Interface",
-            text: "Data Analysis: Planet Four. The images you're about to review come directly from the observation satellites orbiting your assigned planet. These satellites are critical for mapping the surface, assessing terrain, and collecting vital data to support future construction efforts on this planet and others like it.",
+            title: "Sensor Interface",
+            text: "Orbital telemetry analysis. Data packets are sourced from planetary observation assets and prioritized for terrain assessment.",
             image: "/assets/Docs/Satellites/Planet-Four/Step1.jpeg"
         },
         {
-            title: "Surface Formation Analysis",
-            text: "In this region of the planet, unique surface formations are often observed due to geological and environmental factors. Your mission is to help analyze these formations. By classifying the surface features, you'll be providing invaluable data that will inform the development of infrastructure and scientific research for this planet.",
+            title: "Morphology Analysis",
+            text: "Identify discrete geological formations and atmospheric interaction patterns. Classifications determine structural integrity and resource potential.",
             image: "/assets/Docs/Satellites/Planet-Four/Step2.jpeg"
         },
         {
-            title: "Understanding Surface Patterns",
-            text: "In these images, you'll encounter various surface patterns that result from processes like wind erosion, tectonic activity, and weather phenomena. Some of these patterns may indicate areas ideal for constructing future research stations or landing sites, while others may suggest potential resource deposits.",
+            title: "Pattern Identification",
+            text: "Document erosion, tectonic displacement, and meteorological signatures. High-confidence patterns inform station placement protocols.",
             image: "/assets/Docs/Satellites/Planet-Four/Step3.jpeg"
         },
         {
-            title: "Ready to Classify",
-            text: "To proceed, simply review the image and select the best classification from the options provided. Every classification you make brings us closer to building on this planet and establishing a foothold for exploration in the future.",
+            title: "Initialization",
+            text: "Tutorial complete. Initialize surface classification protocol.",
             image: "/assets/Docs/Satellites/Planet-Four/Step6.jpeg"
         }
     ]);

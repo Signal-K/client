@@ -1,5 +1,5 @@
 import { ChevronLeft } from "lucide-react";
-import { cn } from "@/src/shared/utils";
+import { cn } from "@/src/lib/utils";
 
 interface ViewportHeaderProps {
   label: string;

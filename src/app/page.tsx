@@ -5,10 +5,10 @@ import type { Metadata } from "next";
 import { ArrowRight, ExternalLink } from "lucide-react";
 
 import { createSupabaseServerClient } from "@/src/lib/supabase/ssr";
-import { cn } from "@/src/shared/utils";
-import { LandingAnalytics } from "./apt/_components/LandingAnalytics";
-import { LandingMobileMenu } from "./apt/_components/LandingMobileMenu";
-import { LandingStats, LandingStatsFallback } from "./apt/_components/LandingStats";
+import { cn } from "@/src/lib/utils";
+import { LandingAnalytics } from "./(landing)/_components/LandingAnalytics";
+import { LandingMobileMenu } from "./(landing)/_components/LandingMobileMenu";
+import { LandingStats, LandingStatsFallback } from "./(landing)/_components/LandingStats";
 
 export const metadata: Metadata = {
   title: "Star Sailors — Real astronomy. Your kind of game.",

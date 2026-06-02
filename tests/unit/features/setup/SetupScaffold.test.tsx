@@ -10,7 +10,7 @@ vi.mock("@/src/components/layout/Header/MainHeader", () => ({
 vi.mock("@/src/components/classification/telescope/telescope-background", () => ({
   TelescopeBackground: () => <div data-testid="setup-background" />,
 }));
-vi.mock("@/src/shared/hooks/useDarkMode", () => ({
+vi.mock("@/src/hooks/useDarkMode", () => ({
   default: () => ({ isDark: true, toggleDarkMode: vi.fn() }),
 }));
 

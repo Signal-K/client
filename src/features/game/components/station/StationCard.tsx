@@ -1,4 +1,4 @@
-import { cn } from "@/src/shared/utils";
+import { cn } from "@/src/lib/utils";
 
 type StationStatus = "online" | "alert" | "standby" | "locked";
 

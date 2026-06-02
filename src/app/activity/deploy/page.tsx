@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
-import UseDarkMode from "@/src/shared/hooks/useDarkMode"
+import UseDarkMode from "@/src/hooks/useDarkMode"
 import { useAuthUser } from "@/src/hooks/useAuthUser"
 import ViewportShell from "@/src/components/layout/ViewportShell"
 import DeployTelescopeViewport from "@/src/components/scenes/deploy/TelescopeViewportRange"

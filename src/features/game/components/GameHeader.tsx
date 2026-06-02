@@ -21,7 +21,7 @@ import ConvertAnonymousAccount from "@/src/components/profile/auth/ConvertAnonym
 import ProjectPreferencesModal from "@/src/components/onboarding/ProjectPreferencesModal";
 import { useUserPreferences, ProjectType } from "@/src/hooks/useUserPreferences";
 import Link from "next/link";
-import { cn } from "@/src/shared/utils";
+import { cn } from "@/src/lib/utils";
 import { useAuthUser } from "@/src/hooks/useAuthUser";
 
 interface GameHeaderProps {

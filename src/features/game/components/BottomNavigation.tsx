@@ -1,7 +1,7 @@
 "use client";
 
 import { ReactNode } from "react";
-import { cn } from "@/src/shared/utils";
+import { cn } from "@/src/lib/utils";
 import { Telescope, Satellite, Home, Car, Sun } from "lucide-react";
 
 type NavItem = "telescope" | "satellite" | "base" | "rover" | "solar";

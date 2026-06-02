@@ -8,7 +8,7 @@ import { Share2, ThumbsUpIcon, ThumbsDownIcon, MessageCircle } from 'lucide-reac
 import { CommentForm } from '../comments/CommentForm';
 import CommentsList from '../comments/CommentListById';
 import { useRouter } from 'next/navigation';
-import { toggleVoteAction } from '../actions';
+import { toggleVoteAction } from '@/src/app/actions/social-actions';
 
 interface SimplePostSingleProps {
   title: string;
@@ -278,7 +278,7 @@ export function SimplePostSingle({
           </div>
 
                 {/* <Button
-                  onClick={() => router.push(`/next/${id}`)}
+                  onClick={() => router.push(`/classify/${id}`)}
                   variant='outline'
                 >
                   Details

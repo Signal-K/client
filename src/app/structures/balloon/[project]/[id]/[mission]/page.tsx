@@ -9,7 +9,7 @@ import { StarterJovianVortexHunter } from "@/src/components/projects/Lidar/Jovia
 import { StarterCoMShapes } from "@/src/components/projects/Lidar/CloudspottingOnMarsShapes"
 import { StarterPlanetFour } from "@/src/components/projects/Satellite/PlanetFour"
 import MainHeader from "@/src/components/layout/Header/MainHeader"
-import UseDarkMode from "@/src/shared/hooks/useDarkMode"
+import UseDarkMode from "@/src/hooks/useDarkMode"
 import { TelescopeBackground } from "@/src/components/classification/telescope/telescope-background"
 
 export default function BalloonClassifyPage() {

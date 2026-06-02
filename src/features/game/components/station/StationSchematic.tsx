@@ -1,6 +1,6 @@
 "use client";
 
-import { cn } from "@/src/shared/utils";
+import { cn } from "@/src/lib/utils";
 import { Telescope, Satellite, Car, Sun, ChevronRight } from "lucide-react";
 
 type ModuleStatus = "online" | "alert" | "standby" | "locked";

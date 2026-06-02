@@ -8,7 +8,7 @@ vi.mock("@/src/lib/auth/session-context", () => ({
   useSession: mockUseSession,
 }));
 
-import { ActivePlanetProvider, useActivePlanet } from "@/src/core/context/ActivePlanet";
+import { ActivePlanetProvider, useActivePlanet } from "@/src/lib/context/ActivePlanet";
 
 describe("ActivePlanetProvider", () => {
   beforeEach(() => {

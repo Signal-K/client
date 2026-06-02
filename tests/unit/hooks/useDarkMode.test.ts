@@ -12,7 +12,7 @@ Object.defineProperty(window, "matchMedia", {
   writable: true,
 });
 
-import useDarkMode from "@/shared/hooks/useDarkMode";
+import useDarkMode from "@/src/hooks/useDarkMode";
 
 describe("useDarkMode", () => {
   beforeEach(() => {

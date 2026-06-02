@@ -2,18 +2,47 @@
 set -euo pipefail
 
 PROFILE="${1:-all}"
+EXPECTED_PROJECT_ID="client"
 
 if ! command -v supabase >/dev/null 2>&1; then
   echo "Supabase CLI is required for docker test bootstrap."
   exit 1
 fi
 
+active_supabase_project() {
+  local line
+  line="$(docker ps --format '{{.Names}}' 2>/dev/null | sed -n 's/^supabase_db_//p' | head -n1 || true)"
+  printf '%s\n' "${line}"
+}
+
 if ! supabase status >/dev/null 2>&1; then
+  ACTIVE_PROJECT="$(active_supabase_project)"
+  if [[ -n "${ACTIVE_PROJECT}" && "${ACTIVE_PROJECT}" != "${EXPECTED_PROJECT_ID}" ]]; then
+    cat >&2 <<EOF
+Another local Supabase project is already running: ${ACTIVE_PROJECT}
+
+This repo expects the local Supabase project '${EXPECTED_PROJECT_ID}' from supabase/config.toml.
+Stop the other project before running Docker tests, otherwise the app can connect to the
+wrong database schema and fail with missing-table errors.
+EOF
+    exit 1
+  fi
+
   echo "Starting local Supabase..."
   supabase start >/dev/null
 fi
 
 STATUS_ENV="$(supabase status -o env 2>/dev/null || true)"
+
+ACTIVE_PROJECT="$(active_supabase_project)"
+if [[ -n "${ACTIVE_PROJECT}" && "${ACTIVE_PROJECT}" != "${EXPECTED_PROJECT_ID}" ]]; then
+  cat >&2 <<EOF
+Local Supabase project mismatch: running '${ACTIVE_PROJECT}', expected '${EXPECTED_PROJECT_ID}'.
+
+Stop the running project and start this repo's Supabase stack before running Docker tests.
+EOF
+  exit 1
+fi
 
 read_env_value() {
   local key="$1"
@@ -51,6 +80,7 @@ export NEXT_PUBLIC_SUPABASE_URL="${NEXT_PUBLIC_SUPABASE_URL:-${SUPABASE_URL}}"
 export NEXT_PUBLIC_SUPABASE_ANON_KEY="${NEXT_PUBLIC_SUPABASE_ANON_KEY:-${LOCAL_ANON_KEY}}"
 export SUPABASE_SERVICE_ROLE_KEY="${SUPABASE_SERVICE_ROLE_KEY:-${LOCAL_SERVICE_ROLE_KEY}}"
 export SUPABASE_SECRET_KEY="${SUPABASE_SECRET_KEY:-${LOCAL_SECRET_KEY:-${LOCAL_SERVICE_ROLE_KEY}}}"
+export CYPRESS_SPEC="${CYPRESS_SPEC:-}"
 
 echo "Running docker test profile: ${PROFILE}"
 docker compose -f ops/compose/docker-compose.test.yml --profile "${PROFILE}" up --abort-on-container-exit

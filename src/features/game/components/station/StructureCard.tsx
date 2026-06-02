@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { cn } from "@/src/shared/utils";
+import { cn } from "@/src/lib/utils";
 
 export type StructureId = "telescope" | "satellite" | "rover" | "solar";
 export type StructureState = "undeployed" | "standby" | "active" | "incoming";

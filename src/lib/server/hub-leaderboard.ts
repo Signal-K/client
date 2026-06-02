@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/server/prisma";
+import { unstable_cache } from "next/cache";
 
 export interface HubLeaderboardEntry {
   rank: number;
@@ -12,16 +13,24 @@ export interface HubLeaderboardData {
   currentUser: HubLeaderboardEntry | null;
 }
 
+const getCachedTopProfiles = unstable_cache(
+  async () => {
+    return await prisma.profile.findMany({
+      orderBy: [{ classificationPoints: "desc" }, { updatedAt: "asc" }],
+      take: 5,
+      select: {
+        id: true,
+        username: true,
+        classificationPoints: true,
+      },
+    });
+  },
+  ["hub-top-profiles"],
+  { revalidate: 300, tags: ["leaderboard"] }
+);
+
 export async function getHubLeaderboard(userId: string): Promise<HubLeaderboardData> {
-  const topProfiles = await prisma.profile.findMany({
-    orderBy: [{ classificationPoints: "desc" }, { updatedAt: "asc" }],
-    take: 5,
-    select: {
-      id: true,
-      username: true,
-      classificationPoints: true,
-    },
-  });
+  const topProfiles = await getCachedTopProfiles();
 
   const me = await prisma.profile.findUnique({
     where: { id: userId },

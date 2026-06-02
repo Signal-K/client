@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { Input } from "@/src/components/ui/input";
 import { Button } from "@/src/components/ui/button";
-import { completeProfileAction } from "./actions";
+import { completeProfileAction } from "@/src/app/actions/profile-actions";
 
 function generateReferralCode(length = 8) {
   const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";

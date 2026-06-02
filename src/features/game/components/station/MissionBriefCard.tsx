@@ -1,5 +1,5 @@
 import { ArrowRight } from "lucide-react";
-import { cn } from "@/src/shared/utils";
+import { cn } from "@/src/lib/utils";
 
 type BriefVariant = "alert" | "progress" | "nominal" | "boot";
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { Copy, Rocket, Sparkles, X } from "lucide-react";
-import { cn } from "@/src/shared/utils";
+import { cn } from "@/src/lib/utils";
 
 interface ReferralMissionPromptProps {
   referralCode: string | null;

@@ -7,7 +7,7 @@ vi.mock("next/navigation", () => ({
   useSearchParams: () => ({ get: vi.fn() }),
 }));
 vi.mock("@/src/lib/auth/session-context", () => ({ useSession: vi.fn(() => null) }));
-vi.mock("@/src/core/context/ActivePlanet", () => ({
+vi.mock("@/src/lib/context/ActivePlanet", () => ({
   useActivePlanet: vi.fn(() => ({ activePlanet: null, setActivePlanet: vi.fn(), updatePlanetLocation: vi.fn(), classifications: [], setClassifications: vi.fn() })),
 }));
 vi.mock("@/src/utils/mineralAnalysis", () => ({
@@ -19,19 +19,19 @@ const mockCreateClassification = vi.fn();
 const mockCreateMineralDeposit = vi.fn();
 const mockGetLinkedAnomaly = vi.fn();
 
-vi.mock("@/src/features/gameplay/actions/classification-actions", () => ({
+vi.mock("@/src/app/actions/classification-actions", () => ({
   createClassificationAction: (...args: any[]) => mockCreateClassification(...args),
 }));
-vi.mock("@/src/features/gameplay/actions/mineral-actions", () => ({
+vi.mock("@/src/app/actions/mineral-actions", () => ({
   createMineralDepositAction: (...args: any[]) => mockCreateMineralDeposit(...args),
 }));
-vi.mock("@/src/features/gameplay/actions/deploy-actions", () => ({
+vi.mock("@/src/app/actions/deploy-actions", () => ({
   getLinkedAnomaly: (...args: any[]) => mockGetLinkedAnomaly(...args),
 }));
 
 import { useAnnotatorLogic, type ImageAnnotatorProps } from "@/src/components/projects/(classifications)/Annotating/useAnnotatorLogic";
 import { useSession } from "@/src/lib/auth/session-context";
-import { useActivePlanet } from "@/src/core/context/ActivePlanet";
+import { useActivePlanet } from "@/src/lib/context/ActivePlanet";
 
 const SESSION = { user: { id: "u1", email: "t@e.com" }, access_token: "t", expires_at: 9e9, expires_in: 3600, refresh_token: "r", token_type: "bearer" };
 const PLANET = { id: 42, name: "Mars" };
@@ -156,7 +156,7 @@ describe("useAnnotatorLogic – state & config", () => {
         anomaly: 42,
         classificationtype: "rock"
     }));
-    expect(mockPush).toHaveBeenCalledWith("/next/77");
+    expect(mockPush).toHaveBeenCalledWith("/classify/77");
   });
 
   it("submit: handles upload failure", async () => {
@@ -245,7 +245,7 @@ describe("useAnnotatorLogic – state & config", () => {
 
     const { result } = renderHook(() => useAnnotatorLogic(p({ anomalyId: "42", anomalyType: "rock" })));
     await act(async () => { await result.current.createPost(); });
-    expect(mockPush).toHaveBeenCalledWith("/next/77");
+    expect(mockPush).toHaveBeenCalledWith("/classify/77");
     expect(result.current.content).toBe("");
   });
 
@@ -386,7 +386,7 @@ describe("useAnnotatorLogic – state & config", () => {
     await act(async () => { await result.current.createPost(); });
     
     // Should still redirect even if mineral creation fails (logged to console)
-    expect(mockPush).toHaveBeenCalledWith("/next/77");
+    expect(mockPush).toHaveBeenCalledWith("/classify/77");
   });
 
   it("annotationOptions derive from drawings", async () => {

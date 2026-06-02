@@ -110,7 +110,7 @@ export const GalaxyZooTutorial: React.FC<GalaxyZooProps> = ({
       
       // Redirect to the classification page
       if (data?.id) {
-        router.push(`/next/${data.id}`);
+        router.push(`/classify/${data.id}`);
       }
       
     } catch (error) {
@@ -231,7 +231,7 @@ function GalaxyZooClassify({ anomalyId, avatarUrl }: GalaxyZooProps) {
       });
       if (!response.ok) throw new Error("Failed to submit classification");
       const data = await response.json();
-      if (data?.id) router.push(`/next/${data.id}`);
+      if (data?.id) router.push(`/classify/${data.id}`);
     } catch (error) {
       console.error("Error during galaxy classification:", error);
       alert("An error occurred. Please try again.");

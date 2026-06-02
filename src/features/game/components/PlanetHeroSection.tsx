@@ -1,6 +1,6 @@
 "use client";
 
-import { cn } from "@/src/shared/utils";
+import { cn } from "@/src/lib/utils";
 
 interface PlanetHeroSectionProps {
   planetName: string;

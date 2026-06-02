@@ -7,6 +7,7 @@ import { Textarea } from "@/src/components/ui/textarea";
 import { useRouter } from "next/navigation";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/src/components/ui/select";
 import { SuccessPopup } from "@/src/components/ui/SuccessPopup";
+import { submitSurveyorCommentAction } from "@/src/app/actions/gameplay";
 
 interface Props {
   classificationId: string;
@@ -30,31 +31,19 @@ export default function SurveyorCalculator({ classificationId }: Props) {
     if (!newComment.trim() && !calculatedValueComment.trim()) return;
 
     try {
-      const response = await fetch("/api/gameplay/surveyor/comments", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          classificationId,
-          content: `Calculated Value: ${calculatedValueComment}\nGeneral Comment: ${newComment}`,
-          configuration: { generalComment: newComment },
-        }),
+      const result = await submitSurveyorCommentAction({
+        classificationId: Number(classificationId),
+        content: `Calculated Value: ${calculatedValueComment}\nGeneral Comment: ${newComment}`,
+        configuration: { generalComment: newComment },
       });
-      const payload = await response.json().catch(() => null);
-      if (!response.ok) throw new Error(payload?.error || "Failed to add comment");
+      if (!result.ok) throw new Error(result.error);
 
       setNewComment("");
       setCalculatedValueComment("");
       setShowSuccessPopup(true);
       
-      // Show popup and redirect after 3 seconds
       const redirectTimeout = setTimeout(() => {
-        try {
-          router.push('/');
-        } catch (error) {
-          console.error('CalculatorSurveyor: Router.push error:', error);
-          // Fallback to window.location
-          window.location.href = '/';
-        }
+        try { router.push('/'); } catch { window.location.href = '/'; }
       }, 3000);
     } catch (error: any) {
       console.error("Error adding comment:", error.message);
@@ -145,35 +134,21 @@ export default function SurveyorCalculator({ classificationId }: Props) {
     }
 
     try {
-      const response = await fetch("/api/gameplay/surveyor/comments", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          classificationId,
-          content: `${densityInput1}\n\n${densityInput2}`,
-          configuration: { density: `${densityInput2}`, generalComment: newComment },
-          surveyor: "TRUE",
-          value: densityInput2,
-          category: "Density",
-        }),
+      const result = await submitSurveyorCommentAction({
+        classificationId: Number(classificationId),
+        content: `${densityInput1}\n\n${densityInput2}`,
+        configuration: { density: `${densityInput2}`, generalComment: newComment },
+        surveyor: "TRUE",
+        value: densityInput2,
+        category: "Density",
       });
-      const payload = await response.json().catch(() => null);
-      if (!response.ok) throw new Error(payload?.error || "Failed to add density comment");
+      if (!result.ok) throw new Error(result.error);
 
-      
       setCalculatorInputs({ input1: "", input2: "", input3: "" });
       setShowSuccessPopup(true);
-      
-      // Show popup and redirect after 3 seconds
       setTimeout(() => {
-        try {
-          router.push('/');
-        } catch (error) {
-          console.error('CalculatorSurveyor: Router error:', error);
-          window.location.href = '/';
-        }
+        try { router.push('/'); } catch { window.location.href = '/'; }
       }, 3000);
-
     } catch (error) {
       console.error("Error adding density comment:", error);
     }
@@ -189,35 +164,21 @@ export default function SurveyorCalculator({ classificationId }: Props) {
     }
 
     try {
-      const response = await fetch("/api/gameplay/surveyor/comments", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          classificationId,
-          content: `${temperatureInput1}\n\n${temperatureInput2}`,
-          configuration: { temperature: `${temperatureInput2}`, generalComment: newComment },
-          surveyor: "TRUE",
-          value: temperatureInput2,
-          category: "Temperature",
-        }),
+      const result = await submitSurveyorCommentAction({
+        classificationId: Number(classificationId),
+        content: `${temperatureInput1}\n\n${temperatureInput2}`,
+        configuration: { temperature: `${temperatureInput2}`, generalComment: newComment },
+        surveyor: "TRUE",
+        value: temperatureInput2,
+        category: "Temperature",
       });
-      const payload = await response.json().catch(() => null);
-      if (!response.ok) throw new Error(payload?.error || "Failed to add temperature comment");
+      if (!result.ok) throw new Error(result.error);
 
-      
       setCalculatorInputs({ input1: "", input2: "", input3: "" });
       setShowSuccessPopup(true);
-      
-      // Show popup and redirect after 3 seconds
       setTimeout(() => {
-        try {
-          router.push('/');
-        } catch (error) {
-          console.error('CalculatorSurveyor: Router error:', error);
-          window.location.href = '/';
-        }
+        try { router.push('/'); } catch { window.location.href = '/'; }
       }, 3000);
-
     } catch (error) {
       console.error("Error adding temperature comment:", error);
     }
@@ -233,35 +194,23 @@ export default function SurveyorCalculator({ classificationId }: Props) {
     }
 
     try {
-      const response = await fetch("/api/gameplay/surveyor/comments", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          classificationId,
-          content: `${periodInput1}\n\n${periodInput2}`,
-          configuration: { period: `${periodInput2}`, generalComment: newComment },
-          surveyor: "TRUE",
-          value: periodInput2,
-          category: "Period",
-        }),
+      const result = await submitSurveyorCommentAction({
+        classificationId: Number(classificationId),
+        content: `${periodInput1}\n\n${periodInput2}`,
+        configuration: { period: `${periodInput2}`, generalComment: newComment },
+        surveyor: "TRUE",
+        value: periodInput2,
+        category: "Period",
       });
-      const payload = await response.json().catch(() => null);
-      if (!response.ok) throw new Error(payload?.error || "Failed to add period comment");
+      if (!result.ok) throw new Error(result.error);
 
       setCalculatorInputs({ input1: "", input2: "", input3: "" });
       setShowSuccessPopup(true);
-      
       setTimeout(() => {
-        try {
-          router.push('/');
-        } catch (error) {
-          console.error('CalculatorSurveyor: Router error:', error);
-          window.location.href = '/';
-        }
+        try { router.push('/'); } catch { window.location.href = '/'; }
       }, 3000);
-
     } catch (error) {
-      console.error("Error adding period comment: ", error);
+      console.error("Error adding period comment:", error);
     };
   };
 
@@ -275,37 +224,25 @@ export default function SurveyorCalculator({ classificationId }: Props) {
     };
 
     try {
-      const response = await fetch("/api/gameplay/surveyor/comments", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          classificationId,
-          content: `${newComment}`,
-          configuration: { radius: `${radiusInput2}` },
-          surveyor: "TRUE",
-          value: radiusInput2,
-          category: "Radius",
-        }),
+      const result = await submitSurveyorCommentAction({
+        classificationId: Number(classificationId),
+        content: `${newComment}`,
+        configuration: { radius: `${radiusInput2}` },
+        surveyor: "TRUE",
+        value: radiusInput2,
+        category: "Radius",
       });
-      const payload = await response.json().catch(() => null);
-      if (!response.ok) throw new Error(payload?.error || "Failed to add radius comment");
+      if (!result.ok) throw new Error(result.error);
 
       setCalculatorInputs({ input1: "", input2: "", input3: "" });
       setShowSuccessPopup(true);
-      
       setTimeout(() => {
-        try {
-          router.push('/');
-        } catch (error) {
-          console.error('CalculatorSurveyor: Router error:', error);
-          window.location.href = '/';
-        }
+        try { router.push('/'); } catch { window.location.href = '/'; }
       }, 3000);
-      
-  } catch (error: any) {
-    console.error("Error adding your comment: ", error)
+    } catch (error: any) {
+      console.error("Error adding your comment: ", error)
+    }
   }
-}
 
   return (
     <div className="space-y-4">

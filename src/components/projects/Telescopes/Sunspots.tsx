@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useSession } from "@/src/lib/auth/session-context";
-import { useActivePlanet } from "@/src/core/context/ActivePlanet";
+import { useActivePlanet } from "@/src/lib/context/ActivePlanet";
 import ClassificationForm from "../(classifications)/PostForm";
 import ImageAnnotator from "../(classifications)/Annotating/AnnotatorView";
 import TutorialContentBlock, { createTutorialSlides } from "../TutorialContentBlock";
@@ -25,35 +25,34 @@ const SunspotDetectorTutorial: React.FC<TelescopeProps> = ({
     const imageUrl = `${supabaseUrl}/storage/v1/object/public/telescope/telescope-sunspots/${anomalyId}.png`;
     const [showClassification, setShowClassification] = useState(false);
 
-    // Tutorial slides for Sunspot Detection
     const tutorialSlides = createTutorialSlides([
         {
-            title: "Sunspot Classification",
-            text: "Sunspot Classification Interface"
+            title: "Data Protocol",
+            text: "Solar observation analysis interface."
         },
         {
-            title: "Counting Sunspots",
-            text: "You will be shown small subsets of the sunspot drawings and you would have to input the number of spots you see in the text box below",
-            image: "/assets/Docs/Telescopes/Sunspots/Step1.png"
+            title: "Metric: Sunspot Count",
+            text: "Analyze subsets of solar imagery. Input the total count of identified sunspot formations in the provided field.",
+            image: "/assets/Docs/Telescopes/Sunspots/Step1.webp"
         },
         {
-            title: "What Counts as Spots",
-            text: "For this exercise, as spots we refer to all dark markings made by the observer to represent a solar feature. That includes small dots, like the ones shown on the right side of this image, but also bigger structures like the one on the left. In this example one should count 6 spots as marked on the right panel.",
-            image: "/assets/Docs/Telescopes/Sunspots/Step2.png"
+            title: "Feature Identification",
+            text: "Identify all dark markings representing solar features. This includes high-density clusters and smaller discrete formations. Example: 6 formations identified in the reference panel.",
+            image: "/assets/Docs/Telescopes/Sunspots/Step2.webp"
         },
         {
-            title: "Image Sizes",
-            text: "The image sizes vary significantly because each includes only a single group of sunspots. You do not need to zoom in the images to search for smaller features, as these would only be smudges.",
-            image: "/assets/Docs/Telescopes/Sunspots/Step3.png"
+            title: "Scaling Parameters",
+            text: "Image dimensions vary based on the specific formation group. Zoom is generally not required for identifying primary features.",
+            image: "/assets/Docs/Telescopes/Sunspots/Step3.webp"
         },
         {
-            title: "Avoiding False Spots",
-            text: "Pay attention to not count as spots the various lines, writings, and smudges that these images have",
-            image: "/assets/Docs/Telescopes/Sunspots/Step4.png"
+            title: "Signal Noise",
+            text: "Disregard artifacts, annotations, and processing smudges. Focus exclusively on magnetic activity signatures.",
+            image: "/assets/Docs/Telescopes/Sunspots/Step4.webp"
         },
         {
-            title: "Ready to Start!",
-            text: "Let's get started with counting sunspots!"
+            title: "Initialization",
+            text: "Tutorial complete. Initialize sunspot classification protocol."
         }
     ]);
 

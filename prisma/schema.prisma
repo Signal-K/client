@@ -57,6 +57,7 @@ model Classification {
   votes            Vote[]
   linkedAnomalies  LinkedAnomaly[]
 
+  @@index([author, createdAt(sort: Desc)])
   @@map("classifications")
 }
 

@@ -16,7 +16,7 @@ import {
   Info,
   Sparkles
 } from 'lucide-react';
-import { cn } from '@/src/shared/utils';
+import { cn } from '@/src/lib/utils';
 
 interface TutorialSlide {
   text: string;

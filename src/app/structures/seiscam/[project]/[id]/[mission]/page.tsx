@@ -8,7 +8,7 @@ import React, { useEffect, useState } from "react";
 import { AiForMarsProjectWithID } from "@/src/components/projects/Auto/AI4Mars";
 import { RoverBackground } from "@/src/components/classification/telescope/rover-background";
 import MainHeader from "@/src/components/layout/Header/MainHeader";
-import UseDarkMode from "@/src/shared/hooks/useDarkMode";
+import UseDarkMode from "@/src/hooks/useDarkMode";
 
 export default function SeiscamProjectRoute() {
   const params = useParams();

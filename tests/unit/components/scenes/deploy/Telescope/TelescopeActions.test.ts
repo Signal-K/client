@@ -23,7 +23,7 @@ const mockGetStatus = vi.fn();
 const mockGetSkill = vi.fn();
 const mockDeploy = vi.fn();
 
-vi.mock("@/src/features/gameplay/actions/deploy-actions", () => ({
+vi.mock("@/src/app/actions/deploy-actions", () => ({
   getTelescopeAnomalies: (...args: any[]) => mockGetAnomalies(...args),
   getTelescopeStatus: (...args: any[]) => mockGetStatus(...args),
   getTelescopeSkillProgress: (...args: any[]) => mockGetSkill(...args),

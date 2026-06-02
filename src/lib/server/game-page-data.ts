@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/server/prisma";
+import { unstable_cache } from "next/cache";
 import { getHubLeaderboard } from "@/src/lib/server/hub-leaderboard";
 
 function parseConfig(raw: unknown): Record<string, unknown> | null {
@@ -90,43 +91,49 @@ async function getProfileForUser(userId: string) {
 }
 
 async function getRecentClassificationsForUser(userId: string): Promise<RecentClassificationRow[]> {
-  try {
-    return await prisma.classification.findMany({
-      where: { author: userId },
-      orderBy: { createdAt: "desc" },
-      take: 10,
-      select: {
-        id: true,
-        classificationtype: true,
-        content: true,
-        createdAt: true,
-        classificationConfiguration: true,
-        anomalyRef: {
-          select: { content: true },
-        },
-      },
-    });
-  } catch {
-    const rows = await prisma.classification.findMany({
-      where: { author: userId },
-      orderBy: { createdAt: "desc" },
-      take: 10,
-      select: {
-        id: true,
-        classificationtype: true,
-        content: true,
-        createdAt: true,
-        anomalyRef: {
-          select: { content: true },
-        },
-      },
-    });
+  return unstable_cache(
+    async () => {
+      try {
+        return await prisma.classification.findMany({
+          where: { author: userId },
+          orderBy: { createdAt: "desc" },
+          take: 10,
+          select: {
+            id: true,
+            classificationtype: true,
+            content: true,
+            createdAt: true,
+            classificationConfiguration: true,
+            anomalyRef: {
+              select: { content: true },
+            },
+          },
+        });
+      } catch {
+        const rows = await prisma.classification.findMany({
+          where: { author: userId },
+          orderBy: { createdAt: "desc" },
+          take: 10,
+          select: {
+            id: true,
+            classificationtype: true,
+            content: true,
+            createdAt: true,
+            anomalyRef: {
+              select: { content: true },
+            },
+          },
+        });
 
-    return rows.map((row) => ({
-      ...row,
-      classificationConfiguration: null,
-    }));
-  }
+        return rows.map((row) => ({
+          ...row,
+          classificationConfiguration: null,
+        }));
+      }
+    },
+    [`user-classifications-${userId}`],
+    { revalidate: 300, tags: [`user-classifications-${userId}`] }
+  )();
 }
 
 export async function getGamePageDataForUser(userId: string) {

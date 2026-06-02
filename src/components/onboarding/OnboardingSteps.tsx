@@ -1,7 +1,7 @@
 "use client";
 
 import { Shield, Zap, Loader2, Check, ArrowRight, ChevronRight } from "lucide-react";
-import { cn } from "@/src/shared/utils";
+import { cn } from "@/src/lib/utils";
 import { ProjectType } from "@/src/hooks/useUserPreferences";
 import { OnboardingSchematic } from "./OnboardingSchematic";
 import { PROJECTS } from "./onboarding-data";

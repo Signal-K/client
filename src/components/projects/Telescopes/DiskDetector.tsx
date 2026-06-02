@@ -81,32 +81,32 @@ export const DiskDetectorTutorial: React.FC<TelescopeProps> = ({
   // Tutorial slides for Disk Detective
   const tutorialSlides = createTutorialSlides([
     {
-      title: "Disk Detective Classification",
-      text: "Disk Detective Classification",
+      title: "Data Acquisition",
+      text: "Disk Detective classification protocol.",
     },
     {
-      title: "Finding Hidden Disks",
-      text: "Find stars with hidden disks of dust around them. These stars show us where to look for new planetary systems and teach us about how planets form",
-      image: "/assets/Docs/Telescopes/DiskDetector/Step1.png"
+      title: "Target Identification",
+      text: "Locate stars with circumstantial debris disks. These signatures indicate potential planetary formation and target sectors for further study.",
+      image: "/assets/Docs/Telescopes/DiskDetector/Step1.webp"
     },
     {
-      title: "Ideal Disk Candidates",
-      text: "The ideal disk candidate is a single, round source, contained mostly within in the outer circle in all of the images. It may move a bit from image to image, but it does not move beyond the inner circle.",
-      image: "/assets/Docs/Telescopes/DiskDetector/Step2.png"
+      title: "Classification Parameters",
+      text: "A primary candidate consists of a discrete, circular source within the outer reference boundary. Target must remain within internal bounds across all survey frames.",
+      image: "/assets/Docs/Telescopes/DiskDetector/Step2.webp"
     },
     {
-      title: "Survey Labels",
-      text: "As you go through the images, pay attention to the label in the upper right hand corner. This label indicates what survey the image is from, i.e., which telescope took the image.",
-      image: "/assets/Docs/Telescopes/DiskDetector/Step3.png"
+      title: "Survey Telemetry",
+      text: "Reference the survey label (upper right) to identify the source observatory for each data packet.",
+      image: "/assets/Docs/Telescopes/DiskDetector/Step3.webp"
     },
     {
-      title: "Different Survey Features",
-      text: "You'll be looking for different features in the images from different surveys. For example, images from the Pan-STARRS survey are especially good at revealing objects like galaxies that are not round. The last image (unWISE w3), from the WISE telescope, is especially good at revealing interstellar dust clouds.",
-      image: "/assets/Docs/Telescopes/DiskDetector/Step4.png"
+      title: "Multi-Spectrum Analysis",
+      text: "Sensor performance varies by survey. Pan-STARRS is optimized for non-circular morphology (galaxies), while WISE/unWISE w3 is tuned for interstellar dust signatures.",
+      image: "/assets/Docs/Telescopes/DiskDetector/Step4.webp"
     },
     {
-      title: "Ready to Start!",
-      text: "Let's get started with classifying disk candidates!",
+      title: "Initialization",
+      text: "Tutorial complete. Initialize disk detection sequence.",
     }
   ]);
 
@@ -271,7 +271,7 @@ export const DiskDetectorTutorial: React.FC<TelescopeProps> = ({
       
       // Redirect to the classification page
       if (data?.id) {
-        router.push(`/next/${data.id}`);
+        router.push(`/classify/${data.id}`);
       }
       
     } catch (error) {

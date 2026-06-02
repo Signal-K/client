@@ -25,7 +25,7 @@ describe("ActivityHeaderSection", () => {
 
   it("renders welcome text", () => {
     render(<ActivityHeaderSection {...defaultProps} />);
-    expect(screen.getByText("Welcome to Star Sailors")).toBeDefined();
+    expect(screen.getByText("Star Sailors Network")).toBeDefined();
   });
 
   it("renders ActivityHeader", () => {

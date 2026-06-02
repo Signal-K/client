@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { SetupCard, SetupScaffold } from "@/src/features/setup/components/SetupScaffold";
-import { getTelescopeStatus } from "@/src/features/gameplay/actions/deploy-actions";
+import { getTelescopeStatus } from "@/src/app/actions/deploy-actions";
 import TutorialWrapper, { TELESCOPE_INTRO_STEPS } from "@/src/components/onboarding/TutorialWrapper";
 
 type TelescopeStatusPayload = {

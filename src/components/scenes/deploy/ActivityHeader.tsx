@@ -11,7 +11,7 @@ import StardustBalance from "@/src/components/stardust/StardustBalance";
 import PlanetSelectorModal from "@/src/components/modals/PlanetSelectorModal";
 import useDeploymentStatus from "@/src/hooks/useDeploymentStatus";
 import { AvatarGenerator } from "@/src/components/profile/setup/Avatar";
-import { cn } from "@/src/shared/utils";
+import { cn } from "@/src/lib/utils";
 
 // ─── HUD corner bracket ────────────────────────────────────────────────────────
 function HudCorner({ pos }: { pos: "tl" | "tr" | "bl" | "br" }) {

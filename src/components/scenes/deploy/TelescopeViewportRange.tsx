@@ -15,7 +15,7 @@ import DeploymentConfirmation from "./Telescope/DeploymentConfirmation"
 import TelescopeDeploySidebar from "./Telescope/TelescopeDeploySidebar"
 import { seededRandom1, generateAnomalyFromDBFactory, DatabaseAnomaly } from "./Telescope/TelescopeUtils"
 import { fetchAnomalies as fetchAnomaliesAction, checkDeployment as checkDeploymentAction, loadSector as loadSectorAction, fetchSkillProgress as fetchSkillProgressAction, handleDeployAction } from "./Telescope/TelescopeActions"
-import UseDarkMode from "@/src/shared/hooks/useDarkMode"
+import UseDarkMode from "@/src/hooks/useDarkMode"
 import { TelescopeBackground } from "@/src/components/classification/telescope/telescope-background"
 import { useUserPreferences, TelescopeFocusType } from "@/src/hooks/useUserPreferences"
  

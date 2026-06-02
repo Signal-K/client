@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { usePostHog } from "posthog-js/react";
 import { RoverBackground } from "@/src/components/classification/telescope/rover-background";
 import MainHeader from "@/src/components/layout/Header/MainHeader";
-import UseDarkMode from "@/src/shared/hooks/useDarkMode";
+import UseDarkMode from "@/src/hooks/useDarkMode";
 import { usePageData } from "@/hooks/usePageData";
 import { TelescopeBackground } from "@/src/components/classification/telescope/telescope-background";
 import { useAuthUser } from "@/src/hooks/useAuthUser";

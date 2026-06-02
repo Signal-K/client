@@ -7,6 +7,7 @@ import { Textarea } from "@/src/components/ui/textarea";
 import { X } from "lucide-react";
 import { Label } from "@/src/components/ui/label";
 import { useAuthUser } from "@/src/hooks/useAuthUser";
+import { submitNpsAction } from "@/src/app/actions/gameplay";
 
 interface NPSPopupProps {
   isOpen: boolean;
@@ -29,19 +30,11 @@ export default function NPSPopup({ isOpen, onClose, userId }: NPSPopupProps) {
     if (!user?.id && !userId) return;
 
     setIsSubmitting(true);
-    const response = await fetch("/api/gameplay/nps", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        npsScore,
-        feedback: why,
-      }),
-    });
-    const payload = await response.json().catch(() => null);
+    const result = await submitNpsAction({ npsScore, feedback: why });
     setIsSubmitting(false);
 
-    if (!response.ok) {
-      console.error("Error submitting NPS survey:", payload?.error || response.statusText);
+    if (!result.ok) {
+      console.error("Error submitting NPS survey:", result.error);
       return;
     }
 

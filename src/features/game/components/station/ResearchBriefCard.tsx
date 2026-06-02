@@ -1,7 +1,7 @@
 "use client";
 
 import { FlaskConical, ChevronRight } from "lucide-react";
-import { cn } from "@/src/shared/utils";
+import { cn } from "@/src/lib/utils";
 
 interface ResearchBriefCardProps {
   availableStardust: number;

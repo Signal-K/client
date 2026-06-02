@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useSession } from "@/src/lib/auth/session-context";
-import { useActivePlanet } from "@/src/core/context/ActivePlanet";
+import { useActivePlanet } from "@/src/lib/context/ActivePlanet";
 import ClassificationForm from "../(classifications)/PostForm";
 import ImageAnnotator from "../(classifications)/Annotating/AnnotatorView";
 import { Button } from "@/src/components/ui/button";
@@ -103,27 +103,27 @@ export function StarterAiForMars({ anomalyid }: Props) {
         {
             title: "Sand Classification",
             text: "Sand - Look for areas with fine, powdery dust, often with visible ripples. Sand is slippery for rovers and leaves deep wheel tracks. Ignore small sand patches narrower than 20-50 cm based on the trapezoid marker.",
-            image: "/assets/Docs/Automatons/automatons-ai4Mars/Step2.png"
+            image: "/assets/Docs/Automatons/automatons-ai4Mars/Step2.webp"
         },
         {
             title: "Soil Classification",
             text: "Soil - Soil is cohesive and may have small gravel. The rover can drive on it without much slip, leaving light wheel tracks. It looks more compact and smooth compared to sand.",
-            image: "/assets/Docs/Automatons/automatons-ai4Mars/Step3.png"
+            image: "/assets/Docs/Automatons/automatons-ai4Mars/Step3.webp"
         },
         {
             title: "Bedrock Classification",
             text: "Bedrock - Bedrock appears as large, solid, often cracked plates. It's a stable surface for the rover and easily distinguishable from sand or soil. Large flat rocks form the base.",
-            image: "/assets/Docs/Automatons/automatons-ai4Mars/Step4.png"
+            image: "/assets/Docs/Automatons/automatons-ai4Mars/Step4.webp"
         },
         {
             title: "Large Objects",
             text: "Larger objects - Big rocks are larger than the trapezoid (20-50 cm) and act as obstacles for the rover. Avoid overlapping these with other labels since they're distinct hazards.",
-            image: "/assets/Docs/Automatons/automatons-ai4Mars/Step5.png"
+            image: "/assets/Docs/Automatons/automatons-ai4Mars/Step5.webp"
         },
         {
             title: "Distance Guidelines",
             text: "Ignore terrain further than 30 meters, as it is too far to classify. Dark areas in the distance usually indicate this.",
-            image: "/assets/Docs/Automatons/automatons-ai4Mars/Step6.png"
+            image: "/assets/Docs/Automatons/automatons-ai4Mars/Step6.webp"
         },
         {
             title: "Ready to Start!",

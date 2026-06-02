@@ -5,8 +5,9 @@ import { useParams, useRouter } from "next/navigation"
 import { ExtractionScene } from "@/src/components/deployment/extraction/ex-scene"
 import { useAuthUser } from "@/src/hooks/useAuthUser"
 import MainHeader from "@/src/components/layout/Header/MainHeader"
-import UseDarkMode from "@/src/shared/hooks/useDarkMode"
+import UseDarkMode from "@/src/hooks/useDarkMode"
 import { usePageData } from "@/hooks/usePageData"
+import { getExtractionDepositAction, completeExtractionAction } from "@/src/app/actions/gameplay";
 
 export default function ExtractionPage() {
   const params = useParams()
@@ -25,14 +26,12 @@ export default function ExtractionPage() {
       if (!params.id) return
 
       try {
-        const response = await fetch(`/api/gameplay/extraction/${params.id}`, { cache: "no-store" })
-        const payload = await response.json().catch(() => null)
-        if (!response.ok) {
-          setError(payload?.error || "Failed to load mineral deposit")
-          return
+        const result = await getExtractionDepositAction(Number(params.id));
+        if (!result.ok) {
+          setError(result.error);
+          return;
         }
-
-        setDeposit(payload?.deposit || null)
+        setDeposit(result.deposit ?? null);
       } catch (err) {
         console.error("Error fetching deposit:", err)
         setError("Failed to load mineral deposit")
@@ -48,22 +47,14 @@ export default function ExtractionPage() {
     if (!user?.id || !deposit) return
 
     try {
-      const response = await fetch(`/api/gameplay/extraction/${deposit.id}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ extractedQuantity, purity }),
-      });
-      const payload = await response.json().catch(() => null);
-      if (!response.ok) {
-        console.error("Error adding to mineral inventory:", payload?.error || response.statusText);
+      const result = await completeExtractionAction({ depositId: deposit.id, extractedQuantity, purity });
+      if (!result.ok) {
+        console.error("Error adding to mineral inventory:", result.error);
         alert("Failed to save to inventory. Please try again.");
         return
       }
 
-      // Successfully extracted - navigate back after delay
-      setTimeout(() => {
-        router.push("/inventory")
-      }, 3000)
+      setTimeout(() => { router.push("/inventory") }, 3000)
     } catch (err) {
       console.error("Error completing extraction:", err)
       alert("An unexpected error occurred. Please try again.")

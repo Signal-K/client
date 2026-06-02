@@ -5,9 +5,9 @@ import { useSession } from "@/src/lib/auth/session-context";
 import { useRouter } from "next/navigation";
 import { Button } from "@/src/components/ui/button";
 import MainHeader from "@/src/components/layout/Header/MainHeader";
-import { SourceClassificationCallout } from "@/src/components/classifications/SourceClassificationCallout";
-import { MediaSlider } from "@/src/components/classifications/MediaSlider";
-import UseDarkMode from "@/src/shared/hooks/useDarkMode";
+import { SourceClassificationCallout } from "@/src/components/classification/SourceClassificationCallout";
+import { MediaSlider } from "@/src/components/classification/MediaSlider";
+import UseDarkMode from "@/src/hooks/useDarkMode";
 import { TelescopeBackground } from "@/src/components/classification/telescope/telescope-background";
 
 // Extracted Result Components

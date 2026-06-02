@@ -30,37 +30,37 @@ export function StarterJovianVortexHunter({
         {
             title: "Jovian Vortex Hunter - Gas Giant Atmosphere Analysis",
             text: "In this workflow, you will be identifying the type of atmosphere feature visible in satellite images of gas giants in your network. The images you will see are cropped from your automated satellite data, and correspond to an area of ~7000x7000km on nearby gaseous planets.",
-            image: "/assets/Docs/Satellites/JovianVortexHunter/Step1.png"
+            image: "/assets/Docs/Satellites/JovianVortexHunter/Step1.webp"
         },
         {
             title: "Four Main Categories",
             text: "There are four main categories that we are interested in. The first three (vortex, turbulent region and cloud bands) are discrete atmospheric features. The last option is for when the image either shows no large scale structure, or if it is unclear.",
-            image: "/assets/Docs/Satellites/JovianVortexHunter/Step2.png"
+            image: "/assets/Docs/Satellites/JovianVortexHunter/Step2.webp"
         },
         {
             title: "Identifying Vortices",
             text: "A vortex is an atmospheric feature that is generally round/elliptical in shape. On Earth, an example is a hurricane/cyclone/typhoon. On gaseous planets, there are examples of both cyclones and anti-cyclones (spin in the opposite direction of cyclones), and they appear in a variety of sizes and colours. If you see any feature that has a compact oval shape, select this option.",
-            image: "/assets/Docs/Satellites/JovianVortexHunter/Step3.png"
+            image: "/assets/Docs/Satellites/JovianVortexHunter/Step3.webp"
         },
         {
             title: "Turbulent Features",
             text: "Turbulent features are ubiquitous on gas giants. These are cloud structures that don't have a definite shape, but form lots of curls and swirls. Sometimes these structures swirl inwards and appear to form vortices, as shown below. These images should be labelled with the vortices option and the turbulent region option.",
-            image: "/assets/Docs/Satellites/JovianVortexHunter/Step4.png"
+            image: "/assets/Docs/Satellites/JovianVortexHunter/Step4.webp"
         },
         {
             title: "Cloud Bands",
             text: "Sometimes, there are gradients in color that are mostly horizontal in direction. These are the separation between different cloud bands (usually near the equator).",
-            image: "/assets/Docs/Satellites/JovianVortexHunter/Step5.png"
+            image: "/assets/Docs/Satellites/JovianVortexHunter/Step5.webp"
         },
         {
             title: "No Visible Structure",
             text: "Sometimes, there might be no features of interest in the image. In this case, select the no visible structure option.",
-            image: "/assets/Docs/Satellites/JovianVortexHunter/Step6.png"
+            image: "/assets/Docs/Satellites/JovianVortexHunter/Step6.webp"
         },
         {
             title: "Multiple Classifications",
             text: "Don't forget that you can select multiple options. Now, let's get started!",
-            image: "/assets/Docs/Satellites/JovianVortexHunter/Step7.png"
+            image: "/assets/Docs/Satellites/JovianVortexHunter/Step7.webp"
         }
     ]);
 

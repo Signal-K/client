@@ -8,7 +8,7 @@ vi.mock("@/src/components/ui/button", () => ({
   ),
 }));
 
-vi.mock("@/src/shared/utils", () => ({
+vi.mock("@/src/lib/utils", () => ({
   cn: (...args: any[]) => args.filter(Boolean).join(" "),
 }));
 

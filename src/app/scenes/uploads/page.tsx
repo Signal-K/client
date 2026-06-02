@@ -5,7 +5,7 @@ import { useSession } from "@/src/lib/auth/session-context";
 import Link from "next/link";
 import MainHeader from "@/src/components/layout/Header/MainHeader";
 import { TelescopeBackground } from "@/src/components/classification/telescope/telescope-background";
-import UseDarkMode from "@/src/shared/hooks/useDarkMode";
+import UseDarkMode from "@/src/hooks/useDarkMode";
 
 const BiodomeStructureBase = () => {
   const session = useSession();

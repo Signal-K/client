@@ -1,24 +1,25 @@
 {
   "$schema": "https://unpkg.com/knip@latest/schema.json",
   "ignore": [
-    "public/assets/Items/sw.js",
     "public/fallback-*.js",
     "public/service-worker.js",
-    "public/sw.js",
-    "public/workbox-*.js"
+    "public/assets/Items/sw.js",
+    "scripts/sync-posthog-surveys.ts"
   ],
   "ignoreDependencies": [
     "d3",
     "markerjs2",
     "posthog-node",
-    "eslint",
-    "eslint-config-next",
     "start-server-and-test"
   ],
   "ignoreBinaries": [
     "pip3",
     "python3",
     "scripts/tests/run-local-suite.sh",
+    "scripts/tests/with-local-supabase-env.sh",
+    "scripts/tests/run-e2e-frontend-persistence.sh",
+    "scripts/tests/run-docker-suite.sh",
+    "scripts/check-ssr-data-boundaries.sh",
     "docker-compose"
   ]
 }

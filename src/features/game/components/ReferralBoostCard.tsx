@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { usePostHog } from "posthog-js/react";
 import { Share2, Copy, Check, Sparkles } from "lucide-react";
-import { cn } from "@/src/shared/utils";
+import { cn } from "@/src/lib/utils";
 import { captureCrossGameNavigation } from "@/src/features/analytics/cross-game-navigation";
 import { getReferralProgress } from "@/src/features/referrals/referral-progress";
 import { buildClientReferralUrl, buildReferralShareText, getSailyUrl } from "@/src/features/referrals/referral-links";

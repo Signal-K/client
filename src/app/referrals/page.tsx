@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import MainHeader from "@/src/components/layout/Header/MainHeader";
-import UseDarkMode from "@/src/shared/hooks/useDarkMode";
+import UseDarkMode from "@/src/hooks/useDarkMode";
 import { TelescopeBackground } from "@/src/components/classification/telescope/telescope-background";
 import { useSessionContext } from "@/src/lib/auth/session-context";
 import ReferralBoostCard from "@/src/features/game/components/ReferralBoostCard";

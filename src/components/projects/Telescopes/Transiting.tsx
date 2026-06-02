@@ -137,8 +137,8 @@ const FirstTelescopeClassification: React.FC<TelescopeProps> = ({ anomalyid, onT
 
   const tutorialSlides = [
     { title: "System Overview", text: "Process starlight data to identify planetary candidates.", image: "/assets/Template.png" },
-    { title: "Data Analysis", text: "Analyze lightcurves for recurring transit signatures.", image: "/assets/Docs/Curves/Step2.png" },
-    { title: "Submission", text: "Finalize classification to transmit data to the hub.", image: "/assets/Docs/Curves/Step4.png" },
+    { title: "Data Analysis", text: "Analyze lightcurves for recurring transit signatures.", image: "/assets/Docs/Curves/Step2.webp" },
+    { title: "Submission", text: "Finalize classification to transmit data to the hub.", image: "/assets/Docs/Curves/Step4.webp" },
   ];
 
   return (

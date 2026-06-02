@@ -1,12 +1,34 @@
 describe('Average User Journey', () => {
+  let createdUserId = "";
+  const password = "testpassword123";
+  const returningUserPreferences = {
+    projectInterests: ["planet-hunting", "solar-monitoring"],
+    hasCompletedOnboarding: true,
+    hasSeenStructureGuide: true,
+    hasSeenDeploymentTutorial: true,
+    hasSeenMineralGuide: true,
+    completedTutorials: {
+      "init-seen": true,
+      "telescope-deploy": true,
+      "satellite-deploy": true,
+      "rover-deploy": true,
+      "solar-deploy": true,
+    },
+    structureOrder: ["telescope", "satellite", "rover", "solar"],
+    telescopeFocus: null,
+    lastPreferencesAsked: new Date().toISOString(),
+    deviceId: "cypress-average-user",
+  };
+
   beforeEach(() => {
-    // Mock successful auth
-    cy.intercept('GET', '/api/auth/session', {
-      statusCode: 200,
-      body: {
-        user: { id: 'test-user-avg', email: 'avg@user.com' },
-      },
-    }).as('getSession');
+    const email = `avg-${Date.now()}@testing.com`;
+
+    cy.task("createSupabaseTestUser", { email, password }).then((user: any) => {
+      createdUserId = String(user.id);
+      expect(createdUserId).to.not.equal("");
+    });
+
+    cy.login(email, password);
 
     // Mock profile
     cy.intercept('GET', '/api/gameplay/profile/me', {
@@ -18,7 +40,7 @@ describe('Average User Journey', () => {
     }).as('getProfile');
 
     // Mock initial game data
-    cy.intercept('POST', '/api/gameplay/page-data', (req) => {
+    cy.intercept('GET', '/api/gameplay/page-data', (req) => {
         req.reply({
             statusCode: 200,
             body: {
@@ -26,39 +48,66 @@ describe('Average User Journey', () => {
                 classifications: [],
                 linkedAnomalies: [],
                 activityFeed: [],
-                visibleStructures: { telescope: true, satellites: false, rovers: false, solar: true }
+                otherClassifications: [],
+                visibleStructures: { telescope: true, satellites: false, rovers: false, balloons: true },
+                hubLeaderboard: { entries: [], currentUser: null },
+                referralCode: null,
+                referralCount: 0,
+                hasReferral: false,
+                hasRoverMineralDeposits: false,
+                incompletePlanet: null,
+                planetTargets: [],
             }
         })
     }).as('getPageData');
   });
 
+  afterEach(() => {
+    if (!createdUserId) return;
+    cy.task("cleanupSupabaseTestUser", { userId: createdUserId });
+    createdUserId = "";
+  });
+
   it('can navigate the station, deploy structures, and understand the loop', () => {
-    cy.visit('/game');
+    const visitGameAsReturningUser = () => {
+      cy.visit('/game', {
+        onBeforeLoad(win) {
+          win.localStorage.setItem("star-sailors-device-id", returningUserPreferences.deviceId);
+          win.localStorage.setItem("star-sailors-preferences", JSON.stringify(returningUserPreferences));
+        },
+      });
+    };
+
+    visitGameAsReturningUser();
+    cy.wait('@getPageData');
 
     // 1. Verify "Home" (Base) state
     cy.contains('Sector Radar').should('be.visible');
     cy.contains('Station Systems').should('be.visible');
 
     // 2. Navigate to Telescope
-    cy.contains('Telescope').click();
+    cy.contains('[role="button"]', 'Telescope').click();
     cy.url().should('include', 'view=telescope');
-    cy.contains('Telescope Control').should('be.visible');
+    cy.contains('Telescope Array').should('be.visible');
 
     // 3. Simulate "Understanding" -> Check for help/context
     // Assuming there's some help text or clear CTA
     cy.contains('Deploy').should('exist'); // Button to deploy
 
     // 4. Return to Base
-    cy.get('button[aria-label="Close viewport"]').click(); // Or however close is implemented
+    cy.get('button[aria-label="Return to mission control"]').click();
     cy.url().should('not.include', 'view=telescope');
+    visitGameAsReturningUser();
+    cy.wait('@getPageData');
+    cy.contains('Station Systems').should('be.visible');
 
     // 5. Check another system (Solar)
-    cy.contains('Solar Array').click();
+    cy.contains('[role="button"]', 'Solar Array').scrollIntoView().should('be.visible').click();
     cy.url().should('include', 'view=solar');
-    cy.contains('Solar Output').should('exist'); // Hypothetical text
+    cy.contains('Solar Watch').should('exist');
 
     // 6. Return (Retention Loop check - user comes back)
-    cy.visit('/game'); // Simulate refresh/return
+    visitGameAsReturningUser();
     cy.contains('Sector Radar').should('be.visible');
   });
 });

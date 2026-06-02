@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { usePostHog } from "posthog-js/react";
 import { Button } from "@/src/components/ui/button";
-import { getReferralPanelDataAction } from "./actions";
+import { getReferralPanelDataAction } from "@/src/app/actions/profile-actions";
 import { Check, Copy, Share2, Sparkles } from "lucide-react";
 import { captureCrossGameNavigation } from "@/src/features/analytics/cross-game-navigation";
 import { getReferralProgress, REFERRAL_TIERS } from "@/src/features/referrals/referral-progress";

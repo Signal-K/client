@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { Gauge, Send, X } from "lucide-react";
-import { cn } from "@/src/shared/utils";
+import { cn } from "@/src/lib/utils";
 import type { MechanicMicroSurvey } from "@/src/features/surveys/types";
 
 type MechanicPulseSurveyProps = {

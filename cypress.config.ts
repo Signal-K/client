@@ -1,7 +1,6 @@
 import { defineConfig } from 'cypress'
 import dotenv from 'dotenv'
 import { execSync } from 'node:child_process'
-// import codeCoverageTask from '@cypress/code-coverage/task'
 
 dotenv.config({ path: '.env.local' })
 dotenv.config()
@@ -398,9 +397,6 @@ export default defineConfig({
                     return fallbackRows
                 },
             })
-
-            // Code coverage plugin disabled - @cypress/code-coverage is incompatible with Cypress 14
-            // (Cypress.expose is not a function)
 
             return config
         },

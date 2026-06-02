@@ -4,7 +4,7 @@ import React, { useEffect, useState, use } from "react";
 import PostCard from "@/src/components/social/posts/TestPostCard";
 import StructuresOnPlanet from "@/src/components/deployment/structures/Structures";
 import MainHeader from "@/src/components/layout/Header/MainHeader";
-import UseDarkMode from "@/src/shared/hooks/useDarkMode";
+import UseDarkMode from "@/src/hooks/useDarkMode";
 import { TelescopeBackground } from "@/src/components/classification/telescope/telescope-background";
 
 interface Classification {

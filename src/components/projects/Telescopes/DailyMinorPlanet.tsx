@@ -40,22 +40,22 @@ export function StarterDailyMinorPlanet({
         {
             title: "Asteroid Hunters",
             text: "Asteroid Hunters:  In this project, you will be identifying minor planet candidates, like asteroids, around your local star.",
-            image: "/assets/Docs/Telescopes/DailyMinorPlanet/Step1.png"
+            image: "/assets/Docs/Telescopes/DailyMinorPlanet/Step1.webp"
         },
         {
             title: "Finding Moving Objects",
             text: "We use the apparent movement of asteroids from image to image to find them, so if you don't see movement, click through the different images to see if the circled object moves",
-            image: "/assets/Docs/Telescopes/DailyMinorPlanet/Step2.png"
+            image: "/assets/Docs/Telescopes/DailyMinorPlanet/Step2.webp"
         },
         {
             title: "Identify the Detection",
             text: "Find the green circle in the subject clip. Within the green circle is one object (light spot) that moves from frame to frame. We call this light spot inside the green circle a detection.",
-            image: "/assets/Docs/Telescopes/DailyMinorPlanet/Step3.png"
+            image: "/assets/Docs/Telescopes/DailyMinorPlanet/Step3.webp"
         },
         {
             title: "Ready to Explore",
             text: "That's it! Get ready to explore the skies. Click 'Continue' to start classifying.",
-            image: "/assets/Docs/Telescopes/DailyMinorPlanet/Step4.png"
+            image: "/assets/Docs/Telescopes/DailyMinorPlanet/Step4.webp"
         }
     ];
 
@@ -283,22 +283,22 @@ const FirstMinorPlanetClassification: React.FC<MinorPlanetProps> = ({ anomalyid 
         {
             title: "Asteroid Hunters",
             text: "Asteroid Hunters:  In this project, you will be identifying minor planet candidates, like asteroids, around your local star.",
-            image: "/assets/Docs/Telescopes/DailyMinorPlanet/Step1.png"
+            image: "/assets/Docs/Telescopes/DailyMinorPlanet/Step1.webp"
         },
         {
             title: "Finding Moving Objects",
             text: "We use the apparent movement of asteroids from image to image to find them, so if you don't see movement, click through the different images to see if the circled object moves",
-            image: "/assets/Docs/Telescopes/DailyMinorPlanet/Step2.png"
+            image: "/assets/Docs/Telescopes/DailyMinorPlanet/Step2.webp"
         },
         {
             title: "Identify the Detection",
             text: "Find the green circle in the subject clip. Within the green circle is one object (light spot) that moves from frame to frame. We call this light spot inside the green circle a detection.",
-            image: "/assets/Docs/Telescopes/DailyMinorPlanet/Step3.png"
+            image: "/assets/Docs/Telescopes/DailyMinorPlanet/Step3.webp"
         },
         {
             title: "Ready to Explore",
             text: "That's it! Get ready to explore the skies. Click 'Continue' to start classifying.",
-            image: "/assets/Docs/Telescopes/DailyMinorPlanet/Step4.png"
+            image: "/assets/Docs/Telescopes/DailyMinorPlanet/Step4.webp"
         }
     ];
 

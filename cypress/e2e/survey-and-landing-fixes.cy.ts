@@ -29,11 +29,11 @@ describe("Landing page & survey UX fixes", () => {
 
     // The button text is "Launch →" and should be visible without any interaction
     cy.get("header").within(() => {
-      cy.contains("Launch").should("be.visible");
+      cy.get('a[href="/auth"]').filter(":visible").contains(/^Launch/).should("be.visible");
     });
 
     // Confirm it links to /auth
-    cy.get("header a").contains("Launch").should("have.attr", "href", "/auth");
+    cy.get('header a[href="/auth"]').filter(":visible").contains(/^Launch/).should("have.attr", "href", "/auth");
   });
 
   // ── 3. Unauthenticated users can see the landing page ────────────────────

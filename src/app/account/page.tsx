@@ -4,7 +4,7 @@ import ProfileSetupForm from "@/src/components/profile/setup/ProfileSetup";
 import { useState } from "react";
 import MainHeader from "@/src/components/layout/Header/MainHeader";
 import { TelescopeBackground } from "@/src/components/classification/telescope/telescope-background";
-import UseDarkMode from "@/src/shared/hooks/useDarkMode";
+import UseDarkMode from "@/src/hooks/useDarkMode";
 
 export default function AccountPage() {
   const [, setRefresh] = useState(false);

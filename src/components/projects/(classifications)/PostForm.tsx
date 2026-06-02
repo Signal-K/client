@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useSession } from "@/src/lib/auth/session-context";
-import { useActivePlanet } from "@/src/core/context/ActivePlanet";
+import { useActivePlanet } from "@/src/lib/context/ActivePlanet";
 
 import {
   zoodexSouthCoastFaunaRecovery,
@@ -392,7 +392,7 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({
         setSelectedOptions({});
         setUploads([]);
         setPostSubmitted(true);
-        router.push(`/next/${newClassificationId}`);
+        router.push(`/classify/${newClassificationId}`);
       };
 
       // await handleMissionComplete();

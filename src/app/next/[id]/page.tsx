@@ -1,14 +1,6 @@
-import ClientClassificationPage from "@/src/components/projects/(classifications)/NextScene";
+import { redirect } from "next/navigation";
 
-type Props = {
-  params: Promise<{ id: string }>;
-};
-
-export default async function Page(props: Props) {
-  const params = await props.params;
-  const { id } = params;
-
-  if (!id) return null; // or trigger notFound();
-
-  return <ClientClassificationPage id={id} />;
-};
+export default async function LegacyClassifyPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  redirect(`/classify/${id}`);
+}

@@ -1,7 +1,7 @@
 import React, { useEffect, useState, type ChangeEvent } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { getCurrentProfileAction, updateProfileSetupAction } from "./actions";
+import { getCurrentProfileAction, updateProfileSetupAction } from "@/src/app/actions/profile-actions";
 
 interface ProfileSetupFormProps {
   onProfileUpdate: () => void | null;

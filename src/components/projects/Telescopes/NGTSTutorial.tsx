@@ -19,7 +19,7 @@ const NGTSTutorial: React.FC<NGTSTutorialProps> = ({ onClose }) => {
     {
       title: "Understanding Transit Plots",
       text: "NGTS data shows how a star's brightness changes over time. When a planet passes in front of its star (a transit), we see a dip in the light curve.",
-      image: "/assets/Docs/Curves/Step2.png"
+      image: "/assets/Docs/Curves/Step2.webp"
     },
     {
       title: "The Odd Even Transit Check",
@@ -29,17 +29,17 @@ const NGTSTutorial: React.FC<NGTSTutorialProps> = ({ onClose }) => {
     {
       title: "What to Look For",
       text: "Question: 'Do both the green and magenta points cover most of the middle portion of the plot?' If YES, the odd and even transits align well - this is good! If NO, they don't align - this might indicate a false positive or binary star system.",
-      image: "/assets/Docs/Curves/Step1.png"
+      image: "/assets/Docs/Curves/Step1.webp"
     },
     {
       title: "Drawing the Transit Shape",
       text: "After answering the Odd Even Transit Check question, you'll draw the shape of the main transit curve. This helps us understand the transit depth and shape, which reveals information about the planet's size.",
-      image: "/assets/Docs/Curves/Step3.png"
+      image: "/assets/Docs/Curves/Step3.webp"
     },
     {
       title: "Tips for Success",
       text: "Look for: (1) Clear alignment between green and magenta points in the middle, (2) Smooth, U-shaped or V-shaped dips, (3) Consistent transit depth. Be wary of: scattered points, asymmetric shapes, or large differences between odd/even transits.",
-      image: "/assets/Docs/Curves/Step4.png"
+      image: "/assets/Docs/Curves/Step4.webp"
     }
   ];
 

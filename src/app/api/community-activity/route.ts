@@ -20,7 +20,7 @@ export async function GET() {
 
     return NextResponse.json(
       rows.map((r) => ({
-        id: r.id,
+        id: Number(r.id),
         author: r.author?.slice(0, 8) ?? "user",
         type: r.classificationtype,
         at: r.createdAt.toISOString(),

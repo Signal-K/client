@@ -1,4 +1,4 @@
-import { AI4MCategory } from "@/types/Annotation";
+import { AI4MCategory } from "@/src/types/Annotation";
 
 type MineralType = 'iron-ore' | 'cultivable-soil' | 'gold' | 'aluminum' | 'water-ice' | 'silicate' | 'copper';
 

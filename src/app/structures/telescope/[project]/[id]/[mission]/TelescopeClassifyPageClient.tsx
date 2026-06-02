@@ -16,7 +16,7 @@ import { TelescopeBackground } from "@/src/components/classification/telescope/t
 import { DiskDetectorTutorial } from "@/src/components/projects/Telescopes/DiskDetector"
 import { SuperWASPTutorial } from "@/src/components/projects/Telescopes/SuperWASP"
 import { ActiveAsteroidWithId, ActiveAsteroidClassifyWithId } from "@/src/components/projects/Telescopes/ActiveAsteroids"
-import UseDarkMode from "@/src/shared/hooks/useDarkMode"
+import UseDarkMode from "@/src/hooks/useDarkMode"
 
 export default function TelescopeClassifyPage() {
   const params = useParams()

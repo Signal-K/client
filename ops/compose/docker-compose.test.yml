@@ -12,6 +12,7 @@ services:
     environment:
       - NODE_ENV=test
       - SKIP_USER_CREATION_TESTS=true
+      - E2E_TEST_AUTH_ENABLED=true
       - DATABASE_URL=${DATABASE_URL:-postgresql://postgres:postgres@host.docker.internal:54322/postgres}
       - SUPABASE_URL=${SUPABASE_URL:-http://host.docker.internal:54321}
       - NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL:-http://host.docker.internal:54321}
@@ -45,6 +46,7 @@ services:
       - NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY:-}
       - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY:-}
       - SUPABASE_SECRET_KEY=${SUPABASE_SECRET_KEY:-}
+      - CYPRESS_SPEC=${CYPRESS_SPEC:-}
     volumes:
       - ../../:/app
       - /app/node_modules
@@ -68,7 +70,9 @@ services:
     environment:
       - NODE_ENV=test
       - SKIP_USER_CREATION_TESTS=true
-      - CYPRESS_baseUrl=http://nextapp-test:3000
+      - E2E_TEST_AUTH_ENABLED=true
+      - CYPRESS_baseUrl=http://127.0.0.1:3000
+      - CYPRESS_SPEC=${CYPRESS_SPEC:-}
       - DISPLAY=:99
       - DATABASE_URL=${DATABASE_URL:-postgresql://postgres:postgres@host.docker.internal:54322/postgres}
       - SUPABASE_URL=${SUPABASE_URL:-http://host.docker.internal:54321}
@@ -94,7 +98,11 @@ services:
         echo 'Waiting for app to be ready...' &&
         sleep 10 &&
         echo 'Running E2E tests...' &&
-        yarn test:e2e:headless
+        if [ -n \"$$CYPRESS_SPEC\" ]; then
+          SKIP_USER_CREATION_TESTS=true scripts/tests/with-local-supabase-env.sh npx start-server-and-test 'yarn test:e2e:server' http://127.0.0.1:3000/auth \"scripts/tests/run-cypress.sh --headless --spec $$CYPRESS_SPEC\";
+        else
+          yarn test:e2e:headless;
+        fi
       "
     profiles:
       - e2e
@@ -110,7 +118,8 @@ services:
     environment:
       - NODE_ENV=test
       - SKIP_USER_CREATION_TESTS=false
-      - CYPRESS_baseUrl=http://nextapp-test:3000
+      - E2E_TEST_AUTH_ENABLED=true
+      - CYPRESS_baseUrl=http://127.0.0.1:3000
       - DISPLAY=:99
       - DATABASE_URL=${DATABASE_URL:-postgresql://postgres:postgres@host.docker.internal:54322/postgres}
       - SUPABASE_URL=${SUPABASE_URL:-http://host.docker.internal:54321}
@@ -152,7 +161,8 @@ services:
     environment:
       - NODE_ENV=test
       - SKIP_USER_CREATION_TESTS=true
-      - CYPRESS_baseUrl=http://nextapp-test:3000
+      - E2E_TEST_AUTH_ENABLED=true
+      - CYPRESS_baseUrl=http://127.0.0.1:3000
       - DATABASE_URL=${DATABASE_URL:-postgresql://postgres:postgres@host.docker.internal:54322/postgres}
       - SUPABASE_URL=${SUPABASE_URL:-http://host.docker.internal:54321}
       - NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL:-http://host.docker.internal:54321}
