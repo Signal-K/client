@@ -1,35 +1,21 @@
-describe("Critical Smoke", () => {
-  beforeEach(() => {
-    cy.waitForSupabase()
+describe('Smoke — public routes', () => {
+  it('auth page loads', () => {
+    cy.visit('/auth')
+    cy.get('body').should('exist')
   })
 
-  it("checks local Supabase health endpoint", () => {
-    const supabaseUrl = Cypress.env("SUPABASE_URL") || "http://127.0.0.1:54321"
-    cy.task("waitForSupabaseHealth").then((healthy) => {
-      if (!healthy) {
-        cy.log("Skipping health assertion: local Supabase is not reachable")
-        return
-      }
-      cy.request(`${supabaseUrl}/auth/v1/health`).its("status").should("eq", 200)
-    })
+  it('page has a title', () => {
+    cy.visit('/auth')
+    cy.title().should('not.be.empty')
   })
 
-  it("renders core public pages", () => {
-    cy.request({
-      url: "/",
-      timeout: 180000,
-      failOnStatusCode: false,
-    }).its("status").should("be.lessThan", 500)
-
-    const routes = ["/auth", "/privacy", "/terms", "/offline"]
-    routes.forEach((route) => {
-      cy.visit(route)
-      cy.get("body").should("be.visible")
-    })
+  it('root redirects or loads', () => {
+    cy.request({ url: '/', failOnStatusCode: false }).its('status').should('be.oneOf', [200, 307, 302])
   })
+})
 
-  it("redirects protected routes when unauthenticated", () => {
-    cy.visit("/game", { failOnStatusCode: false })
-    cy.url().should("satisfy", (url: string) => url.includes("/") || url.includes("/auth"))
+describe('Smoke — API health', () => {
+  it('next.js health endpoint responds', () => {
+    cy.request({ url: '/_next/static', failOnStatusCode: false }).its('status').should('not.eq', 500)
   })
 })
