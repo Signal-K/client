@@ -1,5 +1,5 @@
 import SatellitePosition from "@/src/components/scenes/deploy/satellite/SatellitePosition";
-import { usePageData } from "@/hooks/usePageData";
+import { usePageData } from "@/src/hooks/usePageData";
 
 type PageSatellite = {
   id: string;

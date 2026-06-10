@@ -1,5 +1,5 @@
 import InventoryViewport from "@/src/components/classification/tools/inventory-viewport";
-import { usePageData } from "@/hooks/usePageData";
+import { usePageData } from "@/src/hooks/usePageData";
 
 export default function InventoryTab() {
   const { hasRoverMineralDeposits } = usePageData();
