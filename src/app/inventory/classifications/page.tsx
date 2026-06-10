@@ -10,10 +10,12 @@ import { ClassificationTypeIcon } from "@/src/components/classification/Classifi
 import { AnnotationOptionLabel } from "@/src/components/classification/AnnotationOptionLabel";
 import ActivityHeaderSection from "@/src/components/social/activity/ActivityHeaderSection";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function UserClassificationsInventoryPage() {
   const session = useSession();
 
+  const router = useRouter();
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [landmarksExpanded, setLandmarksExpanded] = useState(false);
   const [showTipsPanel, setShowTipsPanel] = useState(false);
@@ -79,8 +81,6 @@ export default function UserClassificationsInventoryPage() {
             {/* You may need to import ActivityHeaderSection if not already */}
             <ActivityHeaderSection
               classificationsCount={classifications.length}
-              landmarksExpanded={landmarksExpanded}
-              onToggleLandmarks={() => setLandmarksExpanded((prev) => !prev)}
             />
           </div>
           <main className="w-full flex flex-col gap-0">
@@ -127,6 +127,7 @@ export default function UserClassificationsInventoryPage() {
                               <button
                                 className="px-3 py-1 rounded bg-muted text-foreground text-xs font-mono border border-border hover:bg-muted/80 transition"
                                 type="button"
+                                onClick={() => router.push(`/posts/${c.id}`)}
                               >
                                 Inspect
                               </button>

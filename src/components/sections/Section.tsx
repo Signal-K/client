@@ -1,9 +1,8 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import clsx from "clsx";
-
-// Optionally import your backgrounds here
-// import { TelescopeBackground } from "@/src/components/backgrounds/TelescopeBackground";
+import { TelescopeBackground } from "@/src/components/classification/telescope/telescope-background";
+import { RoverBackground } from "@/src/components/classification/telescope/rover-background";
 
 interface SectionProps {
   variant?: "viewport" | "default" | "highlight" | "minimal";
@@ -46,9 +45,6 @@ const Section: React.FC<SectionProps> = ({
     </svg>
   );
   const [showInfo, setShowInfo] = useState(false);
-  // Use TelescopeBackground or RoverBackground for viewport variant
-  const TelescopeBackground = require("@/src/components/classification/telescope/telescope-background").TelescopeBackground;
-  const RoverBackground = require("@/src/components/classification/telescope/rover-background").RoverBackground;
   const renderBackground = () => {
     if (variant === "minimal") return null;
     if (variant === "viewport" && backgroundType !== "none") {
@@ -61,7 +57,7 @@ const Section: React.FC<SectionProps> = ({
       }
       return (
         <div className="absolute inset-0 z-0 w-full h-full">
-          <TelescopeBackground variant={backgroundType} />
+          <TelescopeBackground variant={backgroundType as any} />
         </div>
       );
     }

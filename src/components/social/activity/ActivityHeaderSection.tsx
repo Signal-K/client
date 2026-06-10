@@ -7,14 +7,10 @@ import { Trophy } from "lucide-react";
 
 interface ActivityHeaderSectionProps {
   classificationsCount: number;
-  landmarksExpanded: boolean;
-  onToggleLandmarks: () => void;
 }
 
 export default function ActivityHeaderSection({
   classificationsCount,
-  landmarksExpanded,
-  onToggleLandmarks,
 }: ActivityHeaderSectionProps) {
   const [showAchievementsModal, setShowAchievementsModal] = useState<boolean>(false);
 
@@ -31,11 +27,7 @@ export default function ActivityHeaderSection({
         </button>
       </div>
 
-      <ActivityHeader
-        scrolled={true}
-        landmarksExpanded={landmarksExpanded}
-        onToggleLandmarks={onToggleLandmarks}
-      />
+      <ActivityHeader />
       <p className="text-lg pt-3">Star Sailors Network</p>
 
       {/* Achievements Modal */}

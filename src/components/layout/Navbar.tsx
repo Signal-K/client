@@ -25,12 +25,7 @@ export default function Navbar() {
   const [isTerrariumOpen, setIsTerrariumOpen] = useState(false);
   const [hasNewAlert, setHasNewAlert] = useState(false);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setHasNewAlert((prev) => !prev);
-    }, 30000);
-    return () => clearInterval(interval);
-  }, []);
+
 
   const signOut = async () => {
     // Clear all browser storage before signing out

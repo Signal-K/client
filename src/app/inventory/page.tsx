@@ -177,8 +177,6 @@ export default function UserInventoryPage() {
         <div className="mb-6">
             <ActivityHeaderSection
                 classificationsCount={classifications.length}
-                landmarksExpanded={landmarksExpanded}
-                onToggleLandmarks={() => setLandmarksExpanded((prev) => !prev)}
             />
         </div>
 

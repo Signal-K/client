@@ -210,8 +210,6 @@ function ResearchPageContent() {
           <div className="mb-8">
             <ActivityHeaderSection
               classificationsCount={0}
-              landmarksExpanded={false}
-              onToggleLandmarks={() => {}}
             />
           </div>
           <main className="w-full flex flex-col gap-6">

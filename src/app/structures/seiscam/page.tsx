@@ -15,7 +15,7 @@ export default function SeiscamOnEarthPage() {
 
   return (
     <ViewportShell>
-      <div className="pt-20 flex flex-row space-y-4">
+      <div className="pt-20 flex flex-row">
         <Dialog defaultOpen onOpenChange={(open) => { if (!open) router.push("/") }}>
           <DialogContent
             className="p-6 rounded-3xl text-white max-w-3xl w-full h-[80vh] overflow-hidden flex flex-col justify-start"

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useSession } from "@/src/lib/auth/session-context";
 import { Button } from "@/src/components/ui/button";
 import { Canvas } from "@react-three/fiber";
@@ -126,9 +126,12 @@ export default function SolarHealth() {
   const solarActivity = sunspotAnomalies.length > 0 ? "Active" : "Normal";
   const sunspotForming = sunspotAnomalies.length > 0;
   const sunspotCount = sunspotAnomalies.length;
-  const nextFlare = sunspotForming
-    ? `${Math.floor(Math.random() * 3) + 1} days`
-    : "N/A";
+  const nextFlare = useMemo(
+    () => sunspotForming
+      ? `${Math.floor(Math.random() * 3) + 1} days`
+      : "N/A",
+    [sunspotForming]
+  );
 
   return (
     <Section

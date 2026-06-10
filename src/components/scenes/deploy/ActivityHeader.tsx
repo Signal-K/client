@@ -230,9 +230,6 @@ function TelemetryLine({ label, value, color }: { label: string; value: string; 
 export default function ActivityHeader({
   location,
 }: {
-  landmarksExpanded: boolean;
-  onToggleLandmarks: () => void;
-  scrolled: boolean;
   location?: string;
 }) {
   const session = useSession();
