@@ -120,7 +120,7 @@ function ResearchPageContent() {
 
   useEffect(() => {
     if (authenticated === false) {
-      router.replace("/auth");
+      router.replace("/auth?next=/research");
     }
   }, [authenticated, router]);
 
@@ -208,9 +208,7 @@ function ResearchPageContent() {
         <div className="w-full max-w-4xl px-6 md:px-8 lg:px-12 xl:px-0">
           {/* Activity Header from main page */}
           <div className="mb-8">
-            <ActivityHeaderSection
-              classificationsCount={0}
-            />
+            <ActivityHeaderSection />
           </div>
           <main className="w-full flex flex-col gap-6">
             {/* Main Research Panel - Compact Layout */}

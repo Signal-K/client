@@ -4,8 +4,8 @@ import React, { useEffect, useState } from "react";
 import { useSession } from "@/src/lib/auth/session-context";
 import MainHeader from "@/src/components/layout/Header/MainHeader";
 import UseDarkMode from "@/src/hooks/useDarkMode";
-import { usePageData } from "@/hooks/usePageData";
-import { groupClassifications } from "@/hooks/useGroupedClassifications";
+import { usePageData } from "@/src/hooks/usePageData";
+import { groupClassifications } from "@/src/hooks/useGroupedClassifications";
 import { ClassificationTypeIcon } from "@/src/components/classification/ClassificationTypeIcon";
 import { AnnotationOptionLabel } from "@/src/components/classification/AnnotationOptionLabel";
 import ActivityHeaderSection from "@/src/components/social/activity/ActivityHeaderSection";
@@ -79,9 +79,7 @@ export default function UserClassificationsInventoryPage() {
           <div className="mb-10">
             {/* Use the same ActivityHeaderSection as research page */}
             {/* You may need to import ActivityHeaderSection if not already */}
-            <ActivityHeaderSection
-              classificationsCount={classifications.length}
-            />
+            <ActivityHeaderSection />
           </div>
           <main className="w-full flex flex-col gap-0">
             <div className="w-full flex flex-col gap-0">
@@ -124,13 +122,12 @@ export default function UserClassificationsInventoryPage() {
                               >
                                 View
                               </a>
-                              <button
+                              <Link
+                                href={`/posts/${c.id}`}
                                 className="px-3 py-1 rounded bg-muted text-foreground text-xs font-mono border border-border hover:bg-muted/80 transition"
-                                type="button"
-                                onClick={() => router.push(`/posts/${c.id}`)}
                               >
                                 Inspect
-                              </button>
+                              </Link>
                               {type === "planet" && (
                                 <a
                                   href={`/planets/paint/${c.id}`}

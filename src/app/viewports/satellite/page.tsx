@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { usePageData } from "@/hooks/usePageData";
+import { usePageData } from "@/src/hooks/usePageData";
 import ViewportShell from "@/src/components/layout/ViewportShell";
 
 const SatellitePosition = dynamic(

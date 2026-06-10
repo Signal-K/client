@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import MainHeader from "@/src/components/layout/Header/MainHeader";
 import UseDarkMode from "@/src/hooks/useDarkMode";
-import { usePageData } from "@/hooks/usePageData";
+import { usePageData } from "@/src/hooks/usePageData";
 import { useSession } from "@/src/lib/auth/session-context";
 import { useRouter } from "next/navigation";
 import ActivityHeaderSection from "@/src/components/social/activity/ActivityHeaderSection";
@@ -175,9 +175,7 @@ export default function UserInventoryPage() {
       {/* Main Content */}
       <div className="w-full h-full pt-24 relative z-10 px-4 md:px-8 max-w-7xl flex flex-col">
         <div className="mb-6">
-            <ActivityHeaderSection
-                classificationsCount={classifications.length}
-            />
+            <ActivityHeaderSection />
         </div>
 
         <main className="flex-1 flex flex-col gap-4 min-h-0">

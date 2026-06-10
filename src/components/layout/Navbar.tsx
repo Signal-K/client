@@ -8,7 +8,7 @@ import Link from "next/link";
 import { useActivePlanet } from "@/src/lib/context/ActivePlanet";
 import MilestoneCard from "../deployment/missions/structures/Milestones/MilestoneCard";
 import JournalPage from "../deployment/missions/structures/Stardust/Journal";
-import { BellDotIcon, TrophyIcon } from "lucide-react";
+import { TrophyIcon } from "lucide-react";
 import MySettlementsLocations from "@/src/components/classification/UserLocations";
 import { useAuthUser } from "@/src/hooks/useAuthUser";
 
@@ -20,10 +20,8 @@ export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [settlementsOpen, setSettlementsOpen] = useState(false);
   const [milestonesOpen, setMilestonesOpen] = useState(false);
-  const [alertsOpen, setAlertsOpen] = useState(false);
   const [isMilestoneView, setIsMilestoneView] = useState(true);
   const [isTerrariumOpen, setIsTerrariumOpen] = useState(false);
-  const [hasNewAlert, setHasNewAlert] = useState(false);
 
 
 
@@ -156,18 +154,6 @@ export default function Navbar() {
                   <MySettlementsLocations />
                 </div>
               )}
-            </div>
-
-            <div className="relative sm:hidden">
-              <button
-                className={`p-2 rounded-full bg-[#5FCBC3]/60 hover:bg-[#5FCBC3]/80 transition ${hasNewAlert ? "animate-pulse" : ""}`}
-                onClick={() => setAlertsOpen((prev) => !prev)}
-              >
-                <BellDotIcon className="w-6 h-6 text-white" />
-                {hasNewAlert && (
-                  <span className="absolute top-1 right-1 h-2.5 w-2.5 bg-red-500 rounded-full ring-2 ring-white" />
-                )}
-              </button>
             </div>
 
             <div className="relative sm:hidden">

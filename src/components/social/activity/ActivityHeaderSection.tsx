@@ -6,12 +6,10 @@ import { AchievementsModal } from "@/src/components/discovery/achievements/Achie
 import { Trophy } from "lucide-react";
 
 interface ActivityHeaderSectionProps {
-  classificationsCount: number;
+  // No props needed — ActivityHeader manages its own data
 }
 
-export default function ActivityHeaderSection({
-  classificationsCount,
-}: ActivityHeaderSectionProps) {
+export default function ActivityHeaderSection({}: ActivityHeaderSectionProps) {
   const [showAchievementsModal, setShowAchievementsModal] = useState<boolean>(false);
 
   return (

@@ -6,7 +6,7 @@ import { ExtractionScene } from "@/src/components/deployment/extraction/ex-scene
 import { useAuthUser } from "@/src/hooks/useAuthUser"
 import MainHeader from "@/src/components/layout/Header/MainHeader"
 import UseDarkMode from "@/src/hooks/useDarkMode"
-import { usePageData } from "@/hooks/usePageData"
+import { usePageData } from "@/src/hooks/usePageData"
 import { getExtractionDepositAction, completeExtractionAction } from "@/src/app/actions/gameplay";
 
 export default function ExtractionPage() {

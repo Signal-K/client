@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useSession } from "@/src/lib/auth/session-context";
 import { Button } from "@/src/components/ui/button";
 import { Canvas } from "@react-three/fiber";
@@ -35,6 +35,7 @@ export default function SolarHealth() {
   const [participating, setParticipating] = useState(false);
   const [now, setNow] = useState(new Date());
   const [sunspots, setSunspots] = useState<number>(0);
+  const [nextFlare, setNextFlare] = useState("N/A");
   const automatonType = "TelescopeSolar";
 
   // Fetch anomalies and linked anomalies
@@ -126,12 +127,15 @@ export default function SolarHealth() {
   const solarActivity = sunspotAnomalies.length > 0 ? "Active" : "Normal";
   const sunspotForming = sunspotAnomalies.length > 0;
   const sunspotCount = sunspotAnomalies.length;
-  const nextFlare = useMemo(
-    () => sunspotForming
-      ? `${Math.floor(Math.random() * 3) + 1} days`
-      : "N/A",
-    [sunspotForming]
-  );
+
+  // Compute next flare estimate on mount & when sunspotForming changes
+  useEffect(() => {
+    if (sunspotForming) {
+      setNextFlare(`${Math.floor(Math.random() * 3) + 1} days`);
+    } else {
+      setNextFlare("N/A");
+    }
+  }, [sunspotForming]);
 
   return (
     <Section
