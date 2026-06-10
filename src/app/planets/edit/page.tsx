@@ -7,7 +7,7 @@ export default function PlanetsEditIndexPage() {
       <p className="text-sm text-gray-600 mb-4">
         Select a planet to open the editor.
       </p>
-      <Link className="text-blue-600 underline" href="/planets/1">
+      <Link className="text-blue-600 underline" href="/planets/edit/1">
         Open Planet 1
       </Link>
     </main>
