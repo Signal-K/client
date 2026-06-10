@@ -1,7 +1,7 @@
 "use client";
 
 import React, { Suspense, useEffect, useRef, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import ActivityHeaderSection from "@/src/components/social/activity/ActivityHeaderSection";
 import { Button } from "@/src/components/ui/button";
 import CompactResearchPanel from "@/src/features/research/components/CompactResearchPanel";
@@ -9,7 +9,7 @@ import ReferralCodePanel from "@/src/components/profile/setup/Referrals";
 import UseDarkMode from "@/src/hooks/useDarkMode";
 import MainHeader from "@/src/components/layout/Header/MainHeader";
 import { TelescopeBackground } from "@/src/components/classification/telescope/telescope-background";
-import Login from "../auth/page";
+
 import { submitReferralCodeAction } from "@/src/app/actions/profile-actions";
 
 // Small helper component to show how stardust was spent
@@ -67,7 +67,9 @@ function StardustSummary({ textColor }: { textColor: string }) {
 
 function ResearchPageContent() {
   const { isDark, toggleDarkMode } = UseDarkMode();
+  const router = useRouter();
   const searchParams = useSearchParams();
+
   const referralPanelRef = useRef<HTMLDivElement | null>(null);
 
   // Referral related states
@@ -116,6 +118,12 @@ function ResearchPageContent() {
     return () => window.clearTimeout(timer);
   }, [searchParams, userHasReferral]);
 
+  useEffect(() => {
+    if (authenticated === false) {
+      router.replace("/auth");
+    }
+  }, [authenticated, router]);
+
   const handleReferralSubmit = async () => {
     setReferralError(null);
     setReferralSuccess(null);
@@ -162,7 +170,9 @@ function ResearchPageContent() {
 
   if (!authenticated) {
     return (
-      <Login />
+      <div className="min-h-screen w-full bg-black text-white flex items-center justify-center">
+        Redirecting to login...
+      </div>
     );
   };
 
