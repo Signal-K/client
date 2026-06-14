@@ -17,7 +17,11 @@ func main() {
 		os.Exit(1)
 	}
 
-	client := supabase.CreateClient(url, key)
+	client, err := supabase.NewClient(url, key, nil)
+	if err != nil {
+		fmt.Println("Failed to create Supabase client:", err)
+		os.Exit(1)
+	}
 	ctx := context.Background()
 
 	// Only run if it's Sunday 00:00 AEST
@@ -33,10 +37,10 @@ func main() {
 	}
 
 	// Delete all rows in push_anomaly_log
-	res, err := client.From("push_anomaly_log").Delete().Execute(ctx)
+	res, _, err := client.From("push_anomaly_log").Delete("minimal", "").ExecuteWithContext(ctx)
 	if err != nil {
 		fmt.Println("Error deleting push_anomaly_log rows:", err)
 		os.Exit(1)
 	}
-	fmt.Println("Deleted all rows in push_anomaly_log.", res)
+	fmt.Println("Deleted all rows in push_anomaly_log.", string(res))
 }
