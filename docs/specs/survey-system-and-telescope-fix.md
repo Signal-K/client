@@ -4,7 +4,7 @@ description: "Spec and known tickets covering the project engagement survey syst
 category: "spec"
 status: "active"
 created: "2026-03-22"
-updated: "2026-03-22"
+updated: "2026-07-24"
 ---
 
 # Survey System: Project Engagement Surveys & Telescope Viewport Fix
@@ -50,8 +50,8 @@ If the anomaly fetch fails, the route degrades gracefully (returns empty anomali
 
 | ID | Title | Status | Notes |
 |----|-------|--------|-------|
-| TEL-01 | Confirm FK exists on `linked_anomalies.anomaly_id → anomalies.id` | Open | If FK is missing, the join syntax fix is irrelevant — the underlying data integrity issue should be confirmed in Supabase dashboard |
-| TEL-02 | Add FK relationship to `linked_anomalies` Supabase migration | Open | Prerequisite for eventually restoring join syntax if desired |
+| TEL-01 | Confirm FK exists on `linked_anomalies.anomaly_id → anomalies.id` | Obsolete | Moot — the route has since moved off Supabase/Postgres entirely onto Pocketbase (`src/app/api/gameplay/telescope/viewport/route.ts`), which doesn't have this FK-detection failure mode |
+| TEL-02 | Add FK relationship to `linked_anomalies` Supabase migration | Obsolete | Moot for the same reason; the two-query approach below is the permanent Pocketbase implementation, not a workaround pending a join fix |
 | TEL-03 | Add error boundary / user-facing empty state to TelescopeSection | Open | Currently shows "Deploy Telescope" prompt when anomalies fail to load, which may be misleading for deployed users |
 
 ---
@@ -60,7 +60,7 @@ If the anomaly fetch fails, the route degrades gracefully (returns empty anomali
 
 ### Background
 
-Users who contribute significantly to a project should be prompted to express interest in a dedicated standalone minigame for that project (e.g. a planet-hunting sim, asteroid miner, or Mars rover game). Responses are captured in PostHog with the user's Supabase UUID attached so follow-up is possible.
+Users who contribute significantly to a project should be prompted to express interest in a dedicated standalone minigame for that project (e.g. a planet-hunting sim, asteroid miner, or Mars rover game). Responses are captured in PostHog with the user's Clerk user id attached so follow-up is possible.
 
 ### Architecture
 
@@ -96,7 +96,7 @@ posthog.capture("survey sent", {
   $survey_id: "project_engage_planet_hunters_v1",
   $survey_name: "Planet Hunter Alert",
   $survey_response_dedicated_interest: "Yes, sign me up",
-  user_uuid: "f47ac10b-58cc-4372-a567-0e02b2c3d479",  // Supabase UUID
+  user_uuid: "user_2abcXYZ...",  // Clerk user id
 })
 ```
 

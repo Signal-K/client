@@ -51,7 +51,7 @@ services:
     # Override default command for different test types
     command: "yarn test:e2e:headless"
 
-  # Pocketbase - replacing Supabase-hosted Postgres (see .claude/plans/sparkling-cooking-dewdrop.md, Phase 2)
+  # Pocketbase - primary datastore (Supabase/Postgres migration complete)
   pocketbase:
     container_name: pocketbase
     image: ghcr.io/muchobien/pocketbase:latest

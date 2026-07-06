@@ -52,9 +52,9 @@ A local, dockerized Pocketbase instance is running (`ops/compose/compose.yml`,
 service `pocketbase`, mapped to host port 8095 — 8090/8091/8092/8093 were
 already in use by other local projects) with all 23 collections below
 imported. Superuser credentials are in the gitignored
-`pocketbase/.superuser.local.env`. See `.claude/plans/sparkling-cooking-dewdrop.md`
-Phase 2 for the full sequencing (migrate one domain at a time, not a single
-big rewrite).
+`pocketbase/.superuser.local.env`. Domains were migrated one at a time rather
+than as a single big rewrite; see the per-domain sections below for sequencing
+and status.
 
 ## Stale pre-Clerk user ids (found and fixed 2026-07-07/08)
 
@@ -348,9 +348,38 @@ decommissioning that database (dropping the container, revoking credentials,
 etc.) is still a separate decision for whoever owns that infra — this pass
 only removed the *application's* dependency on it.
 
+## Supabase teardown (done, 2026-07-24)
+
+With every domain confirmed on Pocketbase/Clerk and no code path left reading
+Supabase (see "Storage: Supabase Storage → Pocketbase" and "Prisma removed
+from the app" above), the one-off cutover scripts had finished their job and
+were removed along with their dependency:
+
+- Deleted `scripts/migrate-users-supabase-to-clerk.ts`,
+  `scripts/migrate-anonymous-guests-to-clerk.ts`,
+  `scripts/migrate-anonymous-active-users.ts`,
+  `scripts/migrate-data-to-pocketbase.ts`,
+  `scripts/migrate-storage-to-pocketbase.ts`,
+  `scripts/fix-stale-pocketbase-user-ids.ts`, and
+  `scripts/migrate-user-ids-supabase-to-clerk.sql`.
+- Deleted the legacy `supabase/` directory (`config.toml`, `migrations/`).
+- Removed the `@supabase/supabase-js` dependency from `package.json`/`yarn.lock`.
+- Removed the now-unused Supabase/Postgres env vars from `.env.example`.
+
+The Postgres database itself (see "Prisma removed from the app" above) is a
+separate, still-open decision for whoever owns that infra — decommissioning
+it isn't blocked by anything in this repo anymore.
+
+**Known gap**: `.github/workflows/ci.yml`'s `e2e` job still spins up a bare
+`postgres` service and sets `SUPABASE_URL`/`NEXT_PUBLIC_SUPABASE_URL` env vars
+that nothing reads. It was never updated for the Pocketbase/Clerk cutover, so
+it doesn't start a Pocketbase service or provide Clerk test keys the way
+`ops/compose/docker-compose.test.yml` and `scripts/tests/with-local-pocketbase-env.sh`
+do — the e2e job as configured does not actually exercise a working app.
+
 ## Not yet done
 
 - Anomaly creation/authoring (if any admin tooling ever needs it) — the only
   `anomalies` write path (`/api/gameplay/anomalies` POST) has no callers in
-  `src/`; anomalies are treated as reference data seeded once via
-  `scripts/migrate-data-to-pocketbase.ts`, not created at runtime.
+  `src/`; anomalies were reference data seeded once via the (now-removed)
+  data migration script, not created at runtime.
