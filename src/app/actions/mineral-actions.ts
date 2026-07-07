@@ -2,8 +2,9 @@
 
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
-import { prisma } from "@/lib/server/prisma";
 import { getRouteUser } from "@/lib/server/supabaseRoute";
+import { createPocketbaseAdminClient } from "@/lib/pocketbase/adminClient";
+import { mapMineralDepositToRow } from "@/lib/pocketbase/legacyShapes";
 
 const MineralDepositSchema = z.object({
   anomaly: z.number(),
@@ -32,23 +33,26 @@ export async function createMineralDepositAction(payload: CreateMineralDepositIn
       created_at 
     } = MineralDepositSchema.parse(payload);
 
-    const deposit = await prisma.mineralDeposit.create({
-      data: {
-        anomaly,
-        discovery,
-        owner: user.id,
-        mineralConfiguration: mineral_configuration || {},
-        location,
-        roverName: rover_name,
-        createdAt: created_at ? new Date(created_at) : new Date(),
-      }
+    const pb = await createPocketbaseAdminClient();
+    const latest = await pb.collection("mineral_deposits").getList(1, 1, { sort: "-legacyId", fields: "legacyId" });
+    const nextLegacyId = (latest.items[0]?.legacyId ?? 0) + 1;
+
+    const deposit = await pb.collection("mineral_deposits").create({
+      legacyId: nextLegacyId,
+      anomaly,
+      discovery,
+      owner: user.id,
+      mineralConfiguration: mineral_configuration || {},
+      location,
+      roverName: rover_name,
+      createdAt: created_at ? new Date(created_at).toISOString() : new Date().toISOString(),
     });
 
     revalidatePath("/inventory");
     revalidatePath("/viewports/rover"); // Fixed typo
     revalidatePath(`/next/${discovery}`);
 
-    return { success: true, data: deposit };
+    return { success: true, data: mapMineralDepositToRow(deposit) };
 
   } catch (error) {
     console.error("[Create Mineral Deposit] Error:", error);
@@ -66,18 +70,18 @@ export async function getMineralDeposits(discoveryId?: number) {
       throw new Error("Unauthorized");
     }
 
-    const deposits = await prisma.mineralDeposit.findMany({
-      where: {
-        owner: user.id,
-        discovery: discoveryId,
-        location: { not: null }
-      },
-      orderBy: {
-        createdAt: "desc"
-      }
+    const pb = await createPocketbaseAdminClient();
+    const filters = [pb.filter("owner = {:owner}", { owner: user.id }), 'location != ""'];
+    if (discoveryId !== undefined) {
+      filters.push(pb.filter("discovery = {:d}", { d: discoveryId }));
+    }
+
+    const deposits = await pb.collection("mineral_deposits").getFullList({
+      filter: filters.join(" && "),
+      sort: "-createdAt",
     });
 
-    return { success: true, data: deposits };
+    return { success: true, data: deposits.map(mapMineralDepositToRow) };
   } catch (error) {
     console.error("[Get Mineral Deposits] Error:", error);
     return { error: "Failed to fetch mineral deposits" };

@@ -1,6 +1,6 @@
-import { prisma } from "@/lib/server/prisma";
 import { unstable_cache } from "next/cache";
 import { getHubLeaderboard } from "@/src/lib/server/hub-leaderboard";
+import { createPocketbaseAdminClient } from "@/lib/pocketbase/adminClient";
 
 function parseConfig(raw: unknown): Record<string, unknown> | null {
   if (!raw) return null;
@@ -31,9 +31,9 @@ type ActivityFeedItem =
     };
 
 type LinkedAnomalyEntry = {
-  id: bigint;
-  anomalyId: bigint;
-  date: Date;
+  id: number;
+  anomalyId: number;
+  date: string;
   automaton: string | null;
   unlocked?: boolean | null;
   anomaly: {
@@ -44,14 +44,22 @@ type LinkedAnomalyEntry = {
 };
 
 type RecentClassificationRow = {
-  id: bigint;
+  id: number;
   classificationtype: string | null;
   content: string | null;
-  createdAt: Date;
+  createdAt: string;
   classificationConfiguration?: unknown;
   anomalyRef: {
     content: string | null;
   } | null;
+};
+
+type OtherClassificationRow = {
+  id: number;
+  classificationtype: string | null;
+  content: string | null;
+  author: string | null;
+  createdAt: string;
 };
 
 async function safeQuery<T>(label: string, query: () => Promise<T>, fallback: T): Promise<T> {
@@ -65,71 +73,48 @@ async function safeQuery<T>(label: string, query: () => Promise<T>, fallback: T)
 }
 
 async function getProfileForUser(userId: string) {
-  try {
-    return await prisma.profile.findUnique({
-      where: { id: userId },
-      select: {
-        id: true,
-        username: true,
-        fullName: true,
-        classificationPoints: true,
-        referralCode: true,
-      },
-    });
-  } catch {
-    const profile = await prisma.profile.findUnique({
-      where: { id: userId },
-      select: {
-        id: true,
-        username: true,
-        fullName: true,
-        classificationPoints: true,
-      },
-    });
-    return profile ? { ...profile, referralCode: null } : null;
-  }
+  const pb = await createPocketbaseAdminClient();
+  const profile = await pb
+    .collection("profiles")
+    .getFirstListItem(pb.filter("userId = {:id}", { id: userId }))
+    .catch(() => null);
+
+  if (!profile) return null;
+
+  return {
+    id: userId,
+    username: (profile.username as string) ?? null,
+    fullName: (profile.fullName as string) ?? null,
+    classificationPoints: (profile.classificationPoints as number) ?? 0,
+    referralCode: (profile.referralCode as string) ?? null,
+  };
 }
 
 async function getRecentClassificationsForUser(userId: string): Promise<RecentClassificationRow[]> {
   return unstable_cache(
     async () => {
-      try {
-        return await prisma.classification.findMany({
-          where: { author: userId },
-          orderBy: { createdAt: "desc" },
-          take: 10,
-          select: {
-            id: true,
-            classificationtype: true,
-            content: true,
-            createdAt: true,
-            classificationConfiguration: true,
-            anomalyRef: {
-              select: { content: true },
-            },
-          },
-        });
-      } catch {
-        const rows = await prisma.classification.findMany({
-          where: { author: userId },
-          orderBy: { createdAt: "desc" },
-          take: 10,
-          select: {
-            id: true,
-            classificationtype: true,
-            content: true,
-            createdAt: true,
-            anomalyRef: {
-              select: { content: true },
-            },
-          },
-        });
+      const pb = await createPocketbaseAdminClient();
+      const rows = await pb.collection("classifications").getList(1, 10, {
+        filter: pb.filter("author = {:author}", { author: userId }),
+        sort: "-createdAt",
+      });
 
-        return rows.map((row) => ({
-          ...row,
-          classificationConfiguration: null,
-        }));
+      const anomalyIds = [...new Set(rows.items.map((r) => r.anomaly).filter((a): a is number => a != null))];
+      let contentByAnomalyId = new Map<number, string | null>();
+      if (anomalyIds.length > 0) {
+        const filter = anomalyIds.map((id) => pb.filter("legacyId = {:id}", { id })).join(" || ");
+        const anomalies = await pb.collection("anomalies").getFullList({ filter, fields: "legacyId,content" });
+        contentByAnomalyId = new Map(anomalies.map((a) => [a.legacyId, a.content ?? null]));
       }
+
+      return rows.items.map((row) => ({
+        id: row.legacyId,
+        classificationtype: row.classificationtype ?? null,
+        content: row.content ?? null,
+        createdAt: row.createdAt,
+        classificationConfiguration: row.classificationConfiguration ?? null,
+        anomalyRef: row.anomaly != null ? { content: contentByAnomalyId.get(row.anomaly) ?? null } : null,
+      }));
     },
     [`user-classifications-${userId}`],
     { revalidate: 300, tags: [`user-classifications-${userId}`] }
@@ -146,34 +131,47 @@ export async function getGamePageDataForUser(userId: string) {
     roverDeposits,
     hubLeaderboard,
     linkedRows,
+  ]: [
+    Awaited<ReturnType<typeof getProfileForUser>> | null,
+    RecentClassificationRow[],
+    OtherClassificationRow[],
+    boolean,
+    Awaited<ReturnType<typeof getHubLeaderboard>>,
+    LinkedAnomalyEntry[],
   ] = await Promise.all([
     safeQuery("profile", () => getProfileForUser(userId), null),
     safeQuery("myClassifications", () => getRecentClassificationsForUser(userId), []),
     safeQuery(
       "otherClassifications",
-      () =>
-        prisma.classification.findMany({
-          where: { author: { not: userId } },
-          orderBy: { createdAt: "desc" },
-          take: 20,
-          select: {
-            id: true,
-            classificationtype: true,
-            content: true,
-            author: true,
-            createdAt: true,
-          },
-        }),
+      async () => {
+        const pb = await createPocketbaseAdminClient();
+        const result = await pb.collection("classifications").getList(1, 20, {
+          filter: pb.filter("author != {:author}", { author: userId }),
+          sort: "-createdAt",
+        });
+        return result.items.map((row) => ({
+          id: row.legacyId as number,
+          classificationtype: (row.classificationtype as string) ?? null,
+          content: (row.content as string) ?? null,
+          author: (row.author as string) ?? null,
+          createdAt: row.createdAt as string,
+        }));
+      },
       []
     ),
     safeQuery(
       "roverDeposits",
-      () =>
-        prisma.mineralDeposit.findFirst({
-          where: { owner: userId, roverName: { not: null } },
-          select: { id: true },
-        }),
-      null
+      async () => {
+        const pb = await createPocketbaseAdminClient();
+        const match = await pb
+          .collection("mineral_deposits")
+          .getFirstListItem(
+            pb.filter("owner = {:owner} && roverName != ''", { owner: userId })
+          )
+          .catch(() => null);
+        return match !== null;
+      },
+      false
     ),
     safeQuery(
       "hubLeaderboard",
@@ -185,41 +183,51 @@ export async function getGamePageDataForUser(userId: string) {
 
   const linkedAnomalyIds = linkedRows.map((row) => row.anomalyId);
 
+  const anomalyIdFilter =
+    linkedAnomalyIds.length > 0
+      ? "(" + linkedAnomalyIds.map((id) => `anomaly = ${id}`).join(" || ") + ")"
+      : "";
+
   const [allUserClassifications, cloudClassifications] = await Promise.all([
     linkedAnomalyIds.length > 0
       ? safeQuery(
           "allUserClassifications",
-          () =>
-            prisma.classification.findMany({
-              where: { author: userId, anomaly: { in: linkedAnomalyIds } },
-              select: { anomaly: true },
-            }),
+          async () => {
+            const pb = await createPocketbaseAdminClient();
+            const rows = await pb.collection("classifications").getFullList({
+              filter: pb.filter("author = {:author}", { author: userId }) + " && " + anomalyIdFilter,
+              fields: "anomaly",
+            });
+            return rows.map((r) => r.anomaly as number | null);
+          },
           []
         )
       : Promise.resolve([]),
     linkedAnomalyIds.length > 0
       ? safeQuery(
           "cloudClassifications",
-          () =>
-            prisma.classification.findMany({
-              where: { author: userId, classificationtype: "cloud", anomaly: { in: linkedAnomalyIds } },
-              select: { anomaly: true },
-            }),
+          async () => {
+            const pb = await createPocketbaseAdminClient();
+            const rows = await pb.collection("classifications").getFullList({
+              filter:
+                pb.filter("author = {:author} && classificationtype = {:t}", { author: userId, t: "cloud" }) +
+                " && " +
+                anomalyIdFilter,
+              fields: "anomaly",
+            });
+            return rows.map((r) => r.anomaly as number | null);
+          },
           []
         )
       : Promise.resolve([]),
   ]);
 
   const classifiedAnomalyIds = new Set(
-    allUserClassifications
-      .map((classification) => classification.anomaly)
-      .filter((value): value is bigint => value !== null)
+    allUserClassifications.filter((value): value is number => value !== null)
   );
 
   const classifiedCloudAnomalyIds = new Set(
-    cloudClassifications
-      .map((classification) => classification.anomaly)
-      .filter((value): value is bigint => value !== null)
+    cloudClassifications.filter((value): value is number => value !== null)
   );
 
   const linkedAnomalies = linkedRows
@@ -230,9 +238,9 @@ export async function getGamePageDataForUser(userId: string) {
       return false;
     })
     .map((row) => ({
-      id: Number(row.id),
-      anomaly_id: Number(row.anomalyId),
-      date: row.date.toISOString(),
+      id: row.id,
+      anomaly_id: row.anomalyId,
+      date: row.date,
       automaton: row.automaton ?? undefined,
       unlocked: row.unlocked ?? undefined,
       anomaly: {
@@ -249,10 +257,10 @@ export async function getGamePageDataForUser(userId: string) {
     : [];
 
   const transformedClassifications = myClassifications.map((classification) => ({
-    id: Number(classification.id),
+    id: classification.id,
     classificationtype: classification.classificationtype,
     content: classification.content,
-    created_at: classification.createdAt.toISOString(),
+    created_at: classification.createdAt,
     anomaly: {
       content: classification.anomalyRef?.content ?? null,
     },
@@ -295,20 +303,25 @@ export async function getGamePageDataForUser(userId: string) {
     referralCode
       ? safeQuery(
           "referralCount",
-          () =>
-            prisma.referral.count({
-              where: { referralCode },
-            }),
+          async () => {
+            const pb = await createPocketbaseAdminClient();
+            const result = await pb.collection("referrals").getList(1, 1, {
+              filter: pb.filter("referralCode = {:c}", { c: referralCode }),
+            });
+            return result.totalItems;
+          },
           0
         )
       : Promise.resolve(0),
     safeQuery(
       "hasReferralRecord",
-      () =>
-        prisma.referral.findFirst({
-          where: { referreeId: userId },
-          select: { id: true },
-        }),
+      async () => {
+        const pb = await createPocketbaseAdminClient();
+        return pb
+          .collection("referrals")
+          .getFirstListItem(pb.filter("referreeId = {:id}", { id: userId }))
+          .catch(() => null);
+      },
       null
     ),
   ]);
@@ -326,11 +339,11 @@ export async function getGamePageDataForUser(userId: string) {
     linkedAnomalies,
     activityFeed,
     otherClassifications: otherClassifications.map((classification) => ({
-      id: Number(classification.id),
+      id: classification.id,
       classificationtype: classification.classificationtype,
       content: classification.content,
       author: classification.author ?? "",
-      created_at: classification.createdAt.toISOString(),
+      created_at: classification.createdAt,
     })),
     incompletePlanet,
     planetTargets,
@@ -343,101 +356,75 @@ export async function getGamePageDataForUser(userId: string) {
   };
 }
 
-async function getLinkedAnomaliesForUser(userId: string) {
-  try {
-    const rows = await prisma.linkedAnomaly.findMany({
-      where: { author: userId },
-      orderBy: { date: "desc" },
-      select: {
-        id: true,
-        anomalyId: true,
-        date: true,
-        automaton: true,
-        unlocked: true,
-        anomaly: {
-          select: {
-            content: true,
-            anomalytype: true,
-            anomalySet: true,
-          },
-        },
-      },
+async function getLinkedAnomaliesForUser(userId: string): Promise<LinkedAnomalyEntry[]> {
+  const pb = await createPocketbaseAdminClient();
+  const rows = await pb.collection("linked_anomalies").getFullList({
+    filter: pb.filter("author = {:author}", { author: userId }),
+    sort: "-date",
+  });
+
+  const anomalyIds = [...new Set(rows.map((r) => r.anomalyId).filter((a): a is number => a != null))];
+  let anomalyById = new Map<number, { content: string | null; anomalytype: string | null; anomalySet: string | null }>();
+  if (anomalyIds.length > 0) {
+    const filter = anomalyIds.map((id) => pb.filter("legacyId = {:id}", { id })).join(" || ");
+    const anomalies = await pb.collection("anomalies").getFullList({
+      filter,
+      fields: "legacyId,content,anomalytype,anomalySet",
     });
-    return rows satisfies LinkedAnomalyEntry[];
-  } catch {
-    const rows = await prisma.linkedAnomaly.findMany({
-      where: { author: userId },
-      orderBy: { date: "desc" },
-      select: {
-        id: true,
-        anomalyId: true,
-        date: true,
-        automaton: true,
-        anomaly: {
-          select: {
-            content: true,
-            anomalytype: true,
-            anomalySet: true,
-          },
-        },
-      },
-    });
-    return rows.map((row) => ({
-      ...row,
-      unlocked: undefined,
-    })) satisfies LinkedAnomalyEntry[];
+    anomalyById = new Map(
+      anomalies.map((a) => [
+        a.legacyId,
+        { content: a.content ?? null, anomalytype: a.anomalytype ?? null, anomalySet: a.anomalySet ?? null },
+      ])
+    );
   }
+
+  return rows.map((row) => ({
+    id: row.legacyId,
+    anomalyId: row.anomalyId,
+    date: row.date,
+    automaton: row.automaton ?? null,
+    unlocked: row.unlocked ?? null,
+    anomaly: anomalyById.get(row.anomalyId) ?? null,
+  }));
 }
 
-async function getActivityFeed(classificationIds: bigint[], oneWeekAgo: Date) {
+async function getActivityFeed(classificationIds: number[], oneWeekAgo: Date): Promise<ActivityFeedItem[]> {
+  const pb = await createPocketbaseAdminClient();
+  const idFilter = "(" + classificationIds.map((id) => pb.filter("classificationId = {:id}", { id })).join(" || ") + ")";
+  const dateFilter = pb.filter("createdAt >= {:d}", { d: oneWeekAgo.toISOString() });
+
   const [comments, votes] = await Promise.all([
-    prisma.comment.findMany({
-      where: {
-        classificationId: { in: classificationIds },
-        createdAt: { gte: oneWeekAgo },
-      },
-      select: {
-        createdAt: true,
-        content: true,
-        classificationId: true,
-        category: true,
-      },
+    pb.collection("comments").getFullList({
+      filter: `${idFilter} && ${dateFilter}`,
+      fields: "createdAt,content,classificationId,category",
     }),
-    prisma.vote.findMany({
-      where: {
-        classificationId: { in: classificationIds },
-        createdAt: { gte: oneWeekAgo },
-      },
-      select: {
-        createdAt: true,
-        voteType: true,
-        classificationId: true,
-      },
+    pb.collection("votes").getFullList({
+      filter: `${idFilter} && ${dateFilter}`,
+      fields: "createdAt,voteType,classificationId",
     }),
   ]);
 
   return [
     ...comments
-      .filter(
-        (comment): comment is typeof comment & { classificationId: bigint } => comment.classificationId !== null
-      )
+      .filter((comment): comment is typeof comment & { classificationId: number } => comment.classificationId != null)
       .map(
         (comment): ActivityFeedItem => ({
           type: "comment",
-          created_at: comment.createdAt.toISOString(),
+          created_at: comment.createdAt,
           content: comment.content ?? null,
-          classification_id: Number(comment.classificationId),
+          classification_id: comment.classificationId,
           category: comment.category ?? null,
         })
       ),
     ...votes
-      .filter((vote): vote is typeof vote & { classificationId: bigint } => vote.classificationId !== null)
+      .filter((vote): vote is typeof vote & { classificationId: number } => vote.classificationId != null)
       .map(
         (vote): ActivityFeedItem => ({
           type: "vote",
-          created_at: vote.createdAt.toISOString(),
+          created_at: vote.createdAt,
           vote_type: vote.voteType ?? "",
-          classification_id: Number(vote.classificationId),
+          classification_id: vote.classificationId,
         })
       ),
   ].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());

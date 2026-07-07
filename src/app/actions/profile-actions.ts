@@ -1,26 +1,41 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { prisma } from "@/lib/server/prisma";
-import { createSupabaseServerClient } from "@/lib/supabase/ssr";
+import { getRouteUser } from "@/lib/server/supabaseRoute";
+import { createPocketbaseAdminClient } from "@/lib/pocketbase/adminClient";
+import { getStorageUrl } from "@/lib/pocketbase/storageUrl";
+import { storageObjectId, storageFilename } from "@/lib/pocketbase/storageId";
 import { ReferralService } from "@/src/features/referrals/referral-service";
 
+async function findProfileByUserId(pb: Awaited<ReturnType<typeof createPocketbaseAdminClient>>, userId: string) {
+  return pb
+    .collection("profiles")
+    .getFirstListItem(pb.filter("userId = {:id}", { id: userId }))
+    .catch(() => null);
+}
+
 export async function getCurrentProfileAction() {
-  const supabase = createSupabaseServerClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const { user } = await getRouteUser();
   if (!user) return { ok: false as const, error: "Unauthorized" };
 
-  const profile = await prisma.profile.findUnique({
-    where: { id: user.id },
-    select: { username: true, fullName: true, avatarUrl: true, referralCode: true }
-  });
+  const pb = await createPocketbaseAdminClient();
+  const profile = await findProfileByUserId(pb, user.id);
 
-  return { ok: true as const, data: profile ?? null };
+  return {
+    ok: true as const,
+    data: profile
+      ? {
+          username: profile.username ?? null,
+          fullName: profile.fullName ?? null,
+          avatarUrl: profile.avatarUrl ?? null,
+          referralCode: profile.referralCode ?? null,
+        }
+      : null,
+  };
 }
 
 export async function updateProfileSetupAction(formData: FormData) {
-  const supabase = createSupabaseServerClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const { user } = await getRouteUser();
   if (!user) return { ok: false as const, error: "Unauthorized" };
 
   const username = String(formData.get("username") || "").trim();
@@ -32,37 +47,43 @@ export async function updateProfileSetupAction(formData: FormData) {
     return { ok: false as const, error: "Username is required." };
   }
 
+  const pb = await createPocketbaseAdminClient();
+
   let avatar_url: string | null = existingAvatarPreview && existingAvatarPreview.trim() ? existingAvatarPreview : null;
   if (avatar && avatar instanceof File && avatar.size > 0) {
     const fileName = `${Date.now()}-${user.id}-avatar.png`;
-    const { data, error } = await supabase.storage
-      .from("avatars")
-      .upload(fileName, avatar, { contentType: avatar.type || "image/png" });
-
-    if (error) return { ok: false as const, error: error.message };
-    avatar_url = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/avatars/${data.path}`;
+    try {
+      const pbFormData = new FormData();
+      pbFormData.append("id", storageObjectId("avatars", fileName));
+      pbFormData.append("bucket", "avatars");
+      pbFormData.append("path", fileName);
+      pbFormData.append(
+        "file",
+        new File([avatar], storageFilename(fileName), { type: avatar.type || "image/png" })
+      );
+      await pb.collection("storage_objects").create(pbFormData);
+    } catch (error: any) {
+      return { ok: false as const, error: error?.message || "Avatar upload failed" };
+    }
+    avatar_url = getStorageUrl("avatars", fileName);
   }
 
   try {
     const referralCode = await ReferralService.ensureReferralCode(user.id);
-    
-    await prisma.profile.upsert({
-      where: { id: user.id },
-      update: {
-        username,
-        fullName: firstName,
-        avatarUrl: avatar_url,
-        updatedAt: new Date(),
-      },
-      create: {
-        id: user.id,
-        username,
-        fullName: firstName,
-        avatarUrl: avatar_url,
-        referralCode,
-        updatedAt: new Date(),
-      }
-    });
+    const existing = await findProfileByUserId(pb, user.id);
+
+    const fields = {
+      username,
+      fullName: firstName,
+      avatarUrl: avatar_url,
+      updatedAt: new Date().toISOString(),
+    };
+
+    if (existing) {
+      await pb.collection("profiles").update(existing.id, fields);
+    } else {
+      await pb.collection("profiles").create({ userId: user.id, referralCode, ...fields });
+    }
   } catch (error) {
     return { ok: false as const, error: String(error) };
   }
@@ -78,8 +99,7 @@ export async function completeProfileAction(input: {
   fullName: string;
   referrerCodeInput?: string;
 }) {
-  const supabase = createSupabaseServerClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const { user } = await getRouteUser();
   if (!user) return { ok: false as const, error: "Unauthorized" };
 
   const username = input.username.trim();
@@ -87,24 +107,23 @@ export async function completeProfileAction(input: {
     return { ok: false as const, error: "Username must be at least 3 characters." };
   }
 
+  const pb = await createPocketbaseAdminClient();
+
   try {
     const referralCode = await ReferralService.ensureReferralCode(user.id);
+    const existing = await findProfileByUserId(pb, user.id);
 
-    await prisma.profile.upsert({
-      where: { id: user.id },
-      update: {
-        username,
-        fullName: input.fullName.trim(),
-        updatedAt: new Date(),
-      },
-      create: {
-        id: user.id,
-        username,
-        fullName: input.fullName.trim(),
-        referralCode,
-        updatedAt: new Date(),
-      }
-    });
+    const fields = {
+      username,
+      fullName: input.fullName.trim(),
+      updatedAt: new Date().toISOString(),
+    };
+
+    if (existing) {
+      await pb.collection("profiles").update(existing.id, fields);
+    } else {
+      await pb.collection("profiles").create({ userId: user.id, referralCode, ...fields });
+    }
 
     const referrerCode = (input.referrerCodeInput || "").trim();
     if (referrerCode) {
@@ -116,10 +135,6 @@ export async function completeProfileAction(input: {
       }
     }
   } catch (error) {
-    const message = String(error);
-    if (message.includes("profiles_username_key")) {
-      return { ok: false as const, error: "That username is already taken." };
-    }
     return { ok: false as const, error: "Failed to update profile." };
   }
 
@@ -130,37 +145,39 @@ export async function completeProfileAction(input: {
 }
 
 export async function getReferralPanelDataAction() {
-  const supabase = createSupabaseServerClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const { user } = await getRouteUser();
   if (!user) return { ok: false as const, error: "Unauthorized" };
 
-  const profile = await prisma.profile.findUnique({
-    where: { id: user.id },
-    select: { referralCode: true }
-  });
+  const pb = await createPocketbaseAdminClient();
+  const profile = await findProfileByUserId(pb, user.id);
 
   if (!profile?.referralCode) {
     const newCode = await ReferralService.ensureReferralCode(user.id);
     return { ok: true as const, data: { referralCode: newCode, referredUsers: [] } };
   }
 
-  const referrals = await prisma.referral.findMany({
-    where: { referralCode: profile.referralCode },
-    select: { referreeId: true }
+  const referrals = await pb.collection("referrals").getFullList({
+    filter: pb.filter("referralCode = {:c}", { c: profile.referralCode }),
   });
 
-  const referreeIds = referrals.map(r => r.referreeId);
-  const referreeProfiles = await prisma.profile.findMany({
-    where: { id: { in: referreeIds } },
-    select: { id: true, username: true }
-  });
+  const referreeIds: string[] = referrals.map((r) => r.referreeId);
+  const referreeProfiles = referreeIds.length
+    ? await pb.collection("profiles").getFullList({
+        filter: referreeIds.map((id) => pb.filter("userId = {:id}", { id })).join(" || "),
+      })
+    : [];
 
-  return { ok: true as const, data: { referralCode: profile.referralCode, referredUsers: referreeProfiles } };
+  return {
+    ok: true as const,
+    data: {
+      referralCode: profile.referralCode as string,
+      referredUsers: referreeProfiles.map((p) => ({ id: p.userId as string, username: (p.username as string) ?? null })),
+    },
+  };
 }
 
 export async function submitReferralCodeAction(referralCode: string) {
-  const supabase = createSupabaseServerClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const { user } = await getRouteUser();
   if (!user) return { ok: false as const, error: "You must be logged in." };
 
   try {

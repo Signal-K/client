@@ -225,7 +225,7 @@ export function useAnnotatorLogic({
         classificationConfiguration,
       });
 
-      if (classificationResponse.error) {
+      if (classificationResponse.error || !classificationResponse.data) {
         console.error("Error creating classification: ", classificationResponse.error);
         alert("Failed to create classification. Please try again");
         return;
@@ -530,7 +530,7 @@ export function useAnnotatorLogic({
         classificationConfiguration,
       });
 
-      if (classificationResponse.error) {
+      if (classificationResponse.error || !classificationResponse.data) {
         console.error("Error creating classification: ", classificationResponse.error);
         alert("Failed to create classification. Please try again");
         return;

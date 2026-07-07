@@ -2,8 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 
-import { prisma } from "@/lib/server/prisma";
 import { getRouteUser } from "@/lib/server/supabaseRoute";
+import { createPocketbaseAdminClient } from "@/lib/pocketbase/adminClient";
 
 type VoteType = "up" | "down";
 
@@ -17,28 +17,36 @@ export async function toggleVoteAction(input: {
   }
 
   const { classificationId, voteType } = input;
+  const pb = await createPocketbaseAdminClient();
 
-  const existingVote = await prisma.vote.findFirst({
-    where: { userId: user.id, classificationId },
-  });
+  const existingVote = await pb
+    .collection("votes")
+    .getFirstListItem(
+      pb.filter("userId = {:u} && classificationId = {:c}", { u: user.id, c: classificationId })
+    )
+    .catch(() => null);
 
   if (existingVote) {
     if (existingVote.voteType === voteType) {
-      await prisma.vote.delete({ where: { id: existingVote.id } });
+      await pb.collection("votes").delete(existingVote.id);
       revalidatePath(`/posts/${classificationId}`);
       return { ok: true as const, userVote: null as VoteType | null };
     }
 
-    await prisma.vote.update({
-      where: { id: existingVote.id },
-      data: { voteType },
-    });
+    await pb.collection("votes").update(existingVote.id, { voteType });
     revalidatePath(`/posts/${classificationId}`);
     return { ok: true as const, userVote: voteType as VoteType };
   }
 
-  await prisma.vote.create({
-    data: { userId: user.id, classificationId, voteType },
+  const latest = await pb.collection("votes").getList(1, 1, { sort: "-legacyId", fields: "legacyId" });
+  const nextLegacyId = (latest.items[0]?.legacyId ?? 0) + 1;
+
+  await pb.collection("votes").create({
+    legacyId: nextLegacyId,
+    createdAt: new Date().toISOString(),
+    userId: user.id,
+    classificationId,
+    voteType,
   });
 
   revalidatePath(`/posts/${classificationId}`);
@@ -61,13 +69,17 @@ export async function submitCommentAction(input: {
     return { ok: false as const, error: "Empty comment" };
   }
 
-  await prisma.comment.create({
-    data: {
-      content: trimmed,
-      author: user.id,
-      classificationId,
-      parentCommentId: parentCommentId ?? null,
-    },
+  const pb = await createPocketbaseAdminClient();
+  const latest = await pb.collection("comments").getList(1, 1, { sort: "-legacyId", fields: "legacyId" });
+  const nextLegacyId = (latest.items[0]?.legacyId ?? 0) + 1;
+
+  await pb.collection("comments").create({
+    legacyId: nextLegacyId,
+    createdAt: new Date().toISOString(),
+    content: trimmed,
+    author: user.id,
+    classificationId,
+    parentCommentId: parentCommentId ?? null,
   });
 
   revalidatePath(`/posts/${classificationId}`);

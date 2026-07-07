@@ -1,6 +1,4 @@
-import { Prisma } from "@prisma/client";
-
-import { prisma } from "@/lib/server/prisma";
+import { createPocketbaseAdminClient } from "@/lib/pocketbase/adminClient";
 
 export const QUANTITY_UPGRADES = ["probereceptors", "satellitecount", "roverwaypoints"] as const;
 
@@ -23,14 +21,10 @@ function techCost(techType: string) {
 }
 
 export async function getResearchedProgressForUser(userId: string): Promise<ResearchedProgress> {
-  const rows = await prisma.researched.findMany({
-    where: { userId },
-    select: {
-      id: true,
-      techType: true,
-      createdAt: true,
-    },
-    orderBy: [{ createdAt: "asc" }, { id: "asc" }],
+  const pb = await createPocketbaseAdminClient();
+  const rows = await pb.collection("researched").getFullList({
+    filter: pb.filter("userId = {:id}", { id: userId }),
+    sort: "+createdAt,+legacyId",
   });
 
   const techTypes = rows.map((row) => row.techType).filter(Boolean);
@@ -38,7 +32,7 @@ export async function getResearchedProgressForUser(userId: string): Promise<Rese
   return {
     entries: rows.map((row) => ({
       tech_type: row.techType,
-      created_at: row.createdAt?.toISOString() ?? null,
+      created_at: row.createdAt ?? null,
     })),
     techTypes,
     techSet: new Set(techTypes),
@@ -47,23 +41,32 @@ export async function getResearchedProgressForUser(userId: string): Promise<Rese
 }
 
 export async function getSurveyBonusForUser(userId: string) {
-  const surveyRewardTotals = await prisma.surveyReward.aggregate({
-    where: { userId },
-    _sum: { stardustGranted: true },
+  const pb = await createPocketbaseAdminClient();
+  const rows = await pb.collection("survey_rewards").getFullList({
+    filter: pb.filter("userId = {:id}", { id: userId }),
+    fields: "stardustGranted",
   });
+  return rows.reduce((total, r) => total + (r.stardustGranted ?? 0), 0);
+}
 
-  return surveyRewardTotals._sum.stardustGranted ?? 0;
+export async function hasResearchedTech(userId: string, techType: string): Promise<boolean> {
+  const pb = await createPocketbaseAdminClient();
+  const match = await pb
+    .collection("researched")
+    .getFirstListItem(pb.filter("userId = {:id} && techType = {:t}", { id: userId, t: techType }))
+    .catch(() => null);
+  return match !== null;
 }
 
 export async function unlockTechForUser(userId: string, techType: string) {
-  return prisma.researched.create({
-    data: {
-      userId,
-      techType,
-    },
-  });
-}
+  const pb = await createPocketbaseAdminClient();
+  const latest = await pb.collection("researched").getList(1, 1, { sort: "-legacyId", fields: "legacyId" });
+  const nextLegacyId = (latest.items[0]?.legacyId ?? 0) + 1;
 
-export function isPrismaUniqueConstraintError(error: unknown) {
-  return error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002";
+  return pb.collection("researched").create({
+    legacyId: nextLegacyId,
+    userId,
+    techType,
+    createdAt: new Date().toISOString(),
+  });
 }

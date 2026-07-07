@@ -2,9 +2,9 @@
 
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
-import { Prisma } from "@prisma/client";
-import { prisma } from "@/lib/server/prisma";
 import { getRouteUser } from "@/lib/server/supabaseRoute";
+import { createPocketbaseAdminClient } from "@/lib/pocketbase/adminClient";
+import { mapClassificationToRow } from "@/lib/pocketbase/legacyShapes";
 
 const ClassificationSchema = z.object({
   anomaly: z.number().nullable().optional(),
@@ -37,20 +37,27 @@ export async function createClassificationAction(payload: CreateClassificationIn
         throw new Error("Classification type is required");
     }
 
-    const parentId = classificationParent ? Number(classificationParent) : null;
     const anomalyId = anomaly ? Number(anomaly) : null;
+    void classificationParent; // not persisted — not part of the classifications collection
 
-    // Use Prisma Client
-    const classification = await prisma.classification.create({
-        data: {
-            author: user.id,
-            anomaly: anomalyId,
-            classificationtype,
-            content: content || "",
-            media: media ?? Prisma.JsonNull,
-            classificationConfiguration: classificationConfiguration ?? Prisma.JsonNull,
-            // classificationParent removed as it's not in schema
-        }
+    const pb = await createPocketbaseAdminClient();
+
+    // legacyId assignment mirrors the old autoincrement PK: one past the
+    // current max. Matches the pattern in /api/gameplay/classifications POST.
+    const latest = await pb
+      .collection("classifications")
+      .getList(1, 1, { sort: "-legacyId", fields: "legacyId" });
+    const nextLegacyId = (latest.items[0]?.legacyId ?? 0) + 1;
+
+    const classification = await pb.collection("classifications").create({
+        legacyId: nextLegacyId,
+        createdAt: new Date().toISOString(),
+        author: user.id,
+        anomaly: anomalyId,
+        classificationtype,
+        content: content || "",
+        media: media ?? null,
+        classificationConfiguration: classificationConfiguration ?? null,
     });
 
     // Revalidate paths
@@ -59,15 +66,9 @@ export async function createClassificationAction(payload: CreateClassificationIn
     revalidatePath("/viewports/satellite");
     revalidatePath("/viewports/solar");
     revalidatePath("/viewports/rover");
-    revalidatePath(`/next/${classification.id}`);
+    revalidatePath(`/next/${nextLegacyId}`);
 
-    // Serialize BigInts if necessary, though Prisma Client usually returns BigInt
-    // Server Actions automatically serialize simple objects, but BigInt needs care.
-    const safeData = JSON.parse(JSON.stringify(classification, (key, value) =>
-        typeof value === 'bigint' ? value.toString() : value
-    ));
-
-    return { success: true, data: safeData };
+    return { success: true, data: mapClassificationToRow(classification) };
 
   } catch (error) {
     console.error("[Create Classification] Error:", error);
