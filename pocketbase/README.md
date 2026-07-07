@@ -8,6 +8,59 @@ imported. Superuser credentials are in the gitignored
 Phase 2 for the full sequencing (migrate one domain at a time, not a single
 big rewrite).
 
+## Stale pre-Clerk user ids (found and fixed 2026-07-07/08)
+
+A post-migration data audit found that `profiles.userId` (736/794 rows),
+`linked_anomalies.author` (66/152), and `researched.userId` (1/35) still held
+pre-Clerk Supabase UUIDs instead of Clerk ids, even though `classifications`,
+`comments`, `votes`, and `mineral_deposits` were 100% correctly Clerk-shaped.
+
+**Root cause, fully traced**: `scripts/migrate-users-supabase-to-clerk.ts`
+had only ever been run for the 52 Supabase users with a real email — the
+remaining 742 are anonymous/guest Supabase sessions (no email), and Clerk's
+`createUser` rejects a user with no identifier at all
+(`"email_address" data doesn't match user requirements set for this
+instance`). 6 anonymous users had been migrated by hand at some point using a
+synthesized `guest-<uuid>@guests.starsailors.space` email, which does pass
+validation — but the other 736 were never attempted that way, so they had no
+Clerk account and no `externalId` mapping at all. `profiles`/`linked_anomalies`/
+`researched` rows for those 736 people were therefore permanently unable to
+be remapped to a Clerk id — this is a different (and worse) root cause than
+originally suspected (an ordering bug in the Postgres→Pocketbase copy); there
+was no ordering bug, the users simply didn't exist in Clerk yet.
+
+**Fix, in order**:
+1. `scripts/migrate-anonymous-guests-to-clerk.ts` (new) — creates a Clerk
+   user for every anonymous Supabase user using the same
+   `guest-<uuid>@guests.starsailors.space` pattern already established by the
+   6 that worked, with `externalId` set to the Supabase UUID. Idempotent
+   (checks for an existing externalId match before creating), retries
+   transient network failures, and writes its report incrementally so a crash
+   mid-run doesn't lose progress. Run against production: 736 created, 6
+   already-migrated (skipped), 1 apparent error that was actually a race with
+   an earlier interrupted run (verified the account existed correctly).
+2. `scripts/fix-stale-pocketbase-user-ids.ts` (new) — for every stale
+   UUID-shaped value in the three affected fields, looks up the matching
+   Clerk user via `externalId` and updates the Pocketbase record in place.
+   Defaults to `DRY_RUN=true`; skips (and reports) any record with no Clerk
+   match or whose target value would collide with an existing record's value
+   in the same collection, rather than guessing or overwriting. Run for real:
+   803/803 updated, 0 no-match, 0 conflicts.
+
+**Verified after**: all three fields are 100% Clerk-shaped (0 stale values),
+`profiles.userId` has 0 duplicate values, live Clerk instance has exactly 794
+users (matching the Supabase source count exactly).
+
+**Process note for next time**: don't assume a Clerk secret key found in
+`.env.local` is the live/production instance — this session burned real time
+(and created 52 throwaway accounts in a `sk_test_` sandbox instance before
+finding the actual `sk_live_...starsailors.space` one) checking `getUserList().totalCount`
+against a key that turned out to be an empty, unrelated dev sandbox. Always
+verify a known-real id (e.g. one already embedded in existing data) resolves
+in the instance before trusting a key. The 52 throwaway accounts in the wrong
+test instance were left in place (harmless, isolated, not worth the extra
+live-system risk of a bulk-delete pass) — not cleaned up as part of this fix.
+
 ## Files
 
 - `pb_schema.json` — importable collection schema (Pocketbase Admin UI →
