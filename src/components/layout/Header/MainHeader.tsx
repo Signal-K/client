@@ -24,6 +24,7 @@ import ProjectPreferencesModal from "@/src/components/onboarding/ProjectPreferen
 import { useUserPreferences, ProjectType } from "@/src/hooks/useUserPreferences";
 import Link from "next/link";
 import { useAuthUser } from "@/src/hooks/useAuthUser";
+import { useClerk } from "@clerk/nextjs";
 import type { CommentVote, OtherClassification } from "@/types/game";
 
 interface MainHeaderProps {
@@ -43,7 +44,8 @@ export default function MainHeader({
   activityFeed,
   otherClassifications,
 }: MainHeaderProps) {
-  const { user, supabase } = useAuthUser();
+  const { user } = useAuthUser();
+  const { signOut } = useClerk();
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [projectPreferencesOpen, setProjectPreferencesOpen] = useState(false);
   const { preferences, savePreferences } = useUserPreferences();
@@ -75,10 +77,7 @@ export default function MainHeader({
       } catch { /* ignore cookie errors */ }
     }
     try {
-      const { error } = await supabase.auth.signOut();
-      if (error) {
-        console.error("Error signing out:", error.message);
-      }
+      await signOut();
     } catch (err) {
       console.error("Sign out failed:", err);
     }

@@ -1,13 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 
-import { prisma } from "@/lib/server/prisma";
-import { getRouteSupabaseWithUser } from "@/lib/server/supabaseRoute";
+import { getRouteUser } from "@/lib/server/supabaseRoute";
+import { createPocketbaseAdminClient } from "@/lib/pocketbase/adminClient";
+import { getStorageUrl } from "@/lib/pocketbase/storageUrl";
+import { storageObjectId, storageFilename } from "@/lib/pocketbase/storageId";
 
 export const dynamic = "force-dynamic";
 
 export async function POST(request: NextRequest) {
-  const { supabase, user, authError } = await getRouteSupabaseWithUser();
+  const { user, authError } = await getRouteUser();
   if (authError || !user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
@@ -45,62 +47,51 @@ export async function POST(request: NextRequest) {
   const safeFileName = fileName.replace(/[^a-zA-Z0-9._-]/g, "_");
   const uploadPath = `${user.id}/${Date.now()}-${safeFileName}`;
 
-  const { error: uploadError } = await supabase.storage.from("uploads").upload(uploadPath, file, {
-    contentType: file.type || "image/jpeg",
-    upsert: false,
-  });
+  const pb = await createPocketbaseAdminClient();
+  const pbFormData = new FormData();
+  pbFormData.append("id", storageObjectId("uploads", uploadPath));
+  pbFormData.append("bucket", "uploads");
+  pbFormData.append("path", uploadPath);
+  pbFormData.append(
+    "file",
+    new File([file], storageFilename(uploadPath), { type: file.type || "image/jpeg" })
+  );
 
-  if (uploadError) {
-    return NextResponse.json({ error: uploadError.message }, { status: 500 });
+  try {
+    await pb.collection("storage_objects").create(pbFormData);
+  } catch (err: any) {
+    return NextResponse.json({ error: err?.message || "Upload failed" }, { status: 500 });
   }
 
-  const { data: publicData } = supabase.storage.from("uploads").getPublicUrl(uploadPath);
-  const fileUrl = publicData.publicUrl;
+  const fileUrl = getStorageUrl("uploads", uploadPath);
 
-  const uploadPayload: Record<string, unknown> = {
+  const latestUpload = await pb.collection("uploads").getList(1, 1, { sort: "-legacyId", fields: "legacyId" });
+  const nextUploadLegacyId = (latestUpload.items[0]?.legacyId ?? 0) + 1;
+
+  await pb.collection("uploads").create({
+    legacyId: nextUploadLegacyId,
     author: user.id,
-    file_url: fileUrl,
+    fileUrl,
     content,
     source,
     configuration,
-  };
-  if (location !== null) {
-    uploadPayload.location = location;
-  }
-
-  await prisma.$executeRaw`
-    INSERT INTO uploads (author, file_url, content, source, configuration, location)
-    VALUES (
-      ${uploadPayload.author as string},
-      ${uploadPayload.file_url as string},
-      ${uploadPayload.content as string},
-      ${uploadPayload.source as string},
-      ${JSON.stringify((uploadPayload.configuration as Record<string, unknown> | null) ?? null)}::jsonb,
-      ${(uploadPayload.location as number | null | undefined) ?? null}
-    )
-  `;
+    location,
+    createdAt: new Date().toISOString(),
+  });
 
   if (shouldSaveToZoo) {
-    const zooPayload: Record<string, unknown> = {
+    const latestZoo = await pb.collection("zoo").getList(1, 1, { sort: "-legacyId", fields: "legacyId" });
+    const nextZooLegacyId = (latestZoo.items[0]?.legacyId ?? 0) + 1;
+
+    await pb.collection("zoo").create({
+      legacyId: nextZooLegacyId,
       author: user.id,
       owner: user.id,
-      file_url: fileUrl,
+      fileUrl,
       configuration,
-    };
-    if (location !== null) {
-      zooPayload.location = location;
-    }
-
-    await prisma.$executeRaw`
-      INSERT INTO zoo (author, owner, file_url, configuration, location)
-      VALUES (
-        ${zooPayload.author as string},
-        ${zooPayload.owner as string},
-        ${zooPayload.file_url as string},
-        ${JSON.stringify((zooPayload.configuration as Record<string, unknown> | null) ?? null)}::jsonb,
-        ${(zooPayload.location as number | null | undefined) ?? null}
-      )
-    `;
+      location,
+      createdAt: new Date().toISOString(),
+    });
   }
 
   revalidatePath("/game");

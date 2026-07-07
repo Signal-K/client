@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 
-import { Prisma } from "@prisma/client";
-
-import { prisma } from "@/lib/server/prisma";
 import { getRouteUser } from "@/lib/server/supabaseRoute";
+import { createPocketbaseAdminClient } from "@/lib/pocketbase/adminClient";
+import { mapAnomalyToRow, mapClassificationToRow } from "@/lib/pocketbase/legacyShapes";
 import { recursiveSerialize } from "@/utils/serialization";
 
 export const dynamic = "force-dynamic";
@@ -15,7 +14,6 @@ type CreateClassificationPayload = {
   content?: string | null;
   media?: any;
   classificationConfiguration?: any;
-  classificationParent?: number | string | null;
 };
 
 export async function GET(request: NextRequest) {
@@ -30,20 +28,20 @@ export async function GET(request: NextRequest) {
   const classificationtype = request.nextUrl.searchParams.get("classificationtype");
   const anomalyParam = request.nextUrl.searchParams.get("anomaly");
   const anomaliesParam = request.nextUrl.searchParams.get("anomalies");
-  const classificationParentParam = request.nextUrl.searchParams.get("classificationParent");
   const orderByParam = request.nextUrl.searchParams.get("orderBy");
   const ascending = request.nextUrl.searchParams.get("ascending") === "true";
   const includeAnomaly = request.nextUrl.searchParams.get("includeAnomaly") === "true";
   const limit = Number(request.nextUrl.searchParams.get("limit") || 200);
 
-  const whereClauses: Prisma.Sql[] = [];
+  const pb = await createPocketbaseAdminClient();
+  const filters: string[] = [];
 
   if (idParam) {
     const id = Number(idParam);
     if (!Number.isFinite(id)) {
       return NextResponse.json({ error: "Invalid id" }, { status: 400 });
     }
-    whereClauses.push(Prisma.sql`c.id = ${id}`);
+    filters.push(pb.filter("legacyId = {:id}", { id }));
   }
 
   if (idsParam) {
@@ -52,16 +50,16 @@ export async function GET(request: NextRequest) {
       .map((x) => Number(x.trim()))
       .filter((x) => Number.isFinite(x));
     if (ids.length > 0) {
-      whereClauses.push(Prisma.sql`c.id IN (${Prisma.join(ids)})`);
+      filters.push("(" + ids.map((id) => pb.filter("legacyId = {:id}", { id })).join(" || ") + ")");
     }
   }
 
   if (author) {
-    whereClauses.push(Prisma.sql`c.author = ${author}`);
+    filters.push(pb.filter("author = {:author}", { author }));
   }
 
   if (classificationtype) {
-    whereClauses.push(Prisma.sql`c.classificationtype = ${classificationtype}`);
+    filters.push(pb.filter("classificationtype = {:t}", { t: classificationtype }));
   }
 
   if (anomalyParam) {
@@ -69,7 +67,7 @@ export async function GET(request: NextRequest) {
     if (!Number.isFinite(anomaly)) {
       return NextResponse.json({ error: "Invalid anomaly" }, { status: 400 });
     }
-    whereClauses.push(Prisma.sql`c.anomaly = ${anomaly}`);
+    filters.push(pb.filter("anomaly = {:a}", { a: anomaly }));
   }
 
   if (anomaliesParam) {
@@ -78,47 +76,33 @@ export async function GET(request: NextRequest) {
       .map((x) => Number(x.trim()))
       .filter((x) => Number.isFinite(x));
     if (anomalies.length > 0) {
-      whereClauses.push(Prisma.sql`c.anomaly IN (${Prisma.join(anomalies)})`);
+      filters.push("(" + anomalies.map((a) => pb.filter("anomaly = {:a}", { a })).join(" || ") + ")");
     }
   }
 
-  if (classificationParentParam) {
-    const parent = Number(classificationParentParam);
-    if (!Number.isFinite(parent)) {
-      return NextResponse.json({ error: "Invalid classificationParent" }, { status: 400 });
-    }
-    whereClauses.push(Prisma.sql`c."classificationParent" = ${parent}`);
-  }
-
-  const orderBy =
-    orderByParam === "id" || orderByParam === "updated_at" || orderByParam === "created_at"
-      ? orderByParam
-      : "created_at";
-  const orderDirection = ascending ? Prisma.sql`ASC` : Prisma.sql`DESC`;
+  const sortField = orderByParam === "id" ? "legacyId" : "createdAt";
+  const sort = `${ascending ? "+" : "-"}${sortField}`;
   const validatedLimit = Math.max(1, Math.min(limit, 2000));
 
-  const baseWhere =
-    whereClauses.length > 0 ? Prisma.sql`WHERE ${Prisma.join(whereClauses, " AND ")}` : Prisma.empty;
+  const result = await pb.collection("classifications").getList(1, validatedLimit, {
+    filter: filters.join(" && "),
+    sort,
+  });
+
+  const rows = result.items.map(mapClassificationToRow);
 
   if (includeAnomaly) {
-    const rows = await prisma.$queryRaw<Array<Record<string, unknown>>>(Prisma.sql`
-      SELECT c.*, row_to_json(a.*) AS anomaly
-      FROM classifications c
-      LEFT JOIN anomalies a ON a.id = c.anomaly
-      ${baseWhere}
-      ORDER BY c.${Prisma.raw(orderBy)} ${orderDirection}
-      LIMIT ${validatedLimit}
-    `);
-    return NextResponse.json({ classifications: recursiveSerialize(rows) });
+    const anomalyIds = [...new Set(rows.map((r) => r.anomaly).filter((a): a is number => a != null))];
+    let anomalyByLegacyId = new Map<number, Record<string, any>>();
+    if (anomalyIds.length > 0) {
+      const anomalyFilter = anomalyIds.map((id) => pb.filter("legacyId = {:id}", { id })).join(" || ");
+      const anomalyRecords = await pb.collection("anomalies").getFullList({ filter: anomalyFilter });
+      anomalyByLegacyId = new Map(anomalyRecords.map((a) => [a.legacyId, mapAnomalyToRow(a)]));
+    }
+    const withAnomaly = rows.map((r) => ({ ...r, anomaly: anomalyByLegacyId.get(r.anomaly!) ?? null }));
+    return NextResponse.json({ classifications: recursiveSerialize(withAnomaly) });
   }
 
-  const rows = await prisma.$queryRaw<Array<Record<string, unknown>>>(Prisma.sql`
-    SELECT c.*
-    FROM classifications c
-    ${baseWhere}
-    ORDER BY c.${Prisma.raw(orderBy)} ${orderDirection}
-    LIMIT ${validatedLimit}
-  `);
   return NextResponse.json({ classifications: recursiveSerialize(rows) });
 }
 
@@ -147,60 +131,35 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const insertPayload: Record<string, any> = {
+    const pb = await createPocketbaseAdminClient();
+
+    // legacyId assignment mirrors the old autoincrement PK: one past the
+    // current max. Not safe under high concurrency, but matches this app's
+    // existing single-writer-per-request pattern.
+    const latest = await pb
+      .collection("classifications")
+      .getList(1, 1, { sort: "-legacyId", fields: "legacyId" });
+    const nextLegacyId = (latest.items[0]?.legacyId ?? 0) + 1;
+
+    const created = await pb.collection("classifications").create({
+      legacyId: nextLegacyId,
+      createdAt: new Date().toISOString(),
       author: user.id,
       anomaly,
       classificationtype,
       content: typeof body?.content === "string" ? body.content : "",
-    };
+      media: body?.media ?? null,
+      classificationConfiguration: body?.classificationConfiguration ?? null,
+    });
 
-    if (body?.media !== undefined) {
-      insertPayload.media = body.media;
-    }
-    if (body?.classificationConfiguration !== undefined) {
-      insertPayload.classificationConfiguration = body.classificationConfiguration;
-    }
-    if (body?.classificationParent !== undefined && body?.classificationParent !== null) {
-      const parentId = Number(body.classificationParent);
-      if (Number.isFinite(parentId)) {
-        insertPayload.classificationParent = parentId;
-      }
-    }
-
-    // Safely execute the query
-    const rows = await prisma.$queryRaw<Array<Record<string, unknown>>>`
-      INSERT INTO classifications (author, anomaly, classificationtype, content, media, "classificationConfiguration", "classificationParent")
-      VALUES (
-        ${insertPayload.author as string}::uuid,
-        ${insertPayload.anomaly as number},
-        ${insertPayload.classificationtype as string},
-        ${insertPayload.content as string},
-        ${(insertPayload.media ?? null) ? JSON.stringify(insertPayload.media) : null}::jsonb,
-        ${(insertPayload.classificationConfiguration ?? null)
-          ? JSON.stringify(insertPayload.classificationConfiguration)
-          : null}::jsonb,
-        ${(insertPayload.classificationParent as number | null | undefined) ?? null}
-      )
-      RETURNING *
-    `;
-    
-    const data = rows[0];
-    if (!data) throw new Error("Database insert returned no data");
-
-    // Revalidate paths
     revalidatePath("/game");
     revalidatePath("/research");
     revalidatePath("/viewports/satellite");
     revalidatePath("/viewports/solar");
     revalidatePath("/viewports/rover");
-    revalidatePath(`/next/${String(data.id)}`);
+    revalidatePath(`/next/${nextLegacyId}`);
 
-    // Serialize BigInts to strings for JSON response
-    const safeData = JSON.parse(JSON.stringify(data, (key, value) =>
-      typeof value === 'bigint' ? value.toString() : value
-    ));
-
-    return NextResponse.json(safeData);
+    return NextResponse.json(recursiveSerialize(mapClassificationToRow(created)));
   } catch (error: any) {
     console.error("Error creating classification:", error);
     return NextResponse.json(

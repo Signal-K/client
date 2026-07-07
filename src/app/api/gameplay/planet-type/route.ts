@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { prisma } from "@/lib/server/prisma";
 import { getRouteUser } from "@/lib/server/supabaseRoute";
+import { createPocketbaseAdminClient } from "@/lib/pocketbase/adminClient";
+import { mapClassificationToRow } from "@/lib/pocketbase/legacyShapes";
 import { recursiveSerialize } from "@/utils/serialization";
 
 export const dynamic = "force-dynamic";
@@ -18,49 +19,45 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Invalid classificationId" }, { status: 400 });
   }
 
-  const [classifications, comments] = await Promise.all([
-    classificationId
-      ? prisma.$queryRaw<Array<Record<string, unknown>>>`
-          SELECT *
-          FROM classifications
-          WHERE id = ${classificationId}
-        `
-      : prisma.$queryRaw<Array<Record<string, unknown>>>`
-          SELECT *
-          FROM classifications
-          WHERE classificationtype = 'planet'
-        `,
-    classificationId
-      ? prisma.$queryRaw<Array<Record<string, unknown>>>`
-          SELECT
-            c.id,
-            c.content,
-            c.configuration,
-            c.classification_id,
-            json_build_object(
-              'id', p.id,
-              'full_name', p.full_name,
-              'avatar_url', p.avatar_url
-            ) AS author
-          FROM comments c
-          LEFT JOIN profiles p ON p.id = c.author
-          WHERE c.classification_id = ${classificationId}
-        `
-      : prisma.$queryRaw<Array<Record<string, unknown>>>`
-          SELECT
-            c.id,
-            c.content,
-            c.configuration,
-            c.classification_id,
-            json_build_object(
-              'id', p.id,
-              'full_name', p.full_name,
-              'avatar_url', p.avatar_url
-            ) AS author
-          FROM comments c
-          LEFT JOIN profiles p ON p.id = c.author
-        `,
+  const pb = await createPocketbaseAdminClient();
+
+  const [classificationRecords, commentRecords] = await Promise.all([
+    pb.collection("classifications").getFullList({
+      filter: classificationId
+        ? pb.filter("legacyId = {:id}", { id: classificationId })
+        : pb.filter("classificationtype = {:t}", { t: "planet" }),
+    }),
+    pb.collection("comments").getFullList({
+      filter: classificationId
+        ? pb.filter("classificationId = {:id}", { id: classificationId })
+        : "",
+    }),
   ]);
 
-  return NextResponse.json(recursiveSerialize({ classifications, comments }));
+  const authorIds = [...new Set(commentRecords.map((c) => c.author).filter(Boolean))];
+  let profileByUserId = new Map<string, Record<string, any>>();
+  if (authorIds.length > 0) {
+    const profileFilter = authorIds.map((id) => pb.filter("userId = {:id}", { id })).join(" || ");
+    const profiles = await pb.collection("profiles").getFullList({ filter: profileFilter });
+    profileByUserId = new Map(profiles.map((p) => [p.userId, p]));
+  }
+
+  const comments = commentRecords.map((c) => {
+    const profile = profileByUserId.get(c.author);
+    return {
+      id: c.legacyId,
+      content: c.content,
+      configuration: c.configuration,
+      classification_id: c.classificationId,
+      author: {
+        id: c.author,
+        full_name: profile?.fullName ?? null,
+        avatar_url: profile?.avatarUrl ?? null,
+      },
+    };
+  });
+
+  return NextResponse.json(
+    recursiveSerialize({ classifications: classificationRecords.map(mapClassificationToRow), comments })
+  );
 }

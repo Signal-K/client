@@ -1,12 +1,13 @@
 "use client"
 
 import React, { useEffect, useState } from "react";
-import { useSupabaseClient, useSession } from "@/src/lib/auth/session-context";
+import { useSession } from "@/src/lib/auth/session-context";
 import { useRouter } from "next/navigation";
 import ClassificationForm from "../(classifications)/PostForm";
 import { Button } from "../../ui/button";
 import TutorialContentBlock, { createTutorialSlides } from "../TutorialContentBlock";
 import { useActivePlanet } from "@/src/lib/context/ActivePlanet";
+import { getStorageUrl } from "@/lib/pocketbase/storageUrl";
 
 type Anomaly = {
   id: string;
@@ -20,12 +21,10 @@ interface TelescopeProps {
 }
 
 export const SuperWASPTutorial: React.FC<TelescopeProps> = ({ anomalyId }) => {
-  const supabase = useSupabaseClient();
   const session = useSession();
   const router = useRouter();
 
   const { activePlanet } = useActivePlanet();
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 
   const [imageUrl, setImageUrl] = useState<string>("");
   const [showClassification, setShowClassification] = useState(false);
@@ -37,12 +36,11 @@ export const SuperWASPTutorial: React.FC<TelescopeProps> = ({ anomalyId }) => {
 
   // Load the lightcurve image
   useEffect(() => {
-    if (anomalyId && supabaseUrl) {
-      const url = `${supabaseUrl}/storage/v1/object/public/telescope/telescope-superwasp-variable/${anomalyId}.gif`;
-      setImageUrl(url);
+    if (anomalyId) {
+      setImageUrl(getStorageUrl("telescope", `telescope-superwasp-variable/${anomalyId}.gif`));
       setLoadingImage(false);
     }
-  }, [anomalyId, supabaseUrl]);
+  }, [anomalyId]);
 
   // Tutorial slides for SuperWASP
   const tutorialSlides = createTutorialSlides([
@@ -86,8 +84,8 @@ export const SuperWASPTutorial: React.FC<TelescopeProps> = ({ anomalyId }) => {
   ];
 
   const handleSubmit = async (withDiscussion: boolean = false) => {
-    if (!session?.user?.id || !supabase) {
-      console.error("No session or supabase client available");
+    if (!session?.user?.id) {
+      console.error("No session available");
       return;
     }
 

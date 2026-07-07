@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
 import webpush from 'web-push';
+
+import { createPocketbaseAdminClient } from '@/lib/pocketbase/adminClient';
 
 const SEND_TIMEOUT_MS = 8000;
 const SEND_CONCURRENCY = 6;
@@ -12,7 +13,23 @@ type PushSubscriptionRow = {
     endpoint: string;
     auth: string;
     p256dh: string;
-    profile_id: string;
+    profileId: string;
+};
+
+type LinkedAnomalyRow = {
+    author: string;
+    anomalyId: number;
+    date: string;
+    automaton: string;
+};
+
+type AnomalyRow = {
+    legacyId: number;
+    content: string;
+};
+
+type ClassificationRow = {
+    anomaly: number;
 };
 
 function dedupeByEndpoint(subscriptions: PushSubscriptionRow[]) {
@@ -65,87 +82,78 @@ export async function POST(request: NextRequest) {
             process.env.VAPID_PRIVATE_KEY!
         );
 
-        // This endpoint is for automated workflows, so we need service role access
-        const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-        const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-
-        if (!supabaseUrl || !serviceRoleKey) {
-            return NextResponse.json({ 
-                error: 'Missing required environment variables' 
-            }, { status: 500 });
-        }
-
-        const supabase = createClient(supabaseUrl, serviceRoleKey);
+        // This endpoint is for automated workflows, so we need admin access
+        const pb = await createPocketbaseAdminClient();
 
         console.log('Auto-checking for unclassified discoveries...');
 
         // Get all users who have push subscriptions
-        const { data: allSubscriptions, error: subError } = await supabase
-            .from('push_subscriptions')
-            .select('profile_id')
-            .order('created_at', { ascending: false });
-
-        if (subError) {
+        let allSubscriptions: PushSubscriptionRow[];
+        try {
+            allSubscriptions = await pb.collection('push_subscriptions').getFullList({
+                sort: '-createdAt',
+            });
+        } catch (subError) {
             console.error('Error fetching subscriptions:', subError);
-            return NextResponse.json({ 
-                error: 'Failed to fetch push subscriptions' 
+            return NextResponse.json({
+                error: 'Failed to fetch push subscriptions'
             }, { status: 500 });
         }
 
         if (!allSubscriptions || allSubscriptions.length === 0) {
-            return NextResponse.json({ 
+            return NextResponse.json({
                 message: 'No push subscriptions found'
             });
         }
 
         // Get unique user IDs
-        const userIds = [...new Set(allSubscriptions.map(sub => sub.profile_id))].slice(0, MAX_USERS_PER_RUN);
+        const userIds = [...new Set(allSubscriptions.map(sub => sub.profileId))].slice(0, MAX_USERS_PER_RUN);
         console.log(`Found ${userIds.length} unique users with push subscriptions`);
 
         const perUserResults = await mapWithConcurrency(userIds, USER_CONCURRENCY, async (userId) => {
             try {
                 // Get user's linked anomalies
-                const { data: linkedAnomalies, error: linkedError } = await supabase
-                    .from('linked_anomalies')
-                    .select('id, author, anomaly_id, date, automaton')
-                    .eq('author', userId)
-                    .order('date', { ascending: false });
+                const linkedAnomalies = await pb.collection('linked_anomalies').getFullList<LinkedAnomalyRow>({
+                    filter: pb.filter('author = {:author}', { author: userId }),
+                    sort: '-date',
+                }).catch(() => []);
 
-                if (linkedError || !linkedAnomalies || linkedAnomalies.length === 0) {
+                if (linkedAnomalies.length === 0) {
                     return { sent: 0, hasUnclassified: false };
                 }
 
                 // Get anomaly details
-                const anomalyIds = linkedAnomalies.map(la => la.anomaly_id);
-                const { data: anomalies, error: anomalyError } = await supabase
-                    .from('anomalies')
-                    .select('id, content')
-                    .in('id', anomalyIds);
+                const anomalyIds = [...new Set(linkedAnomalies.map(la => la.anomalyId))];
+                const anomalyFilter = anomalyIds
+                    .map(id => pb.filter('legacyId = {:id}', { id }))
+                    .join(' || ');
+                const anomalies = anomalyIds.length > 0
+                    ? await pb.collection('anomalies').getFullList<AnomalyRow>({ filter: anomalyFilter }).catch(() => [])
+                    : [];
 
                 // Create anomaly details map
-                const anomalyDetails = new Map();
-                (anomalies || []).forEach(a => {
-                    anomalyDetails.set(a.id, a);
+                const anomalyDetails = new Map<number, AnomalyRow>();
+                anomalies.forEach(a => {
+                    anomalyDetails.set(a.legacyId, a);
                 });
 
                 // Get user's classifications
-                const { data: classifications, error: classError } = await supabase
-                    .from('classifications')
-                    .select('anomaly')
-                    .eq('author', userId);
+                const classifications = await pb.collection('classifications').getFullList<ClassificationRow>({
+                    filter: pb.filter('author = {:author}', { author: userId }),
+                }).catch(() => null);
 
-                if (classError) {
+                if (classifications === null) {
                     return { sent: 0, hasUnclassified: false };
                 }
 
                 // Create set of classified anomaly IDs
                 const classifiedAnomalies = new Set(
-                    (classifications || []).map(c => c.anomaly).filter(Boolean)
+                    classifications.map(c => c.anomaly).filter(Boolean)
                 );
 
                 // Find unclassified discoveries
                 const unclassifiedDiscoveries = linkedAnomalies.filter(
-                    linked => !classifiedAnomalies.has(linked.anomaly_id)
+                    linked => !classifiedAnomalies.has(linked.anomalyId)
                 );
 
                 if (unclassifiedDiscoveries.length === 0) {
@@ -154,24 +162,23 @@ export async function POST(request: NextRequest) {
 
                 // Prepare discovery data
                 const discoveryData = unclassifiedDiscoveries.map(d => ({
-                    anomalyId: d.anomaly_id,
-                    name: anomalyDetails.get(d.anomaly_id)?.content || `Discovery #${d.anomaly_id}`,
+                    anomalyId: d.anomalyId,
+                    name: anomalyDetails.get(d.anomalyId)?.content || `Discovery #${d.anomalyId}`,
                     automaton: d.automaton,
                     date: d.date
                 }));
 
                 // Get user's push subscriptions
-                const { data: userSubscriptions, error: userSubError } = await supabase
-                    .from('push_subscriptions')
-                    .select('*')
-                    .eq('profile_id', userId)
-                    .order('created_at', { ascending: false });
+                const userSubscriptions = await pb.collection('push_subscriptions').getFullList<PushSubscriptionRow>({
+                    filter: pb.filter('profileId = {:id}', { id: userId }),
+                    sort: '-createdAt',
+                }).catch(() => []);
 
-                if (userSubError || !userSubscriptions || userSubscriptions.length === 0) {
+                if (userSubscriptions.length === 0) {
                     return { sent: 0, hasUnclassified: true };
                 }
 
-                const deduplicatedSubscriptions = dedupeByEndpoint(userSubscriptions as PushSubscriptionRow[]).slice(0, MAX_ENDPOINTS_PER_USER);
+                const deduplicatedSubscriptions = dedupeByEndpoint(userSubscriptions).slice(0, MAX_ENDPOINTS_PER_USER);
 
                 // Create notification message
                 const discoveryCount = unclassifiedDiscoveries.length;

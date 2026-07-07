@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import type { Metadata } from "next";
 import { ArrowRight, ExternalLink } from "lucide-react";
 
-import { createSupabaseServerClient } from "@/src/lib/supabase/ssr";
+import { auth } from "@clerk/nextjs/server";
 import { cn } from "@/src/lib/utils";
 import { LandingAnalytics } from "./(landing)/_components/LandingAnalytics";
 import { LandingMobileMenu } from "./(landing)/_components/LandingMobileMenu";
@@ -67,12 +67,9 @@ const projects = [
 ] as const;
 
 export default async function HomePage() {
-  const supabase = createSupabaseServerClient();
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
+  const { userId } = await auth();
 
-  if (session) {
+  if (userId) {
     redirect("/game?from=landing");
   }
 

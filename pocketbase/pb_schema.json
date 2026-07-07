@@ -1,0 +1,1047 @@
+[
+  {
+    "name": "storage_objects",
+    "type": "base",
+    "fields": [
+      { "name": "bucket", "type": "text", "required": true },
+      { "name": "path", "type": "text", "required": true },
+      { "name": "file", "type": "file", "maxSelect": 1, "maxSize": 52428800 }
+    ],
+    "indexes": ["CREATE UNIQUE INDEX idx_storage_objects_bucket_path ON storage_objects (bucket, path)"],
+    "listRule": "", "viewRule": "", "createRule": null, "updateRule": null, "deleteRule": null,
+    "_note": "Preserves the exact bucket/path addressing the app already used against Supabase Storage, so the ~20 read call sites only need their URL construction swapped, not a full relational rewrite. See src/lib/pocketbase/storageUrl.ts."
+  },
+  {
+    "name": "anomalies",
+    "type": "base",
+    "fields": [
+      {
+        "name": "legacyId",
+        "type": "number",
+        "required": true
+      },
+      {
+        "name": "content",
+        "type": "text"
+      },
+      {
+        "name": "ticId",
+        "type": "text"
+      },
+      {
+        "name": "anomalytype",
+        "type": "text"
+      },
+      {
+        "name": "type",
+        "type": "text"
+      },
+      {
+        "name": "radius",
+        "type": "number"
+      },
+      {
+        "name": "mass",
+        "type": "number"
+      },
+      {
+        "name": "density",
+        "type": "number"
+      },
+      {
+        "name": "gravity",
+        "type": "number"
+      },
+      {
+        "name": "temperatureEq",
+        "type": "number"
+      },
+      {
+        "name": "temperature",
+        "type": "number"
+      },
+      {
+        "name": "smaxis",
+        "type": "number"
+      },
+      {
+        "name": "orbitalPeriod",
+        "type": "number"
+      },
+      {
+        "name": "classificationStatus",
+        "type": "text"
+      },
+      {
+        "name": "avatarUrl",
+        "type": "text"
+      },
+      {
+        "name": "createdAt",
+        "type": "date"
+      },
+      {
+        "name": "deepnote",
+        "type": "text"
+      },
+      {
+        "name": "lightkurve",
+        "type": "text"
+      },
+      {
+        "name": "configuration",
+        "type": "json"
+      },
+      {
+        "name": "parentAnomaly",
+        "type": "number"
+      },
+      {
+        "name": "anomalySet",
+        "type": "text"
+      },
+      {
+        "name": "anomalyConfiguration",
+        "type": "json"
+      }
+    ],
+    "indexes": [
+      "CREATE UNIQUE INDEX idx_anomalies_legacyId ON anomalies (legacyId)"
+    ],
+    "listRule": null,
+    "viewRule": null,
+    "createRule": null,
+    "updateRule": null,
+    "deleteRule": null
+  },
+  {
+    "name": "classifications",
+    "type": "base",
+    "fields": [
+      {
+        "name": "legacyId",
+        "type": "number",
+        "required": true
+      },
+      {
+        "name": "createdAt",
+        "type": "date"
+      },
+      {
+        "name": "content",
+        "type": "text"
+      },
+      {
+        "name": "author",
+        "type": "text"
+      },
+      {
+        "name": "anomaly",
+        "type": "number"
+      },
+      {
+        "name": "media",
+        "type": "json"
+      },
+      {
+        "name": "classificationtype",
+        "type": "text"
+      },
+      {
+        "name": "classificationConfiguration",
+        "type": "json"
+      }
+    ],
+    "indexes": [
+      "CREATE UNIQUE INDEX idx_classifications_legacyId ON classifications (legacyId)",
+      "CREATE INDEX idx_classifications_author_createdAt ON classifications (author, createdAt)"
+    ],
+    "listRule": null,
+    "viewRule": null,
+    "createRule": null,
+    "updateRule": null,
+    "deleteRule": null
+  },
+  {
+    "name": "comments",
+    "type": "base",
+    "fields": [
+      {
+        "name": "legacyId",
+        "type": "number",
+        "required": true
+      },
+      {
+        "name": "createdAt",
+        "type": "date"
+      },
+      {
+        "name": "content",
+        "type": "text",
+        "required": true
+      },
+      {
+        "name": "author",
+        "type": "text",
+        "required": true
+      },
+      {
+        "name": "classificationId",
+        "type": "number"
+      },
+      {
+        "name": "parentCommentId",
+        "type": "number"
+      },
+      {
+        "name": "configuration",
+        "type": "json"
+      },
+      {
+        "name": "uploads",
+        "type": "number"
+      },
+      {
+        "name": "surveyor",
+        "type": "bool"
+      },
+      {
+        "name": "confirmed",
+        "type": "bool"
+      },
+      {
+        "name": "value",
+        "type": "text"
+      },
+      {
+        "name": "category",
+        "type": "text"
+      }
+    ],
+    "indexes": [
+      "CREATE UNIQUE INDEX idx_comments_legacyId ON comments (legacyId)"
+    ],
+    "listRule": null,
+    "viewRule": null,
+    "createRule": null,
+    "updateRule": null,
+    "deleteRule": null
+  },
+  {
+    "name": "uploads",
+    "type": "base",
+    "fields": [
+      {
+        "name": "legacyId",
+        "type": "number",
+        "required": true
+      },
+      {
+        "name": "author",
+        "type": "text",
+        "required": true
+      },
+      {
+        "name": "location",
+        "type": "number",
+        "required": true
+      },
+      {
+        "name": "configuration",
+        "type": "json"
+      },
+      {
+        "name": "source",
+        "type": "text",
+        "required": true
+      },
+      {
+        "name": "fileUrl",
+        "type": "text",
+        "required": true
+      },
+      {
+        "name": "createdAt",
+        "type": "date"
+      },
+      {
+        "name": "content",
+        "type": "text"
+      },
+      {
+        "name": "name",
+        "type": "text"
+      },
+      {
+        "name": "originatingLocation",
+        "type": "text"
+      }
+    ],
+    "indexes": [
+      "CREATE UNIQUE INDEX idx_uploads_legacyId ON uploads (legacyId)"
+    ],
+    "listRule": null,
+    "viewRule": null,
+    "createRule": null,
+    "updateRule": null,
+    "deleteRule": null
+  },
+  {
+    "name": "votes",
+    "type": "base",
+    "fields": [
+      {
+        "name": "legacyId",
+        "type": "number",
+        "required": true
+      },
+      {
+        "name": "userId",
+        "type": "text",
+        "required": true
+      },
+      {
+        "name": "classificationId",
+        "type": "number"
+      },
+      {
+        "name": "anomalyId",
+        "type": "number"
+      },
+      {
+        "name": "createdAt",
+        "type": "date"
+      },
+      {
+        "name": "upload",
+        "type": "number"
+      },
+      {
+        "name": "voteType",
+        "type": "text"
+      }
+    ],
+    "indexes": [
+      "CREATE UNIQUE INDEX idx_votes_legacyId ON votes (legacyId)"
+    ],
+    "listRule": null,
+    "viewRule": null,
+    "createRule": null,
+    "updateRule": null,
+    "deleteRule": null
+  },
+  {
+    "name": "profiles",
+    "type": "base",
+    "fields": [
+      {
+        "name": "userId",
+        "type": "text",
+        "required": true
+      },
+      {
+        "name": "updatedAt",
+        "type": "date"
+      },
+      {
+        "name": "username",
+        "type": "text"
+      },
+      {
+        "name": "fullName",
+        "type": "text"
+      },
+      {
+        "name": "avatarUrl",
+        "type": "text"
+      },
+      {
+        "name": "website",
+        "type": "text"
+      },
+      {
+        "name": "location",
+        "type": "number"
+      },
+      {
+        "name": "activemission",
+        "type": "number"
+      },
+      {
+        "name": "classificationPoints",
+        "type": "number"
+      },
+      {
+        "name": "pushSubscription",
+        "type": "json"
+      },
+      {
+        "name": "referralCode",
+        "type": "text"
+      }
+    ],
+    "indexes": [
+      "CREATE UNIQUE INDEX idx_profiles_userId ON profiles (userId)"
+    ],
+    "listRule": "",
+    "viewRule": "",
+    "createRule": "@request.auth.id = userId",
+    "updateRule": "@request.auth.id = userId",
+    "deleteRule": null
+  },
+  {
+    "name": "referrals",
+    "type": "base",
+    "fields": [
+      {
+        "name": "referreeId",
+        "type": "text",
+        "required": true
+      },
+      {
+        "name": "referralCode",
+        "type": "text",
+        "required": true
+      },
+      {
+        "name": "referredAt",
+        "type": "date"
+      }
+    ],
+    "listRule": null,
+    "viewRule": null,
+    "createRule": null,
+    "updateRule": null,
+    "deleteRule": null
+  },
+  {
+    "name": "researched",
+    "type": "base",
+    "fields": [
+      {
+        "name": "legacyId",
+        "type": "number",
+        "required": true
+      },
+      {
+        "name": "techType",
+        "type": "text",
+        "required": true
+      },
+      {
+        "name": "techId",
+        "type": "number"
+      },
+      {
+        "name": "createdAt",
+        "type": "date"
+      },
+      {
+        "name": "userId",
+        "type": "text"
+      }
+    ],
+    "indexes": [
+      "CREATE UNIQUE INDEX idx_researched_legacyId ON researched (legacyId)"
+    ],
+    "listRule": null,
+    "viewRule": null,
+    "createRule": null,
+    "updateRule": null,
+    "deleteRule": null
+  },
+  {
+    "name": "survey_rewards",
+    "type": "base",
+    "fields": [
+      {
+        "name": "createdAt",
+        "type": "date"
+      },
+      {
+        "name": "userId",
+        "type": "text",
+        "required": true
+      },
+      {
+        "name": "surveyId",
+        "type": "text",
+        "required": true
+      },
+      {
+        "name": "surveyName",
+        "type": "text"
+      },
+      {
+        "name": "stardustGranted",
+        "type": "number"
+      }
+    ],
+    "indexes": [
+      "CREATE UNIQUE INDEX idx_survey_rewards_user_survey ON survey_rewards (userId, surveyId)"
+    ],
+    "listRule": null,
+    "viewRule": null,
+    "createRule": null,
+    "updateRule": null,
+    "deleteRule": null
+  },
+  {
+    "name": "linked_anomalies",
+    "type": "base",
+    "fields": [
+      {
+        "name": "legacyId",
+        "type": "number",
+        "required": true
+      },
+      {
+        "name": "author",
+        "type": "text",
+        "required": true
+      },
+      {
+        "name": "anomalyId",
+        "type": "number",
+        "required": true
+      },
+      {
+        "name": "classificationId",
+        "type": "number"
+      },
+      {
+        "name": "date",
+        "type": "date"
+      },
+      {
+        "name": "automaton",
+        "type": "text"
+      },
+      {
+        "name": "unlocked",
+        "type": "bool"
+      },
+      {
+        "name": "unlockTime",
+        "type": "date"
+      }
+    ],
+    "indexes": [
+      "CREATE UNIQUE INDEX idx_linked_anomalies_legacyId ON linked_anomalies (legacyId)"
+    ],
+    "listRule": null,
+    "viewRule": null,
+    "createRule": null,
+    "updateRule": null,
+    "deleteRule": null
+  },
+  {
+    "name": "inventory",
+    "type": "base",
+    "fields": [
+      {
+        "name": "legacyId",
+        "type": "number",
+        "required": true
+      },
+      {
+        "name": "item",
+        "type": "number"
+      },
+      {
+        "name": "owner",
+        "type": "text"
+      },
+      {
+        "name": "quantity",
+        "type": "number"
+      },
+      {
+        "name": "notes",
+        "type": "text"
+      },
+      {
+        "name": "timeOfDeploy",
+        "type": "date"
+      },
+      {
+        "name": "anomaly",
+        "type": "number"
+      },
+      {
+        "name": "parentItem",
+        "type": "number"
+      },
+      {
+        "name": "configuration",
+        "type": "json"
+      },
+      {
+        "name": "terrarium",
+        "type": "number"
+      }
+    ],
+    "indexes": [
+      "CREATE UNIQUE INDEX idx_inventory_legacyId ON inventory (legacyId)"
+    ],
+    "listRule": null,
+    "viewRule": null,
+    "createRule": null,
+    "updateRule": null,
+    "deleteRule": null
+  },
+  {
+    "name": "missions",
+    "type": "base",
+    "fields": [
+      {
+        "name": "legacyId",
+        "type": "number",
+        "required": true
+      },
+      {
+        "name": "userId",
+        "type": "text"
+      },
+      {
+        "name": "timeOfCompletion",
+        "type": "date"
+      },
+      {
+        "name": "mission",
+        "type": "number"
+      },
+      {
+        "name": "configuration",
+        "type": "json"
+      },
+      {
+        "name": "rewardedItems",
+        "type": "json"
+      }
+    ],
+    "indexes": [
+      "CREATE UNIQUE INDEX idx_missions_legacyId ON missions (legacyId)"
+    ],
+    "listRule": null,
+    "viewRule": null,
+    "createRule": null,
+    "updateRule": null,
+    "deleteRule": null
+  },
+  {
+    "name": "routes",
+    "type": "base",
+    "fields": [
+      {
+        "name": "legacyId",
+        "type": "number",
+        "required": true
+      },
+      {
+        "name": "author",
+        "type": "text",
+        "required": true
+      },
+      {
+        "name": "routeConfiguration",
+        "type": "json"
+      },
+      {
+        "name": "timestamp",
+        "type": "date"
+      },
+      {
+        "name": "location",
+        "type": "number",
+        "required": true
+      }
+    ],
+    "indexes": [
+      "CREATE UNIQUE INDEX idx_routes_legacyId ON routes (legacyId)"
+    ],
+    "listRule": null,
+    "viewRule": null,
+    "createRule": null,
+    "updateRule": null,
+    "deleteRule": null
+  },
+  {
+    "name": "mineral_deposits",
+    "type": "base",
+    "fields": [
+      {
+        "name": "legacyId",
+        "type": "number",
+        "required": true
+      },
+      {
+        "name": "anomaly",
+        "type": "number"
+      },
+      {
+        "name": "owner",
+        "type": "text"
+      },
+      {
+        "name": "mineralConfiguration",
+        "type": "json"
+      },
+      {
+        "name": "location",
+        "type": "text"
+      },
+      {
+        "name": "discovery",
+        "type": "number"
+      },
+      {
+        "name": "createdAt",
+        "type": "date"
+      },
+      {
+        "name": "roverName",
+        "type": "text"
+      }
+    ],
+    "indexes": [
+      "CREATE UNIQUE INDEX idx_mineral_deposits_legacyId ON mineral_deposits (legacyId)"
+    ],
+    "listRule": null,
+    "viewRule": null,
+    "createRule": null,
+    "updateRule": null,
+    "deleteRule": null
+  },
+  {
+    "name": "user_mineral_inventory",
+    "type": "base",
+    "fields": [
+      {
+        "name": "legacyId",
+        "type": "number",
+        "required": true
+      },
+      {
+        "name": "userId",
+        "type": "text",
+        "required": true
+      },
+      {
+        "name": "mineralDepositId",
+        "type": "number",
+        "required": true
+      },
+      {
+        "name": "mineralType",
+        "type": "text",
+        "required": true
+      },
+      {
+        "name": "quantity",
+        "type": "number",
+        "required": true
+      },
+      {
+        "name": "purity",
+        "type": "number",
+        "required": true
+      },
+      {
+        "name": "extractedAt",
+        "type": "date"
+      },
+      {
+        "name": "createdAt",
+        "type": "date"
+      }
+    ],
+    "indexes": [
+      "CREATE UNIQUE INDEX idx_user_mineral_inventory_legacyId ON user_mineral_inventory (legacyId)"
+    ],
+    "listRule": "@request.auth.id = userId",
+    "viewRule": "@request.auth.id = userId",
+    "createRule": "@request.auth.id = userId",
+    "updateRule": "@request.auth.id = userId",
+    "deleteRule": "@request.auth.id = userId"
+  },
+  {
+    "name": "events",
+    "type": "base",
+    "fields": [
+      {
+        "name": "legacyId",
+        "type": "number",
+        "required": true
+      },
+      {
+        "name": "location",
+        "type": "number",
+        "required": true
+      },
+      {
+        "name": "classificationLocation",
+        "type": "number",
+        "required": true
+      },
+      {
+        "name": "type",
+        "type": "text",
+        "required": true
+      },
+      {
+        "name": "configuration",
+        "type": "json"
+      },
+      {
+        "name": "time",
+        "type": "date"
+      },
+      {
+        "name": "completed",
+        "type": "bool"
+      }
+    ],
+    "indexes": [
+      "CREATE UNIQUE INDEX idx_events_legacyId ON events (legacyId)"
+    ],
+    "listRule": null,
+    "viewRule": null,
+    "createRule": null,
+    "updateRule": null,
+    "deleteRule": null
+  },
+  {
+    "name": "defensive_probes",
+    "type": "base",
+    "fields": [
+      {
+        "name": "eventId",
+        "type": "text"
+      },
+      {
+        "name": "userId",
+        "type": "text"
+      },
+      {
+        "name": "count",
+        "type": "number"
+      },
+      {
+        "name": "launchedAt",
+        "type": "date"
+      }
+    ],
+    "listRule": null,
+    "viewRule": null,
+    "createRule": null,
+    "updateRule": null,
+    "deleteRule": null
+  },
+  {
+    "name": "solar_events",
+    "type": "base",
+    "fields": [
+      {
+        "name": "weekStart",
+        "type": "date",
+        "required": true
+      },
+      {
+        "name": "weekEnd",
+        "type": "date",
+        "required": true
+      },
+      {
+        "name": "wasDefended",
+        "type": "bool"
+      },
+      {
+        "name": "createdAt",
+        "type": "date"
+      },
+      {
+        "name": "updatedAt",
+        "type": "date"
+      }
+    ],
+    "listRule": null,
+    "viewRule": null,
+    "createRule": null,
+    "updateRule": null,
+    "deleteRule": null
+  },
+  {
+    "name": "push_subscriptions",
+    "type": "base",
+    "fields": [
+      {
+        "name": "profileId",
+        "type": "text",
+        "required": true
+      },
+      {
+        "name": "endpoint",
+        "type": "text",
+        "required": true
+      },
+      {
+        "name": "p256dh",
+        "type": "text",
+        "required": true
+      },
+      {
+        "name": "auth",
+        "type": "text",
+        "required": true
+      },
+      {
+        "name": "createdAt",
+        "type": "date"
+      }
+    ],
+    "listRule": null,
+    "viewRule": null,
+    "createRule": null,
+    "updateRule": null,
+    "deleteRule": null
+  },
+  {
+    "name": "notification_rejections",
+    "type": "base",
+    "fields": [
+      {
+        "name": "profileId",
+        "type": "text",
+        "required": true
+      },
+      {
+        "name": "createdAt",
+        "type": "date"
+      }
+    ],
+    "listRule": "@request.auth.id = profileId",
+    "viewRule": "@request.auth.id = profileId",
+    "createRule": "@request.auth.id = profileId",
+    "updateRule": "@request.auth.id = profileId",
+    "deleteRule": "@request.auth.id = profileId"
+  },
+  {
+    "name": "push_anomaly_log",
+    "type": "base",
+    "fields": [
+      {
+        "name": "anomalyId",
+        "type": "number",
+        "required": true
+      },
+      {
+        "name": "sentAt",
+        "type": "date"
+      }
+    ],
+    "listRule": null,
+    "viewRule": null,
+    "createRule": null,
+    "updateRule": null,
+    "deleteRule": null
+  },
+  {
+    "name": "nps_surveys",
+    "type": "base",
+    "fields": [
+      {
+        "name": "createdAt",
+        "type": "date"
+      },
+      {
+        "name": "updatedAt",
+        "type": "date"
+      },
+      {
+        "name": "npsScore",
+        "type": "number",
+        "required": true
+      },
+      {
+        "name": "projectInterests",
+        "type": "text"
+      },
+      {
+        "name": "userId",
+        "type": "text"
+      },
+      {
+        "name": "userAgent",
+        "type": "text"
+      },
+      {
+        "name": "ipAddress",
+        "type": "text"
+      },
+      {
+        "name": "sessionId",
+        "type": "text"
+      }
+    ],
+    "listRule": null,
+    "viewRule": null,
+    "createRule": null,
+    "updateRule": null,
+    "deleteRule": null
+  },
+  {
+    "name": "zoo",
+    "type": "base",
+    "fields": [
+      {
+        "name": "legacyId",
+        "type": "number",
+        "required": true
+      },
+      {
+        "name": "author",
+        "type": "text",
+        "required": true
+      },
+      {
+        "name": "owner",
+        "type": "text",
+        "required": true
+      },
+      {
+        "name": "location",
+        "type": "number"
+      },
+      {
+        "name": "configuration",
+        "type": "json"
+      },
+      {
+        "name": "uploaded",
+        "type": "number"
+      },
+      {
+        "name": "content",
+        "type": "text"
+      },
+      {
+        "name": "createdAt",
+        "type": "date"
+      },
+      {
+        "name": "fileUrl",
+        "type": "text"
+      }
+    ],
+    "indexes": [
+      "CREATE UNIQUE INDEX idx_zoo_legacyId ON zoo (legacyId)"
+    ],
+    "listRule": null,
+    "viewRule": null,
+    "createRule": null,
+    "updateRule": null,
+    "deleteRule": null,
+    "_note": "Deprecated per prisma/schema.prisma comment \u2014 evaluate for removal instead of migrating."
+  }
+]

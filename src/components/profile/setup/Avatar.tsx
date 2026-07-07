@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { useSession } from "@/src/lib/auth/session-context";
+import { getStorageUrl } from "@/lib/pocketbase/storageUrl";
 
 interface Props {
     author: string;
@@ -70,7 +71,7 @@ export function Avatar() {
     <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-300 border-2 border-gray-400 shadow-md relative">
       {avatarUrl ? (
         <Image
-          src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/avatars/${avatarUrl}`}
+          src={getStorageUrl("avatars", avatarUrl)}
           alt="User Avatar"
           fill
           className="object-cover"

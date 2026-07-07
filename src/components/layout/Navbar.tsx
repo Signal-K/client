@@ -10,10 +10,10 @@ import MilestoneCard from "../deployment/missions/structures/Milestones/Mileston
 import JournalPage from "../deployment/missions/structures/Stardust/Journal";
 import { TrophyIcon } from "lucide-react";
 import MySettlementsLocations from "@/src/components/classification/UserLocations";
-import { useAuthUser } from "@/src/hooks/useAuthUser";
+import { useClerk } from "@clerk/nextjs";
 
 export default function Navbar() {
-  const { supabase } = useAuthUser();
+  const { signOut: clerkSignOut } = useClerk();
   const { activePlanet } = useActivePlanet();
   const router = useRouter();
 
@@ -35,12 +35,11 @@ export default function Navbar() {
         document.cookie = c.replace(/^ +/, '').replace(/=.*/, '=;expires=' + new Date(0).toUTCString() + ';path=/');
       });
     }
-    const { error } = await supabase.auth.signOut();
-    if (error) {
-      console.error("Error signing out:", error.message);
-    } else {
-      // Signed out
+    try {
+      await clerkSignOut();
       router.push('/');
+    } catch (err) {
+      console.error("Error signing out:", err);
     }
   };
 

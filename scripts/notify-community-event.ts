@@ -1,20 +1,20 @@
 #!/usr/bin/env tsx
 
-import { createClient } from "@supabase/supabase-js";
+import PocketBase from "pocketbase";
 import webpush from "web-push";
 import fs from "fs";
 
 type PushRow = {
-  profile_id: string;
+  profileId: string;
   endpoint: string;
   auth: string;
   p256dh: string;
-  created_at: string;
+  createdAt: string;
 };
 
-const supabaseUrl = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseServiceKey =
-  process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_KEY;
+const pbUrl = process.env.NEXT_PUBLIC_POCKETBASE_URL || process.env.PB_URL;
+const pbAdminEmail = process.env.POCKETBASE_ADMIN_EMAIL || process.env.PB_ADMIN_EMAIL;
+const pbAdminPassword = process.env.POCKETBASE_ADMIN_PASSWORD || process.env.PB_ADMIN_PASSWORD;
 const vapidPublicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
 const vapidPrivateKey = process.env.VAPID_PRIVATE_KEY;
 
@@ -24,28 +24,27 @@ const url = process.env.COMMUNITY_EVENT_URL || "/game";
 const dryRun = String(process.env.DRY_RUN || "true").toLowerCase() === "true";
 const reportPath = process.env.REPORT_PATH || "community-event-report.json";
 
-if (!supabaseUrl || !supabaseServiceKey || !vapidPublicKey || !vapidPrivateKey) {
+if (!pbUrl || !pbAdminEmail || !pbAdminPassword || !vapidPublicKey || !vapidPrivateKey) {
   console.error("Missing required environment variables.");
   process.exit(1);
 }
 
-const supabase = createClient(supabaseUrl, supabaseServiceKey);
+const pb = new PocketBase(pbUrl);
+const adminEmail = pbAdminEmail;
+const adminPassword = pbAdminPassword;
 webpush.setVapidDetails("mailto:ops@starsailors.space", vapidPublicKey, vapidPrivateKey);
 
 async function main() {
   const start = new Date().toISOString();
+  await pb.collection("_superusers").authWithPassword(adminEmail, adminPassword);
 
-  const { data: rows, error } = await supabase
-    .from("push_subscriptions")
-    .select("profile_id, endpoint, auth, p256dh, created_at")
-    .order("created_at", { ascending: false });
-
-  if (error) {
-    throw new Error(`Failed to load subscriptions: ${error.message}`);
-  }
+  const rows = await pb.collection("push_subscriptions").getFullList<PushRow>({
+    sort: "-createdAt",
+    fields: "profileId,endpoint,auth,p256dh,createdAt",
+  });
 
   const deduped = new Map<string, PushRow>();
-  for (const row of (rows as PushRow[]) || []) {
+  for (const row of rows) {
     if (!deduped.has(row.endpoint)) deduped.set(row.endpoint, row);
   }
   const subscriptions = Array.from(deduped.values());
@@ -69,7 +68,7 @@ async function main() {
     dry_run: dryRun,
     message: { title, body: message, url },
     totals: {
-      raw_subscriptions: rows?.length || 0,
+      raw_subscriptions: rows.length,
       unique_endpoints: subscriptions.length,
       sent: 0,
       failed: 0,
@@ -93,7 +92,7 @@ async function main() {
         report.totals.failed += 1;
         report.failures.push({
           endpoint: sub.endpoint,
-          profile_id: sub.profile_id,
+          profile_id: sub.profileId,
           error: String(sendError?.message || sendError),
         });
       }

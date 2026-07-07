@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { prisma } from "@/lib/server/prisma";
 import { getRouteUser } from "@/lib/server/supabaseRoute";
+import { createPocketbaseAdminClient } from "@/lib/pocketbase/adminClient";
 import { recursiveSerialize } from "@/utils/serialization";
 
 export const dynamic = "force-dynamic";
@@ -17,14 +17,11 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "mission is required" }, { status: 400 });
   }
 
-  const rows = await prisma.$queryRaw<Array<{ id: number }>>`
-    SELECT id
-    FROM missions
-    WHERE "user" = ${user.id}
-      AND mission = ${missionParam}
-    LIMIT 1
-  `;
+  const pb = await createPocketbaseAdminClient();
+  const existing = await pb
+    .collection("missions")
+    .getFirstListItem(pb.filter("userId = {:user} && mission = {:mission}", { user: user.id, mission: missionParam }))
+    .catch(() => null);
 
-  return NextResponse.json(recursiveSerialize({ exists: rows.length > 0 }));
+  return NextResponse.json(recursiveSerialize({ exists: !!existing }));
 }
-

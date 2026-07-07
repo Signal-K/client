@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 
-import { getRouteSupabaseWithUser } from "@/lib/server/supabaseRoute";
+import { createPocketbaseAdminClient } from "@/lib/pocketbase/adminClient";
+import { getRouteUser } from "@/lib/server/supabaseRoute";
 
 export const dynamic = "force-dynamic";
 
@@ -11,7 +12,7 @@ type PreferredBody = {
 };
 
 export async function POST(request: NextRequest) {
-  const { supabase, user, authError } = await getRouteSupabaseWithUser();
+  const { user, authError } = await getRouteUser();
   if (authError || !user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
@@ -24,29 +25,35 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
   }
 
-  const { data: classification, error: classificationError } = await supabase
-    .from("classifications")
-    .select("id, author, classificationConfiguration")
-    .eq("id", classificationId)
-    .single();
+  const pb = await createPocketbaseAdminClient();
+  const classification = await pb
+    .collection("classifications")
+    .getFirstListItem(pb.filter("legacyId = {:id}", { id: classificationId }), {
+      fields: "id,legacyId,author,classificationConfiguration",
+    })
+    .catch(() => null);
 
-  if (classificationError || !classification) {
-    return NextResponse.json({ error: classificationError?.message || "Classification not found" }, { status: 404 });
+  if (!classification) {
+    return NextResponse.json({ error: "Classification not found" }, { status: 404 });
   }
 
   if (classification.author !== user.id) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
-  const { data: comment, error: commentError } = await supabase
-    .from("comments")
-    .select("id, classification_id, configuration")
-    .eq("id", commentId)
-    .eq("classification_id", classificationId)
-    .single();
+  const comment = await pb
+    .collection("comments")
+    .getFirstListItem(
+      pb.filter("legacyId = {:id} && classificationId = {:classificationId}", {
+        id: commentId,
+        classificationId,
+      }),
+      { fields: "id,legacyId,classificationId,configuration" }
+    )
+    .catch(() => null);
 
-  if (commentError || !comment) {
-    return NextResponse.json({ error: commentError?.message || "Comment not found" }, { status: 404 });
+  if (!comment) {
+    return NextResponse.json({ error: "Comment not found" }, { status: 404 });
   }
 
   const planetType = comment.configuration?.planetType;
@@ -66,28 +73,16 @@ export async function POST(request: NextRequest) {
     },
   };
 
-  const { error: updateClassificationError } = await supabase
-    .from("classifications")
-    .update({ classificationConfiguration: updatedClassificationConfig })
-    .eq("id", classificationId);
-
-  if (updateClassificationError) {
-    return NextResponse.json({ error: updateClassificationError.message }, { status: 500 });
-  }
+  await pb.collection("classifications").update(classification.id, {
+    classificationConfiguration: updatedClassificationConfig,
+  });
 
   const updatedCommentConfig = {
     ...(comment.configuration || {}),
     preferred: true,
   };
 
-  const { error: updateCommentError } = await supabase
-    .from("comments")
-    .update({ configuration: updatedCommentConfig })
-    .eq("id", commentId);
-
-  if (updateCommentError) {
-    return NextResponse.json({ error: updateCommentError.message }, { status: 500 });
-  }
+  await pb.collection("comments").update(comment.id, { configuration: updatedCommentConfig });
 
   revalidatePath(`/planets/${classificationId}`);
   revalidatePath(`/posts/${classificationId}`);

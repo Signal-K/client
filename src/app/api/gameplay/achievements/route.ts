@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
-import { getRouteSupabaseWithUser } from "@/lib/server/supabaseRoute";
+import { createPocketbaseAdminClient } from "@/lib/pocketbase/adminClient";
+import { getRouteUser } from "@/lib/server/supabaseRoute";
 import { MILESTONE_TIERS } from "@/src/types/achievement";
 
 export const dynamic = "force-dynamic";
@@ -44,35 +45,27 @@ function createEmptyAchievements() {
 }
 
 export async function GET() {
-  const { supabase, user, authError } = await getRouteSupabaseWithUser();
+  const { user, authError } = await getRouteUser();
   if (authError || !user) {
     return NextResponse.json(createEmptyAchievements());
   }
 
   const userId = user.id;
+  const pb = await createPocketbaseAdminClient();
 
-  const [{ data: classifications, error: classificationsError }, { count: mineralCount, error: mineralCountError }] =
-    await Promise.all([
-      supabase
-        .from("classifications")
-        .select("id, anomaly, classificationtype")
-        .eq("author", userId),
-      supabase
-        .from("mineral_deposits")
-        .select("id", { count: "exact", head: true })
-        .eq("owner", userId),
-    ]);
+  const [classifications, mineralCountResult] = await Promise.all([
+    pb.collection("classifications").getFullList({
+      filter: pb.filter("author = {:author}", { author: userId }),
+      fields: "legacyId,anomaly,classificationtype",
+    }),
+    pb.collection("mineral_deposits").getList(1, 1, {
+      filter: pb.filter("owner = {:owner}", { owner: userId }),
+      fields: "id",
+    }),
+  ]);
 
-  if (classificationsError || mineralCountError) {
-    return NextResponse.json(
-      {
-        error: classificationsError?.message || mineralCountError?.message || "Failed to load achievements",
-      },
-      { status: 500 }
-    );
-  }
-
-  const rows = classifications || [];
+  const rows = classifications;
+  const mineralCount = mineralCountResult.totalItems;
   const classificationCounts: Record<string, number> = {};
   const planetAnomalyIds = new Set<number>();
 
@@ -109,51 +102,41 @@ export async function GET() {
   const anomalyIds = Array.from(planetAnomalyIds);
 
   if (anomalyIds.length > 0) {
-    const [
-      { data: anomalyRows, error: anomalyError },
-      { data: cloudRows, error: cloudError },
-      { data: depositRows, error: depositsError },
-    ] = await Promise.all([
-      supabase
-        .from("anomalies")
-        .select("id, density, temperature")
-        .in("id", anomalyIds),
-      supabase
-        .from("classifications")
-        .select("anomaly")
-        .eq("classificationtype", "cloud")
-        .in("anomaly", anomalyIds),
-      supabase
-        .from("mineral_deposits")
-        .select("anomaly, mineral_configuration")
-        .in("anomaly", anomalyIds),
+    const anomalyFilter = anomalyIds.map((id) => pb.filter("legacyId = {:id}", { id })).join(" || ");
+    const classificationFilter = anomalyIds.map((id) => pb.filter("anomaly = {:id}", { id })).join(" || ");
+    const depositFilter = anomalyIds.map((id) => pb.filter("anomaly = {:id}", { id })).join(" || ");
+
+    const [anomalyRows, cloudRows, depositRows] = await Promise.all([
+      pb.collection("anomalies").getFullList({
+        filter: anomalyFilter,
+        fields: "legacyId,density,temperature",
+      }),
+      pb.collection("classifications").getFullList({
+        filter: `classificationtype = "cloud" && (${classificationFilter})`,
+        fields: "anomaly",
+      }),
+      pb.collection("mineral_deposits").getFullList({
+        filter: depositFilter,
+        fields: "anomaly,mineralConfiguration",
+      }),
     ]);
 
-    if (anomalyError || cloudError || depositsError) {
-      return NextResponse.json(
-        {
-          error: anomalyError?.message || cloudError?.message || depositsError?.message || "Failed to compute planets",
-        },
-        { status: 500 }
-      );
-    }
-
     const cloudAnomalySet = new Set<number>(
-      (cloudRows || [])
+      cloudRows
         .map((row) => row.anomaly)
         .filter((id): id is number => typeof id === "number")
     );
 
     const depositsByAnomaly = new Map<number, any[]>();
-    for (const deposit of depositRows || []) {
+    for (const deposit of depositRows) {
       if (typeof deposit.anomaly !== "number") continue;
       const list = depositsByAnomaly.get(deposit.anomaly) || [];
       list.push(deposit);
       depositsByAnomaly.set(deposit.anomaly, list);
     }
 
-    for (const anomaly of anomalyRows || []) {
-      const anomalyId = anomaly.id;
+    for (const anomaly of anomalyRows) {
+      const anomalyId = anomaly.legacyId;
       const density = anomaly.density;
       const temperature = anomaly.temperature;
 
@@ -178,7 +161,7 @@ export async function GET() {
       let hasWater = false;
       if (requiresWater) {
         hasWater = deposits.some((deposit) => {
-          const config = deposit.mineral_configuration;
+          const config = deposit.mineralConfiguration;
           const type = config?.type?.toLowerCase?.() || "";
           return type.includes("water") || type.includes("ice") || type.includes("h2o");
         });

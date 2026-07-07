@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
 import webpush from 'web-push';
+
+import { createPocketbaseAdminClient } from '@/lib/pocketbase/adminClient';
 
 const SEND_TIMEOUT_MS = 8000;
 const SEND_CONCURRENCY = 6;
@@ -10,7 +11,7 @@ type PushSubscriptionRow = {
     endpoint: string;
     auth: string;
     p256dh: string;
-    profile_id: string;
+    profileId: string;
 };
 
 async function withTimeout<T>(promise: Promise<T>, timeoutMs: number): Promise<T> {
@@ -63,41 +64,24 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'User ID is required' }, { status: 400 });
         }
 
-        // Check if we're in Docker environment
-        const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.includes('127.0.0.1')
-            ? process.env.NEXT_PUBLIC_SUPABASE_URL?.replace('127.0.0.1', 'host.docker.internal')
-            : process.env.NEXT_PUBLIC_SUPABASE_URL;
-        
-        const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-        if (!supabaseUrl || !serviceRoleKey) {
-            return NextResponse.json({ 
-                error: 'Missing required environment variables',
-                details: {
-                    hasUrl: !!supabaseUrl,
-                    hasServiceKey: !!serviceRoleKey
-                }
-            }, { status: 500 });
-        }
-
-        const supabase = createClient(supabaseUrl, serviceRoleKey);
+        const pb = await createPocketbaseAdminClient();
 
         // Handle custom messages (like deployment notifications)
         if (customMessage) {
             console.log('Processing custom message notification for user:', userId);
-            
-            // Get user's push subscriptions
-            const { data: subscriptions, error: subError } = await supabase
-                .from('push_subscriptions')
-                .select('*')
-                .eq('profile_id', userId)
-                .order('created_at', { ascending: false });
 
-            if (subError) {
+            // Get user's push subscriptions
+            let subscriptions: PushSubscriptionRow[];
+            try {
+                subscriptions = await pb.collection('push_subscriptions').getFullList({
+                    filter: pb.filter('profileId = {:id}', { id: userId }),
+                    sort: '-createdAt',
+                });
+            } catch (subError) {
                 console.error('Error fetching subscriptions:', subError);
-                return NextResponse.json({ 
+                return NextResponse.json({
                     error: 'Failed to fetch push subscriptions',
-                    details: subError.message
+                    details: String(subError)
                 }, { status: 500 });
             }
 
@@ -163,24 +147,22 @@ export async function POST(request: NextRequest) {
         }
 
         // Get user's push subscriptions
-        const { data: subscriptions, error: subError } = await supabase
-            .from('push_subscriptions')
-            .select('*')
-            .eq('profile_id', userId)
-            .order('created_at', { ascending: false });
-
-        if (subError) {
+        let subscriptions: PushSubscriptionRow[];
+        try {
+            subscriptions = await pb.collection('push_subscriptions').getFullList({
+                filter: pb.filter('profileId = {:id}', { id: userId }),
+                sort: '-createdAt',
+            });
+        } catch (subError) {
             console.error('Error fetching subscriptions:', subError);
-            return NextResponse.json({ 
+            return NextResponse.json({
                 error: 'Failed to fetch push subscriptions',
-                details: subError.message,
-                code: subError.code,
-                hint: subError.hint
+                details: String(subError)
             }, { status: 500 });
         }
 
         if (!subscriptions || subscriptions.length === 0) {
-            return NextResponse.json({ 
+            return NextResponse.json({
                 message: 'User has no push subscriptions',
                 unclassifiedCount: unclassifiedDiscoveries.length
             });

@@ -8,21 +8,17 @@ import ImageAnnotator from "../(classifications)/Annotating/AnnotatorView";
 import TutorialContentBlock from "../TutorialContentBlock";
 
 import { Button } from "@/src/components/ui/button";
+import { getStorageUrl } from "@/lib/pocketbase/storageUrl";
 interface Props {
-    anomalyid: number | bigint; 
+    anomalyid: number | bigint;
 };
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 
 export function StarterDailyMinorPlanet({
     anomalyid
 }: Props) {
-    const imageUrls = [
-        `${supabaseUrl}/storage/v1/object/public/telescope/telescope-dailyMinorPlanet/${anomalyid}/1.png`,
-        `${supabaseUrl}/storage/v1/object/public/telescope/telescope-dailyMinorPlanet/${anomalyid}/2.png`,
-        `${supabaseUrl}/storage/v1/object/public/telescope/telescope-dailyMinorPlanet/${anomalyid}/3.png`,
-        `${supabaseUrl}/storage/v1/object/public/telescope/telescope-dailyMinorPlanet/${anomalyid}/4.png`
-    ];
+    const imageUrls = [1, 2, 3, 4].map((i) =>
+        getStorageUrl("telescope", `telescope-dailyMinorPlanet/${anomalyid}/${i}.png`)
+    );
 
     const [part, setPart] = useState(1);
     const [currentImageIndex, setCurrentImageIndex] = useState<number>(0);
@@ -120,8 +116,6 @@ export function DailyMinorPlanetWithId({ anomalyId }: { anomalyId: string }) {
   const [error, setError] = useState<string | null>(null);
   const [showTutorial, setShowTutorial] = useState(false);
 
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
-
   const handleImageChange = (index: number) => {
     if (imageUrls[index]) {
       setCurrentImageIndex(index);
@@ -157,8 +151,8 @@ export function DailyMinorPlanetWithId({ anomalyId }: { anomalyId: string }) {
 
           setSelectedAnomaly(anomaly);
 
-          const urls = [1, 2, 3, 4].map(i => 
-            `${supabaseUrl}/storage/v1/object/public/telescope/telescope-dailyMinorPlanet/${anomaly.id}/${i}.png`
+          const urls = [1, 2, 3, 4].map(i =>
+            getStorageUrl("telescope", `telescope-dailyMinorPlanet/${anomaly.id}/${i}.png`)
           );
           setImageUrls(urls);
           setCurrentImageUrl(urls[0]);
@@ -178,8 +172,8 @@ export function DailyMinorPlanetWithId({ anomalyId }: { anomalyId: string }) {
           setSelectedAnomaly(anomaly);
 
           // Set up image URLs for all frames (1-4)
-          const urls = [1, 2, 3, 4].map(i => 
-            `${supabaseUrl}/storage/v1/object/public/telescope/telescope-dailyMinorPlanet/${anomaly.id}/${i}.png`
+          const urls = [1, 2, 3, 4].map(i =>
+            getStorageUrl("telescope", `telescope-dailyMinorPlanet/${anomaly.id}/${i}.png`)
           );
           setImageUrls(urls);
           
@@ -196,7 +190,7 @@ export function DailyMinorPlanetWithId({ anomalyId }: { anomalyId: string }) {
     };
 
     fetchAnomalyById();
-  }, [session, anomalyId, supabaseUrl]);
+  }, [session, anomalyId]);
 
   if (error) return <div className="text-red-500 p-4">{error}</div>;
   if (loading) return <div className="text-white p-4">Loading...</div>;
@@ -271,9 +265,8 @@ interface MinorPlanetProps {
 const FirstMinorPlanetClassification: React.FC<MinorPlanetProps> = ({ anomalyid }) => {
     const session = useSession();
 
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const imageUrls = [1, 2, 3, 4].map(i => 
-        `${supabaseUrl}/storage/v1/object/public/telescope/telescope-dailyMinorPlanet/${anomalyid}/${i}.png`
+    const imageUrls = [1, 2, 3, 4].map(i =>
+        getStorageUrl("telescope", `telescope-dailyMinorPlanet/${anomalyid}/${i}.png`)
     );
 
     const [part, setPart] = useState(1);

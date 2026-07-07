@@ -1,24 +1,23 @@
 "use client";
 
 import React, { useState } from "react";
-import { useSupabaseClient, useSession } from "@/src/lib/auth/session-context";
+import { useSession } from "@/src/lib/auth/session-context";
 import { useActivePlanet } from "@/src/lib/context/ActivePlanet";
 import ClassificationForm from "../(classifications)/PostForm";
 import TutorialContentBlock, { createTutorialSlides, SCIENTIFIC_CONTEXTS } from "../TutorialContentBlock";
+import { getStorageUrl } from "@/lib/pocketbase/storageUrl";
 
-interface LidarProps { 
+interface LidarProps {
     anomalyId: string;
 };
 
 export const CloudspottingOnMarsTutorial: React.FC<LidarProps> = ({
     anomalyId
 }) => {
-    const supabase = useSupabaseClient();
     const session = useSession();
     const { activePlanet } = useActivePlanet();
 
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const imageUrl = `${supabaseUrl}/storage/v1/object/public/clouds/${anomalyId}.png`;
+    const imageUrl = getStorageUrl("clouds", `${anomalyId}.png`);
     const [showClassification, setShowClassification] = useState(false);
 
     const tutorialSlides = createTutorialSlides([

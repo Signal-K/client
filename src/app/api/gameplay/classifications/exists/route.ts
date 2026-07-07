@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { prisma } from "@/lib/server/prisma";
 import { getRouteUser } from "@/lib/server/supabaseRoute";
+import { createPocketbaseAdminClient } from "@/lib/pocketbase/adminClient";
 import { recursiveSerialize } from "@/utils/serialization";
 
 export const dynamic = "force-dynamic";
@@ -17,17 +17,13 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "classificationtype is required" }, { status: 400 });
   }
 
-  const rows = await prisma.$queryRaw<Array<{ id: number }>>`
-    SELECT id
-    FROM classifications
-    WHERE author = ${user.id}
-      AND classificationtype = ${classificationType}
-    LIMIT 1
-  `;
+  const pb = await createPocketbaseAdminClient();
+  const existing = await pb
+    .collection("classifications")
+    .getFirstListItem(
+      pb.filter("author = {:author} && classificationtype = {:t}", { author: user.id, t: classificationType })
+    )
+    .catch(() => null);
 
-  return NextResponse.json(
-    recursiveSerialize({
-      exists: rows.length > 0,
-    })
-  );
+  return NextResponse.json(recursiveSerialize({ exists: !!existing }));
 }

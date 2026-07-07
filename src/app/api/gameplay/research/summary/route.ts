@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { prisma } from "@/lib/server/prisma";
+import { createPocketbaseAdminClient } from "@/lib/pocketbase/adminClient";
 import { getResearchedProgressForUser, getSurveyBonusForUser, QUANTITY_UPGRADES } from "@/lib/server/researched";
 import { getRouteUser } from "@/lib/server/supabaseRoute";
 
@@ -51,26 +51,28 @@ export async function GET() {
     }
 
     const userId = user.id;
+    const pb = await createPocketbaseAdminClient();
 
     const [researchProgress, classifications, surveyBonus, profile] = await Promise.all([
       getResearchedProgressForUser(userId),
-      prisma.classification.findMany({
-        where: { author: userId },
-        select: { classificationtype: true },
+      pb.collection("classifications").getFullList({
+        filter: pb.filter("author = {:a}", { a: userId }),
+        fields: "classificationtype",
       }),
       getSurveyBonusForUser(userId),
-      prisma.profile.findUnique({
-        where: { id: userId },
-        select: { referralCode: true },
-      }),
+      pb
+        .collection("profiles")
+        .getFirstListItem(pb.filter("userId = {:id}", { id: userId }))
+        .catch(() => null),
     ]);
 
     const referralCode = profile?.referralCode ?? null;
     let referralCount = 0;
     if (referralCode) {
-      referralCount = await prisma.referral.count({
-        where: { referralCode },
-      });
+      const referralResult = await pb
+        .collection("referrals")
+        .getList(1, 1, { filter: pb.filter("referralCode = {:c}", { c: referralCode }) });
+      referralCount = referralResult.totalItems;
     }
     const referralBonus = referralCount * 5;
 

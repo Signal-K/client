@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 
-import { prisma } from "@/lib/server/prisma";
 import { getRouteUser } from "@/lib/server/supabaseRoute";
+import { createPocketbaseAdminClient } from "@/lib/pocketbase/adminClient";
 import { recursiveSerialize } from "@/utils/serialization";
 
 export const dynamic = "force-dynamic";
@@ -14,18 +14,19 @@ export async function GET(request: NextRequest) {
   }
 
   const { user } = await getRouteUser();
-  const rows = await prisma.$queryRaw<Array<{ vote_type: "up" | "down"; user_id: string }>>`
-    SELECT vote_type, user_id
-    FROM votes
-    WHERE classification_id = ${classificationId}
-  `;
-  const upvotes = rows.filter((v: any) => v.vote_type === "up").length;
-  const downvotes = rows.filter((v: any) => v.vote_type === "down").length;
+  const pb = await createPocketbaseAdminClient();
+  const rows = await pb.collection("votes").getFullList({
+    filter: pb.filter("classificationId = {:id}", { id: classificationId }),
+    fields: "voteType,userId",
+  });
+
+  const upvotes = rows.filter((v) => v.voteType === "up").length;
+  const downvotes = rows.filter((v) => v.voteType === "down").length;
 
   let userVote: "up" | "down" | null = null;
   if (user?.id) {
-    const mine = rows.find((v: any) => v.user_id === user.id);
-    userVote = (mine?.vote_type as "up" | "down" | undefined) || null;
+    const mine = rows.find((v) => v.userId === user.id);
+    userVote = (mine?.voteType as "up" | "down" | undefined) || null;
   }
 
   return NextResponse.json(recursiveSerialize({
@@ -56,38 +57,29 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(recursiveSerialize({ error: "Invalid classificationId" }), { status: 400 });
   }
 
-  const existingVoteRows = await prisma.$queryRaw<Array<{ id: number }>>`
-    SELECT id
-    FROM votes
-    WHERE classification_id = ${classificationId}
-      AND user_id = ${user.id}
-    LIMIT 1
-  `;
-  const existingVote = existingVoteRows[0];
+  const pb = await createPocketbaseAdminClient();
+  const existingVote = await pb
+    .collection("votes")
+    .getFirstListItem(
+      pb.filter("classificationId = {:cid} && userId = {:uid}", { cid: classificationId, uid: user.id })
+    )
+    .catch(() => null);
 
-  if (existingVote?.id) {
+  if (existingVote) {
     return NextResponse.json(recursiveSerialize({ success: true, alreadyVoted: true }));
   }
 
-  const insertPayload: Record<string, unknown> = {
-    user_id: user.id,
-    classification_id: classificationId,
-    vote_type: voteType,
-  };
+  const latest = await pb.collection("votes").getList(1, 1, { sort: "-legacyId", fields: "legacyId" });
+  const nextLegacyId = (latest.items[0]?.legacyId ?? 0) + 1;
 
-  if (body?.anomalyId !== undefined && body?.anomalyId !== null) {
-    insertPayload.anomaly_id = body.anomalyId;
-  }
-
-  await prisma.$executeRaw`
-    INSERT INTO votes (user_id, classification_id, vote_type, anomaly_id)
-    VALUES (
-      ${insertPayload.user_id as string},
-      ${insertPayload.classification_id as number},
-      ${insertPayload.vote_type as "up" | "down"},
-      ${(insertPayload.anomaly_id as number | string | undefined) ?? null}
-    )
-  `;
+  await pb.collection("votes").create({
+    legacyId: nextLegacyId,
+    createdAt: new Date().toISOString(),
+    userId: user.id,
+    classificationId,
+    voteType,
+    anomalyId: body?.anomalyId != null ? Number(body.anomalyId) : null,
+  });
 
   revalidatePath(`/posts/${classificationId}`);
 

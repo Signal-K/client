@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 
-import { prisma } from "@/lib/server/prisma";
 import { getRouteUser } from "@/lib/server/supabaseRoute";
+import { createPocketbaseAdminClient } from "@/lib/pocketbase/adminClient";
 import { recursiveSerialize } from "@/utils/serialization";
 
 export const dynamic = "force-dynamic";
@@ -35,39 +35,43 @@ export async function GET() {
     const oneWeekAgo = new Date();
     oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
 
+    const pb = await createPocketbaseAdminClient();
+
     const [planetClassifications, telescopeDeployments, satelliteDeployments, roverDeployments, userClassifications] =
       await Promise.all([
-        prisma.$queryRaw<Array<{ anomaly: number; content: string | null }>>`
-          SELECT c.anomaly, a.content
-          FROM classifications c
-          LEFT JOIN anomalies a ON a.id = c.anomaly
-          WHERE c.author::text = ${user.id}
-            AND c.classificationtype = 'planet'
-        `,
-        prisma.$queryRaw<Array<{ anomaly_id: number }>>`
-          SELECT anomaly_id
-          FROM linked_anomalies
-          WHERE author::text = ${user.id}
-            AND automaton = 'Telescope'
-            AND date >= ${oneWeekAgo.toISOString()}
-        `,
-        prisma.$queryRaw<Array<{ anomaly_id: number }>>`
-          SELECT anomaly_id
-          FROM linked_anomalies
-          WHERE author::text = ${user.id}
-            AND automaton = 'WeatherSatellite'
-        `,
-        prisma.$queryRaw<Array<{ anomaly_id: number }>>`
-          SELECT anomaly_id
-          FROM linked_anomalies
-          WHERE author::text = ${user.id}
-            AND automaton = 'Rover'
-        `,
-        prisma.$queryRaw<Array<{ anomaly: number }>>`
-          SELECT anomaly
-          FROM classifications
-          WHERE author::text = ${user.id}
-        `,
+        pb.collection("classifications").getFullList({
+          filter: pb.filter("author = {:author} && classificationtype = {:t}", { author: user.id, t: "planet" }),
+          fields: "anomaly,legacyId",
+        }).then(async (rows) => {
+          const anomalyIds = [...new Set(rows.map((r) => r.anomaly).filter((a): a is number => a != null))];
+          let contentByAnomalyId = new Map<number, string | null>();
+          if (anomalyIds.length > 0) {
+            const filter = anomalyIds.map((id) => pb.filter("legacyId = {:id}", { id })).join(" || ");
+            const anomalies = await pb.collection("anomalies").getFullList({ filter, fields: "legacyId,content" });
+            contentByAnomalyId = new Map(anomalies.map((a) => [a.legacyId, a.content ?? null]));
+          }
+          return rows.map((r) => ({ anomaly: r.anomaly, content: contentByAnomalyId.get(r.anomaly) ?? null }));
+        }),
+        pb.collection("linked_anomalies").getFullList({
+          filter: pb.filter("author = {:author} && automaton = {:a} && date >= {:d}", {
+            author: user.id,
+            a: "Telescope",
+            d: oneWeekAgo.toISOString(),
+          }),
+          fields: "anomalyId",
+        }),
+        pb.collection("linked_anomalies").getFullList({
+          filter: pb.filter("author = {:author} && automaton = {:a}", { author: user.id, a: "WeatherSatellite" }),
+          fields: "anomalyId",
+        }),
+        pb.collection("linked_anomalies").getFullList({
+          filter: pb.filter("author = {:author} && automaton = {:a}", { author: user.id, a: "Rover" }),
+          fields: "anomalyId",
+        }),
+        pb.collection("classifications").getFullList({
+          filter: pb.filter("author = {:author}", { author: user.id }),
+          fields: "anomaly",
+        }),
       ]);
 
     const planetTargets = planetClassifications
@@ -86,13 +90,13 @@ export async function GET() {
     );
 
     const telescopeUnclassified = telescopeDeployments.filter(
-      (deployment: any) => !classifiedAnomalyIds.has(deployment.anomaly_id)
+      (deployment: any) => !classifiedAnomalyIds.has(deployment.anomalyId)
     ).length;
     const satelliteUnclassified = satelliteDeployments.filter(
-      (deployment: any) => !classifiedAnomalyIds.has(deployment.anomaly_id)
+      (deployment: any) => !classifiedAnomalyIds.has(deployment.anomalyId)
     ).length;
     const roverUnclassified = roverDeployments.filter(
-      (deployment: any) => !classifiedAnomalyIds.has(deployment.anomaly_id)
+      (deployment: any) => !classifiedAnomalyIds.has(deployment.anomalyId)
     ).length;
 
     return NextResponse.json(recursiveSerialize({

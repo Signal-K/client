@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { Prisma } from "@prisma/client";
-
-import { prisma } from "@/lib/server/prisma";
 import { getRouteUser } from "@/lib/server/supabaseRoute";
+import { createPocketbaseAdminClient } from "@/lib/pocketbase/adminClient";
+import { mapInventoryToRow } from "@/lib/pocketbase/legacyShapes";
 import { recursiveSerialize } from "@/utils/serialization";
 
 export const dynamic = "force-dynamic";
@@ -18,14 +17,15 @@ export async function GET(request: NextRequest) {
   const itemParam = request.nextUrl.searchParams.get("item");
   const limit = Number(request.nextUrl.searchParams.get("limit") || 500);
 
-  const conditions: Prisma.Sql[] = [Prisma.sql`owner = ${user.id}`];
+  const pb = await createPocketbaseAdminClient();
+  const filters = [pb.filter("owner = {:owner}", { owner: user.id })];
 
   if (anomalyParam) {
     const anomaly = Number(anomalyParam);
     if (!Number.isFinite(anomaly)) {
       return NextResponse.json({ error: "Invalid anomaly" }, { status: 400 });
     }
-    conditions.push(Prisma.sql`anomaly = ${anomaly}`);
+    filters.push(pb.filter("anomaly = {:a}", { a: anomaly }));
   }
 
   if (itemParam) {
@@ -33,17 +33,13 @@ export async function GET(request: NextRequest) {
     if (!Number.isFinite(item)) {
       return NextResponse.json({ error: "Invalid item" }, { status: 400 });
     }
-    conditions.push(Prisma.sql`item = ${item}`);
+    filters.push(pb.filter("item = {:i}", { i: item }));
   }
 
-  const rows = await prisma.$queryRaw<Array<Record<string, unknown>>>(Prisma.sql`
-    SELECT *
-    FROM inventory
-    WHERE ${Prisma.join(conditions, " AND ")}
-    ORDER BY id DESC
-    LIMIT ${Math.max(1, Math.min(limit, 2000))}
-  `);
+  const result = await pb.collection("inventory").getList(1, Math.max(1, Math.min(limit, 2000)), {
+    filter: filters.join(" && "),
+    sort: "-legacyId",
+  });
 
-  return NextResponse.json(recursiveSerialize({ inventory: rows }));
+  return NextResponse.json(recursiveSerialize({ inventory: result.items.map(mapInventoryToRow) }));
 }
-

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { prisma } from "@/lib/server/prisma";
+import { createPocketbaseAdminClient } from "@/lib/pocketbase/adminClient";
 import { getRouteUser } from "@/lib/server/supabaseRoute";
 
 export const dynamic = "force-dynamic";
@@ -12,10 +12,11 @@ export async function GET() {
       return NextResponse.json({ authenticated: false, hasReferral: false }, { status: 200 });
     }
 
-    const data = await prisma.referral.findFirst({
-      where: { referreeId: user.id },
-      select: { id: true },
-    });
+    const pb = await createPocketbaseAdminClient();
+    const data = await pb
+      .collection("referrals")
+      .getFirstListItem(pb.filter("referreeId = {:id}", { id: user.id }))
+      .catch(() => null);
 
     return NextResponse.json({ authenticated: true, hasReferral: Boolean(data) });
   } catch (err: unknown) {

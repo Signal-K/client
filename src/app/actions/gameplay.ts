@@ -1,8 +1,9 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { prisma } from "@/lib/server/prisma";
 import { getRouteUser } from "@/lib/server/supabaseRoute";
+import { createPocketbaseAdminClient } from "@/lib/pocketbase/adminClient";
+import { mapMineralDepositToRow } from "@/lib/pocketbase/legacyShapes";
 import { recursiveSerialize } from "@/utils/serialization";
 
 // ── NPS ──────────────────────────────────────────────────────────────────────
@@ -16,10 +17,13 @@ export async function submitNpsAction(input: { npsScore: number; feedback?: stri
     return { ok: false as const, error: "Invalid score" };
   }
 
-  await prisma.$executeRaw`
-    INSERT INTO nps_surveys (user_id, nps_score, project_interests)
-    VALUES (${user.id}, ${npsScore}, ${feedback})
-  `;
+  const pb = await createPocketbaseAdminClient();
+  await pb.collection("nps_surveys").create({
+    createdAt: new Date().toISOString(),
+    userId: user.id,
+    npsScore,
+    projectInterests: feedback,
+  });
 
   revalidatePath("/game");
   return { ok: true as const };
@@ -45,23 +49,21 @@ export async function submitSurveyorCommentAction(input: SurveyorCommentInput) {
     return { ok: false as const, error: "Invalid payload" };
   }
 
-  const configurationJson = configuration ? JSON.stringify(configuration) : null;
-  const surveyorVal = surveyor ?? null;
-  const categoryVal = category ?? null;
-  const valueVal = value ?? null;
+  const pb = await createPocketbaseAdminClient();
+  const latest = await pb.collection("comments").getList(1, 1, { sort: "-legacyId", fields: "legacyId" });
+  const nextLegacyId = (latest.items[0]?.legacyId ?? 0) + 1;
 
-  await prisma.$executeRaw`
-    INSERT INTO comments (content, classification_id, author, configuration, surveyor, category, value)
-    VALUES (
-      ${content},
-      ${classificationId},
-      ${user.id},
-      ${configurationJson}::jsonb,
-      ${surveyorVal},
-      ${categoryVal},
-      ${valueVal}
-    )
-  `;
+  await pb.collection("comments").create({
+    legacyId: nextLegacyId,
+    createdAt: new Date().toISOString(),
+    content,
+    classificationId,
+    author: user.id,
+    configuration: configuration ?? null,
+    surveyor: surveyor ?? null,
+    category: category ?? null,
+    value: value ?? null,
+  });
 
   revalidatePath(`/planets/${classificationId}`);
   revalidatePath(`/posts/surveyor/${classificationId}`);
@@ -76,14 +78,15 @@ export async function getExtractionDepositAction(depositId: number) {
 
   if (!Number.isFinite(depositId)) return { ok: false as const, error: "Invalid deposit ID" };
 
-  const rows = await prisma.$queryRaw<Array<Record<string, unknown>>>`
-    SELECT * FROM mineral_deposits WHERE id = ${depositId} LIMIT 1
-  `;
-  const data = rows[0];
-  if (!data) return { ok: false as const, error: "Mineral deposit not found" };
-  if (data.owner !== user.id) return { ok: false as const, error: "Forbidden" };
+  const pb = await createPocketbaseAdminClient();
+  const record = await pb
+    .collection("mineral_deposits")
+    .getFirstListItem(pb.filter("legacyId = {:id}", { id: depositId }))
+    .catch(() => null);
+  if (!record) return { ok: false as const, error: "Mineral deposit not found" };
+  if (record.owner !== user.id) return { ok: false as const, error: "Forbidden" };
 
-  return { ok: true as const, deposit: recursiveSerialize(data) };
+  return { ok: true as const, deposit: recursiveSerialize(mapMineralDepositToRow(record)) };
 }
 
 export async function completeExtractionAction(input: {
@@ -100,29 +103,37 @@ export async function completeExtractionAction(input: {
     return { ok: false as const, error: "Invalid extraction payload" };
   }
 
-  const depositRows = await prisma.$queryRaw<
-    Array<{ id: number; owner: string; mineral_configuration: Record<string, unknown> | null }>
-  >`
-    SELECT id, owner, mineral_configuration FROM mineral_deposits WHERE id = ${depositId} LIMIT 1
-  `;
-  const deposit = depositRows[0];
+  const pb = await createPocketbaseAdminClient();
+  const deposit = await pb
+    .collection("mineral_deposits")
+    .getFirstListItem(pb.filter("legacyId = {:id}", { id: depositId }))
+    .catch(() => null);
   if (!deposit) return { ok: false as const, error: "Mineral deposit not found" };
   if (deposit.owner !== user.id) return { ok: false as const, error: "Forbidden" };
 
-  const mineralType = deposit.mineral_configuration?.type;
+  const mineralType = deposit.mineralConfiguration?.type;
   if (!mineralType) return { ok: false as const, error: "Deposit has no mineral type" };
 
-  await prisma.$executeRaw`
-    INSERT INTO user_mineral_inventory (user_id, mineral_deposit_id, mineral_type, quantity, purity, extracted_at)
-    VALUES (${user.id}, ${deposit.id}, ${String(mineralType)}, ${extractedQuantity}, ${purity}, ${new Date().toISOString()})
-  `;
+  const latest = await pb
+    .collection("user_mineral_inventory")
+    .getList(1, 1, { sort: "-legacyId", fields: "legacyId" });
+  const nextLegacyId = (latest.items[0]?.legacyId ?? 0) + 1;
 
-  const updatedConfig = { ...deposit.mineral_configuration, amount: 0, quantity: 0 };
-  await prisma.$executeRaw`
-    UPDATE mineral_deposits SET mineral_configuration = ${JSON.stringify(updatedConfig)}::jsonb WHERE id = ${deposit.id}
-  `;
+  await pb.collection("user_mineral_inventory").create({
+    legacyId: nextLegacyId,
+    userId: user.id,
+    mineralDepositId: deposit.legacyId,
+    mineralType: String(mineralType),
+    quantity: extractedQuantity,
+    purity,
+    extractedAt: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
+  });
+
+  const updatedConfig = { ...deposit.mineralConfiguration, amount: 0, quantity: 0 };
+  await pb.collection("mineral_deposits").update(deposit.id, { mineralConfiguration: updatedConfig });
 
   revalidatePath("/inventory");
-  revalidatePath(`/extraction/${deposit.id}`);
+  revalidatePath(`/extraction/${deposit.legacyId}`);
   return { ok: true as const };
 }

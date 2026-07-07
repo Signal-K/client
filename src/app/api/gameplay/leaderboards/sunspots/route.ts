@@ -1,58 +1,60 @@
 import { NextResponse } from "next/server";
 
-import { prisma } from "@/lib/server/prisma";
+import { createPocketbaseAdminClient } from "@/lib/pocketbase/adminClient";
 
 export const dynamic = "force-dynamic";
 
+type LeaderEntry = { user_id: string; username: string | null; full_name: string | null; avatar_url: string | null; count: number };
+
+function toLeaderboard(countsByUser: Map<string, number>, profileByUserId: Map<string, Record<string, any>>): LeaderEntry[] {
+  return [...countsByUser.entries()]
+    .map(([userId, count]) => {
+      const profile = profileByUserId.get(userId);
+      return {
+        user_id: userId,
+        username: profile?.username || "Anonymous",
+        full_name: profile?.fullName || "Unknown",
+        avatar_url: profile?.avatarUrl ?? null,
+        count,
+      };
+    })
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 10);
+}
+
 export async function GET() {
-  const [probeLeaders, classificationLeaders] = await Promise.all([
-    prisma.$queryRaw<
-      Array<{ user_id: string; username: string | null; full_name: string | null; avatar_url: string | null; count: number }>
-    >`
-      SELECT
-        dp.user_id,
-        p.username,
-        p.full_name,
-        p.avatar_url,
-        COALESCE(SUM(dp.count), 0)::int AS count
-      FROM defensive_probes dp
-      LEFT JOIN profiles p ON p.id = dp.user_id
-      GROUP BY dp.user_id, p.username, p.full_name, p.avatar_url
-      ORDER BY count DESC
-      LIMIT 10
-    `,
-    prisma.$queryRaw<
-      Array<{ user_id: string; username: string | null; full_name: string | null; avatar_url: string | null; count: number }>
-    >`
-      SELECT
-        c.author AS user_id,
-        p.username,
-        p.full_name,
-        p.avatar_url,
-        COUNT(*)::int AS count
-      FROM classifications c
-      LEFT JOIN profiles p ON p.id = c.author
-      WHERE c.classificationtype = 'sunspot'
-      GROUP BY c.author, p.username, p.full_name, p.avatar_url
-      ORDER BY count DESC
-      LIMIT 10
-    `,
+  const pb = await createPocketbaseAdminClient();
+
+  const [probes, sunspotClassifications] = await Promise.all([
+    pb.collection("defensive_probes").getFullList({ fields: "userId,count" }),
+    pb.collection("classifications").getFullList({
+      filter: pb.filter("classificationtype = {:t}", { t: "sunspot" }),
+      fields: "author",
+    }),
   ]);
 
+  const probeCounts = new Map<string, number>();
+  for (const p of probes) {
+    if (!p.userId) continue;
+    probeCounts.set(p.userId, (probeCounts.get(p.userId) ?? 0) + (p.count ?? 0));
+  }
+
+  const classificationCounts = new Map<string, number>();
+  for (const c of sunspotClassifications) {
+    if (!c.author) continue;
+    classificationCounts.set(c.author, (classificationCounts.get(c.author) ?? 0) + 1);
+  }
+
+  const allUserIds = [...new Set([...probeCounts.keys(), ...classificationCounts.keys()])];
+  let profileByUserId = new Map<string, Record<string, any>>();
+  if (allUserIds.length > 0) {
+    const filter = allUserIds.map((id) => pb.filter("userId = {:id}", { id })).join(" || ");
+    const profiles = await pb.collection("profiles").getFullList({ filter });
+    profileByUserId = new Map(profiles.map((p) => [p.userId, p]));
+  }
+
   return NextResponse.json({
-    probeLeaders: probeLeaders.map((entry) => ({
-      user_id: entry.user_id,
-      username: entry.username || "Anonymous",
-      full_name: entry.full_name || "Unknown",
-      avatar_url: entry.avatar_url,
-      count: entry.count || 0,
-    })),
-    classificationLeaders: classificationLeaders.map((entry) => ({
-      user_id: entry.user_id,
-      username: entry.username || "Anonymous",
-      full_name: entry.full_name || "Unknown",
-      avatar_url: entry.avatar_url,
-      count: entry.count || 0,
-    })),
+    probeLeaders: toLeaderboard(probeCounts, profileByUserId),
+    classificationLeaders: toLeaderboard(classificationCounts, profileByUserId),
   });
 }

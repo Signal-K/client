@@ -1,4 +1,4 @@
-import { prisma } from "@/lib/server/prisma";
+import { createPocketbaseAdminClient } from "@/lib/pocketbase/adminClient";
 import { nanoid } from "nanoid";
 
 /**
@@ -9,15 +9,17 @@ export class ReferralService {
    * Generates a new unique referral code for a profile.
    */
   static async generateUniqueCode(): Promise<string> {
+    const pb = await createPocketbaseAdminClient();
     let code = "";
     let isUnique = false;
     let attempts = 0;
 
     while (!isUnique && attempts < 10) {
       code = nanoid(8).toUpperCase();
-      const existing = await prisma.profile.findFirst({
-        where: { referralCode: code }
-      });
+      const existing = await pb
+        .collection("profiles")
+        .getFirstListItem(pb.filter("referralCode = {:c}", { c: code }))
+        .catch(() => null);
       if (!existing) isUnique = true;
       attempts++;
     }
@@ -29,18 +31,20 @@ export class ReferralService {
    * Ensures a user has a referral code.
    */
   static async ensureReferralCode(userId: string): Promise<string> {
-    const profile = await prisma.profile.findUnique({
-      where: { id: userId },
-      select: { referralCode: true }
-    });
+    const pb = await createPocketbaseAdminClient();
+    const profile = await pb
+      .collection("profiles")
+      .getFirstListItem(pb.filter("userId = {:id}", { id: userId }))
+      .catch(() => null);
 
     if (profile?.referralCode) return profile.referralCode;
 
     const newCode = await this.generateUniqueCode();
-    await prisma.profile.update({
-      where: { id: userId },
-      data: { referralCode: newCode }
-    });
+    if (profile) {
+      await pb.collection("profiles").update(profile.id, { referralCode: newCode });
+    } else {
+      await pb.collection("profiles").create({ userId, referralCode: newCode, updatedAt: new Date().toISOString() });
+    }
 
     return newCode;
   }
@@ -50,78 +54,81 @@ export class ReferralService {
    * Checks for self-referral, already referred, and valid code.
    */
   static async applyReferral(referreeId: string, code: string) {
+    const pb = await createPocketbaseAdminClient();
+
     // 1. Validate the code exists and get the referrer
-    const referrer = await prisma.profile.findFirst({
-      where: { referralCode: code },
-      select: { id: true }
-    });
+    const referrer = await pb
+      .collection("profiles")
+      .getFirstListItem(pb.filter("referralCode = {:c}", { c: code }))
+      .catch(() => null);
 
     if (!referrer) {
       throw new Error("Invalid referral code.");
     }
 
     // 2. Prevent self-referral
-    if (referrer.id === referreeId) {
+    if (referrer.userId === referreeId) {
       throw new Error("You cannot refer yourself.");
     }
 
     // 3. Check if user already used a referral code
-    const existingReferral = await prisma.referral.findFirst({
-      where: { referreeId }
-    });
+    const existingReferral = await pb
+      .collection("referrals")
+      .getFirstListItem(pb.filter("referreeId = {:id}", { id: referreeId }))
+      .catch(() => null);
 
     if (existingReferral) {
       throw new Error("You have already been referred.");
     }
 
-    // 4. Record the referral
-    return await prisma.$transaction(async (tx) => {
-      const referral = await tx.referral.create({
-        data: {
-          referreeId,
-          referralCode: code,
-        }
-      });
-
-      // 5. Grant rewards (Stardust) to the referrer
-      // Currently using survey_rewards table as a way to grant stardust 
-      // since there's no direct 'stardust' balance in Profile (it's calculated from rewards)
-      await tx.surveyReward.create({
-        data: {
-          userId: referrer.id,
-          surveyId: `referral-${referreeId}`,
-          surveyName: "Referral Bonus",
-          stardustGranted: 25 // Premium bonus for referring a friend
-        }
-      });
-
-      // Also grant a smaller bonus to the referred user
-      await tx.surveyReward.create({
-        data: {
-          userId: referreeId,
-          surveyId: `referred-by-${referrer.id}`,
-          surveyName: "Acquisition Bonus",
-          stardustGranted: 10
-        }
-      });
-
-      return referral;
+    // 4. Record the referral. Pocketbase's JS SDK has no cross-collection
+    // transaction API, so these are sequential creates, not atomic — accepted
+    // given the low stakes (a missed bonus reward is recoverable, unlike the
+    // duplicate-referral check above which already guards the important case).
+    const referral = await pb.collection("referrals").create({
+      referreeId,
+      referralCode: code,
+      referredAt: new Date().toISOString(),
     });
+
+    // 5. Grant rewards (Stardust) to the referrer
+    // Currently using survey_rewards table as a way to grant stardust
+    // since there's no direct 'stardust' balance in Profile (it's calculated from rewards)
+    await pb.collection("survey_rewards").create({
+      userId: referrer.userId,
+      surveyId: `referral-${referreeId}`,
+      surveyName: "Referral Bonus",
+      stardustGranted: 25, // Premium bonus for referring a friend
+      createdAt: new Date().toISOString(),
+    });
+
+    // Also grant a smaller bonus to the referred user
+    await pb.collection("survey_rewards").create({
+      userId: referreeId,
+      surveyId: `referred-by-${referrer.userId}`,
+      surveyName: "Acquisition Bonus",
+      stardustGranted: 10,
+      createdAt: new Date().toISOString(),
+    });
+
+    return referral;
   }
 
   /**
    * Gets the total number of successful referrals for a user.
    */
   static async getReferralCount(userId: string): Promise<number> {
-    const profile = await prisma.profile.findUnique({
-      where: { id: userId },
-      select: { referralCode: true }
-    });
+    const pb = await createPocketbaseAdminClient();
+    const profile = await pb
+      .collection("profiles")
+      .getFirstListItem(pb.filter("userId = {:id}", { id: userId }))
+      .catch(() => null);
 
     if (!profile?.referralCode) return 0;
 
-    return await prisma.referral.count({
-      where: { referralCode: profile.referralCode }
+    const result = await pb.collection("referrals").getList(1, 1, {
+      filter: pb.filter("referralCode = {:c}", { c: profile.referralCode }),
     });
+    return result.totalItems;
   }
 }

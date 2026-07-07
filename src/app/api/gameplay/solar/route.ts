@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 
-import { prisma } from "@/lib/server/prisma";
 import { getRouteUser } from "@/lib/server/supabaseRoute";
+import { createPocketbaseAdminClient } from "@/lib/pocketbase/adminClient";
 import { recursiveSerialize } from "@/utils/serialization";
 
 export const dynamic = "force-dynamic";
@@ -15,11 +15,11 @@ type SolarActionBody =
     }
   | {
       action: "mark_defended";
-      eventId?: number | string;
+      eventId?: string;
     }
   | {
       action: "launch_probe";
-      eventId?: number | string;
+      eventId?: string;
       count?: number;
     };
 
@@ -30,6 +30,8 @@ export async function POST(request: NextRequest) {
   }
 
   const body = (await request.json().catch(() => ({}))) as SolarActionBody;
+  const pb = await createPocketbaseAdminClient();
+
   if (body?.action === "ensure_event") {
     const weekStart = typeof body?.weekStart === "string" ? body.weekStart : "";
     const weekEnd = typeof body?.weekEnd === "string" ? body.weekEnd : "";
@@ -38,44 +40,53 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "weekStart and weekEnd are required" }, { status: 400 });
     }
 
-    const rows = await prisma.$queryRaw<Array<Record<string, unknown>>>`
-      INSERT INTO solar_events (week_start, week_end, was_defended)
-      VALUES (${weekStart}, ${weekEnd}, false)
-      RETURNING *
-    `;
-    const newEvent = rows[0];
+    const now = new Date().toISOString();
+    const newEvent = await pb.collection("solar_events").create({
+      weekStart,
+      weekEnd,
+      wasDefended: false,
+      createdAt: now,
+      updatedAt: now,
+    });
 
     revalidatePath("/game");
-    return NextResponse.json(recursiveSerialize(newEvent));
+    return NextResponse.json(
+      recursiveSerialize({
+        id: newEvent.id,
+        week_start: newEvent.weekStart,
+        week_end: newEvent.weekEnd,
+        was_defended: newEvent.wasDefended,
+        created_at: newEvent.createdAt,
+        updated_at: newEvent.updatedAt,
+      })
+    );
   }
 
   if (body?.action === "mark_defended") {
-    const eventId = Number(body?.eventId);
-    if (!Number.isFinite(eventId)) {
+    const eventId = body?.eventId;
+    if (!eventId) {
       return NextResponse.json({ error: "Invalid eventId" }, { status: 400 });
     }
 
-    await prisma.$executeRaw`
-      UPDATE solar_events
-      SET was_defended = true
-      WHERE id = ${eventId}
-    `;
+    await pb.collection("solar_events").update(eventId, { wasDefended: true, updatedAt: new Date().toISOString() });
 
     revalidatePath("/game");
     return NextResponse.json(recursiveSerialize({ success: true }));
   }
 
   if (body?.action === "launch_probe") {
-    const eventId = Number(body?.eventId);
+    const eventId = body?.eventId;
     const count = Number(body?.count ?? 1);
-    if (!Number.isFinite(eventId) || !Number.isFinite(count) || count <= 0) {
+    if (!eventId || !Number.isFinite(count) || count <= 0) {
       return NextResponse.json({ error: "Invalid launch payload" }, { status: 400 });
     }
 
-    await prisma.$executeRaw`
-      INSERT INTO defensive_probes (event_id, user_id, count)
-      VALUES (${eventId}, ${user.id}, ${count})
-    `;
+    await pb.collection("defensive_probes").create({
+      eventId,
+      userId: user.id,
+      count,
+      launchedAt: new Date().toISOString(),
+    });
 
     revalidatePath("/game");
     return NextResponse.json(recursiveSerialize({ success: true }));

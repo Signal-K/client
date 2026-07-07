@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 
-import { prisma } from "@/lib/server/prisma";
 import { getRouteUser } from "@/lib/server/supabaseRoute";
+import { createPocketbaseAdminClient } from "@/lib/pocketbase/adminClient";
 
 export const dynamic = "force-dynamic";
 
@@ -11,14 +11,17 @@ export async function POST() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const existing = await prisma.$queryRaw<Array<{ id: string }>>`
-    SELECT id FROM profiles WHERE id::text = ${user.id} LIMIT 1
-  `;
+  const pb = await createPocketbaseAdminClient();
+  const existing = await pb
+    .collection("profiles")
+    .getFirstListItem(pb.filter("userId = {:id}", { id: user.id }))
+    .catch(() => null);
 
-  if (existing.length === 0) {
-    await prisma.$executeRaw`
-      INSERT INTO profiles (id, updated_at) VALUES (${user.id}::uuid, NOW())
-    `;
+  if (!existing) {
+    await pb.collection("profiles").create({
+      userId: user.id,
+      updatedAt: new Date().toISOString(),
+    });
   }
 
   return NextResponse.json({ success: true });

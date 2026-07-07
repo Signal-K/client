@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 
-import { prisma } from "@/lib/server/prisma";
 import { getRouteUser } from "@/lib/server/supabaseRoute";
+import { createPocketbaseAdminClient } from "@/lib/pocketbase/adminClient";
 import { recursiveSerialize } from "@/utils/serialization";
 
 export const dynamic = "force-dynamic";
@@ -23,24 +23,18 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(recursiveSerialize({ error: "Invalid amount" }), { status: 400 });
   }
 
-  const rows = await prisma.$queryRaw<Array<{ id: string; classificationPoints: number | null }>>`
-    SELECT id, "classificationPoints"
-    FROM profiles
-    WHERE id::text = ${user.id}
-    LIMIT 1
-  `;
-  const profile = rows[0];
+  const pb = await createPocketbaseAdminClient();
+  const profile = await pb
+    .collection("profiles")
+    .getFirstListItem(pb.filter("userId = {:id}", { id: user.id }))
+    .catch(() => null);
 
   if (!profile) {
     return NextResponse.json(recursiveSerialize({ error: "Profile not found" }), { status: 404 });
   }
 
   const nextPoints = (profile.classificationPoints || 0) + amount;
-  await prisma.$executeRaw`
-    UPDATE profiles
-    SET "classificationPoints" = ${nextPoints}
-    WHERE id::text = ${user.id}
-  `;
+  await pb.collection("profiles").update(profile.id, { classificationPoints: nextPoints });
 
   revalidatePath("/game");
   revalidatePath("/profile");

@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 
-import { prisma } from "@/lib/server/prisma";
 import { getRouteUser } from "@/lib/server/supabaseRoute";
+import { createPocketbaseAdminClient } from "@/lib/pocketbase/adminClient";
 
 export const dynamic = "force-dynamic";
 
@@ -12,20 +12,20 @@ export async function POST() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const existing = await prisma.$queryRaw<Array<{ id: number }>>`
-    SELECT id
-    FROM notification_rejections
-    WHERE profile_id = ${user.id}
-    LIMIT 1
-  `;
-  if (existing.length > 0) {
+  const pb = await createPocketbaseAdminClient();
+  const existing = await pb
+    .collection("notification_rejections")
+    .getFirstListItem(pb.filter("profileId = {:id}", { id: user.id }))
+    .catch(() => null);
+
+  if (existing) {
     return NextResponse.json({ success: true, alreadyExists: true });
   }
 
-  await prisma.$executeRaw`
-    INSERT INTO notification_rejections (profile_id)
-    VALUES (${user.id})
-  `;
+  await pb.collection("notification_rejections").create({
+    profileId: user.id,
+    createdAt: new Date().toISOString(),
+  });
 
   revalidatePath("/game");
   return NextResponse.json({ success: true, alreadyExists: false });

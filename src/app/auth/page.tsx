@@ -35,12 +35,12 @@ function LoginContent() {
       router.replace(destination);
     }, [isLoading, user, router, searchParams, posthog]);
 
-    return <EnhancedAuthPage />;
+    return <EnhancedAuthPage mode="sign-in" />;
 }
 
 export default function Login() {
   return (
-    <Suspense fallback={<EnhancedAuthPage />}>
+    <Suspense fallback={<EnhancedAuthPage mode="sign-in" />}>
       <LoginContent />
     </Suspense>
   );

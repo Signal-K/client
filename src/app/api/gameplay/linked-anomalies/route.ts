@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 
-import { Prisma } from "@prisma/client";
-
-import { prisma } from "@/lib/server/prisma";
 import { getRouteUser } from "@/lib/server/supabaseRoute";
+import { createPocketbaseAdminClient } from "@/lib/pocketbase/adminClient";
+import { mapLinkedAnomalyToRow } from "@/lib/pocketbase/legacyShapes";
 import { recursiveSerialize } from "@/utils/serialization";
 
 export const dynamic = "force-dynamic";
@@ -31,43 +30,41 @@ export async function GET(request: NextRequest) {
   const automaton = request.nextUrl.searchParams.get("automaton");
   const dateGte = request.nextUrl.searchParams.get("dateGte");
 
+  const pb = await createPocketbaseAdminClient();
+
   if (anomalyIdParam) {
     const anomalyId = Number(anomalyIdParam);
     if (!Number.isFinite(anomalyId)) {
       return NextResponse.json({ error: "Invalid anomalyId" }, { status: 400 });
     }
 
-    const rows = await prisma.$queryRaw<Array<{ id: number; classification_id: number | null }>>`
-      SELECT id, classification_id
-      FROM linked_anomalies
-      WHERE author = ${user.id}
-        AND anomaly_id = ${anomalyId}
-      ORDER BY id DESC
-      LIMIT 1
-    `;
-    const row = rows[0] ?? null;
+    const row = await pb
+      .collection("linked_anomalies")
+      .getFirstListItem(
+        pb.filter("author = {:author} && anomalyId = {:aid}", { author: user.id, aid: anomalyId }),
+        { sort: "-legacyId" }
+      )
+      .catch(() => null);
+
     if (classificationIdOnly) {
-      return NextResponse.json(recursiveSerialize({ classification_id: row?.classification_id ?? null }));
+      return NextResponse.json(recursiveSerialize({ classification_id: row?.classificationId ?? null }));
     }
-    return NextResponse.json(recursiveSerialize({ linkedAnomaly: row }));
+    return NextResponse.json(recursiveSerialize({ linkedAnomaly: row ? mapLinkedAnomalyToRow(row) : null }));
   }
 
-  const conditions: Prisma.Sql[] = [Prisma.sql`author = ${user.id}`];
+  const filters = [pb.filter("author = {:author}", { author: user.id })];
   if (automaton) {
-    conditions.push(Prisma.sql`automaton = ${automaton}`);
+    filters.push(pb.filter("automaton = {:a}", { a: automaton }));
   }
   if (dateGte) {
-    conditions.push(Prisma.sql`date >= ${dateGte}`);
+    filters.push(pb.filter("date >= {:d}", { d: dateGte }));
   }
 
-  const rows = await prisma.$queryRaw<Array<Record<string, unknown>>>(Prisma.sql`
-    SELECT *
-    FROM linked_anomalies
-    WHERE ${Prisma.join(conditions, " AND ")}
-    ORDER BY id DESC
-    LIMIT 500
-  `);
-  return NextResponse.json(recursiveSerialize({ linkedAnomalies: rows }));
+  const result = await pb.collection("linked_anomalies").getList(1, 500, {
+    filter: filters.join(" && "),
+    sort: "-legacyId",
+  });
+  return NextResponse.json(recursiveSerialize({ linkedAnomalies: result.items.map(mapLinkedAnomalyToRow) }));
 }
 
 export async function DELETE(request: NextRequest) {
@@ -78,14 +75,17 @@ export async function DELETE(request: NextRequest) {
 
   const body = (await request.json().catch(() => ({}))) as DeleteBody;
 
-  const conditions: Prisma.Sql[] = [Prisma.sql`author = ${user.id}`];
+  const pb = await createPocketbaseAdminClient();
+  const filters = [pb.filter("author = {:author}", { author: user.id })];
+  let hasExtraFilter = false;
 
   if (body?.linkedAnomalyId !== undefined && body?.linkedAnomalyId !== null) {
     const linkedAnomalyId = Number(body.linkedAnomalyId);
     if (!Number.isFinite(linkedAnomalyId)) {
       return NextResponse.json({ error: "Invalid linkedAnomalyId" }, { status: 400 });
     }
-    conditions.push(Prisma.sql`id = ${linkedAnomalyId}`);
+    filters.push(pb.filter("legacyId = {:id}", { id: linkedAnomalyId }));
+    hasExtraFilter = true;
   }
 
   if (body?.anomalyId !== undefined && body?.anomalyId !== null) {
@@ -93,21 +93,21 @@ export async function DELETE(request: NextRequest) {
     if (!Number.isFinite(anomalyId)) {
       return NextResponse.json({ error: "Invalid anomalyId" }, { status: 400 });
     }
-    conditions.push(Prisma.sql`anomaly_id = ${anomalyId}`);
+    filters.push(pb.filter("anomalyId = {:aid}", { aid: anomalyId }));
+    hasExtraFilter = true;
   }
 
   if (typeof body?.automaton === "string" && body.automaton.trim()) {
-    conditions.push(Prisma.sql`automaton = ${body.automaton.trim()}`);
+    filters.push(pb.filter("automaton = {:a}", { a: body.automaton.trim() }));
+    hasExtraFilter = true;
   }
 
-  if (conditions.length < 2) {
+  if (!hasExtraFilter) {
     return NextResponse.json({ error: "At least one delete filter is required" }, { status: 400 });
   }
 
-  await prisma.$executeRaw`
-    DELETE FROM linked_anomalies
-    WHERE ${Prisma.join(conditions, " AND ")}
-  `;
+  const toDelete = await pb.collection("linked_anomalies").getFullList({ filter: filters.join(" && ") });
+  await Promise.all(toDelete.map((record) => pb.collection("linked_anomalies").delete(record.id)));
 
   revalidatePath("/activity/deploy");
   revalidatePath("/viewports/satellite");
@@ -129,22 +129,17 @@ export async function PATCH(request: NextRequest) {
     return NextResponse.json({ error: "Invalid id" }, { status: 400 });
   }
 
-  const updates: Record<string, unknown> = {};
   if (typeof body?.unlocked === "boolean") {
-    updates.unlocked = body.unlocked;
-  }
-
-  if (Object.keys(updates).length === 0) {
+    const pb = await createPocketbaseAdminClient();
+    const record = await pb
+      .collection("linked_anomalies")
+      .getFirstListItem(pb.filter("legacyId = {:id} && author = {:author}", { id, author: user.id }))
+      .catch(() => null);
+    if (record) {
+      await pb.collection("linked_anomalies").update(record.id, { unlocked: body.unlocked });
+    }
+  } else {
     return NextResponse.json({ error: "No valid patch fields provided" }, { status: 400 });
-  }
-
-  if (Object.prototype.hasOwnProperty.call(updates, "unlocked")) {
-    await prisma.$executeRaw`
-      UPDATE linked_anomalies
-      SET unlocked = ${Boolean(updates.unlocked)}
-      WHERE id = ${id}
-        AND author = ${user.id}
-    `;
   }
 
   revalidatePath("/viewports/satellite");

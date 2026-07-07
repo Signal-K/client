@@ -1,25 +1,26 @@
 import { NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 
-import { getRouteSupabaseWithUser } from "@/lib/server/supabaseRoute";
+import { createPocketbaseAdminClient } from "@/lib/pocketbase/adminClient";
+import { getRouteUser } from "@/lib/server/supabaseRoute";
 
 export const dynamic = "force-dynamic";
 
 export async function POST() {
-  const { supabase, user, authError } = await getRouteSupabaseWithUser();
+  const { user, authError } = await getRouteUser();
   if (authError || !user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { error: linkedError } = await supabase
-    .from("linked_anomalies")
-    .delete()
-    .eq("author", user.id)
-    .eq("automaton", "Rover");
-
-  if (linkedError) {
-    return NextResponse.json({ error: linkedError.message }, { status: 500 });
-  }
+  const pb = await createPocketbaseAdminClient();
+  const linkedRows = await pb.collection("linked_anomalies").getFullList({
+    filter: pb.filter("author = {:author} && automaton = {:automaton}", {
+      author: user.id,
+      automaton: "Rover",
+    }),
+    fields: "id",
+  });
+  await Promise.all(linkedRows.map((row) => pb.collection("linked_anomalies").delete(row.id)));
 
   const now = new Date();
   const utcDay = now.getUTCDay();
@@ -28,15 +29,14 @@ export async function POST() {
   cutoff.setUTCDate(now.getUTCDate() - daysToLastSaturday);
   cutoff.setUTCHours(14, 1, 0, 0);
 
-  const { error: routeError } = await supabase
-    .from("routes")
-    .delete()
-    .eq("author", user.id)
-    .gte("timestamp", cutoff.toISOString());
-
-  if (routeError) {
-    return NextResponse.json({ error: routeError.message }, { status: 500 });
-  }
+  const routes = await pb.collection("routes").getFullList({
+    filter: pb.filter("author = {:author} && timestamp >= {:cutoff}", {
+      author: user.id,
+      cutoff: cutoff.toISOString(),
+    }),
+    fields: "id",
+  });
+  await Promise.all(routes.map((route) => pb.collection("routes").delete(route.id)));
 
   revalidatePath("/activity/deploy/rover");
   revalidatePath("/viewports/rover");

@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { Prisma } from "@prisma/client";
 
-import { prisma } from "@/lib/server/prisma";
 import { getRouteUser } from "@/lib/server/supabaseRoute";
+import { createPocketbaseAdminClient } from "@/lib/pocketbase/adminClient";
+import { mapClassificationToRow } from "@/lib/pocketbase/legacyShapes";
 import { recursiveSerialize } from "@/utils/serialization";
 
 export const dynamic = "force-dynamic";
@@ -22,17 +22,15 @@ export async function GET(
     return NextResponse.json({ error: "Invalid id" }, { status: 400 });
   }
 
-  const rows = await prisma.$queryRaw<Array<Record<string, unknown>>>(Prisma.sql`
-    SELECT c.*
-    FROM classifications c
-    WHERE c.id = ${numericId}
-    LIMIT 1
-  `);
+  const pb = await createPocketbaseAdminClient();
+  const record = await pb
+    .collection("classifications")
+    .getFirstListItem(pb.filter("legacyId = {:id}", { id: numericId }))
+    .catch(() => null);
 
-  const classification = rows[0] ?? null;
-  if (!classification) {
+  if (!record) {
     return NextResponse.json({ error: "Classification not found" }, { status: 404 });
   }
 
-  return NextResponse.json({ classification: recursiveSerialize(classification) });
+  return NextResponse.json({ classification: recursiveSerialize(mapClassificationToRow(record)) });
 }

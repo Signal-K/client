@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
-import { createSupabaseServerClient } from "@/src/lib/supabase/ssr";
+import { auth } from "@clerk/nextjs/server";
 import GameClient from "./GameClient";
 
 export const dynamic = "force-dynamic";
@@ -25,25 +25,18 @@ function ControlStationSkeleton() {
 export default async function GamePage() {
   console.log("[GamePage] render start");
   try {
-    const supabase = createSupabaseServerClient();
-    console.log("[GamePage] supabase client created");
+    const { userId } = await auth();
+    console.log("[GamePage] auth() done", { hasUser: !!userId });
 
-    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-    console.log("[GamePage] getSession done", { hasSession: !!session, sessionError });
-
-    if (sessionError) {
-      console.error("[GamePage] getSession error:", sessionError);
-    }
-
-    if (!session) {
-      console.log("[GamePage] no session, redirecting to /auth");
+    if (!userId) {
+      console.log("[GamePage] no user, redirecting to /auth");
       redirect("/auth");
     }
 
-    console.log("[GamePage] rendering GameClient for user", session.user.id);
+    console.log("[GamePage] rendering GameClient for user", userId);
     return (
       <Suspense fallback={<ControlStationSkeleton />}>
-        <GameClient initialData={null} user={session.user} />
+        <GameClient initialData={null} user={{ id: userId }} />
       </Suspense>
     );
   } catch (err) {

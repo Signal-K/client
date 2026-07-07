@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { useSession } from "@/src/lib/auth/session-context";
 import ImageAnnotator from "../(classifications)/Annotating/AnnotatorView";
+import { getStorageUrl } from "@/lib/pocketbase/storageUrl";
 
 type Anomaly = {
   id: string;
@@ -11,8 +12,7 @@ type Anomaly = {
 };
 
 function cloudImageUrl(anomalyId: string) {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  return `${supabaseUrl}/storage/v1/object/public/clouds/${anomalyId}.png`;
+  return getStorageUrl("clouds", `${anomalyId}.png`);
 }
 
 export function StarterLidar({ anomalyid }: { anomalyid: string }) {

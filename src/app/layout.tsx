@@ -1,6 +1,7 @@
 import { ReactNode } from "react";
 import type { Metadata, Viewport } from "next";
 import { Syne_Mono } from "next/font/google";
+import { ClerkProvider } from "@clerk/nextjs";
 import RootLayoutClient from "@/src/components/layout/RootLayoutClient";
 import { PostHogProvider } from "@/src/components/providers/PostHogProvider";
 
@@ -73,12 +74,19 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     "US Cloud";
 
   return (
-    <PostHogProvider
-      apiKey={posthogApiKey}
-      projectId={posthogProjectId}
-      region={posthogRegion}
+    <ClerkProvider
+      signInUrl="/auth"
+      signUpUrl="/auth/register"
+      signInFallbackRedirectUrl="/game"
+      signUpFallbackRedirectUrl="/game"
     >
-      <RootLayoutClient fontClassName={syneMono.variable}>{children}</RootLayoutClient>
-    </PostHogProvider>
+      <PostHogProvider
+        apiKey={posthogApiKey}
+        projectId={posthogProjectId}
+        region={posthogRegion}
+      >
+        <RootLayoutClient fontClassName={syneMono.variable}>{children}</RootLayoutClient>
+      </PostHogProvider>
+    </ClerkProvider>
   );
 };

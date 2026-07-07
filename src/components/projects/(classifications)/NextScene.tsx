@@ -9,6 +9,7 @@ import { SourceClassificationCallout } from "@/src/components/classification/Sou
 import { MediaSlider } from "@/src/components/classification/MediaSlider";
 import UseDarkMode from "@/src/hooks/useDarkMode";
 import { TelescopeBackground } from "@/src/components/classification/telescope/telescope-background";
+import { getStorageUrl } from "@/lib/pocketbase/storageUrl";
 
 // Extracted Result Components
 import { DiskDetectiveResults } from "./results/DiskDetectiveResults";
@@ -73,11 +74,9 @@ export default function ClientClassificationPage({ id }: Props) {
   }, [id]);
 
   const detectDiskDetectiveImages = async (anomalyId: number) => {
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    if (!supabaseUrl) return [];
     const urls: string[] = [];
     for (let i = 1; i <= 20; i++) {
-      const url = `${supabaseUrl}/storage/v1/object/public/telescope/telescope-diskDetective/${anomalyId}/${i}.png`;
+      const url = getStorageUrl("telescope", `telescope-diskDetective/${anomalyId}/${i}.png`);
       try {
         const res = await fetch(url, { method: "HEAD" });
         if (res.ok) urls.push(url); else break;

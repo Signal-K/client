@@ -23,6 +23,7 @@ import { useUserPreferences, ProjectType } from "@/src/hooks/useUserPreferences"
 import Link from "next/link";
 import { cn } from "@/src/lib/utils";
 import { useAuthUser } from "@/src/hooks/useAuthUser";
+import { useClerk } from "@clerk/nextjs";
 
 interface GameHeaderProps {
   stardust?: number;
@@ -37,7 +38,8 @@ export default function GameHeader({
   onNotificationsClick,
   className,
 }: GameHeaderProps) {
-  const { user, supabase } = useAuthUser();
+  const { user } = useAuthUser();
+  const { signOut } = useClerk();
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [projectPreferencesOpen, setProjectPreferencesOpen] = useState(false);
   const { preferences, savePreferences } = useUserPreferences();
@@ -58,13 +60,13 @@ export default function GameHeader({
         document.cookie = c.replace(/^ +/, '').replace(/=.*/, '=;expires=' + new Date(0).toUTCString() + ';path=/');
       });
     }
-    const { error } = await supabase.auth.signOut();
-    if (error) {
-      console.error("Error signing out:", error.message);
-    } else {
+    try {
+      await signOut();
       if (typeof window !== "undefined") {
         window.location.href = "/";
       }
+    } catch (err) {
+      console.error("Error signing out:", err);
     }
   };
 

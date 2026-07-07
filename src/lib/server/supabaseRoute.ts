@@ -1,21 +1,26 @@
-import { createSupabaseServerClient } from "@/lib/supabase/ssr";
+import { auth, currentUser } from "@clerk/nextjs/server";
 
-/* v8 ignore next 25 */
-export async function getRouteSupabaseWithUser() {
-  const supabase = createSupabaseServerClient();
-  const {
-    data: { user },
-    error,
-  } = await supabase.auth.getUser();
+/* v8 ignore next 22 */
+export async function getRouteUser() {
+  const { userId } = await auth();
+
+  if (!userId) {
+    return {
+      user: null,
+      authError: new Error("Not signed in"),
+    };
+  }
+
+  const clerkUser = await currentUser();
 
   return {
-    supabase,
-    user,
-    authError: error,
+    user: clerkUser
+      ? {
+          id: userId,
+          email: clerkUser.primaryEmailAddress?.emailAddress ?? null,
+          is_anonymous: Boolean(clerkUser.publicMetadata?.guest),
+        }
+      : null,
+    authError: clerkUser ? null : new Error("User not found"),
   };
-}
-
-export async function getRouteUser() {
-  const { user, authError } = await getRouteSupabaseWithUser();
-  return { user, authError };
 }

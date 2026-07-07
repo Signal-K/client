@@ -22,26 +22,6 @@ services:
     # Simple command to start the development server
     command: "yarn dev"
 
-  # Prisma Studio - Database management UI connected to Supabase
-  prisma-studio:
-    container_name: prisma-studio
-    build:
-      context: ../..
-      dockerfile: ops/docker/next.dockerfile
-    ports:
-      - "4983:4983"
-    env_file:
-      - ../../.env.local
-    volumes:
-      - ../../:/app
-      - /app/node_modules
-    working_dir: /app
-    networks:
-      - app-network
-    command: "yarn prisma:studio --hostname 0.0.0.0 --port 4983"
-    profiles:
-      - studio
-
   # E2E Testing Service
   e2e-tests:
     container_name: e2e-tests
@@ -71,6 +51,25 @@ services:
     # Override default command for different test types
     command: "yarn test:e2e:headless"
 
+  # Pocketbase - replacing Supabase-hosted Postgres (see .claude/plans/sparkling-cooking-dewdrop.md, Phase 2)
+  pocketbase:
+    container_name: pocketbase
+    image: ghcr.io/muchobien/pocketbase:latest
+    ports:
+      - "8095:8090"
+    volumes:
+      - pocketbase-data:/pb_data
+      - ../../pocketbase/pb_hooks:/pb_hooks
+      - ../../pocketbase/pb_migrations:/pb_migrations
+    networks:
+      - app-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8090/api/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   # Optional: Flask service (uncomment if needed)
   # flask:
   #   container_name: flask
@@ -91,3 +90,6 @@ services:
 networks:
   app-network:
     driver: bridge
+
+volumes:
+  pocketbase-data:

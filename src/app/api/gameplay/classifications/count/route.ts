@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { Prisma } from "@prisma/client";
-
-import { prisma } from "@/lib/server/prisma";
 import { getRouteUser } from "@/lib/server/supabaseRoute";
+import { createPocketbaseAdminClient } from "@/lib/pocketbase/adminClient";
 import { recursiveSerialize } from "@/utils/serialization";
 
 export const dynamic = "force-dynamic";
@@ -18,22 +16,23 @@ export async function GET(request: NextRequest) {
   const createdAtGte = request.nextUrl.searchParams.get("createdAtGte");
   const createdAtLt = request.nextUrl.searchParams.get("createdAtLt");
 
-  const conditions: Prisma.Sql[] = [Prisma.sql`author = ${user.id}`];
+  const pb = await createPocketbaseAdminClient();
+
+  const conditions: string[] = [pb.filter("author = {:author}", { author: user.id })];
   if (classificationtype) {
-    conditions.push(Prisma.sql`classificationtype = ${classificationtype}`);
+    conditions.push(pb.filter("classificationtype = {:t}", { t: classificationtype }));
   }
   if (createdAtGte) {
-    conditions.push(Prisma.sql`created_at >= ${createdAtGte}`);
+    conditions.push(pb.filter("createdAt >= {:gte}", { gte: createdAtGte }));
   }
   if (createdAtLt) {
-    conditions.push(Prisma.sql`created_at < ${createdAtLt}`);
+    conditions.push(pb.filter("createdAt < {:lt}", { lt: createdAtLt }));
   }
 
-  const rows = await prisma.$queryRaw<Array<{ count: bigint | number }>>(Prisma.sql`
-    SELECT COUNT(*)::bigint AS count
-    FROM classifications
-    WHERE ${Prisma.join(conditions, " AND ")}
-  `);
+  const result = await pb.collection("classifications").getList(1, 1, {
+    filter: conditions.join(" && "),
+    fields: "id",
+  });
 
-  return NextResponse.json(recursiveSerialize({ count: Number(rows[0]?.count ?? 0) }));
+  return NextResponse.json(recursiveSerialize({ count: result.totalItems }));
 }

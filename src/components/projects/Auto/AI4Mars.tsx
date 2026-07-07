@@ -8,6 +8,7 @@ import ImageAnnotator from "../(classifications)/Annotating/AnnotatorView";
 import { Button } from "@/src/components/ui/button";
 import Link from "next/link";
 import TutorialContentBlock, { createTutorialSlides } from "../TutorialContentBlock";
+import { getStorageUrl } from "@/lib/pocketbase/storageUrl";
 
 interface Props {
     anomalyid: number | bigint;
@@ -50,9 +51,7 @@ export function AiForMarsProjectWithID({ anomalyid }: { anomalyid?: number }) {
                 if (!res.ok || !payload?.anomalies?.[0]) throw new Error(payload?.error || "Anomaly not found");
                 const data = payload.anomalies[0];
                 setAnomaly(data);
-                const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-                // images for this project are stored in the "automaton-aiForMars" bucket
-                setImageUrl(`${supabaseUrl}/storage/v1/object/public/telescope/automaton-aiForMars/${data.id}.jpeg`);
+                setImageUrl(getStorageUrl("telescope", `automaton-aiForMars/${data.id}.jpeg`));
             } catch (err: any) {
                 console.error("Error fetching anomaly:", err.message);
                 setAnomaly(null);
@@ -88,9 +87,7 @@ export function AiForMarsProjectWithID({ anomalyid }: { anomalyid?: number }) {
 }
 
 export function StarterAiForMars({ anomalyid }: Props) {
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    // ensure we use the correct public bucket path (automaton-aiForMars)
-    const imageUrl = `${supabaseUrl}/storage/v1/object/public/telescope/automaton-aiForMars/${anomalyid}.jpeg`;
+    const imageUrl = getStorageUrl("telescope", `automaton-aiForMars/${anomalyid}.jpeg`);
     const [showClassification, setShowClassification] = useState(false);
 
     // Tutorial slides for AI4Mars

@@ -1,31 +1,37 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { getRouteSupabaseWithUser } from "@/lib/server/supabaseRoute";
+import { createPocketbaseAdminClient } from "@/lib/pocketbase/adminClient";
+import { getRouteUser } from "@/lib/server/supabaseRoute";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(request: NextRequest) {
-  const { supabase, user, authError } = await getRouteSupabaseWithUser();
+  const { user, authError } = await getRouteUser();
   if (authError || !user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   const since = request.nextUrl.searchParams.get("since");
-  const query = supabase
-    .from("routes")
-    .select("*")
-    .eq("author", user.id)
-    .order("timestamp", { ascending: false })
-    .limit(1);
-
+  const pb = await createPocketbaseAdminClient();
+  const filters = [pb.filter("author = {:author}", { author: user.id })];
   if (since) {
-    query.gte("timestamp", since);
+    filters.push(pb.filter("timestamp >= {:since}", { since }));
   }
 
-  const { data, error } = await query.maybeSingle();
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
-  }
+  const data = await pb
+    .collection("routes")
+    .getFirstListItem(filters.join(" && "), { sort: "-timestamp" })
+    .catch(() => null);
 
-  return NextResponse.json({ route: data ?? null });
+  return NextResponse.json({
+    route: data
+      ? {
+          id: data.legacyId,
+          author: data.author,
+          routeConfiguration: data.routeConfiguration,
+          timestamp: data.timestamp,
+          location: data.location,
+        }
+      : null,
+  });
 }

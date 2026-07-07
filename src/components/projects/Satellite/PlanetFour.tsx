@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/src
 import { Button } from "@/src/components/ui/button";
 import ImageAnnotator from "../(classifications)/Annotating/AnnotatorView";
 import TutorialContentBlock, { createTutorialSlides } from "../TutorialContentBlock";
+import { getStorageUrl } from "@/lib/pocketbase/storageUrl";
 
 interface Props {
     anomalyid: number | bigint;
@@ -23,8 +24,7 @@ export function StarterPlanetFour({
     anomalyid
 }: Props) {
     const session = useSession();
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const imageUrl = `${supabaseUrl}/storage/v1/object/public/telescope/satellite-planetFour/${anomalyid}.jpeg`;
+    const imageUrl = getStorageUrl("telescope", `satellite-planetFour/${anomalyid}.jpeg`);
     const [showClassification, setShowClassification] = useState(false);
     const [checkingTutorialStatus, setCheckingTutorialStatus] = useState(true);
     const [showTutorialButton, setShowTutorialButton] = useState(false);
@@ -237,8 +237,7 @@ export function PlanetFourProject() {
 
                 if (anomalyData) {
                     setAnomaly(anomalyData);
-                    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-                    setImageUrl(`${supabaseUrl}/storage/v1/object/public/telescope/satellite-planetFour/${anomalyData.id}.jpeg`);
+                    setImageUrl(getStorageUrl("telescope", `satellite-planetFour/${anomalyData.id}.jpeg`));
                 } else {
                     setAnomaly(null);
                     setImageUrl(null);

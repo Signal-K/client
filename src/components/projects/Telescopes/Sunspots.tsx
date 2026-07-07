@@ -6,6 +6,7 @@ import { useActivePlanet } from "@/src/lib/context/ActivePlanet";
 import ClassificationForm from "../(classifications)/PostForm";
 import ImageAnnotator from "../(classifications)/Annotating/AnnotatorView";
 import TutorialContentBlock, { createTutorialSlides } from "../TutorialContentBlock";
+import { getStorageUrl } from "@/lib/pocketbase/storageUrl";
 
 interface SelectedAnomalyProps {
     anomalyid: number;
@@ -21,8 +22,7 @@ const SunspotDetectorTutorial: React.FC<TelescopeProps> = ({
     const session = useSession(); 
     const { activePlanet } = useActivePlanet();
 
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const imageUrl = `${supabaseUrl}/storage/v1/object/public/telescope/telescope-sunspots/${anomalyId}.png`;
+    const imageUrl = getStorageUrl("telescope", `telescope-sunspots/${anomalyId}.png`);
     const [showClassification, setShowClassification] = useState(false);
 
     const tutorialSlides = createTutorialSlides([
@@ -111,7 +111,6 @@ export function StarterSunspot({ anomalyId }: { anomalyId?: string }) {
     const [unlocking, setUnlocking] = useState(false);
     const [now, setNow] = useState<Date>(new Date());
 
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
     const automatonType = "TelescopeSolar";
 
     useEffect(() => {
@@ -132,7 +131,7 @@ export function StarterSunspot({ anomalyId }: { anomalyId?: string }) {
 
                     if (anomalyData) {
                         setAnomaly(anomalyData);
-                        setImageUrl(`${supabaseUrl}/storage/v1/object/public/telescope/telescope-sunspots/${anomalyData.id}.png`);
+                        setImageUrl(getStorageUrl("telescope", `telescope-sunspots/${anomalyData.id}.png`));
                     }
                 } else {
                     const anomalyRes = await fetch(
@@ -145,7 +144,7 @@ export function StarterSunspot({ anomalyId }: { anomalyId?: string }) {
                     const anomalyData = anomalyPayload.anomalies[0];
                     if (anomalyData) {
                         setAnomaly(anomalyData);
-                        setImageUrl(`${supabaseUrl}/storage/v1/object/public/telescope/telescope-sunspots/${anomalyData.id}.png`);
+                        setImageUrl(getStorageUrl("telescope", `telescope-sunspots/${anomalyData.id}.png`));
                     }
                 }
             } catch (error: any) {

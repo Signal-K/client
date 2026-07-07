@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 
-import { prisma } from "@/lib/server/prisma";
 import { getRouteUser } from "@/lib/server/supabaseRoute";
+import { createPocketbaseAdminClient } from "@/lib/pocketbase/adminClient";
 import { recursiveSerialize } from "@/utils/serialization";
 
 export const dynamic = "force-dynamic";
@@ -27,13 +27,11 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
   }
 
-  const rows = await prisma.$queryRaw<Array<{ id: number; classificationConfiguration: Record<string, unknown> | null }>>`
-    SELECT id, "classificationConfiguration"
-    FROM classifications
-    WHERE id = ${classificationId}
-    LIMIT 1
-  `;
-  const classification = rows[0];
+  const pb = await createPocketbaseAdminClient();
+  const classification = await pb
+    .collection("classifications")
+    .getFirstListItem(pb.filter("legacyId = {:id}", { id: classificationId }))
+    .catch(() => null);
   if (!classification) return NextResponse.json({ error: "Classification not found" }, { status: 404 });
 
   const existingConfig = (classification.classificationConfiguration as Record<string, unknown>) || {};
@@ -56,11 +54,9 @@ export async function POST(request: NextRequest) {
     };
   }
 
-  await prisma.$executeRaw`
-    UPDATE classifications
-    SET "classificationConfiguration" = ${JSON.stringify(updatedConfiguration)}::jsonb
-    WHERE id = ${classificationId}
-  `;
+  await pb.collection("classifications").update(classification.id, {
+    classificationConfiguration: updatedConfiguration,
+  });
 
   revalidatePath(`/posts/${classificationId}`);
   revalidatePath(`/planets/${classificationId}`);

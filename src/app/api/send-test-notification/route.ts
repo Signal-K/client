@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
 import webpush from 'web-push';
+
+import { createPocketbaseAdminClient } from '@/lib/pocketbase/adminClient';
 
 const SEND_TIMEOUT_MS = 8000;
 const SEND_CONCURRENCY = 8;
@@ -10,7 +11,7 @@ type PushSubscriptionRow = {
     endpoint: string;
     auth: string;
     p256dh: string;
-    profile_id: string;
+    profileId: string;
 };
 
 function dedupeByEndpoint(subscriptions: PushSubscriptionRow[]) {
@@ -63,40 +64,19 @@ export async function POST(request: NextRequest) {
             process.env.VAPID_PRIVATE_KEY!
         );
 
-        // Check if we're in Docker environment
-        const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.includes('127.0.0.1')
-            ? process.env.NEXT_PUBLIC_SUPABASE_URL?.replace('127.0.0.1', 'host.docker.internal')
-            : process.env.NEXT_PUBLIC_SUPABASE_URL;
-        
-        if (!supabaseUrl || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
-            return NextResponse.json({ 
-                error: 'Missing required environment variables',
-                details: {
-                    hasUrl: !!supabaseUrl,
-                    hasServiceKey: !!process.env.SUPABASE_SERVICE_ROLE_KEY
-                }
-            }, { status: 500 });
-        }
-        
-        // Create Supabase client with service role for admin access
-        const supabase = createClient(
-            supabaseUrl,
-            process.env.SUPABASE_SERVICE_ROLE_KEY!
-        );
+        const pb = await createPocketbaseAdminClient();
 
         // Get all push subscriptions, but deduplicate by endpoint to avoid sending multiple notifications to the same device
-        const { data: allSubscriptions, error } = await supabase
-            .from('push_subscriptions')
-            .select('*')
-            .order('created_at', { ascending: false });
-
-        if (error) {
+        let allSubscriptions: PushSubscriptionRow[];
+        try {
+            allSubscriptions = await pb.collection('push_subscriptions').getFullList({
+                sort: '-createdAt',
+            });
+        } catch (error) {
             console.error('Error fetching subscriptions:', error);
-            return NextResponse.json({ 
-                error: 'Failed to fetch subscriptions', 
-                details: error.message,
-                code: error.code,
-                hint: error.hint
+            return NextResponse.json({
+                error: 'Failed to fetch subscriptions',
+                details: String(error)
             }, { status: 500 });
         }
 
@@ -104,7 +84,7 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ message: 'No subscriptions found' }, { status: 200 });
         }
 
-        const deduped = dedupeByEndpoint(allSubscriptions as PushSubscriptionRow[]);
+        const deduped = dedupeByEndpoint(allSubscriptions);
         const subscriptions = deduped.slice(0, MAX_NOTIFICATIONS_PER_REQUEST);
         const skipped = Math.max(0, deduped.length - subscriptions.length);
 
@@ -133,9 +113,9 @@ export async function POST(request: NextRequest) {
                 };
 
                 await withTimeout(webpush.sendNotification(pushSubscription, payload), SEND_TIMEOUT_MS);
-                return { success: true, userId: subscription.profile_id };
+                return { success: true, userId: subscription.profileId };
             } catch (error) {
-                return { success: false, userId: subscription.profile_id, error: String(error) };
+                return { success: false, userId: subscription.profileId, error: String(error) };
             }
         });
 

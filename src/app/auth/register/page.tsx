@@ -24,12 +24,12 @@ function RegisterContent() {
       router.replace(destination);
     }, [isLoading, user, router, searchParams]);
 
-    return <EnhancedAuthPage />;
+    return <EnhancedAuthPage mode="sign-up" />;
 }
 
 export default function Register() {
   return (
-    <Suspense fallback={<EnhancedAuthPage />}>
+    <Suspense fallback={<EnhancedAuthPage mode="sign-up" />}>
       <RegisterContent />
     </Suspense>
   );

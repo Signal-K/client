@@ -5,6 +5,7 @@ import { ChevronUp, ChevronDown, Satellite } from 'lucide-react';
 import { useSession } from '@/src/lib/auth/session-context';
 import { useRouter } from 'next/navigation';
 import { DatabaseAnomaly } from '../Telescope/TelescopeUtils';
+import { getStorageUrl } from '@/lib/pocketbase/storageUrl';
 
 interface SatelliteSpiderScanProps {
   anomalies: (DatabaseAnomaly & { linked_anomaly_id: number; classification_id: number | string | null; date: string; })[];
@@ -281,10 +282,8 @@ const SatelliteSpiderScan: React.FC<SatelliteSpiderScanProps> = ({ anomalies }) 
     return `${sec}s`;
   };
 
-  const SUPABASE_URL = typeof process !== 'undefined' ? process.env.NEXT_PUBLIC_SUPABASE_URL : undefined;
   const buildPhotoUrl = (anomalyId: number | string) => {
-    if (!SUPABASE_URL) return `/assets/Viewports/Satellite/Satellite_Tile1.png`;
-    return `${SUPABASE_URL.replace(/\/$/, '')}/storage/v1/object/public/telescope/satellite-planetFour/${anomalyId}.jpeg`;
+    return getStorageUrl("telescope", `satellite-planetFour/${anomalyId}.jpeg`);
   };
 
   return (

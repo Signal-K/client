@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 
-import { prisma } from "@/lib/server/prisma";
 import { getRouteUser } from "@/lib/server/supabaseRoute";
+import { createPocketbaseAdminClient } from "@/lib/pocketbase/adminClient";
 
 export const dynamic = "force-dynamic";
 
@@ -27,21 +27,23 @@ export async function POST(request: NextRequest) {
   const auth = typeof body?.auth === "string" ? body.auth : "";
   const p256dh = typeof body?.p256dh === "string" ? body.p256dh : "";
 
-  const existing = await prisma.$queryRaw<Array<{ id: number }>>`
-    SELECT id
-    FROM push_subscriptions
-    WHERE profile_id = ${user.id}
-      AND endpoint = ${endpoint}
-    LIMIT 1
-  `;
-  if (existing.length > 0) {
+  const pb = await createPocketbaseAdminClient();
+  const existing = await pb
+    .collection("push_subscriptions")
+    .getFirstListItem(pb.filter("profileId = {:id} && endpoint = {:e}", { id: user.id, e: endpoint }))
+    .catch(() => null);
+
+  if (existing) {
     return NextResponse.json({ success: true, alreadyExists: true });
   }
 
-  await prisma.$executeRaw`
-    INSERT INTO push_subscriptions (profile_id, endpoint, auth, p256dh)
-    VALUES (${user.id}, ${endpoint}, ${auth}, ${p256dh})
-  `;
+  await pb.collection("push_subscriptions").create({
+    profileId: user.id,
+    endpoint,
+    auth,
+    p256dh,
+    createdAt: new Date().toISOString(),
+  });
 
   revalidatePath("/game");
   return NextResponse.json({ success: true, alreadyExists: false });

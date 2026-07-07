@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { getRouteSupabaseWithUser } from "@/lib/server/supabaseRoute";
+import { createPocketbaseAdminClient } from "@/lib/pocketbase/adminClient";
+import { getRouteUser } from "@/lib/server/supabaseRoute";
 import { recursiveSerialize } from "@/utils/serialization";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(request: NextRequest) {
-  const { supabase, user, authError } = await getRouteSupabaseWithUser();
+  const { user, authError } = await getRouteUser();
   if (authError || !user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
@@ -17,19 +18,27 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "anomaly and item are required" }, { status: 400 });
   }
 
-  const { data, error } = await supabase
-    .from("inventory")
-    .select("id, configuration")
-    .eq("owner", user.id)
-    .eq("anomaly", anomaly)
-    .eq("item", item)
-    .order("id", { ascending: true })
-    .limit(1)
-    .maybeSingle();
+  const pb = await createPocketbaseAdminClient();
+  const data = await pb
+    .collection("inventory")
+    .getFirstListItem(
+      pb.filter("owner = {:owner} && anomaly = {:anomaly} && item = {:item}", {
+        owner: user.id,
+        anomaly,
+        item,
+      }),
+      { sort: "legacyId", fields: "legacyId,configuration" }
+    )
+    .catch(() => null);
 
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
-  }
-
-  return NextResponse.json(recursiveSerialize({ item: data ?? null }));
+  return NextResponse.json(
+    recursiveSerialize({
+      item: data
+        ? {
+            id: data.legacyId,
+            configuration: data.configuration,
+          }
+        : null,
+    })
+  );
 }

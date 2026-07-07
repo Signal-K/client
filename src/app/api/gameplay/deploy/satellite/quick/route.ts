@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 
-import { prisma } from "@/lib/server/prisma";
 import { getRouteUser } from "@/lib/server/supabaseRoute";
+import { createPocketbaseAdminClient } from "@/lib/pocketbase/adminClient";
 import { recursiveSerialize } from "@/utils/serialization";
 
 export const dynamic = "force-dynamic";
@@ -24,11 +24,11 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(recursiveSerialize({ error: "Invalid planet classification id" }), { status: 400 });
   }
 
-  const cloudAnomalies = await prisma.$queryRaw<Array<{ id: number }>>`
-    SELECT id
-    FROM anomalies
-    WHERE anomalytype = 'cloud'
-  `;
+  const pb = await createPocketbaseAdminClient();
+  const cloudAnomalies = await pb.collection("anomalies").getFullList({
+    filter: pb.filter("anomalytype = {:t}", { t: "cloud" }),
+    fields: "legacyId",
+  });
 
   if (cloudAnomalies.length === 0) {
     return NextResponse.json(recursiveSerialize({ error: "No cloud anomalies available" }), { status: 500 });
@@ -37,27 +37,23 @@ export async function POST(request: NextRequest) {
   const randomIndex = Math.floor(Math.random() * cloudAnomalies.length);
   const selectedAnomaly = cloudAnomalies[randomIndex];
 
-  const insertPayload = [
-    {
-      author: user.id,
-      anomaly_id: selectedAnomaly.id,
-      classification_id: planetClassificationId,
-      automaton: "WeatherSatellite",
-    },
-    {
-      author: user.id,
-      anomaly_id: selectedAnomaly.id,
-      classification_id: planetClassificationId,
-      automaton: "WeatherSatellite",
-    },
-  ];
+  const latest = await pb.collection("linked_anomalies").getList(1, 1, { sort: "-legacyId", fields: "legacyId" });
+  let nextLegacyId = (latest.items[0]?.legacyId ?? 0) + 1;
 
-  await prisma.$executeRaw`
-    INSERT INTO linked_anomalies (author, anomaly_id, classification_id, automaton)
-    SELECT x.author, x.anomaly_id, x.classification_id, x.automaton
-    FROM jsonb_to_recordset(${JSON.stringify(insertPayload)}::jsonb)
-      AS x(author text, anomaly_id int, classification_id int, automaton text)
-  `;
+  // Preserves existing (likely unintentional but load-bearing) behavior of
+  // inserting the same linked_anomaly twice per quick-deploy.
+  await Promise.all(
+    [1, 2].map(() =>
+      pb.collection("linked_anomalies").create({
+        legacyId: nextLegacyId++,
+        author: user.id,
+        anomalyId: selectedAnomaly.legacyId,
+        classificationId: planetClassificationId,
+        automaton: "WeatherSatellite",
+        date: new Date().toISOString(),
+      })
+    )
+  );
 
   revalidatePath("/activity/deploy");
   revalidatePath("/game");

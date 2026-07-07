@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useSession } from "@/src/lib/auth/session-context";
 import ImageAnnotator from "../(classifications)/Annotating/AnnotatorView";
+import { getStorageUrl } from "@/lib/pocketbase/storageUrl";
 
 type Anomaly = {
   id: string;
@@ -60,12 +61,9 @@ export function StarterCoMShapes({ anomalyid }: ShapesProps) {
           details: anomalyRecord.anomalySet,
         });
 
-        const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-        if (supabaseUrl) {
-          setImageUrl(
-            `${supabaseUrl}/storage/v1/object/public/telescope/balloon-marsCloudsShapes/${anomalyRecord.id}/${anomalyRecord.id}/1.png`
-          );
-        }
+        setImageUrl(
+          getStorageUrl("telescope", `balloon-marsCloudsShapes/${anomalyRecord.id}/${anomalyRecord.id}/1.png`)
+        );
       } catch (error: any) {
         console.error("Error fetching cloud shape:", error.message);
         setAnomaly(null);

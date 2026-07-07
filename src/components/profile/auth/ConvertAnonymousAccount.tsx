@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useUser } from "@clerk/nextjs";
 import { Button } from "@/src/components/ui/button";
 import { Input } from "@/src/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/src/components/ui/card";
@@ -13,60 +14,81 @@ interface ConvertAnonymousAccountProps {
   onCancel?: () => void;
 }
 
+/**
+ * Converts a guest (Clerk user created with publicMetadata.guest === true, see
+ * src/lib/server/guestAuth.ts) into a permanent account, in place — same Clerk
+ * user id, so existing gameplay data stays attached. Two steps: verify a real
+ * email address, then set a password; a server call flips publicMetadata.guest
+ * to false once both are done.
+ */
 export default function ConvertAnonymousAccount({ onSuccess, onCancel }: ConvertAnonymousAccountProps) {
-  const { supabase, user } = useAuthUser();
+  const { user: clerkUser } = useUser();
+  const { user } = useAuthUser();
+  const [step, setStep] = useState<"email" | "verify">("email");
   const [email, setEmail] = useState("");
+  const [code, setCode] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [pendingEmailId, setPendingEmailId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
   const isAnonymousUser = Boolean((user as any)?.is_anonymous);
 
-  const handleEmailConversion = async (e: React.FormEvent) => {
+  const handleSendCode = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!clerkUser) return;
+    setError(null);
+    setIsLoading(true);
+
+    try {
+      const emailAddress = await clerkUser.createEmailAddress({ email });
+      await emailAddress.prepareVerification({ strategy: "email_code" });
+      setPendingEmailId(emailAddress.id);
+      setStep("verify");
+    } catch (err: any) {
+      setError(err?.errors?.[0]?.longMessage || err?.message || "Could not send verification email");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleCompleteConversion = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!clerkUser || !pendingEmailId) return;
     setError(null);
     setSuccess(null);
-    setIsLoading(true);
 
     if (password !== confirmPassword) {
       setError("Passwords don't match");
-      setIsLoading(false);
+      return;
+    }
+    if (password.length < 8) {
+      setError("Password must be at least 8 characters long");
       return;
     }
 
-    if (password.length < 6) {
-      setError("Password must be at least 6 characters long");
-      setIsLoading(false);
-      return;
-    }
-
+    setIsLoading(true);
     try {
-      // Step 1: Update user with email
-      const { error: emailError } = await supabase.auth.updateUser({
-        email: email,
-      });
-
-      if (emailError) {
-        if (emailError.message.includes("already registered")) {
-          setError("This email is already registered. Please use a different email or sign in to your existing account.");
-        } else {
-          setError(emailError.message);
-        }
-        setIsLoading(false);
-        return;
+      const emailAddress = clerkUser.emailAddresses.find((e) => e.id === pendingEmailId);
+      if (!emailAddress) {
+        throw new Error("Verification email not found — please try again.");
       }
 
-      // Step 2: Show success message for email verification
-      setSuccess("Please check your email and click the verification link. After verification, you can set your password.");
-      
-      // Note: The password will need to be set after email verification
-      // The user will need to use the "forgot password" flow or we can guide them through it
+      await emailAddress.attemptVerification({ code });
+      await clerkUser.update({ primaryEmailAddressId: emailAddress.id });
+      await clerkUser.updatePassword({ newPassword: password });
 
+      const response = await fetch("/api/auth/complete-guest-conversion", { method: "POST" });
+      if (!response.ok) {
+        throw new Error("Could not finalize account conversion");
+      }
+
+      setSuccess("Your account is now permanent — your progress is saved!");
+      onSuccess?.();
     } catch (err: any) {
-      setError("An unexpected error occurred");
-      console.error("Email conversion error:", err);
+      setError(err?.errors?.[0]?.longMessage || err?.message || "An unexpected error occurred");
     } finally {
       setIsLoading(false);
     }
@@ -111,78 +133,112 @@ export default function ConvertAnonymousAccount({ onSuccess, onCancel }: Convert
           </Alert>
         )}
 
-        {/* Email/Password Conversion */}
-        <div className="space-y-3">
-          <h3 className="font-semibold text-sm">Create Your Free Account</h3>
-          <form onSubmit={handleEmailConversion} className="space-y-4">
-            <div>
-              <label htmlFor="email" className="text-sm font-medium text-gray-700">
-                Email Address
-              </label>
-              <Input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="your@email.com"
-                required
-                disabled={isLoading}
-              />
-            </div>
-            
-            <div>
-              <label htmlFor="password" className="text-sm font-medium text-gray-700">
-                Password
-              </label>
-              <Input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Choose a strong password"
-                required
-                disabled={isLoading}
-                minLength={6}
-              />
-            </div>
+        {step === "email" ? (
+          <div className="space-y-3">
+            <h3 className="font-semibold text-sm">Create Your Free Account</h3>
+            <form onSubmit={handleSendCode} className="space-y-4">
+              <div>
+                <label htmlFor="email" className="text-sm font-medium text-gray-700">
+                  Email Address
+                </label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="your@email.com"
+                  required
+                  disabled={isLoading}
+                />
+              </div>
 
-            <div>
-              <label htmlFor="confirmPassword" className="text-sm font-medium text-gray-700">
-                Confirm Password
-              </label>
-              <Input
-                id="confirmPassword"
-                type="password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                placeholder="Confirm your password"
-                required
-                disabled={isLoading}
-                minLength={6}
-              />
-            </div>
+              <Button type="submit" disabled={isLoading || !email} className="w-full">
+                {isLoading ? (
+                  <div className="flex items-center gap-2">
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Sending Code...
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <Mail className="w-4 h-4" />
+                    Send Verification Code
+                  </div>
+                )}
+              </Button>
+            </form>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            <h3 className="font-semibold text-sm">Verify Your Email & Set a Password</h3>
+            <form onSubmit={handleCompleteConversion} className="space-y-4">
+              <div>
+                <label htmlFor="code" className="text-sm font-medium text-gray-700">
+                  Verification Code
+                </label>
+                <Input
+                  id="code"
+                  type="text"
+                  value={code}
+                  onChange={(e) => setCode(e.target.value)}
+                  placeholder="Check your email"
+                  required
+                  disabled={isLoading}
+                />
+              </div>
 
-            <Button
-              type="submit"
-              disabled={isLoading || !email || !password || !confirmPassword}
-              className="w-full"
-            >
-              {isLoading ? (
-                <div className="flex items-center gap-2">
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  Creating Account...
-                </div>
-              ) : (
-                <div className="flex items-center gap-2">
-                  <Mail className="w-4 h-4" />
-                  Create Free Permanent Account
-                </div>
-              )}
-            </Button>
-          </form>
-        </div>
+              <div>
+                <label htmlFor="password" className="text-sm font-medium text-gray-700">
+                  Password
+                </label>
+                <Input
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Choose a strong password"
+                  required
+                  disabled={isLoading}
+                  minLength={8}
+                />
+              </div>
 
-        {/* Benefits reminder */}
+              <div>
+                <label htmlFor="confirmPassword" className="text-sm font-medium text-gray-700">
+                  Confirm Password
+                </label>
+                <Input
+                  id="confirmPassword"
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="Confirm your password"
+                  required
+                  disabled={isLoading}
+                  minLength={8}
+                />
+              </div>
+
+              <Button
+                type="submit"
+                disabled={isLoading || !code || !password || !confirmPassword}
+                className="w-full"
+              >
+                {isLoading ? (
+                  <div className="flex items-center gap-2">
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Creating Account...
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <Mail className="w-4 h-4" />
+                    Create Free Permanent Account
+                  </div>
+                )}
+              </Button>
+            </form>
+          </div>
+        )}
+
         <div className="mt-6 p-3 bg-green-50 rounded-lg border border-green-200">
           <h4 className="font-medium text-green-800 text-sm mb-2">Benefits of saving your account:</h4>
           <ul className="text-sm text-green-700 space-y-1">
@@ -195,7 +251,6 @@ export default function ConvertAnonymousAccount({ onSuccess, onCancel }: Convert
           </ul>
         </div>
 
-        {/* Action buttons */}
         <div className="flex gap-3 pt-2">
           {onCancel && (
             <Button

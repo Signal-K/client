@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 
-import { Prisma } from "@prisma/client";
-
-import { prisma } from "@/lib/server/prisma";
 import { getRouteUser } from "@/lib/server/supabaseRoute";
+import { createPocketbaseAdminClient } from "@/lib/pocketbase/adminClient";
+import { mapCommentToRow } from "@/lib/pocketbase/legacyShapes";
 import { recursiveSerialize } from "@/utils/serialization";
 
 export const dynamic = "force-dynamic";
@@ -15,17 +14,6 @@ type CommentBody = {
   configuration?: Record<string, unknown>;
 };
 
-type CommentRow = {
-  id: number;
-  classification_id: number;
-  author: string;
-  content: string;
-  created_at: string;
-  surveyor?: boolean;
-  value?: string | null;
-  category?: string | null;
-};
-
 export async function GET(request: NextRequest) {
   const classificationId = Number(request.nextUrl.searchParams.get("classificationId"));
   if (!Number.isFinite(classificationId)) {
@@ -34,36 +22,20 @@ export async function GET(request: NextRequest) {
 
   const surveyorParam = request.nextUrl.searchParams.get("surveyor");
   const categoryParam = request.nextUrl.searchParams.get("category");
-  const order = request.nextUrl.searchParams.get("order") === "asc" ? "ASC" : "DESC";
-  const whereClauses: Prisma.Sql[] = [Prisma.sql`classification_id = ${classificationId}`];
+  const ascending = request.nextUrl.searchParams.get("order") === "asc";
 
-  if (surveyorParam === "true") {
-    whereClauses.push(Prisma.sql`surveyor = TRUE`);
-  } else if (surveyorParam === "false") {
-    whereClauses.push(Prisma.sql`surveyor = FALSE`);
-  }
-  if (categoryParam) {
-    whereClauses.push(Prisma.sql`category = ${categoryParam}`);
-  }
+  const pb = await createPocketbaseAdminClient();
+  const filters = [pb.filter("classificationId = {:id}", { id: classificationId })];
+  if (surveyorParam === "true") filters.push("surveyor = true");
+  if (surveyorParam === "false") filters.push("surveyor = false");
+  if (categoryParam) filters.push(pb.filter("category = {:c}", { c: categoryParam }));
 
-  try {
-    const rows = await prisma.$queryRaw<CommentRow[]>(Prisma.sql`
-      SELECT *
-      FROM comments
-      WHERE ${Prisma.join(whereClauses, " AND ")}
-      ORDER BY created_at ${Prisma.raw(order)}
-    `);
-    return NextResponse.json(recursiveSerialize({ comments: rows }));
-  } catch (_error) {
-    // Older DBs may not have the surveyor column; retry without surveyor filtering.
-    const rows = await prisma.$queryRaw<CommentRow[]>`
-      SELECT *
-      FROM comments
-      WHERE classification_id = ${classificationId}
-      ORDER BY created_at ${Prisma.raw(order)}
-    `;
-    return NextResponse.json(recursiveSerialize({ comments: rows }));
-  }
+  const rows = await pb.collection("comments").getFullList({
+    filter: filters.join(" && "),
+    sort: ascending ? "+createdAt" : "-createdAt",
+  });
+
+  return NextResponse.json(recursiveSerialize({ comments: rows.map(mapCommentToRow) }));
 }
 
 export async function POST(request: NextRequest) {
@@ -80,28 +52,18 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(recursiveSerialize({ error: "Invalid payload" }), { status: 400 });
   }
 
-  const insertPayload: Record<string, unknown> = {
+  const pb = await createPocketbaseAdminClient();
+  const latest = await pb.collection("comments").getList(1, 1, { sort: "-legacyId", fields: "legacyId" });
+  const nextLegacyId = (latest.items[0]?.legacyId ?? 0) + 1;
+
+  await pb.collection("comments").create({
+    legacyId: nextLegacyId,
+    createdAt: new Date().toISOString(),
     author: user.id,
-    classification_id: classificationId,
+    classificationId,
     content,
-  };
-
-  if (body?.configuration && typeof body.configuration === "object") {
-    insertPayload.configuration = body.configuration;
-  }
-  const configurationJson = insertPayload.configuration
-    ? JSON.stringify(insertPayload.configuration as Record<string, unknown>)
-    : null;
-
-  await prisma.$executeRaw`
-    INSERT INTO comments (author, classification_id, content, configuration)
-    VALUES (
-      ${insertPayload.author as string},
-      ${insertPayload.classification_id as number},
-      ${insertPayload.content as string},
-      ${configurationJson}::jsonb
-    )
-  `;
+    configuration: body?.configuration && typeof body.configuration === "object" ? body.configuration : null,
+  });
 
   revalidatePath(`/posts/${classificationId}`);
   revalidatePath(`/planets/${classificationId}`);

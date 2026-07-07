@@ -6,6 +6,7 @@ import ImageAnnotator from "../(classifications)/Annotating/AnnotatorView";
 import { Button } from "@/src/components/ui/button";
 import TutorialContentBlock from "../TutorialContentBlock";
 import NGTSTutorial from "./NGTSTutorial";
+import { getStorageUrl } from "@/lib/pocketbase/storageUrl";
 
 type Anomaly = {
   id: number;
@@ -15,11 +16,14 @@ type Anomaly = {
 };
 
 function buildPlanetImageUrl(anomaly: Anomaly) {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
+  // avatar_url (when set) is already a full absolute URL — some point at NASA
+  // directly, some at an older/unrelated Supabase project — not a path
+  // relative to our own storage. Was previously double-prefixed into a
+  // broken URL; use it as-is instead.
   if (anomaly.avatar_url) {
-    return `${supabaseUrl.replace(/\/$/, "")}/storage/v1/object/public/${anomaly.avatar_url}`;
+    return anomaly.avatar_url;
   }
-  return `${supabaseUrl.replace(/\/$/, "")}/storage/v1/object/public/anomalies/${anomaly.id}/Sector1.png`;
+  return getStorageUrl("anomalies", `${anomaly.id}/Sector1.png`);
 }
 
 export function TelescopeTessWithId({ anomalyId }: { anomalyId: string }) {
@@ -129,8 +133,7 @@ interface TelescopeProps {
 }
 
 const FirstTelescopeClassification: React.FC<TelescopeProps> = ({ anomalyid, onTutorialComplete }) => {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const imageUrl = `${supabaseUrl}/storage/v1/object/public/anomalies/${anomalyid}/Binned.png`;
+  const imageUrl = getStorageUrl("anomalies", `${anomalyid}/Binned.png`);
 
   const [part, setPart] = useState(1);
   const nextPart = () => setPart(2);

@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 
-import { prisma } from "@/lib/server/prisma";
 import { getRouteUser } from "@/lib/server/supabaseRoute";
+import { createPocketbaseAdminClient } from "@/lib/pocketbase/adminClient";
 import { recursiveSerialize } from "@/utils/serialization";
 
 export const dynamic = "force-dynamic";
@@ -14,11 +14,11 @@ type SatelliteDeployBody = {
   planetId?: number;
 };
 
-function sampleIds(input: Array<{ id: number }>, count: number) {
+function sampleIds(input: any[], count: number) {
   return [...input]
     .sort(() => 0.5 - Math.random())
     .slice(0, count)
-    .map((item) => item.id);
+    .map((item) => item.legacyId);
 }
 
 export async function POST(request: NextRequest) {
@@ -39,78 +39,72 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(recursiveSerialize({ error: "Invalid planet ID" }), { status: 400 });
   }
 
-  const [classificationCountRows, satelliteUpgradeRows, planetRows, planetClassifications] = await Promise.all([
-    prisma.$queryRaw<Array<{ count: bigint }>>`
-      SELECT COUNT(*)::bigint AS count
-      FROM classifications
-      WHERE author = ${user.id}
-    `,
-    prisma.$queryRaw<Array<{ tech_type: string }>>`
-      SELECT tech_type
-      FROM researched
-      WHERE user_id = ${user.id}
-        AND tech_type = 'satellitecount'
-    `,
-    prisma.$queryRaw<Array<{ id: number; content: string | null }>>`
-      SELECT id, content
-      FROM anomalies
-      WHERE id = ${planetId}
-      LIMIT 1
-    `,
-    prisma.$queryRaw<Array<{ id: number }>>`
-      SELECT id
-      FROM classifications
-      WHERE author = ${user.id}
-        AND anomaly = ${planetId}
-        AND classificationtype = 'planet'
-      LIMIT 1
-    `,
+  const pb = await createPocketbaseAdminClient();
+
+  const [classificationCount, satelliteUpgrade, planet, planetClassification] = await Promise.all([
+    pb.collection("classifications").getList(1, 1, { filter: pb.filter("author = {:a}", { a: user.id }) }),
+    pb
+      .collection("researched")
+      .getFirstListItem(pb.filter("userId = {:u} && techType = {:t}", { u: user.id, t: "satellitecount" }))
+      .catch(() => null),
+    pb
+      .collection("anomalies")
+      .getFirstListItem(pb.filter("legacyId = {:id}", { id: planetId }))
+      .catch(() => null),
+    pb
+      .collection("classifications")
+      .getFirstListItem(
+        pb.filter("author = {:a} && anomaly = {:p} && classificationtype = {:t}", {
+          a: user.id,
+          p: planetId,
+          t: "planet",
+        })
+      )
+      .catch(() => null),
   ]);
 
-  const planet = (planetRows || [])[0];
   if (!planet) {
     return NextResponse.json(recursiveSerialize({ error: "Planet not found" }), { status: 404 });
   }
 
-  const userClassificationCount = Number(classificationCountRows[0]?.count ?? 0);
+  const userClassificationCount = classificationCount.totalItems;
   const isFastDeployEnabled = userClassificationCount === 0;
   const deploymentDate = isFastDeployEnabled
     ? new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
     : new Date().toISOString();
-  const anomalyCount = (satelliteUpgradeRows || []).length > 0 ? 6 : 4;
-  const classificationId = (planetClassifications || [])[0]?.id || null;
+  const anomalyCount = satelliteUpgrade ? 6 : 4;
+  const classificationId = planetClassification?.legacyId ?? null;
 
   let selectedIds: number[] = [];
 
   if (investigationMode === "planets") {
     selectedIds = [planetId];
   } else if (investigationMode === "weather") {
-    const cloudCountRows = await prisma.$queryRaw<Array<{ count: bigint }>>`
-      SELECT COUNT(*)::bigint AS count
-      FROM classifications
-      WHERE author = ${user.id}
-        AND classificationtype IN ('cloud', 'vortex', 'radar')
-    `;
-    const userCloudClassifications = Number(cloudCountRows[0]?.count ?? 0);
+    const cloudCount = await pb.collection("classifications").getList(1, 1, {
+      filter:
+        pb.filter("author = {:a}", { a: user.id }) +
+        " && (" +
+        ["cloud", "vortex", "radar"].map((t) => pb.filter("classificationtype = {:t}", { t })).join(" || ") +
+        ")",
+    });
+    const userCloudClassifications = cloudCount.totalItems;
 
     const anomalySets =
       userCloudClassifications >= 2
         ? ["lidar-jovianVortexHunter", "cloudspottingOnMars", "balloon-marsCloudShapes"]
         : ["cloudspottingOnMars"];
 
-    const cloudRows = await prisma.$queryRaw<Array<{ id: number }>>`
-      SELECT id
-      FROM anomalies
-      WHERE "anomalySet" = ANY(${anomalySets}::text[])
-    `;
+    const cloudRows = await pb.collection("anomalies").getFullList({
+      filter: "(" + anomalySets.map((s) => pb.filter("anomalySet = {:s}", { s })).join(" || ") + ")",
+      fields: "legacyId",
+    });
 
     selectedIds = sampleIds(cloudRows, anomalyCount);
   } else {
-    const p4Rows = await prisma.$queryRaw<Array<{ id: number }>>`
-      SELECT id
-      FROM anomalies
-      WHERE "anomalySet" = 'satellite-planetFour'
-    `;
+    const p4Rows = await pb.collection("anomalies").getFullList({
+      filter: pb.filter("anomalySet = {:s}", { s: "satellite-planetFour" }),
+      fields: "legacyId",
+    });
 
     selectedIds = sampleIds(p4Rows, anomalyCount);
   }
@@ -119,22 +113,23 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(recursiveSerialize({ error: "No anomalies available for this deployment" }), { status: 400 });
   }
 
-  const rows = selectedIds.map((id) => ({
-    author: user.id,
-    anomaly_id: id,
-    classification_id: classificationId,
-    date: deploymentDate,
-    automaton: "WeatherSatellite",
-    unlocked: false,
-    unlock_time: null,
-  }));
+  const latest = await pb.collection("linked_anomalies").getList(1, 1, { sort: "-legacyId", fields: "legacyId" });
+  let nextLegacyId = (latest.items[0]?.legacyId ?? 0) + 1;
 
-  await prisma.$executeRaw`
-    INSERT INTO linked_anomalies (author, anomaly_id, classification_id, date, automaton, unlocked, unlock_time)
-    SELECT x.author, x.anomaly_id, x.classification_id, x.date::timestamptz, x.automaton, x.unlocked, x.unlock_time
-    FROM jsonb_to_recordset(${JSON.stringify(rows)}::jsonb)
-      AS x(author text, anomaly_id int, classification_id int, date text, automaton text, unlocked boolean, unlock_time timestamptz)
-  `;
+  await Promise.all(
+    selectedIds.map((id) =>
+      pb.collection("linked_anomalies").create({
+        legacyId: nextLegacyId++,
+        author: user.id,
+        anomalyId: id,
+        classificationId,
+        date: deploymentDate,
+        automaton: "WeatherSatellite",
+        unlocked: false,
+        unlockTime: null,
+      })
+    )
+  );
 
   revalidatePath("/viewports/satellite/deploy");
   revalidatePath("/viewports/satellite");
@@ -143,6 +138,6 @@ export async function POST(request: NextRequest) {
   return NextResponse.json(recursiveSerialize({
     success: true,
     anomalyIds: selectedIds,
-    sectorName: planet.content || `TIC ${planet.id}`,
+    sectorName: planet.content || `TIC ${planet.legacyId}`,
   }));
 }

@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 
-import { prisma } from "@/lib/server/prisma";
 import { getRouteUser } from "@/lib/server/supabaseRoute";
+import { createPocketbaseAdminClient } from "@/lib/pocketbase/adminClient";
+import { mapMineralDepositToRow } from "@/lib/pocketbase/legacyShapes";
 import { recursiveSerialize } from "@/utils/serialization";
 
 export const dynamic = "force-dynamic";
@@ -14,31 +15,23 @@ export async function GET(request: NextRequest) {
   }
 
   const discoveryParam = request.nextUrl.searchParams.get("discovery");
-  let rows: Array<Record<string, unknown>> = [];
+  const pb = await createPocketbaseAdminClient();
+  const filters = [pb.filter("owner = {:owner}", { owner: user.id }), 'location != ""'];
+
   if (discoveryParam) {
     const discovery = Number(discoveryParam);
     if (!Number.isFinite(discovery)) {
       return NextResponse.json(recursiveSerialize({ error: "Invalid discovery" }), { status: 400 });
     }
-    rows = await prisma.$queryRaw<Array<Record<string, unknown>>>`
-      SELECT id, mineral_configuration, location, rover_name, created_at, discovery
-      FROM mineral_deposits
-      WHERE owner = ${user.id}
-        AND discovery = ${discovery}
-        AND location IS NOT NULL
-      ORDER BY created_at DESC
-    `;
-  } else {
-    rows = await prisma.$queryRaw<Array<Record<string, unknown>>>`
-      SELECT id, mineral_configuration, location, rover_name, created_at, discovery
-      FROM mineral_deposits
-      WHERE owner = ${user.id}
-        AND location IS NOT NULL
-      ORDER BY created_at DESC
-    `;
+    filters.push(pb.filter("discovery = {:d}", { d: discovery }));
   }
 
-  return NextResponse.json(recursiveSerialize({ deposits: rows }));
+  const rows = await pb.collection("mineral_deposits").getFullList({
+    filter: filters.join(" && "),
+    sort: "-createdAt",
+  });
+
+  return NextResponse.json(recursiveSerialize({ deposits: rows.map(mapMineralDepositToRow) }));
 }
 
 type MineralDepositBody = {
@@ -74,7 +67,12 @@ export async function POST(request: NextRequest) {
     (body?.mineralConfiguration as Record<string, unknown> | undefined) || // legacy fallback
     {};
 
-  const payload = {
+  const pb = await createPocketbaseAdminClient();
+  const latest = await pb.collection("mineral_deposits").getList(1, 1, { sort: "-legacyId", fields: "legacyId" });
+  const nextLegacyId = (latest.items[0]?.legacyId ?? 0) + 1;
+
+  const created = await pb.collection("mineral_deposits").create({
+    legacyId: nextLegacyId,
     anomaly,
     discovery,
     owner: user.id,
@@ -86,27 +84,12 @@ export async function POST(request: NextRequest) {
         : typeof body?.roverName === "string"
           ? body.roverName
           : "Rover 1",
-    created_at: typeof body?.created_at === "string" ? body.created_at : new Date().toISOString(),
-  };
-
-  const rows = await prisma.$queryRaw<Array<Record<string, unknown>>>`
-    INSERT INTO mineral_deposits (anomaly, discovery, owner, mineral_configuration, location, rover_name, created_at)
-    VALUES (
-      ${payload.anomaly},
-      ${payload.discovery},
-      ${payload.owner},
-      ${JSON.stringify(payload.mineralConfiguration)}::jsonb,
-      ${payload.location},
-      ${payload.roverName},
-      ${payload.created_at}
-    )
-    RETURNING *
-  `;
-  const data = rows[0];
+    createdAt: typeof body?.created_at === "string" ? body.created_at : new Date().toISOString(),
+  });
 
   revalidatePath("/inventory");
   revalidatePath("/viewports/rover");
   revalidatePath(`/next/${discovery}`);
 
-  return NextResponse.json(recursiveSerialize(data));
+  return NextResponse.json(recursiveSerialize(mapMineralDepositToRow(created)));
 }

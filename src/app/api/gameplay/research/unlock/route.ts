@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 
-import { prisma } from "@/lib/server/prisma";
+import { createPocketbaseAdminClient } from "@/lib/pocketbase/adminClient";
 import { getResearchedProgressForUser, getSurveyBonusForUser, unlockTechForUser } from "@/lib/server/researched";
 import { getRouteUser } from "@/lib/server/supabaseRoute";
 
@@ -58,13 +58,13 @@ export async function POST(request: NextRequest) {
   }
 
   const userId = user.id;
-  const [researchProgress, classificationCount, surveyBonus] = await Promise.all([
+  const pb = await createPocketbaseAdminClient();
+  const [researchProgress, classificationCountResult, surveyBonus] = await Promise.all([
     getResearchedProgressForUser(userId),
-    prisma.classification.count({
-      where: { author: userId },
-    }),
+    pb.collection("classifications").getList(1, 1, { filter: pb.filter("author = {:a}", { a: userId }) }),
     getSurveyBonusForUser(userId),
   ]);
+  const classificationCount = classificationCountResult.totalItems;
 
   const researchedRows = researchProgress.entries;
   const researchedSet = researchProgress.techSet;
@@ -84,13 +84,10 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Requires p4Minerals first" }, { status: 400 });
   }
   if (techType === "ngtsAccess") {
-    const planetCount = await prisma.classification.count({
-      where: {
-        author: userId,
-        classificationtype: "planet",
-      },
+    const planetCountResult = await pb.collection("classifications").getList(1, 1, {
+      filter: pb.filter("author = {:a} && classificationtype = {:t}", { a: userId, t: "planet" }),
     });
-    if ((planetCount || 0) < 4) {
+    if (planetCountResult.totalItems < 4) {
       return NextResponse.json({ error: "Requires 4 planet classifications" }, { status: 400 });
     }
   }

@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 
-import { prisma } from "@/lib/server/prisma";
 import { getRouteUser } from "@/lib/server/supabaseRoute";
+import { createPocketbaseAdminClient } from "@/lib/pocketbase/adminClient";
+import { mapMineralDepositToRow } from "@/lib/pocketbase/legacyShapes";
 import { recursiveSerialize } from "@/utils/serialization";
 
 export const dynamic = "force-dynamic";
@@ -19,18 +20,20 @@ export async function GET(_request: NextRequest, props: { params: Promise<{ id: 
     return NextResponse.json({ error: "Invalid deposit ID" }, { status: 400 });
   }
 
-  const rows = await prisma.$queryRaw<Array<Record<string, unknown>>>`
-    SELECT * FROM mineral_deposits WHERE id = ${depositId} LIMIT 1
-  `;
-  const data = rows[0] as Record<string, unknown> | undefined;
-  if (!data) {
+  const pb = await createPocketbaseAdminClient();
+  const record = await pb
+    .collection("mineral_deposits")
+    .getFirstListItem(pb.filter("legacyId = {:id}", { id: depositId }))
+    .catch(() => null);
+
+  if (!record) {
     return NextResponse.json({ error: "Mineral deposit not found" }, { status: 404 });
   }
-  if (data.owner !== user.id) {
+  if (record.owner !== user.id) {
     return NextResponse.json({ error: "You don't have permission to extract this deposit" }, { status: 403 });
   }
 
-  return NextResponse.json(recursiveSerialize({ deposit: data }));
+  return NextResponse.json(recursiveSerialize({ deposit: mapMineralDepositToRow(record) }));
 }
 
 export async function POST(request: NextRequest, props: { params: Promise<{ id: string }> }) {
@@ -53,45 +56,48 @@ export async function POST(request: NextRequest, props: { params: Promise<{ id: 
     return NextResponse.json({ error: "Invalid extraction payload" }, { status: 400 });
   }
 
-  const depositRows = await prisma.$queryRaw<
-    Array<{ id: number; owner: string; mineral_configuration: Record<string, unknown> | null }>
-  >`
-    SELECT id, owner, mineral_configuration
-    FROM mineral_deposits
-    WHERE id = ${depositId}
-    LIMIT 1
-  `;
-  const deposit = depositRows[0];
+  const pb = await createPocketbaseAdminClient();
+  const deposit = await pb
+    .collection("mineral_deposits")
+    .getFirstListItem(pb.filter("legacyId = {:id}", { id: depositId }))
+    .catch(() => null);
   if (!deposit) return NextResponse.json({ error: "Mineral deposit not found" }, { status: 404 });
 
   if (deposit.owner !== user.id) {
     return NextResponse.json({ error: "You don't have permission to extract this deposit" }, { status: 403 });
   }
 
-  const mineralType = deposit.mineral_configuration?.type;
+  const mineralType = deposit.mineralConfiguration?.type;
   if (!mineralType) {
     return NextResponse.json({ error: "Deposit has no mineral type" }, { status: 400 });
   }
 
-  await prisma.$executeRaw`
-    INSERT INTO user_mineral_inventory (user_id, mineral_deposit_id, mineral_type, quantity, purity, extracted_at)
-    VALUES (${user.id}, ${deposit.id}, ${String(mineralType)}, ${extractedQuantity}, ${purity}, ${new Date().toISOString()})
-  `;
+  const latest = await pb
+    .collection("user_mineral_inventory")
+    .getList(1, 1, { sort: "-legacyId", fields: "legacyId" });
+  const nextLegacyId = (latest.items[0]?.legacyId ?? 0) + 1;
+
+  await pb.collection("user_mineral_inventory").create({
+    legacyId: nextLegacyId,
+    userId: user.id,
+    mineralDepositId: deposit.legacyId,
+    mineralType: String(mineralType),
+    quantity: extractedQuantity,
+    purity,
+    extractedAt: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
+  });
 
   const updatedConfig = {
-    ...deposit.mineral_configuration,
+    ...deposit.mineralConfiguration,
     amount: 0,
     quantity: 0,
   };
 
-  await prisma.$executeRaw`
-    UPDATE mineral_deposits
-    SET mineral_configuration = ${JSON.stringify(updatedConfig)}::jsonb
-    WHERE id = ${deposit.id}
-  `;
+  await pb.collection("mineral_deposits").update(deposit.id, { mineralConfiguration: updatedConfig });
 
   revalidatePath("/inventory");
-  revalidatePath(`/extraction/${deposit.id}`);
+  revalidatePath(`/extraction/${deposit.legacyId}`);
 
   return NextResponse.json({ success: true });
 }

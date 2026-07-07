@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { PostCardSingle } from "@/src/components/social/posts/PostSingle";
-import { useSession, useSupabaseClient } from "@/src/lib/auth/session-context";
+import { useSession } from "@/src/lib/auth/session-context";
 import { incrementClassificationVote } from "@/src/lib/gameplay/classification-vote";
 import { fetchClassificationsForVoting } from "@/src/lib/gameplay/classification-list";
 
@@ -22,7 +22,6 @@ const defaultGetImages = (media: any): string[] => {
 };
 
 export default function VotePanel({ classificationType, getImages = defaultGetImages }: VotePanelProps) {
-  const supabase = useSupabaseClient();
   const session = useSession();
 
   const [classifications, setClassifications] = useState<any[]>([]);
@@ -39,7 +38,7 @@ export default function VotePanel({ classificationType, getImages = defaultGetIm
     setLoading(true);
     setError(null);
 
-    fetchClassificationsForVoting({ supabase, classificationType, getImages })
+    fetchClassificationsForVoting({ classificationType, getImages })
       .then(setClassifications)
       .catch((err) => {
         console.error("Error fetching classifications:", err);

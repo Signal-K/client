@@ -38,9 +38,7 @@ export default function PlanetsEditIndexPage() {
       {loading ? (
         <p className="text-sm text-gray-400">Loading planets...</p>
       ) : planets.length === 0 ? (
-        <Link className="text-blue-600 underline" href="/planets/edit/1">
-          Open Planet 1
-        </Link>
+        <p className="text-sm text-gray-400">No planets found.</p>
       ) : (
         <ul className="space-y-2">
           {planets.map((planet) => (

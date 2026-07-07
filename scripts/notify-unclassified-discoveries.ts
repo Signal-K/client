@@ -1,22 +1,22 @@
 #!/usr/bin/env tsx
 
-import { createClient } from "@supabase/supabase-js";
+import PocketBase from "pocketbase";
 import webpush from "web-push";
 
-const supabaseUrl = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseServiceKey =
-  process.env.SUPABASE_SERVICE_ROLE_KEY ||
-  process.env.SUPABASE_SERVICE_KEY ||
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const pbUrl = process.env.NEXT_PUBLIC_POCKETBASE_URL || process.env.PB_URL;
+const pbAdminEmail = process.env.POCKETBASE_ADMIN_EMAIL || process.env.PB_ADMIN_EMAIL;
+const pbAdminPassword = process.env.POCKETBASE_ADMIN_PASSWORD || process.env.PB_ADMIN_PASSWORD;
 const vapidPublicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
 const vapidPrivateKey = process.env.VAPID_PRIVATE_KEY;
 
-if (!supabaseUrl || !supabaseServiceKey || !vapidPublicKey || !vapidPrivateKey) {
+if (!pbUrl || !pbAdminEmail || !pbAdminPassword || !vapidPublicKey || !vapidPrivateKey) {
   console.error("Missing required environment variables");
   process.exit(1);
 }
 
-const supabase = createClient(supabaseUrl, supabaseServiceKey);
+const pb = new PocketBase(pbUrl);
+const adminEmail = pbAdminEmail;
+const adminPassword = pbAdminPassword;
 webpush.setVapidDetails("mailto:teddy@scroobl.es", vapidPublicKey, vapidPrivateKey);
 
 type Discovery = {
@@ -36,49 +36,33 @@ async function findUsersWithUnclassifiedDiscoveries(): Promise<UserDiscoveries[]
   try {
     console.log("Finding users with unclassified discoveries...");
 
-    const { data: linkedAnomalies, error: linkedError } = await supabase
-      .from("linked_anomalies")
-      .select(
-        `
-        id,
-        author,
-        anomaly_id,
-        date,
-        automaton,
-        anomaly:anomaly_id(content)
-      `,
-      )
-      .order("date", { ascending: false });
+    const linkedAnomalies = await pb.collection("linked_anomalies").getFullList({
+      sort: "-date",
+      fields: "legacyId,author,anomalyId,date,automaton",
+    });
 
-    if (linkedError) {
-      console.error("Error fetching linked anomalies:", linkedError);
-      return [];
-    }
+    console.log(`Found ${linkedAnomalies.length} linked anomalies`);
 
-    console.log(`Found ${linkedAnomalies?.length || 0} linked anomalies`);
+    const notifiedAnomalies = await pb.collection("push_anomaly_log").getFullList({ fields: "anomalyId" });
 
-    const { data: notifiedAnomalies, error: notifiedError } = await supabase
-      .from("push_anomaly_log")
-      .select("anomaly_id");
+    const notifiedAnomalyIds = new Set(notifiedAnomalies.map((log: any) => log.anomalyId));
 
-    if (notifiedError) {
-      console.error("Error fetching notified anomalies:", notifiedError);
-      return [];
-    }
+    const classifications = await pb.collection("classifications").getFullList({
+      fields: "author,anomaly",
+    });
 
-    const notifiedAnomalyIds = new Set(notifiedAnomalies?.map((log: any) => log.anomaly_id) || []);
-
-    const { data: classifications, error: classError } = await supabase
-      .from("classifications")
-      .select("author, anomaly");
-
-    if (classError) {
-      console.error("Error fetching classifications:", classError);
-      return [];
+    const anomalyIds = [...new Set(linkedAnomalies.map((linked: any) => linked.anomalyId).filter(Boolean))];
+    const anomalyNames = new Map<number, string>();
+    if (anomalyIds.length > 0) {
+      const filter = anomalyIds.map((id) => pb.filter("legacyId = {:id}", { id })).join(" || ");
+      const anomalies = await pb.collection("anomalies").getFullList({ filter, fields: "legacyId,content" });
+      for (const anomaly of anomalies) {
+        anomalyNames.set(anomaly.legacyId, anomaly.content || `Discovery #${anomaly.legacyId}`);
+      }
     }
 
     const userClassifiedAnomalies = new Map<string, Set<number>>();
-    classifications?.forEach((classification: any) => {
+    classifications.forEach((classification: any) => {
       if (!userClassifiedAnomalies.has(classification.author)) {
         userClassifiedAnomalies.set(classification.author, new Set<number>());
       }
@@ -87,10 +71,10 @@ async function findUsersWithUnclassifiedDiscoveries(): Promise<UserDiscoveries[]
 
     const usersWithUnclassified = new Map<string, Discovery[]>();
 
-    linkedAnomalies?.forEach((linkedAnomaly: any) => {
+    linkedAnomalies.forEach((linkedAnomaly: any) => {
       const userId = linkedAnomaly.author as string;
-      const anomalyId = linkedAnomaly.anomaly_id as number;
-      const linkedAnomalyId = linkedAnomaly.id as number;
+      const anomalyId = linkedAnomaly.anomalyId as number;
+      const linkedAnomalyId = linkedAnomaly.legacyId as number;
 
       if (notifiedAnomalyIds.has(linkedAnomalyId)) return;
 
@@ -100,7 +84,7 @@ async function findUsersWithUnclassifiedDiscoveries(): Promise<UserDiscoveries[]
         if (!usersWithUnclassified.has(userId)) usersWithUnclassified.set(userId, []);
         usersWithUnclassified.get(userId)!.push({
           anomalyId,
-          anomalyName: linkedAnomaly.anomaly?.content || `Discovery #${anomalyId}`,
+          anomalyName: anomalyNames.get(anomalyId) || `Discovery #${anomalyId}`,
           linkedAnomalyId,
           automaton: linkedAnomaly.automaton,
           date: linkedAnomaly.date,
@@ -122,11 +106,13 @@ async function logNotifiedAnomalies(discoveries: Discovery[]) {
   if (!discoveries.length) return true;
 
   const logEntries = discoveries.map((discovery) => ({
-    anomaly_id: discovery.linkedAnomalyId,
+    anomalyId: discovery.linkedAnomalyId,
+    sentAt: new Date().toISOString(),
   }));
 
-  const { error } = await supabase.from("push_anomaly_log").insert(logEntries);
-  if (error) {
+  try {
+    await Promise.all(logEntries.map((entry) => pb.collection("push_anomaly_log").create(entry)));
+  } catch (error) {
     console.error("Error logging notified anomalies:", error);
     return false;
   }
@@ -136,14 +122,12 @@ async function logNotifiedAnomalies(discoveries: Discovery[]) {
 
 async function sendNotificationsToUser(userId: string, discoveries: Discovery[]) {
   try {
-    const { data: subscriptions, error } = await supabase
-      .from("push_subscriptions")
-      .select("*")
-      .eq("profile_id", userId)
-      .order("created_at", { ascending: false });
+    const subscriptions = await pb.collection("push_subscriptions").getFullList({
+      filter: pb.filter("profileId = {:profileId}", { profileId: userId }),
+      sort: "-createdAt",
+    });
 
-    if (error) return { success: false, error: error.message };
-    if (!subscriptions?.length) return { success: true, message: "No subscriptions" };
+    if (!subscriptions.length) return { success: true, message: "No subscriptions" };
 
     const uniqueSubscriptions = new Map<string, any>();
     subscriptions.forEach((sub: any) => {
@@ -231,6 +215,8 @@ async function main() {
   console.log("Timestamp:", new Date().toISOString());
 
   try {
+    await pb.collection("_superusers").authWithPassword(adminEmail, adminPassword);
+
     const usersWithUnclassified = await findUsersWithUnclassifiedDiscoveries();
     if (!usersWithUnclassified.length) {
       console.log("No users with unclassified discoveries found.");

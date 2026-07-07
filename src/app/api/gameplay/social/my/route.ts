@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { Prisma } from "@prisma/client";
-
-import { prisma } from "@/lib/server/prisma";
 import { getRouteUser } from "@/lib/server/supabaseRoute";
+import { createPocketbaseAdminClient } from "@/lib/pocketbase/adminClient";
+import { mapCommentToRow, mapVoteToRow } from "@/lib/pocketbase/legacyShapes";
 import { recursiveSerialize } from "@/utils/serialization";
 
 export const dynamic = "force-dynamic";
@@ -21,35 +20,30 @@ export async function GET(request: NextRequest) {
     .split(",")
     .map((x) => Number(x.trim()))
     .filter((x) => Number.isFinite(x));
+  const validatedLimit = Math.max(1, Math.min(limit, 5000));
 
-  const commentWhere: Prisma.Sql[] = [Prisma.sql`author = ${user.id}`];
-  const voteWhere: Prisma.Sql[] = [Prisma.sql`user_id = ${user.id}`];
+  const pb = await createPocketbaseAdminClient();
+
+  const commentFilters = [pb.filter("author = {:author}", { author: user.id })];
+  const voteFilters = [pb.filter("userId = {:author}", { author: user.id })];
 
   if (ids.length > 0) {
-    commentWhere.push(Prisma.sql`classification_id IN (${Prisma.join(ids)})`);
-    voteWhere.push(Prisma.sql`classification_id IN (${Prisma.join(ids)})`);
+    commentFilters.push("(" + ids.map((id) => pb.filter("classificationId = {:id}", { id })).join(" || ") + ")");
+    voteFilters.push("(" + ids.map((id) => pb.filter("classificationId = {:id}", { id })).join(" || ") + ")");
   }
   if (category) {
-    commentWhere.push(Prisma.sql`category = ${category}`);
+    commentFilters.push(pb.filter("category = {:c}", { c: category }));
   }
 
   const [comments, votes] = await Promise.all([
-    prisma.$queryRaw<Array<Record<string, unknown>>>(Prisma.sql`
-      SELECT *
-      FROM comments
-      WHERE ${Prisma.join(commentWhere, " AND ")}
-      ORDER BY created_at DESC
-      LIMIT ${Math.max(1, Math.min(limit, 5000))}
-    `),
-    prisma.$queryRaw<Array<Record<string, unknown>>>(Prisma.sql`
-      SELECT *
-      FROM votes
-      WHERE ${Prisma.join(voteWhere, " AND ")}
-      ORDER BY id DESC
-      LIMIT ${Math.max(1, Math.min(limit, 5000))}
-    `),
+    pb.collection("comments").getList(1, validatedLimit, { filter: commentFilters.join(" && "), sort: "-createdAt" }),
+    pb.collection("votes").getList(1, validatedLimit, { filter: voteFilters.join(" && "), sort: "-legacyId" }),
   ]);
 
-  return NextResponse.json(recursiveSerialize({ comments, votes }));
+  return NextResponse.json(
+    recursiveSerialize({
+      comments: comments.items.map(mapCommentToRow),
+      votes: votes.items.map(mapVoteToRow),
+    })
+  );
 }
-

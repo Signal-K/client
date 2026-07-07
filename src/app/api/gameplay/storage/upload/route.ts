@@ -1,11 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { getRouteSupabaseWithUser } from "@/lib/server/supabaseRoute";
+import { getRouteUser } from "@/lib/server/supabaseRoute";
+import { createPocketbaseAdminClient } from "@/lib/pocketbase/adminClient";
+import { getStorageUrl } from "@/lib/pocketbase/storageUrl";
+import { storageObjectId, storageFilename } from "@/lib/pocketbase/storageId";
 
 export const dynamic = "force-dynamic";
 
 export async function POST(request: NextRequest) {
-  const { supabase, user, authError } = await getRouteSupabaseWithUser();
+  const { user, authError } = await getRouteUser();
   if (authError || !user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
@@ -24,15 +27,18 @@ export async function POST(request: NextRequest) {
       ? fileNameOverride.trim()
       : `${Date.now()}-${user.id}-${file.name}`;
 
-  const { data, error } = await supabase.storage.from(bucket).upload(safeName, file, {
-    contentType: file.type || "application/octet-stream",
-    upsert: false,
-  });
+  const pb = await createPocketbaseAdminClient();
+  const pbFormData = new FormData();
+  pbFormData.append("id", storageObjectId(bucket, safeName));
+  pbFormData.append("bucket", bucket);
+  pbFormData.append("path", safeName);
+  pbFormData.append("file", new File([file], storageFilename(safeName), { type: file.type }));
 
-  if (error || !data) {
-    return NextResponse.json({ error: error?.message || "Upload failed" }, { status: 500 });
+  try {
+    await pb.collection("storage_objects").create(pbFormData);
+  } catch (err: any) {
+    return NextResponse.json({ error: err?.message || "Upload failed" }, { status: 500 });
   }
 
-  const publicUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${bucket}/${data.path}`;
-  return NextResponse.json({ path: data.path, publicUrl });
+  return NextResponse.json({ path: safeName, publicUrl: getStorageUrl(bucket, safeName) });
 }

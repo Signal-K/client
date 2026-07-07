@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 
-import { prisma } from "@/lib/server/prisma";
 import { getRouteUser } from "@/lib/server/supabaseRoute";
+import { createPocketbaseAdminClient } from "@/lib/pocketbase/adminClient";
 
 export const dynamic = "force-dynamic";
 
@@ -11,26 +11,17 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const rows = await prisma.$queryRaw<
-    Array<{
-      avatar_url: string | null;
-      username: string | null;
-      full_name: string | null;
-      referral_code: string | null;
-      location: bigint | null;
-    }>
-  >`
-    SELECT avatar_url, username, full_name, referral_code, location
-    FROM profiles
-    WHERE id::text = ${user.id}
-    LIMIT 1
-  `;
+  const pb = await createPocketbaseAdminClient();
+  const profile = await pb
+    .collection("profiles")
+    .getFirstListItem(pb.filter("userId = {:id}", { id: user.id }))
+    .catch(() => null);
 
   return NextResponse.json({
-    avatar_url: rows[0]?.avatar_url ?? null,
-    username: rows[0]?.username ?? null,
-    full_name: rows[0]?.full_name ?? null,
-    referral_code: rows[0]?.referral_code ?? null,
-    location: rows[0]?.location ? rows[0].location.toString() : null,
+    avatar_url: profile?.avatarUrl ?? null,
+    username: profile?.username ?? null,
+    full_name: profile?.fullName ?? null,
+    referral_code: profile?.referralCode ?? null,
+    location: profile?.location != null ? String(profile.location) : null,
   });
 }

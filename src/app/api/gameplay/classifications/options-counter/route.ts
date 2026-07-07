@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { prisma } from "@/lib/server/prisma";
 import { getRouteUser } from "@/lib/server/supabaseRoute";
+import { createPocketbaseAdminClient } from "@/lib/pocketbase/adminClient";
 import { recursiveSerialize } from "@/utils/serialization";
 
 export const dynamic = "force-dynamic";
@@ -42,12 +42,14 @@ export async function GET(request: NextRequest) {
   const classificationType =
     request.nextUrl.searchParams.get("classificationType") || "lidar-jovianVortexHunter";
 
-  const rows = await prisma.$queryRaw<Array<{ classificationConfiguration: unknown }>>`
-    SELECT "classificationConfiguration"
-    FROM classifications
-    WHERE author = ${user.id}
-      AND classificationtype = ${classificationType}
-  `;
+  const pb = await createPocketbaseAdminClient();
+  const rows = await pb.collection("classifications").getFullList({
+    filter: pb.filter("author = {:author} && classificationtype = {:t}", {
+      author: user.id,
+      t: classificationType,
+    }),
+    fields: "classificationConfiguration",
+  });
 
   const counts: Counts = { 1: 0, 2: 0, 3: 0, 4: 0 };
   for (const row of rows) {

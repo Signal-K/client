@@ -5,33 +5,23 @@ type ClassificationRow = {
   [key: string]: unknown;
 };
 
-type SupabaseLike = {
-  from: (table: string) => any;
-};
-
 export async function fetchClassificationsForVoting({
-  supabase,
   classificationType,
   getImages,
 }: {
-  supabase: SupabaseLike;
   classificationType: string;
   getImages: (media: unknown) => string[];
 }): Promise<Array<ClassificationRow & { images: string[]; votes: number }>> {
-  const { data, error } = (await supabase
-    .from("classifications")
-    .select("*")
-    .eq("classificationtype", classificationType)
-    .order("created_at", { ascending: false })) as {
-    data: ClassificationRow[];
-    error: any;
-  };
+  const params = new URLSearchParams({ classificationtype: classificationType });
+  const response = await fetch(`/api/gameplay/classifications?${params.toString()}`);
 
-  if (error) {
-    throw error;
+  if (!response.ok) {
+    throw new Error(`Failed to fetch classifications: ${response.status}`);
   }
 
-  return (data || []).map((classification) => ({
+  const { classifications } = (await response.json()) as { classifications: ClassificationRow[] };
+
+  return (classifications || []).map((classification) => ({
     ...classification,
     images: getImages(classification.media),
     votes: classification.classificationConfiguration?.votes || 0,

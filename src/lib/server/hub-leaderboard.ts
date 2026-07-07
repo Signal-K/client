@@ -1,4 +1,4 @@
-import { prisma } from "@/lib/server/prisma";
+import { createPocketbaseAdminClient } from "@/lib/pocketbase/adminClient";
 import { unstable_cache } from "next/cache";
 
 export interface HubLeaderboardEntry {
@@ -15,15 +15,12 @@ export interface HubLeaderboardData {
 
 const getCachedTopProfiles = unstable_cache(
   async () => {
-    return await prisma.profile.findMany({
-      orderBy: [{ classificationPoints: "desc" }, { updatedAt: "asc" }],
-      take: 5,
-      select: {
-        id: true,
-        username: true,
-        classificationPoints: true,
-      },
+    const pb = await createPocketbaseAdminClient();
+    const result = await pb.collection("profiles").getList(1, 5, {
+      sort: "-classificationPoints,+updatedAt",
+      fields: "userId,username,classificationPoints",
     });
+    return result.items;
   },
   ["hub-top-profiles"],
   { revalidate: 300, tags: ["leaderboard"] }
@@ -31,36 +28,32 @@ const getCachedTopProfiles = unstable_cache(
 
 export async function getHubLeaderboard(userId: string): Promise<HubLeaderboardData> {
   const topProfiles = await getCachedTopProfiles();
+  const pb = await createPocketbaseAdminClient();
 
-  const me = await prisma.profile.findUnique({
-    where: { id: userId },
-    select: {
-      id: true,
-      username: true,
-      classificationPoints: true,
-    },
-  });
+  const me = await pb
+    .collection("profiles")
+    .getFirstListItem(pb.filter("userId = {:id}", { id: userId }), {
+      fields: "userId,username,classificationPoints",
+    })
+    .catch(() => null);
 
   const myScore = Number(me?.classificationPoints ?? 0);
-  const higherCount = await prisma.profile.count({
-    where: {
-      classificationPoints: {
-        gt: BigInt(myScore),
-      },
-    },
+  const higherCountResult = await pb.collection("profiles").getList(1, 1, {
+    filter: `classificationPoints > ${myScore}`,
   });
+  const higherCount = higherCountResult.totalItems;
 
   const entries = topProfiles.map((profile, index) => ({
     rank: index + 1,
-    username: profile.username || `User ${profile.id.slice(0, 6)}`,
+    username: profile.username || `User ${profile.userId.slice(0, 6)}`,
     score: Number(profile.classificationPoints ?? 0),
-    isCurrentUser: profile.id === userId,
+    isCurrentUser: profile.userId === userId,
   }));
 
   const currentUserEntry: HubLeaderboardEntry | null = me
     ? {
         rank: higherCount + 1,
-        username: me.username || `User ${me.id.slice(0, 6)}`,
+        username: me.username || `User ${me.userId.slice(0, 6)}`,
         score: myScore,
         isCurrentUser: true,
       }

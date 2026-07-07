@@ -6,12 +6,11 @@ import ClassificationForm from "../(classifications)/PostForm";
 import { Button } from "@/src/components/ui/button";
 import ImageAnnotator from "../(classifications)/Annotating/AnnotatorView";
 import TutorialContentBlock, { createTutorialSlides } from "../TutorialContentBlock";
+import { getStorageUrl } from "@/lib/pocketbase/storageUrl";
 
 interface Props {
     anomalyid: number | bigint;
 };
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 
 // StarterActiveAsteroids component removed (deleted per cleanup request)
 
@@ -50,8 +49,7 @@ export function ActiveAsteroidWithId() {
 
                 if (anomalyData) {
                     setAnomaly(anomalyData);
-                    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-                    setImageUrl(`${supabaseUrl}/storage/v1/object/public/telescope/telescope-active-asteroids/${anomalyData.id}.png`);
+                    setImageUrl(getStorageUrl("telescope", `telescope-active-asteroids/${anomalyData.id}.png`));
                 } else {
                     setAnomaly(null);
                     setImageUrl(null);
@@ -141,8 +139,7 @@ export function ActiveAsteroidClassifyWithId({ anomalyId }: { anomalyId: string 
 
                 if (anomalyData) {
                     setAnomaly(anomalyData);
-                    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-                    setImageUrl(`${supabaseUrl}/storage/v1/object/public/telescope/telescope-active-asteroids/${anomalyData.id}.png`);
+                    setImageUrl(getStorageUrl("telescope", `telescope-active-asteroids/${anomalyData.id}.png`));
                 } else {
                     setError("Active asteroid not found.");
                 }

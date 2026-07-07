@@ -85,3 +85,4 @@ supabase_exports/
 # cypress artifacts
 cypress/screenshots/
 cypress/videos/
+backups/

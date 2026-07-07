@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import ClassificationForm from "../(classifications)/PostForm";
 import { Button } from "@/src/components/ui/button";
 import TutorialContentBlock, { createTutorialSlides } from "../TutorialContentBlock";
+import { getStorageUrl } from "@/lib/pocketbase/storageUrl";
 
 type Anomaly = {
   id: string;
@@ -26,8 +27,6 @@ export const DiskDetectorTutorial: React.FC<TelescopeProps> = ({
   const session = useSession();
   const router = useRouter();
 
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  
   const [imageUrls, setImageUrls] = useState<string[]>([]);
   const [showClassification, setShowClassification] = useState(false);
   const [selectedOptions, setSelectedOptions] = useState<boolean[]>(new Array(7).fill(false));
@@ -39,15 +38,13 @@ export const DiskDetectorTutorial: React.FC<TelescopeProps> = ({
 
   // Function to detect how many images are available for this anomaly
   const detectAvailableImages = async () => {
-    if (!supabaseUrl) return [];
-    
     const urls: string[] = [];
     let imageIndex = 1;
     const maxAttempts = 20; // Safety limit
-    
+
     while (imageIndex <= maxAttempts) {
-      const imageUrl = `${supabaseUrl}/storage/v1/object/public/telescope/telescope-diskDetective/${anomalyId}/${imageIndex}.png`;
-      
+      const imageUrl = getStorageUrl("telescope", `telescope-diskDetective/${anomalyId}/${imageIndex}.png`);
+
       try {
         const response = await fetch(imageUrl, { method: 'HEAD' });
         if (response.ok) {
@@ -76,7 +73,7 @@ export const DiskDetectorTutorial: React.FC<TelescopeProps> = ({
     if (anomalyId) {
       loadImages();
     }
-  }, [anomalyId, supabaseUrl]);
+  }, [anomalyId]);
 
   // Tutorial slides for Disk Detective
   const tutorialSlides = createTutorialSlides([
@@ -469,8 +466,7 @@ export function TelescopeDiskDetector() {
 
         if (anomalyData) {
           setAnomaly(anomalyData);
-          const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-          setImageUrl(`${supabaseUrl}/storage/v1/object/public/telescope/telescope-diskDetective/${anomalyData.id}/1.png`);
+          setImageUrl(getStorageUrl("telescope", `telescope-diskDetective/${anomalyData.id}/1.png`));
         } else {
           setAnomaly(null);
           setImageUrl(null);

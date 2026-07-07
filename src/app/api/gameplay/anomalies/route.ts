@@ -1,13 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 
-import { prisma } from "@/lib/server/prisma";
 import { getRouteUser } from "@/lib/server/supabaseRoute";
+import { createPocketbaseAdminClient } from "@/lib/pocketbase/adminClient";
+import { mapAnomalyToRow } from "@/lib/pocketbase/legacyShapes";
 import { recursiveSerialize } from "@/utils/serialization";
 
 export const dynamic = "force-dynamic";
 
-type AnomalyInput = Record<string, unknown>;
+type AnomalyInput = Record<string, any>;
 
 type AnomalyBody = {
   anomalies?: AnomalyInput[];
@@ -24,29 +25,25 @@ export async function GET(request: NextRequest) {
   const limit = Number(request.nextUrl.searchParams.get("limit") || 500);
   const clampedLimit = Math.max(1, Math.min(limit, 2000));
 
-  const conditions: string[] = ["1 = 1"];
-  const params: unknown[] = [];
-  const addParam = (value: unknown) => {
-    params.push(value);
-    return `$${params.length}`;
-  };
+  const pb = await createPocketbaseAdminClient();
+  const filters: string[] = [];
 
   if (anomalySet) {
-    conditions.push(`"anomalySet" = ${addParam(anomalySet)}`);
+    filters.push(pb.filter("anomalySet = {:v}", { v: anomalySet }));
   }
   if (parentAnomaly) {
     const value = Number(parentAnomaly);
     if (!Number.isFinite(value)) {
       return NextResponse.json({ error: "Invalid parentAnomaly" }, { status: 400 });
     }
-    conditions.push(`"parentAnomaly" = ${addParam(Math.trunc(value))}`);
+    filters.push(pb.filter("parentAnomaly = {:v}", { v: Math.trunc(value) }));
   }
   if (id) {
     const value = Number(id);
     if (!Number.isFinite(value)) {
       return NextResponse.json({ error: "Invalid id" }, { status: 400 });
     }
-    conditions.push(`id = ${addParam(Math.trunc(value))}`);
+    filters.push(pb.filter("legacyId = {:v}", { v: Math.trunc(value) }));
   }
   if (ids) {
     const parsed = ids
@@ -55,32 +52,25 @@ export async function GET(request: NextRequest) {
       .filter((x) => Number.isFinite(x))
       .map((x) => Math.trunc(x));
     if (parsed.length > 0) {
-      conditions.push(`id = ANY(${addParam(parsed)}::bigint[])`);
+      filters.push("(" + parsed.map((v) => pb.filter("legacyId = {:v}", { v })).join(" || ") + ")");
     }
   }
   if (author) {
-    conditions.push(`author = ${addParam(author)}`);
+    filters.push(pb.filter("author = {:v}", { v: author }));
   }
   if (content) {
-    conditions.push(`content = ${addParam(content)}`);
+    filters.push(pb.filter("content = {:v}", { v: content }));
   }
 
   try {
-    const query = `
-      SELECT *
-      FROM anomalies
-      WHERE ${conditions.join(" AND ")}
-      ORDER BY id DESC
-      LIMIT ${addParam(clampedLimit)}
-    `;
-    const rows = await prisma.$queryRawUnsafe<Array<Record<string, unknown>>>(query, ...params);
+    const result = await pb.collection("anomalies").getList(1, clampedLimit, {
+      filter: filters.join(" && "),
+      sort: "-legacyId",
+    });
 
-    return NextResponse.json({ anomalies: recursiveSerialize(rows) });
+    return NextResponse.json({ anomalies: recursiveSerialize(result.items.map(mapAnomalyToRow)) });
   } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : String(err);
-    if (message.includes("Can't reach database server") || message.includes("PrismaClient")) {
-      return NextResponse.json({ error: "Database unavailable" }, { status: 503 });
-    }
+    console.error("Error fetching anomalies:", err);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
@@ -103,22 +93,46 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const data = await prisma.$queryRaw<Array<{ id: number; avatar_url: string | null }>>`
-      INSERT INTO anomalies
-      SELECT *
-      FROM jsonb_populate_recordset(NULL::anomalies, ${JSON.stringify(rows)}::jsonb)
-      RETURNING id, avatar_url
-    `;
+    const pb = await createPocketbaseAdminClient();
+    const latest = await pb.collection("anomalies").getList(1, 1, { sort: "-legacyId", fields: "legacyId" });
+    let nextLegacyId = (latest.items[0]?.legacyId ?? 0) + 1;
+
+    const created = [];
+    for (const row of rows) {
+      const legacyId = typeof row.id === "number" ? row.id : nextLegacyId++;
+      const record = await pb.collection("anomalies").create({
+        legacyId,
+        content: row.content ?? null,
+        ticId: row.ticId ?? null,
+        anomalytype: row.anomalytype ?? null,
+        type: row.type ?? null,
+        radius: row.radius ?? null,
+        mass: row.mass ?? null,
+        density: row.density ?? null,
+        gravity: row.gravity ?? null,
+        temperatureEq: row.temperatureEq ?? null,
+        temperature: row.temperature ?? null,
+        smaxis: row.smaxis ?? null,
+        orbitalPeriod: row.orbital_period ?? row.orbitalPeriod ?? null,
+        classificationStatus: row.classification_status ?? row.classificationStatus ?? null,
+        avatarUrl: row.avatar_url ?? row.avatarUrl ?? null,
+        createdAt: new Date().toISOString(),
+        deepnote: row.deepnote ?? null,
+        lightkurve: row.lightkurve ?? null,
+        configuration: row.configuration ?? null,
+        parentAnomaly: row.parentAnomaly ?? null,
+        anomalySet: row.anomalySet ?? null,
+        anomalyConfiguration: row.anomalyConfiguration ?? null,
+      });
+      created.push({ id: record.legacyId, avatar_url: record.avatarUrl });
+    }
 
     revalidatePath("/game");
     revalidatePath("/viewports/rover");
 
-    return NextResponse.json(recursiveSerialize(data));
+    return NextResponse.json(recursiveSerialize(created));
   } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : String(err);
-    if (message.includes("Can't reach database server") || message.includes("PrismaClient")) {
-      return NextResponse.json({ error: "Database unavailable" }, { status: 503 });
-    }
+    console.error("Error creating anomalies:", err);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 
-import { getRouteSupabaseWithUser } from "@/lib/server/supabaseRoute";
+import { createPocketbaseAdminClient } from "@/lib/pocketbase/adminClient";
+import { getRouteUser } from "@/lib/server/supabaseRoute";
 
 export const dynamic = "force-dynamic";
 
@@ -11,7 +12,7 @@ type UseInventoryBody = {
 };
 
 export async function POST(request: NextRequest) {
-  const { supabase, user, authError } = await getRouteSupabaseWithUser();
+  const { user, authError } = await getRouteUser();
   if (authError || !user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
@@ -24,14 +25,16 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
   }
 
-  const { data: row, error: rowError } = await supabase
-    .from("inventory")
-    .select("id, owner, configuration")
-    .eq("id", inventoryId)
-    .single();
+  const pb = await createPocketbaseAdminClient();
+  const row = await pb
+    .collection("inventory")
+    .getFirstListItem(pb.filter("legacyId = {:id}", { id: inventoryId }), {
+      fields: "id,legacyId,owner,configuration",
+    })
+    .catch(() => null);
 
-  if (rowError || !row) {
-    return NextResponse.json({ error: rowError?.message || "Inventory item not found" }, { status: 404 });
+  if (!row) {
+    return NextResponse.json({ error: "Inventory item not found" }, { status: 404 });
   }
 
   if (row.owner !== user.id) {
@@ -46,15 +49,7 @@ export async function POST(request: NextRequest) {
     Uses: nextUses,
   };
 
-  const { error: updateError } = await supabase
-    .from("inventory")
-    .update({ configuration: nextConfig })
-    .eq("id", inventoryId)
-    .eq("owner", user.id);
-
-  if (updateError) {
-    return NextResponse.json({ error: updateError.message }, { status: 500 });
-  }
+  await pb.collection("inventory").update(row.id, { configuration: nextConfig });
 
   revalidatePath("/inventory");
   revalidatePath("/game");

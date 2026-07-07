@@ -5,8 +5,7 @@ import { useSession } from "@/src/lib/auth/session-context";
 import ImageAnnotator from "../(classifications)/Annotating/AnnotatorView";
 import { Button } from "@/src/components/ui/button";
 import TutorialContentBlock, { createTutorialSlides } from "../TutorialContentBlock";
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL; 
+import { getStorageUrl } from "@/lib/pocketbase/storageUrl";
 
 type Anomaly = {
   id: number;
@@ -22,7 +21,7 @@ export function StarterJovianVortexHunter({
     anomalyid
 }: Props) {
     const session = useSession();
-    const imageUrl = `${supabaseUrl}/storage/v1/object/public/telescope/lidar-jovianVortexHunter/${anomalyid}.png`;
+    const imageUrl = getStorageUrl("telescope", `lidar-jovianVortexHunter/${anomalyid}.png`);
     const [showTutorial, setShowTutorial] = useState(false);
 
     // Tutorial slides for Jovian Vortex Hunter
@@ -194,8 +193,6 @@ export function LidarJVHSatelliteWithId() {
     const [loading, setLoading] = useState<boolean>(true);
     const [showTutorial, setShowTutorial] = useState<boolean>(false);
 
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-
     async function fetchAnomaly() {
         if (!session) {
             setLoading(false);
@@ -212,7 +209,7 @@ export function LidarJVHSatelliteWithId() {
 
             if (anomalyData) {
                 setAnomaly(anomalyData);
-                setImageUrl(`${supabaseUrl}/storage/v1/object/public/telescope/lidar-jovianVortexHunter/${anomalyData.id}.png`);
+                setImageUrl(getStorageUrl("telescope", `lidar-jovianVortexHunter/${anomalyData.id}.png`));
             } else {
                 setAnomaly(null);
                 setImageUrl(null);

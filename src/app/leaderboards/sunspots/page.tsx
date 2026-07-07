@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/src/components/ui/ca
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/src/components/ui/tabs";
 import { Trophy, Shield, SunIcon } from "lucide-react";
 import UseDarkMode from "@/src/hooks/useDarkMode";
+import { getStorageUrl } from "@/lib/pocketbase/storageUrl";
 
 interface LeaderboardEntry {
   user_id: string;
@@ -50,7 +51,7 @@ export default function SunspotLeaderboardPage() {
 
   const getAvatarUrl = (entry: LeaderboardEntry) => {
     if (entry.avatar_url) {
-      return `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/avatars/${entry.avatar_url}`;
+      return getStorageUrl("avatars", entry.avatar_url);
     }
     // Use DiceBear robot API as fallback
     return `https://api.dicebear.com/7.x/bottts/svg?seed=${entry.user_id}`;

@@ -1,46 +1,46 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { getRouteSupabaseWithUser } from "@/lib/server/supabaseRoute";
+import { createPocketbaseAdminClient } from "@/lib/pocketbase/adminClient";
+import { mapAnomalyToRow, mapClassificationToRow } from "@/lib/pocketbase/legacyShapes";
+import { getRouteUser } from "@/lib/server/supabaseRoute";
 import { recursiveSerialize } from "@/utils/serialization";
 
 export const dynamic = "force-dynamic";
 
 async function resolveLocation(
-  supabase: Awaited<ReturnType<typeof getRouteSupabaseWithUser>>["supabase"],
+  pb: Awaited<ReturnType<typeof createPocketbaseAdminClient>>,
   userId: string,
   requestedLocation?: number
 ) {
-  if (requestedLocation !== undefined && Number.isFinite(requestedLocation)) {
-    const { error: updateError } = await supabase
-      .from("profiles")
-      .update({ location: BigInt(requestedLocation) })
-      .eq("id", userId);
+  const profile = await pb
+    .collection("profiles")
+    .getFirstListItem(pb.filter("userId = {:userId}", { userId }))
+    .catch(() => null);
 
-    if (updateError) {
-      throw new Error(updateError.message);
+  if (requestedLocation !== undefined && Number.isFinite(requestedLocation)) {
+    if (profile) {
+      await pb.collection("profiles").update(profile.id, { location: requestedLocation });
+    } else {
+      await pb.collection("profiles").create({
+        userId,
+        location: requestedLocation,
+        updatedAt: new Date().toISOString(),
+      });
     }
 
     return requestedLocation as number;
   }
 
-  const { data: profile, error: profileError } = await supabase
-    .from("profiles")
-    .select("location")
-    .eq("id", userId)
-    .maybeSingle();
-
-  if (profileError) {
-    throw new Error(profileError.message);
-  }
-
-  const location = profile?.location ?? BigInt(30);
+  const location = profile?.location ?? 30;
   if (profile?.location == null) {
-    const { error: updateError } = await supabase
-      .from("profiles")
-      .update({ location })
-      .eq("id", userId);
-    if (updateError) {
-      throw new Error(updateError.message);
+    if (profile) {
+      await pb.collection("profiles").update(profile.id, { location });
+    } else {
+      await pb.collection("profiles").create({
+        userId,
+        location,
+        updatedAt: new Date().toISOString(),
+      });
     }
   }
 
@@ -48,43 +48,42 @@ async function resolveLocation(
 }
 
 async function fetchActivePlanetPayload(userId: string, requestedLocation?: number) {
-  const { supabase, user, authError } = await getRouteSupabaseWithUser();
+  const { user, authError } = await getRouteUser();
   if (authError || !user || user.id !== userId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   try {
-    const location = await resolveLocation(supabase, userId, requestedLocation);
+    const pb = await createPocketbaseAdminClient();
+    const location = await resolveLocation(pb, userId, requestedLocation);
 
-    const { data: planet, error: planetError } = await supabase
-      .from("anomalies")
-      .select("*")
-      .eq("id", BigInt(location))
-      .maybeSingle();
+    const [planet, classifications] = await Promise.all([
+      pb
+        .collection("anomalies")
+        .getFirstListItem(pb.filter("legacyId = {:location}", { location }))
+        .catch(() => null),
+      pb.collection("classifications").getFullList({
+        filter: pb.filter("author = {:author} && anomaly = {:location} && classificationtype = {:type}", {
+          author: userId,
+          location,
+          type: "lightcurve",
+        }),
+      }),
+    ]);
 
-    if (planetError) {
-      throw new Error(planetError.message);
-    }
-
-    const { data: classifications, error: classificationsError } = await supabase
-      .from("classifications")
-      .select("*")
-      .eq("author", userId)
-      .eq("anomaly", BigInt(location))
-      .eq("classificationtype", "lightcurve");
-
-    if (classificationsError) {
-      throw new Error(classificationsError.message);
-    }
+    const planetRow = planet ? mapAnomalyToRow(planet) : null;
 
     return NextResponse.json(recursiveSerialize({
       location: location.toString(),
-      planet: planet ? { ...planet, id: planet.id.toString() } : null,
-      classifications: (classifications ?? []).map((c: any) => ({
-        ...c,
+      planet: planetRow ? { ...planetRow, id: planetRow.id.toString() } : null,
+      classifications: classifications.map((classification) => {
+        const c = mapClassificationToRow(classification);
+        return {
+          ...c,
         id: c.id.toString(),
         anomaly: c.anomaly?.toString(),
-      })),
+        };
+      }),
     }));
   } catch (error: any) {
     return NextResponse.json(

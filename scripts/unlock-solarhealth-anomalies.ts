@@ -1,51 +1,44 @@
 #!/usr/bin/env tsx
 
-import { createClient } from "@supabase/supabase-js";
+import PocketBase from "pocketbase";
 
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const pbUrl = process.env.NEXT_PUBLIC_POCKETBASE_URL || process.env.PB_URL;
+const pbAdminEmail = process.env.POCKETBASE_ADMIN_EMAIL || process.env.PB_ADMIN_EMAIL;
+const pbAdminPassword = process.env.POCKETBASE_ADMIN_PASSWORD || process.env.PB_ADMIN_PASSWORD;
 
-if (!supabaseUrl || !supabaseServiceRoleKey) {
-  console.error("Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY");
+if (!pbUrl || !pbAdminEmail || !pbAdminPassword) {
+  console.error("Missing PocketBase admin environment variables");
   process.exit(1);
 }
 
-const supabase = createClient(supabaseUrl, supabaseServiceRoleKey);
+const pb = new PocketBase(pbUrl);
+const adminEmail = pbAdminEmail;
+const adminPassword = pbAdminPassword;
 
 async function unlockSolarHealthAnomalies() {
+  await pb.collection("_superusers").authWithPassword(adminEmail, adminPassword);
+
   const now = new Date();
   const minDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
   const maxDate = new Date(now.getTime() - 24 * 60 * 60 * 1000);
 
-  const { data, error } = await supabase
-    .from("linked_anomalies")
-    .select("id")
-    .eq("automaton", "TelescopeSolar")
-    .eq("unlocked", false)
-    .gte("date", minDate.toISOString())
-    .lte("date", maxDate.toISOString());
+  const data = await pb.collection("linked_anomalies").getFullList({
+    filter: pb.filter("automaton = {:automaton} && unlocked = false && date >= {:minDate} && date <= {:maxDate}", {
+      automaton: "TelescopeSolar",
+      minDate: minDate.toISOString(),
+      maxDate: maxDate.toISOString(),
+    }),
+    fields: "id,legacyId",
+  });
 
-  if (error) {
-    console.error("Error fetching anomalies:", error);
-    process.exit(1);
-  }
-
-  if (!data || data.length === 0) {
+  if (data.length === 0) {
     console.log("No anomalies to unlock.");
     return;
   }
 
   for (const anomaly of data) {
-    const { error: updateError } = await supabase
-      .from("linked_anomalies")
-      .update({ unlocked: true })
-      .eq("id", anomaly.id);
-
-    if (updateError) {
-      console.error(`Error unlocking anomaly ${anomaly.id}:`, updateError);
-    } else {
-      console.log(`Unlocked anomaly ${anomaly.id}`);
-    }
+    await pb.collection("linked_anomalies").update(anomaly.id, { unlocked: true });
+    console.log(`Unlocked anomaly ${anomaly.legacyId}`);
   }
 }
 

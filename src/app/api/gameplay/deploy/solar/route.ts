@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 
-import { prisma } from "@/lib/server/prisma";
 import { getRouteUser } from "@/lib/server/supabaseRoute";
+import { createPocketbaseAdminClient } from "@/lib/pocketbase/adminClient";
 import { recursiveSerialize } from "@/utils/serialization";
 
 export const dynamic = "force-dynamic";
@@ -24,47 +24,48 @@ export async function POST() {
   const weekStart = getWeekStart(now).toISOString();
   const automatonType = "TelescopeSolar";
 
+  const pb = await createPocketbaseAdminClient();
+
   const [anomalies, existing] = await Promise.all([
-    prisma.$queryRaw<Array<{ id: number }>>`
-      SELECT id
-      FROM anomalies
-      WHERE "anomalySet" = 'sunspot'
-    `,
-    prisma.$queryRaw<Array<{ id: number }>>`
-      SELECT id
-      FROM linked_anomalies
-      WHERE author = ${user.id}
-        AND automaton = ${automatonType}
-        AND date >= ${weekStart}
-      LIMIT 1
-    `,
+    pb.collection("anomalies").getFullList({
+      filter: pb.filter("anomalySet = {:s}", { s: "sunspot" }),
+      fields: "legacyId",
+    }),
+    pb.collection("linked_anomalies").getList(1, 1, {
+      filter: pb.filter("author = {:author} && automaton = {:a} && date >= {:d}", {
+        author: user.id,
+        a: automatonType,
+        d: weekStart,
+      }),
+    }),
   ]);
 
-  if ((existing || []).length > 0) {
+  if (existing.items.length > 0) {
     return NextResponse.json(recursiveSerialize({ success: true, inserted: 0 }));
   }
 
-  const rows = anomalies.map((anomaly) => ({
-    author: user.id,
-    anomaly_id: anomaly.id,
-    automaton: automatonType,
-    unlocked: false,
-    date: now.toISOString(),
-  }));
-
-  if (rows.length === 0) {
+  if (anomalies.length === 0) {
     return NextResponse.json({ error: "No sunspot anomalies available" }, { status: 400 });
   }
 
-  await prisma.$executeRaw`
-    INSERT INTO linked_anomalies (author, anomaly_id, automaton, unlocked, date)
-    SELECT x.author, x.anomaly_id, x.automaton, x.unlocked, x.date::timestamptz
-    FROM jsonb_to_recordset(${JSON.stringify(rows)}::jsonb)
-      AS x(author text, anomaly_id int, automaton text, unlocked boolean, date text)
-  `;
+  const latest = await pb.collection("linked_anomalies").getList(1, 1, { sort: "-legacyId", fields: "legacyId" });
+  let nextLegacyId = (latest.items[0]?.legacyId ?? 0) + 1;
+
+  await Promise.all(
+    anomalies.map((anomaly) =>
+      pb.collection("linked_anomalies").create({
+        legacyId: nextLegacyId++,
+        author: user.id,
+        anomalyId: anomaly.legacyId,
+        automaton: automatonType,
+        unlocked: false,
+        date: now.toISOString(),
+      })
+    )
+  );
 
   revalidatePath("/viewports/solar");
   revalidatePath("/game");
 
-  return NextResponse.json(recursiveSerialize({ success: true, inserted: rows.length }));
+  return NextResponse.json(recursiveSerialize({ success: true, inserted: anomalies.length }));
 }

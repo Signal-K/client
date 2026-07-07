@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 
-import { prisma } from "@/lib/server/prisma";
 import { getRouteUser } from "@/lib/server/supabaseRoute";
+import { createPocketbaseAdminClient } from "@/lib/pocketbase/adminClient";
 
 export const dynamic = "force-dynamic";
 
@@ -29,44 +29,21 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
   }
 
-  const insertPayload: Record<string, unknown> = {
+  const pb = await createPocketbaseAdminClient();
+  const latest = await pb.collection("comments").getList(1, 1, { sort: "-legacyId", fields: "legacyId" });
+  const nextLegacyId = (latest.items[0]?.legacyId ?? 0) + 1;
+
+  await pb.collection("comments").create({
+    legacyId: nextLegacyId,
+    createdAt: new Date().toISOString(),
     content,
-    classification_id: classificationId,
+    classificationId,
     author: user.id,
-  };
-
-  if (body?.configuration && typeof body.configuration === "object") {
-    insertPayload.configuration = body.configuration;
-  }
-  if (typeof body?.surveyor === "string") {
-    insertPayload.surveyor = body.surveyor;
-  }
-  if (typeof body?.category === "string") {
-    insertPayload.category = body.category;
-  }
-  if (typeof body?.value === "string") {
-    insertPayload.value = body.value;
-  }
-
-  const configurationJson = insertPayload.configuration
-    ? JSON.stringify(insertPayload.configuration as Record<string, unknown>)
-    : null;
-  const surveyor = (insertPayload.surveyor as string | undefined) ?? null;
-  const category = (insertPayload.category as string | undefined) ?? null;
-  const value = (insertPayload.value as string | undefined) ?? null;
-
-  await prisma.$executeRaw`
-    INSERT INTO comments (content, classification_id, author, configuration, surveyor, category, value)
-    VALUES (
-      ${insertPayload.content as string},
-      ${insertPayload.classification_id as number},
-      ${insertPayload.author as string},
-      ${configurationJson}::jsonb,
-      ${surveyor},
-      ${category},
-      ${value}
-    )
-  `;
+    configuration: body?.configuration && typeof body.configuration === "object" ? body.configuration : null,
+    surveyor: typeof body?.surveyor === "string" ? body.surveyor : null,
+    category: typeof body?.category === "string" ? body.category : null,
+    value: typeof body?.value === "string" ? body.value : null,
+  });
 
   revalidatePath(`/planets/${classificationId}`);
   revalidatePath(`/posts/surveyor/${classificationId}`);
