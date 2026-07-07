@@ -41,11 +41,8 @@ services:
     networks:
       - app-network
     restart: unless-stopped
-    # Run migrations before starting the app
     command: >
       sh -c "
-        echo 'Running Prisma migrations...' &&
-        yarn prisma:migrate:deploy &&
         echo 'Starting production application...' &&
         node server.js
       "

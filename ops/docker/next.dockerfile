@@ -29,8 +29,7 @@ COPY . .
 ENV NEXT_PUBLIC_SUPABASE_URL=http://localhost:54321
 ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=dummy-key-for-build
 
-# Generate Prisma client and build app into the image layer.
-RUN yarn prisma:generate && yarn build
+RUN yarn build
 
 # Expose the port the app runs on
 EXPOSE 3000

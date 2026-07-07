@@ -44,8 +44,6 @@ RUN npx cypress install
 
 # Copy the rest of the application code
 COPY . .
-# Generate Prisma client in image so tests do not depend on host-generated artifacts.
-RUN yarn prisma:generate
 
 # Expose the port the app runs on
 EXPOSE 3000
