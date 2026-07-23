@@ -23,9 +23,6 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-ARG DATABASE_URL
-ENV DATABASE_URL=$DATABASE_URL
-
 # Build the application
 RUN yarn build
 
@@ -57,5 +54,4 @@ EXPOSE 3000
 ENV PORT 3000
 ENV HOSTNAME "0.0.0.0"
 
-# Run database migrations on startup if DATABASE_URL is available
 CMD ["node", "server.js"]

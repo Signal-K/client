@@ -1,4 +1,23 @@
 services:
+  # PocketBase test data service
+  pocketbase-test:
+    container_name: pocketbase-test
+    image: ghcr.io/muchobien/pocketbase:latest
+    ports:
+      - "8096:8090"
+    volumes:
+      - pocketbase_test_data:/pb_data
+      - ../../pocketbase/pb_hooks:/pb_hooks:ro
+    networks:
+      - test-network
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8090/api/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 10s
+    restart: unless-stopped
+
   # Next.js Application for Testing
   nextapp-test:
     container_name: nextapp-test
@@ -13,14 +32,13 @@ services:
       - NODE_ENV=test
       - SKIP_USER_CREATION_TESTS=true
       - E2E_TEST_AUTH_ENABLED=true
-      - DATABASE_URL=${DATABASE_URL:-postgresql://postgres:postgres@host.docker.internal:54322/postgres}
-      - SUPABASE_URL=${SUPABASE_URL:-http://host.docker.internal:54321}
-      - NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL:-http://host.docker.internal:54321}
-      - NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY:-}
-      - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY:-}
-      - SUPABASE_SECRET_KEY=${SUPABASE_SECRET_KEY:-}
+      - POCKETBASE_URL=http://pocketbase-test:8090
+      - NEXT_PUBLIC_POCKETBASE_URL=http://pocketbase-test:8090
     networks:
       - test-network
+    depends_on:
+      pocketbase-test:
+        condition: service_healthy
     extra_hosts:
       - "host.docker.internal:host-gateway"
     command: "yarn start"
@@ -40,12 +58,6 @@ services:
       - ../../.env.test
     environment:
       - NODE_ENV=test
-      - DATABASE_URL=${DATABASE_URL:-postgresql://postgres:postgres@host.docker.internal:54322/postgres}
-      - SUPABASE_URL=${SUPABASE_URL:-http://host.docker.internal:54321}
-      - NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL:-http://host.docker.internal:54321}
-      - NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY:-}
-      - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY:-}
-      - SUPABASE_SECRET_KEY=${SUPABASE_SECRET_KEY:-}
       - CYPRESS_SPEC=${CYPRESS_SPEC:-}
     volumes:
       - ../../:/app
@@ -74,12 +86,6 @@ services:
       - CYPRESS_baseUrl=http://127.0.0.1:3000
       - CYPRESS_SPEC=${CYPRESS_SPEC:-}
       - DISPLAY=:99
-      - DATABASE_URL=${DATABASE_URL:-postgresql://postgres:postgres@host.docker.internal:54322/postgres}
-      - SUPABASE_URL=${SUPABASE_URL:-http://host.docker.internal:54321}
-      - NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL:-http://host.docker.internal:54321}
-      - NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY:-}
-      - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY:-}
-      - SUPABASE_SECRET_KEY=${SUPABASE_SECRET_KEY:-}
     volumes:
       - ../../:/app
       - /app/node_modules
@@ -99,7 +105,7 @@ services:
         sleep 10 &&
         echo 'Running E2E tests...' &&
         if [ -n \"$$CYPRESS_SPEC\" ]; then
-          SKIP_USER_CREATION_TESTS=true scripts/tests/with-local-supabase-env.sh npx start-server-and-test 'yarn test:e2e:server' http://127.0.0.1:3000/auth \"scripts/tests/run-cypress.sh --headless --spec $$CYPRESS_SPEC\";
+          SKIP_USER_CREATION_TESTS=true scripts/tests/with-local-pocketbase-env.sh npx start-server-and-test 'yarn test:e2e:server' http://127.0.0.1:3000/auth \"scripts/tests/run-cypress.sh --headless --spec $$CYPRESS_SPEC\";
         else
           yarn test:e2e:headless;
         fi
@@ -121,12 +127,6 @@ services:
       - E2E_TEST_AUTH_ENABLED=true
       - CYPRESS_baseUrl=http://127.0.0.1:3000
       - DISPLAY=:99
-      - DATABASE_URL=${DATABASE_URL:-postgresql://postgres:postgres@host.docker.internal:54322/postgres}
-      - SUPABASE_URL=${SUPABASE_URL:-http://host.docker.internal:54321}
-      - NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL:-http://host.docker.internal:54321}
-      - NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY:-}
-      - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY:-}
-      - SUPABASE_SECRET_KEY=${SUPABASE_SECRET_KEY:-}
     volumes:
       - ../../:/app
       - /app/node_modules
@@ -163,12 +163,6 @@ services:
       - SKIP_USER_CREATION_TESTS=true
       - E2E_TEST_AUTH_ENABLED=true
       - CYPRESS_baseUrl=http://127.0.0.1:3000
-      - DATABASE_URL=${DATABASE_URL:-postgresql://postgres:postgres@host.docker.internal:54322/postgres}
-      - SUPABASE_URL=${SUPABASE_URL:-http://host.docker.internal:54321}
-      - NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL:-http://host.docker.internal:54321}
-      - NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY:-}
-      - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY:-}
-      - SUPABASE_SECRET_KEY=${SUPABASE_SECRET_KEY:-}
     volumes:
       - ../../:/app
       - /app/node_modules
@@ -200,5 +194,6 @@ networks:
     driver: bridge
 
 volumes:
+  pocketbase_test_data:
   cypress_cache:
   node_modules_cache:

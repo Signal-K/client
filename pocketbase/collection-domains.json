@@ -1,0 +1,64 @@
+{
+  "version": 1,
+  "rules": {
+    "legacy_star_sailors": {
+      "description": "Original Star Sailors client/game collections. Names are frozen for compatibility with the current app and existing migrated data.",
+      "instance": "client/pocketbase",
+      "collections": [
+        "anomalies",
+        "classifications",
+        "comments",
+        "defensive_probes",
+        "events",
+        "inventory",
+        "linked_anomalies",
+        "mineral_deposits",
+        "missions",
+        "notification_rejections",
+        "nps_surveys",
+        "profiles",
+        "push_anomaly_log",
+        "push_subscriptions",
+        "referrals",
+        "researched",
+        "routes",
+        "solar_events",
+        "storage_objects",
+        "survey_rewards",
+        "uploads",
+        "user_mineral_inventory",
+        "votes",
+        "zoo"
+      ],
+      "new_collection_prefix": "ss_"
+    },
+    "platform_shared": {
+      "description": "Cross-product identity and service-to-service data owned by the shared backend.",
+      "instance": "../backend",
+      "collections": [
+        "users",
+        "ecosystem_profiles",
+        "ss_ecosystem_profiles",
+        "internal_apps"
+      ],
+      "new_collection_prefix": "platform_"
+    },
+    "atlas": {
+      "description": "New Atlas citizen-science product collections owned by the shared backend.",
+      "instance": "../backend",
+      "prefix": "atlas_",
+      "new_collection_prefix": "atlas_"
+    },
+    "other_product": {
+      "description": "Product-specific data belongs in that product's PocketBase spoke, not in the legacy Star Sailors instance.",
+      "instance": "dedicated spoke",
+      "new_collection_prefix": "product_"
+    }
+  },
+  "policy": [
+    "Do not rename legacy_star_sailors collections without a compatibility migration and an app-wide query update.",
+    "Do not add new unprefixed collections to the legacy Star Sailors instance.",
+    "Do not add Atlas or other product collections to the legacy Star Sailors instance.",
+    "A collection that is used by one product's gameplay belongs to that product's spoke; only genuinely cross-product data belongs on the shared backend."
+  ]
+}

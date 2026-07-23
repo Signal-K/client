@@ -64,8 +64,7 @@ const SunspotIcon = (props: any) => (
 
 export default function Sidebar() {
 
-// Supabase session and client
-  // Supabase session and client
+// Clerk session and PocketBase-backed application data
   const session = useSession();
   // Tool deployment state
   const [toolDeployment, setToolDeployment] = useState({

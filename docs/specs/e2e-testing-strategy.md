@@ -33,7 +33,7 @@ E2E testing has been restructured to optimize CI/CD performance and test coverag
 **Runs**: All 10 e2e test files (29 tests)
 - auth.cy.ts
 - contributions-critical.cy.ts
-- frontend-supabase-persistence.cy.ts
+- frontend-pocketbase-persistence.cy.ts
 - navigation.cy.ts
 - planets.cy.ts
 - project-matrix.cy.ts
@@ -110,14 +110,14 @@ The following tests are **not** part of the standard pipeline due to environment
 ## Test Dependencies
 
 ### Required environment variables
-- `NEXT_PUBLIC_SUPABASE_URL`
-- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-- `SUPABASE_SERVICE_ROLE_KEY` (for tests with Supabase setup)
+- `NEXT_PUBLIC_POCKETBASE_URL`
+- `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`
+- `CLERK_SECRET_KEY`
 
-### Local Supabase (optional for non-main branches)
-Tests will work with remote Supabase, but local instances can be used:
+### Local PocketBase
+Run PocketBase before e2e tests that hit gameplay API routes:
 ```bash
-supabase start  # Before running e2e tests
+docker compose -f ops/compose/compose.yml up pocketbase
 ```
 
 ## Performance Notes
@@ -140,7 +140,7 @@ Update the package.json test commands to include new critical tests.
 ## Troubleshooting
 
 ### Tests fail locally but pass in CI
-- Ensure Supabase is configured correctly
+- Ensure PocketBase is running and Clerk test credentials are configured
 - Check environment variables are set
 - Try `yarn test:e2e:local` to run all tests including skipped ones
 

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { getRouteUser } from "@/lib/server/supabaseRoute";
+import { getRouteUser } from "@/lib/server/routeAuth";
 import { createPocketbaseAdminClient } from "@/lib/pocketbase/adminClient";
 import { mapAnomalyToRow, mapClassificationToRow } from "@/lib/pocketbase/legacyShapes";
 import { recursiveSerialize } from "@/utils/serialization";

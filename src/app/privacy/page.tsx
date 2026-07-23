@@ -194,7 +194,7 @@ export default function PrivacyPolicyPage() {
                   <h3 className="font-semibold text-red-800 dark:text-red-200 mb-2">🔒 Security Measures</h3>
                   <ul className="space-y-1 text-sm text-red-700 dark:text-red-300">
                     <li>• All data encrypted in transit and at rest</li>
-                    <li>• Secure authentication through Supabase</li>
+                    <li>• Secure authentication through Clerk</li>
                     <li>• Regular security audits and updates</li>
                     <li>• Access controls and monitoring</li>
                   </ul>
@@ -245,7 +245,7 @@ export default function PrivacyPolicyPage() {
           <div className="bg-background/20 backdrop-blur-sm rounded-lg border border-[#78cce2]/30 p-6">
             <h2 className="text-2xl font-semibold text-primary mb-4">🔗 Third-Party Services</h2>
             <div className="space-y-2 text-sm text-muted-foreground">
-              <p>• Authentication and database infrastructure are provided through Supabase.</p>
+              <p>• Authentication is provided through Clerk and application data is stored in PocketBase.</p>
               <p>• Optional sign-in may use Google OAuth, subject to Google's policies.</p>
               <p>• Analytics and error monitoring may be used to improve reliability and performance.</p>
             </div>

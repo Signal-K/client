@@ -32,5 +32,9 @@
       "WebFetch(domain:alerce.readthedocs.io)",
       "WebFetch(domain:developer.zooniverse.org)"
     ]
-  }
+  },
+  "enabledMcpjsonServers": [
+    "stitch",
+    "knowns"
+  ]
 }

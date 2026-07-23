@@ -119,7 +119,7 @@ export const DiskDetectorTutorial: React.FC<TelescopeProps> = ({
 
   const handleSubmit = async (withDiscussion: boolean = false) => {
     if (!session?.user?.id) {
-      console.error("No session or supabase client available");
+      console.error("No signed-in user available");
       return;
     }
 

@@ -33,6 +33,7 @@ const pbAdminPassword = process.env.POCKETBASE_ADMIN_PASSWORD || process.env.PB_
 const clerkSecretKey = process.env.CLERK_SECRET_KEY;
 const dryRun = String(process.env.DRY_RUN ?? "true").toLowerCase() !== "false";
 const reportPath = process.env.REPORT_PATH || "fix-stale-user-ids-report.json";
+const clerkUsersExport = process.env.CLERK_USERS_EXPORT;
 
 if (!pbUrl || !pbAdminEmail || !pbAdminPassword || !clerkSecretKey) {
   console.error("Missing required env vars: NEXT_PUBLIC_POCKETBASE_URL, POCKETBASE_ADMIN_EMAIL, POCKETBASE_ADMIN_PASSWORD, CLERK_SECRET_KEY");
@@ -64,6 +65,19 @@ type ReportEntry = {
 async function resolveClerkIds(uuids: string[]): Promise<Map<string, string>> {
   const map = new Map<string, string>();
   const unique = [...new Set(uuids)];
+
+  if (clerkUsersExport) {
+    const pages = JSON.parse(fs.readFileSync(clerkUsersExport, "utf8")) as Array<{
+      data?: Array<{ id?: string; external_id?: string | null }>;
+    }>;
+    for (const page of pages) {
+      for (const user of page.data ?? []) {
+        if (user.external_id && user.id) map.set(user.external_id, user.id);
+      }
+    }
+    return map;
+  }
+
   const BATCH = 100; // Clerk's externalId filter accepts an array; batch defensively.
   for (let i = 0; i < unique.length; i += BATCH) {
     const batch = unique.slice(i, i + BATCH);

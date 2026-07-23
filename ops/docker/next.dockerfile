@@ -23,11 +23,9 @@ RUN set -eux; \
 # Copy the rest of the application code
 COPY . .
 
-# Set default environment variables for the build phase to prevent prerendering errors.
-# These will be baked into the client-side bundle if not overridden during build.
-# At runtime, the server-side will use the actual environment variables.
-ENV NEXT_PUBLIC_SUPABASE_URL=http://localhost:54321
-ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=dummy-key-for-build
+# Set a non-secret PocketBase URL for the build phase. Runtime server requests
+# use the deployment-provided POCKETBASE_URL and admin credentials.
+ENV POCKETBASE_URL=http://localhost:8095
 
 RUN yarn build
 

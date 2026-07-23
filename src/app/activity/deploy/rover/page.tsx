@@ -19,7 +19,7 @@ export default function DeployRoverPage() {
   const [waypoints, setWaypoints] = useState<{ x: number; y: number }[]>([]);
   const mapRef = useRef<HTMLDivElement>(null);
 
-  // Supabase session
+  // Clerk session
   const { user } = useAuthUser();
 
   // Most recent planet classification and anomaly

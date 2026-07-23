@@ -210,7 +210,7 @@ export function surveyStorageKey(surveyId: string, userId: string): string {
 // ── Project engagement surveys ───────────────────────────────────────────────
 // Shown when a user reaches the contribution threshold for a project,
 // asking whether they'd like to try a dedicated standalone minigame.
-// The user's Supabase UUID is captured in PostHog alongside the response.
+// The user's Clerk id is captured in PostHog alongside the response.
 
 export const PROJECT_ENGAGEMENT_SURVEYS: readonly ProjectEngagementSurvey[] = [
   {

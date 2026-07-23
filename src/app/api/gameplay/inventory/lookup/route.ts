@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import { createPocketbaseAdminClient } from "@/lib/pocketbase/adminClient";
-import { getRouteUser } from "@/lib/server/supabaseRoute";
+import { getRouteUser } from "@/lib/server/routeAuth";
 import { recursiveSerialize } from "@/utils/serialization";
 
 export const dynamic = "force-dynamic";

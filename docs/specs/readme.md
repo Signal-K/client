@@ -163,10 +163,9 @@ Multi-service orchestration for comprehensive testing:
 Test environment configuration:
 ```bash
 NODE_ENV=test
-NEXTAUTH_URL=http://localhost:3000
-NEXT_PUBLIC_BASE_URL=http://localhost:3000
-NEXT_PUBLIC_SUPABASE_URL=https://placeholder.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=placeholder_key
+NEXT_PUBLIC_POCKETBASE_URL=http://localhost:8095
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_placeholder
+CLERK_SECRET_KEY=sk_test_placeholder
 SKIP_USER_CREATION_TESTS=true
 ```
 

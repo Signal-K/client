@@ -1,4 +1,4 @@
-# Development commands for Supabase setup
+# Development commands for Clerk + PocketBase
 # QUICK START OPTIONS (use these first!)
 quick-start:
 	@./scripts/docker-quick-start.sh
@@ -21,12 +21,12 @@ build:
 	docker-compose -f ops/compose/compose.yml build
 
 up-full:
-	supabase start && yarn && docker-compose -f ops/compose/compose.yml up --build
+	yarn && docker-compose -f ops/compose/compose.yml up --build
 
 down:
 	docker-compose -f ops/compose/compose.yml down
 
-# Run locally without Docker (recommended for Supabase development)
+# Run locally without Docker
 dev:
 	yarn dev
 
@@ -36,30 +36,33 @@ install:
 build-app:
 	yarn build
 
-# Supabase commands (run these locally, not in Docker)
-# Make sure you have Supabase CLI installed
-supabase-start:
-	supabase start
+# PocketBase helpers
+pb-up:
+	docker-compose -f ops/compose/compose.yml up -d pocketbase
 
-supabase-stop:
-	supabase stop
+pb-down:
+	docker-compose -f ops/compose/compose.yml stop pocketbase
 
-# Database type generation (if using Supabase CLI)
-db-types:
-	supabase gen types typescript --project-id your-project-id --schema public > src/types/supabase.ts
+pb-logs:
+	docker-compose -f ops/compose/compose.yml logs -f pocketbase
 
-# Prisma commands (connected to Supabase Postgres)
-db-studio:
-	docker-compose -f ops/compose/compose.yml --profile studio up prisma-studio
+pb-import-schema:
+	yarn pocketbase:import-schema
 
-db-studio-down:
-	docker-compose -f ops/compose/compose.yml --profile studio down
+pb-check-domains:
+	yarn pocketbase:check-domains
 
-db-generate:
-	yarn prisma:generate
+pb-map-clerk-users:
+	DRY_RUN=$${DRY_RUN:-true} yarn pocketbase:map-clerk-users
 
-db-push:
-	yarn prisma:migrate:deploy
+pb-backfill-ecosystem-profiles:
+	DRY_RUN=$${DRY_RUN:-true} yarn pocketbase:backfill-ecosystem-profiles
+
+pb-restore-legacy-profiles:
+	DRY_RUN=$${DRY_RUN:-true} yarn pocketbase:restore-legacy-profiles
+
+pb-backup:
+	./scripts/pocketbase/backup.sh
 
 # Production commands (if using Docker for production)
 prod-build:
@@ -83,8 +86,8 @@ clean:
 setup:
 	cp .env.example .env.local
 	yarn install
-	@echo "Please update .env.local with your Supabase credentials"
-	@echo "Then run 'make dev' or 'yarn dev' to start development"
+	@echo "Please update .env.local with Clerk and PocketBase credentials"
+	@echo "Then run 'make pb-up' and 'make dev' to start development"
 
 # Help
 help:
@@ -94,7 +97,8 @@ help:
 	@echo "  test-docker  - Run unit & E2E tests in headless Docker (GitHub Actions style)"
 	@echo "  sync-surveys - Sync micro-surveys to PostHog using .env.posthog"
 	@echo "  down         - Stop Docker containers"
-	@echo "  db-studio    - Start Prisma Studio"
+	@echo "  pb-up        - Start local PocketBase"
+	@echo "  pb-backup    - Back up local PocketBase data"
 	@echo "  setup        - Setup for new developers"
 
 # Docker Testing (Headless E2E + Unit)

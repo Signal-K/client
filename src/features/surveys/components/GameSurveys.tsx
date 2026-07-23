@@ -53,7 +53,7 @@ export function GameSurveys({ userId, classifications = [] }: GameSurveysProps) 
             ),
           };
 
-          // For project engagement surveys, always record the user's Supabase UUID
+          // For project engagement surveys, record the authenticated Clerk user id
           // so responses can be linked back to accounts for follow-up.
           if (isEngagement && userId) {
             capturePayload.user_uuid = userId;

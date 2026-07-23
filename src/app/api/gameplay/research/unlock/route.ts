@@ -3,7 +3,7 @@ import { revalidatePath } from "next/cache";
 
 import { createPocketbaseAdminClient } from "@/lib/pocketbase/adminClient";
 import { getResearchedProgressForUser, getSurveyBonusForUser, unlockTechForUser } from "@/lib/server/researched";
-import { getRouteUser } from "@/lib/server/supabaseRoute";
+import { getRouteUser } from "@/lib/server/routeAuth";
 
 export const dynamic = "force-dynamic";
 

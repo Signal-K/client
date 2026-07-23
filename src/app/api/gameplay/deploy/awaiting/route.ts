@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { createPocketbaseAdminClient } from "@/lib/pocketbase/adminClient";
-import { getRouteUser } from "@/lib/server/supabaseRoute";
+import { getRouteUser } from "@/lib/server/routeAuth";
 
 export const dynamic = "force-dynamic";
 

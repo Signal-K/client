@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 
 import { createPocketbaseAdminClient } from "@/lib/pocketbase/adminClient";
 import { getResearchedProgressForUser, getSurveyBonusForUser, QUANTITY_UPGRADES } from "@/lib/server/researched";
-import { getRouteUser } from "@/lib/server/supabaseRoute";
+import { getRouteUser } from "@/lib/server/routeAuth";
 
 export const dynamic = "force-dynamic";
 

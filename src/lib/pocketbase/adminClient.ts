@@ -1,12 +1,13 @@
 import PocketBase from "pocketbase";
 
 /**
- * Server-side Pocketbase client authenticated as superuser, for API routes
- * writing to storage_objects (and, once Phase 2's broader rewrite lands, any
- * other collection). Mirrors the pattern in src/lib/supabase/legacyDataClient.ts.
+ * Server-side Pocketbase client authenticated as superuser for API routes that
+ * need privileged collection access.
  */
 export async function createPocketbaseAdminClient() {
-  const url = process.env.NEXT_PUBLIC_POCKETBASE_URL;
+  // Prefer the server-only value in production. Keep the public fallback for
+  // local development and one-off migration scripts.
+  const url = process.env.POCKETBASE_URL || process.env.NEXT_PUBLIC_POCKETBASE_URL;
   const email = process.env.POCKETBASE_ADMIN_EMAIL;
   const password = process.env.POCKETBASE_ADMIN_PASSWORD;
 

@@ -75,7 +75,7 @@ const captureWebcamImage = () => {
 };
 
 // Upload image and create related entries through the API
-const uploadImageToSupabase = async (file: File) => {
+const uploadImageToPocketBase = async (file: File) => {
   if (!file) return;
   setLoading(true);
 
@@ -428,7 +428,7 @@ const sendImage = async () => {
               <button
   onClick={() => {
     if (image) {
-      uploadImageToSupabase(image);
+      uploadImageToPocketBase(image);
     }
     setResponse(null);
   }}

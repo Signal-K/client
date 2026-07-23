@@ -18,7 +18,7 @@ function RootLayoutInner({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!posthog) return;
     if (!user) { posthog.reset(); return; }
-    posthog.identify(user.id, { email: user.email ?? undefined, supabase_uuid: user.id });
+    posthog.identify(user.id, { email: user.email ?? undefined, clerk_user_id: user.id });
   }, [posthog, user]);
 
   useEffect(() => {

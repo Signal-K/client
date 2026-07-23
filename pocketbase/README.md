@@ -1,5 +1,53 @@
 # Pocketbase migration scaffold (Phase 2)
 
+## Production deployment
+
+Collection ownership and naming are defined in
+`pocketbase/collection-domains.json`. The original Star Sailors collections
+are compatibility-frozen; new Star Sailors-specific collections must use the
+`ss_` prefix. New Atlas collections use `atlas_` on the shared backend, and
+other game/product data belongs in that product's PocketBase spoke.
+
+Run the local guard with:
+
+```bash
+yarn pocketbase:check-domains
+```
+
+Production runs PocketBase as a private service in
+`ops/compose/docker-compose.prod.yml`, with its state stored in the named
+`pocketbase_data_prod` volume. Set `POCKETBASE_URL` to the internal service URL
+(`http://pocketbase:8090`) and provide `POCKETBASE_ADMIN_EMAIL` and
+`POCKETBASE_ADMIN_PASSWORD` to the Next.js container through the deployment
+secret manager. Do not publish port 8090 publicly.
+
+The first production boot must have a PocketBase superuser and the collections
+from `pb_schema.json` imported before the Next.js service receives traffic.
+The repository's historical `pb_migrations` directory is intentionally not
+mounted by Compose: it contains destructive cleanup migrations that are not
+safe against a fresh PocketBase data directory.
+Back up `/pb_data` before importing data or upgrading the PocketBase image.
+
+For a local instance, import the schema with:
+
+```bash
+POCKETBASE_ADMIN_EMAIL=... POCKETBASE_ADMIN_PASSWORD=... \
+  yarn pocketbase:import-schema
+```
+
+Before copying legacy game records into the shared backend, create the Clerk →
+shared-PocketBase identity anchors with the mapper. It is dry-run by default:
+
+```bash
+LEGACY_POCKETBASE_ADMIN_EMAIL=... LEGACY_POCKETBASE_ADMIN_PASSWORD=... \
+SHARED_POCKETBASE_ADMIN_EMAIL=... SHARED_POCKETBASE_ADMIN_PASSWORD=... \
+CLERK_SECRET_KEY=... yarn pocketbase:map-clerk-users
+```
+
+Use `DRY_RUN=false` only after reviewing the generated report. The mapper is
+idempotent and stores the original Clerk ID in `users.clerk_user_id`; it does
+not change Clerk accounts or copy gameplay records.
+
 A local, dockerized Pocketbase instance is running (`ops/compose/compose.yml`,
 service `pocketbase`, mapped to host port 8095 — 8090/8091/8092/8093 were
 already in use by other local projects) with all 23 collections below
@@ -182,7 +230,7 @@ Two things came up while building this:
 - **`profile-actions.ts`, `src/app/page.tsx`, `src/app/game/page.tsx`** were
   still calling `createSupabaseServerClient()`/`supabase.auth.getUser()`
   directly — missed in the Phase 1 Clerk cutover because they don't route
-  through `src/lib/server/supabaseRoute.ts`. Fixed to use Clerk's `auth()`/
+  through `src/lib/server/routeAuth.ts`. Fixed to use Clerk's `auth()`/
   `getRouteUser()`; these were silently broken (always-unauthenticated) since
   Phase 1 shipped.
 

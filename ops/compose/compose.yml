@@ -1,5 +1,5 @@
 services:
-  # Next.js Application (using Supabase instead of local PostgreSQL)
+  # Next.js application
   nextapp:
     container_name: nextapp
     build:
@@ -60,7 +60,6 @@ services:
     volumes:
       - pocketbase-data:/pb_data
       - ../../pocketbase/pb_hooks:/pb_hooks
-      - ../../pocketbase/pb_migrations:/pb_migrations
     networks:
       - app-network
     restart: unless-stopped

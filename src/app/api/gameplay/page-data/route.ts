@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getGamePageDataForUser } from "@/lib/server/game-page-data";
-import { getRouteUser } from "@/lib/server/supabaseRoute";
+import { getRouteUser } from "@/lib/server/routeAuth";
 
 export const dynamic = "force-dynamic";
 

@@ -16,7 +16,7 @@
     "pip3",
     "python3",
     "scripts/tests/run-local-suite.sh",
-    "scripts/tests/with-local-supabase-env.sh",
+    "scripts/tests/with-local-pocketbase-env.sh",
     "scripts/tests/run-e2e-frontend-persistence.sh",
     "scripts/tests/run-docker-suite.sh",
     "scripts/check-ssr-data-boundaries.sh",

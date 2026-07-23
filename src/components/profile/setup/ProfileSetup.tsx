@@ -26,8 +26,6 @@ export default function ProfileSetupForm({
   const [avatar, setAvatar] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
 
-  // const [inventoryItems, setInventoryItems] = useState<{ item: number }[] | null>(null);
-
   useEffect(() => {
     let ignore = false;
     async function getProfile() {
@@ -52,26 +50,6 @@ export default function ProfileSetupForm({
       ignore = true;
     };
   }, []);
-
-  // useEffect(() => {
-  //   async function fetchInventory() {
-  //     if (!session?.user?.id) return;
-
-  //     const { data, error } = await supabase
-  //       .from("inventory")
-  //       .select("item")
-  //       .eq("owner", session.user.id)
-  //       .in("item", [23, 24]);
-
-  //     if (error) {
-  //       console.warn(error);
-  //     } else {
-  //       setInventoryItems(data);
-  //     }
-  //   }
-
-  //   fetchInventory();
-  // }, [session, supabase]);
 
   const handleAvatarChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
