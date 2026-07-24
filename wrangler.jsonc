@@ -8,6 +8,10 @@
     "directory": ".open-next/assets",
     "binding": "ASSETS"
   },
+  "routes": [
+    { "pattern": "starsailors.space", "custom_domain": true },
+    { "pattern": "www.starsailors.space", "custom_domain": true }
+  ],
   "observability": {
     "enabled": true
   }
