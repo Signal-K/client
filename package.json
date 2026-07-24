@@ -53,7 +53,10 @@
     "docker:test:e2e:local": "scripts/tests/run-docker-suite.sh local-test",
     "docker:test:all": "scripts/tests/run-docker-suite.sh all",
     "docker:test:clean": "docker-compose -f ops/compose/docker-compose.test.yml down --volumes --remove-orphans",
-    "ssr:check": "scripts/check-ssr-data-boundaries.sh"
+    "ssr:check": "scripts/check-ssr-data-boundaries.sh",
+    "cf:preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
+    "cf:deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
+    "cf:typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts"
   },
   "dependencies": {
     "@clerk/nextjs": "^7.5.12",
@@ -107,6 +110,7 @@
   },
   "devDependencies": {
     "@clerk/backend": "^3.10.0",
+    "@opennextjs/cloudflare": "^1.20.2",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.6.4",
     "@testing-library/react": "^16.3.0",
@@ -129,7 +133,8 @@
     "start-server-and-test": "^2.1.3",
     "tailwindcss": "^3.4.1",
     "typescript": "^5.6.3",
-    "vitest": "^3.2.4"
+    "vitest": "^3.2.4",
+    "wrangler": "^4.114.0"
   },
   "engines": {
     "node": ">=20 <26"
