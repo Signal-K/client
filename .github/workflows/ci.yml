@@ -34,16 +34,15 @@ jobs:
     runs-on: ubuntu-latest
 
     services:
-      postgres:
-        image: postgres:15
+      pocketbase:
+        image: ghcr.io/muchobien/pocketbase:latest
         env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: postgres
+          PB_ADMIN_EMAIL: ci@example.com
+          PB_ADMIN_PASSWORD: "Ci-TestPassword123!"
         ports:
-          - 54322:5432
+          - 8095:8090
         options: >-
-          --health-cmd pg_isready
+          --health-cmd "wget --spider -q http://localhost:8090/api/health || exit 1"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
@@ -59,12 +58,26 @@ jobs:
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
+      - name: Import PocketBase schema
+        run: |
+          POCKETBASE_URL=http://localhost:8095 \
+          POCKETBASE_ADMIN_EMAIL=ci@example.com \
+          POCKETBASE_ADMIN_PASSWORD="Ci-TestPassword123!" \
+            node --experimental-strip-types scripts/pocketbase/import-schema.ts
+
       - name: Build
         run: yarn build
+        env:
+          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.CI_NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
+          NEXT_PUBLIC_POCKETBASE_URL: http://localhost:8095
 
       - name: E2E tests
         run: yarn test:e2e:headless
         env:
-          SUPABASE_URL: http://localhost:54321
-          NEXT_PUBLIC_SUPABASE_URL: http://localhost:54321
+          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.CI_NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
+          CLERK_SECRET_KEY: ${{ secrets.CI_CLERK_SECRET_KEY }}
+          NEXT_PUBLIC_POCKETBASE_URL: http://localhost:8095
+          POCKETBASE_URL: http://localhost:8095
+          POCKETBASE_ADMIN_EMAIL: ci@example.com
+          POCKETBASE_ADMIN_PASSWORD: "Ci-TestPassword123!"
           CYPRESS_baseUrl: http://localhost:3000
