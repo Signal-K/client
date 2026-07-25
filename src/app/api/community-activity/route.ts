@@ -7,7 +7,7 @@ export async function GET() {
   try {
     const since = new Date(Date.now() - 24 * 60 * 60 * 1000);
     const pb = await createPocketbaseAdminClient();
-    const rows = await pb.collection("classifications").getList(1, 12, {
+    const rows = await pb.collection("ss_classifications").getList(1, 12, {
       filter: pb.filter("createdAt >= {:d}", { d: since.toISOString() }),
       sort: "-createdAt",
       fields: "legacyId,author,classificationtype,createdAt",

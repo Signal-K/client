@@ -47,7 +47,7 @@ async function findUsersWithUnclassifiedDiscoveries(): Promise<UserDiscoveries[]
 
     const notifiedAnomalyIds = new Set(notifiedAnomalies.map((log: any) => log.anomalyId));
 
-    const classifications = await pb.collection("classifications").getFullList({
+    const classifications = await pb.collection("ss_classifications").getFullList({
       fields: "author,anomaly",
     });
 

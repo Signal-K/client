@@ -59,7 +59,7 @@ export async function POST(request: NextRequest) {
   }
 
   const [classifiedRes, allAnomalies, classificationCountResult] = await Promise.all([
-    pb.collection("classifications").getFullList({
+    pb.collection("ss_classifications").getFullList({
       filter: pb.filter("classificationtype = {:t} && author = {:a}", { t: "automaton-aiForMars", a: user.id }),
       fields: "anomaly",
     }),
@@ -67,7 +67,7 @@ export async function POST(request: NextRequest) {
       filter: pb.filter("anomalySet = {:s}", { s: "automaton-aiForMars" }),
       fields: "legacyId",
     }),
-    pb.collection("classifications").getList(1, 1, { filter: pb.filter("author = {:a}", { a: user.id }) }),
+    pb.collection("ss_classifications").getList(1, 1, { filter: pb.filter("author = {:a}", { a: user.id }) }),
   ]);
 
   const classifiedIds = new Set(classifiedRes.map((c) => c.anomaly));

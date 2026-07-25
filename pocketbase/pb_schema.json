@@ -3,12 +3,31 @@
     "name": "storage_objects",
     "type": "base",
     "fields": [
-      { "name": "bucket", "type": "text", "required": true },
-      { "name": "path", "type": "text", "required": true },
-      { "name": "file", "type": "file", "maxSelect": 1, "maxSize": 52428800 }
+      {
+        "name": "bucket",
+        "type": "text",
+        "required": true
+      },
+      {
+        "name": "path",
+        "type": "text",
+        "required": true
+      },
+      {
+        "name": "file",
+        "type": "file",
+        "maxSelect": 1,
+        "maxSize": 52428800
+      }
     ],
-    "indexes": ["CREATE UNIQUE INDEX idx_storage_objects_bucket_path ON storage_objects (bucket, path)"],
-    "listRule": "", "viewRule": "", "createRule": null, "updateRule": null, "deleteRule": null,
+    "indexes": [
+      "CREATE UNIQUE INDEX idx_storage_objects_bucket_path ON storage_objects (bucket, path)"
+    ],
+    "listRule": "",
+    "viewRule": "",
+    "createRule": null,
+    "updateRule": null,
+    "deleteRule": null,
     "_note": "Preserves the exact bucket/path addressing the app already used against Supabase Storage, so the ~20 read call sites only need their URL construction swapped, not a full relational rewrite. See src/lib/pocketbase/storageUrl.ts."
   },
   {
@@ -115,7 +134,7 @@
     "deleteRule": null
   },
   {
-    "name": "classifications",
+    "name": "ss_classifications",
     "type": "base",
     "fields": [
       {
@@ -163,7 +182,7 @@
     "deleteRule": null
   },
   {
-    "name": "comments",
+    "name": "ss_comments",
     "type": "base",
     "fields": [
       {

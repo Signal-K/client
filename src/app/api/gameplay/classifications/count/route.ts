@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
     conditions.push(pb.filter("createdAt < {:lt}", { lt: createdAtLt }));
   }
 
-  const result = await pb.collection("classifications").getList(1, 1, {
+  const result = await pb.collection("ss_classifications").getList(1, 1, {
     filter: conditions.join(" && "),
     fields: "id",
   });

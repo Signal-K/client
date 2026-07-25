@@ -138,7 +138,7 @@ export async function POST(request: NextRequest) {
                 });
 
                 // Get user's classifications
-                const classifications = await pb.collection('classifications').getFullList<ClassificationRow>({
+                const classifications = await pb.collection('ss_classifications').getFullList<ClassificationRow>({
                     filter: pb.filter('author = {:author}', { author: userId }),
                 }).catch(() => null);
 

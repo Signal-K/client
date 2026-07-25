@@ -55,7 +55,7 @@ export async function GET() {
 
     const [researchProgress, classifications, surveyBonus, profile] = await Promise.all([
       getResearchedProgressForUser(userId),
-      pb.collection("classifications").getFullList({
+      pb.collection("ss_classifications").getFullList({
         filter: pb.filter("author = {:a}", { a: userId }),
         fields: "classificationtype",
       }),

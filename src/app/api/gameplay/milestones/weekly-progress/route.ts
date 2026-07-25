@@ -19,7 +19,7 @@ type Body = {
 };
 
 const COLLECTIONS: Record<string, { dateField: string; userField: string; fields: Record<string, string> }> = {
-  classifications: {
+  ss_classifications: {
     dateField: "createdAt",
     userField: "author",
     fields: {
@@ -30,7 +30,7 @@ const COLLECTIONS: Record<string, { dateField: string; userField: string; fields
       classificationtype: "classificationtype",
     },
   },
-  comments: {
+  ss_comments: {
     dateField: "createdAt",
     userField: "author",
     fields: {

@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
 
   const pb = await createPocketbaseAdminClient();
   const existing = await pb
-    .collection("classifications")
+    .collection("ss_classifications")
     .getFirstListItem(
       pb.filter("author = {:author} && classificationtype = {:t}", { author: user.id, t: classificationType })
     )

@@ -84,7 +84,7 @@ export async function GET(request: NextRequest) {
   const sort = `${ascending ? "+" : "-"}${sortField}`;
   const validatedLimit = Math.max(1, Math.min(limit, 2000));
 
-  const result = await pb.collection("classifications").getList(1, validatedLimit, {
+  const result = await pb.collection("ss_classifications").getList(1, validatedLimit, {
     filter: filters.join(" && "),
     sort,
   });
@@ -137,11 +137,11 @@ export async function POST(request: NextRequest) {
     // current max. Not safe under high concurrency, but matches this app's
     // existing single-writer-per-request pattern.
     const latest = await pb
-      .collection("classifications")
+      .collection("ss_classifications")
       .getList(1, 1, { sort: "-legacyId", fields: "legacyId" });
     const nextLegacyId = (latest.items[0]?.legacyId ?? 0) + 1;
 
-    const created = await pb.collection("classifications").create({
+    const created = await pb.collection("ss_classifications").create({
       legacyId: nextLegacyId,
       createdAt: new Date().toISOString(),
       author: user.id,

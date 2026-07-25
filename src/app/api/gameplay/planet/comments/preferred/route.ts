@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
 
   const pb = await createPocketbaseAdminClient();
   const classification = await pb
-    .collection("classifications")
+    .collection("ss_classifications")
     .getFirstListItem(pb.filter("legacyId = {:id}", { id: classificationId }), {
       fields: "id,legacyId,author,classificationConfiguration",
     })
@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
   }
 
   const comment = await pb
-    .collection("comments")
+    .collection("ss_comments")
     .getFirstListItem(
       pb.filter("legacyId = {:id} && classificationId = {:classificationId}", {
         id: commentId,
@@ -73,7 +73,7 @@ export async function POST(request: NextRequest) {
     },
   };
 
-  await pb.collection("classifications").update(classification.id, {
+  await pb.collection("ss_classifications").update(classification.id, {
     classificationConfiguration: updatedClassificationConfig,
   });
 
@@ -82,7 +82,7 @@ export async function POST(request: NextRequest) {
     preferred: true,
   };
 
-  await pb.collection("comments").update(comment.id, { configuration: updatedCommentConfig });
+  await pb.collection("ss_comments").update(comment.id, { configuration: updatedCommentConfig });
 
   revalidatePath(`/planets/${classificationId}`);
   revalidatePath(`/posts/${classificationId}`);

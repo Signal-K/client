@@ -45,11 +45,11 @@ export async function createClassificationAction(payload: CreateClassificationIn
     // legacyId assignment mirrors the old autoincrement PK: one past the
     // current max. Matches the pattern in /api/gameplay/classifications POST.
     const latest = await pb
-      .collection("classifications")
+      .collection("ss_classifications")
       .getList(1, 1, { sort: "-legacyId", fields: "legacyId" });
     const nextLegacyId = (latest.items[0]?.legacyId ?? 0) + 1;
 
-    const classification = await pb.collection("classifications").create({
+    const classification = await pb.collection("ss_classifications").create({
         legacyId: nextLegacyId,
         createdAt: new Date().toISOString(),
         author: user.id,
