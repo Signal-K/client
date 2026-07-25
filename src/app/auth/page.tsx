@@ -1,14 +1,13 @@
 "use client";
 
 import { Suspense, useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { usePostHog } from "posthog-js/react";
 import EnhancedAuthPage from "@/src/components/profile/auth/EnhancedAuth";
 import { useAuthUser } from "@/src/hooks/useAuthUser";
 
 function LoginContent() {
     const { user, isLoading } = useAuthUser();
-    const router = useRouter();
     const searchParams = useSearchParams();
     const posthog = usePostHog();
 
@@ -32,8 +31,11 @@ function LoginContent() {
         nextPath && nextPath.startsWith("/") && !nextPath.startsWith("//")
           ? nextPath
           : "/onboarding";
-      router.replace(destination);
-    }, [isLoading, user, router, searchParams, posthog]);
+      // Full navigation (not router.replace) so the server middleware
+      // re-checks auth against a fresh request instead of racing the
+      // client SDK's optimistic session state against cookie propagation.
+      window.location.assign(destination);
+    }, [isLoading, user, searchParams, posthog]);
 
     return <EnhancedAuthPage mode="sign-in" />;
 }
