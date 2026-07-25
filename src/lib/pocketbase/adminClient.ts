@@ -1,13 +1,16 @@
-import PocketBase from "pocketbase";
+import PocketBase, { type RecordModel } from "pocketbase";
 
-// Cached per Worker isolate so concurrent calls (e.g. the burst of gameplay
-// fetches on game-page load) reuse one superuser session instead of each
-// hitting PocketBase's auth endpoint independently, which was tripping
-// PocketBase's collection/rate-limit middleware under load.
-let cachedClient: PocketBase | null = null;
-let authPromise: Promise<PocketBase> | null = null;
+// Cloudflare Workers forbids reusing I/O objects (streams, request/response
+// bodies, fetch state) across requests -- so we cannot cache the PocketBase
+// *client* itself across calls, only the auth *token*, which is plain data.
+// Each call gets its own client, seeded with the cached token via
+// authStore.save() (no network request), falling back to a real
+// authWithPassword() only when there's no valid cached token yet.
+let cachedToken: string | null = null;
+let cachedModel: RecordModel | null = null;
+let authPromise: Promise<{ token: string; model: RecordModel }> | null = null;
 
-async function authenticate(): Promise<PocketBase> {
+function getConfig() {
   // Prefer the server-only value in production. Keep the public fallback for
   // local development and one-off migration scripts.
   const url = process.env.POCKETBASE_URL || process.env.NEXT_PUBLIC_POCKETBASE_URL;
@@ -18,19 +21,33 @@ async function authenticate(): Promise<PocketBase> {
     throw new Error("Missing Pocketbase admin environment variables");
   }
 
+  return { url, email, password };
+}
+
+async function authenticate(): Promise<{ token: string; model: RecordModel }> {
+  const { url, email, password } = getConfig();
   const pb = new PocketBase(url);
   await pb.collection("_superusers").authWithPassword(email, password);
-  cachedClient = pb;
-  return pb;
+  cachedToken = pb.authStore.token;
+  cachedModel = pb.authStore.record;
+  return { token: cachedToken, model: cachedModel! };
 }
 
 /**
  * Server-side Pocketbase client authenticated as superuser for API routes that
- * need privileged collection access.
+ * need privileged collection access. Returns a fresh client per call (safe for
+ * Cloudflare Workers' per-request I/O isolation) reusing a cached auth token
+ * where possible to avoid re-authenticating on every request.
  */
 export async function createPocketbaseAdminClient(): Promise<PocketBase> {
-  if (cachedClient?.authStore.isValid) {
-    return cachedClient;
+  const { url } = getConfig();
+  const pb = new PocketBase(url);
+
+  if (cachedToken && cachedModel) {
+    pb.authStore.save(cachedToken, cachedModel);
+    if (pb.authStore.isValid) {
+      return pb;
+    }
   }
 
   if (!authPromise) {
@@ -39,5 +56,7 @@ export async function createPocketbaseAdminClient(): Promise<PocketBase> {
     });
   }
 
-  return authPromise;
+  const { token, model } = await authPromise;
+  pb.authStore.save(token, model);
+  return pb;
 }
