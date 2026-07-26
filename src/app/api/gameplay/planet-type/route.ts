@@ -22,12 +22,12 @@ export async function GET(request: NextRequest) {
   const pb = await createPocketbaseAdminClient();
 
   const [classificationRecords, commentRecords] = await Promise.all([
-    pb.collection("classifications").getFullList({
+    pb.collection("ss_classifications").getFullList({
       filter: classificationId
         ? pb.filter("legacyId = {:id}", { id: classificationId })
         : pb.filter("classificationtype = {:t}", { t: "planet" }),
     }),
-    pb.collection("comments").getFullList({
+    pb.collection("ss_comments").getFullList({
       filter: classificationId
         ? pb.filter("classificationId = {:id}", { id: classificationId })
         : "",

@@ -36,7 +36,7 @@ function computeSetsToFetch(
 
 async function countOthersInteractions(
   pb: Awaited<ReturnType<typeof createPocketbaseAdminClient>>,
-  collection: "comments" | "votes",
+  collection: "ss_comments" | "votes",
   filter: string,
   userId: string
 ) {
@@ -45,7 +45,7 @@ async function countOthersInteractions(
   if (classificationIds.length === 0) return 0;
 
   const classFilter = classificationIds.map((id) => pb.filter("legacyId = {:id}", { id })).join(" || ");
-  const classifications = await pb.collection("classifications").getFullList({
+  const classifications = await pb.collection("ss_classifications").getFullList({
     filter: classFilter,
     fields: "legacyId,author",
   });
@@ -79,7 +79,7 @@ export async function getTelescopeStatus() {
       }).then((r) => r.totalItems),
       countOthersInteractions(
         pb,
-        "comments",
+        "ss_comments",
         pb.filter("author = {:u} && createdAt >= {:d}", { u: user.id, d: oneWeekAgo.toISOString() }),
         user.id
       ),
@@ -133,7 +133,7 @@ export async function getTelescopeAnomalies(deploymentType: DeploymentType) {
 
     if (deploymentType === "planetary") {
       const [minorPlanetCount, hasNgtsAccess] = await Promise.all([
-        pb.collection("classifications").getList(1, 1, {
+        pb.collection("ss_classifications").getList(1, 1, {
           filter: pb.filter("author = {:a} && classificationtype = {:t}", { a: user.id, t: "telescope-minorPlanet" }),
         }).then((r) => r.totalItems),
         hasResearchedTech(user.id, "ngtsAccess")
@@ -170,7 +170,7 @@ export async function getTelescopeSkillProgress() {
         const pb = await createPocketbaseAdminClient();
 
         const countByTypes = (types: string[]) =>
-          pb.collection("classifications").getList(1, 1, {
+          pb.collection("ss_classifications").getList(1, 1, {
             filter:
               pb.filter("author = {:a} && createdAt >= {:s}", { a: user.id, s: start }) +
               " && (" +

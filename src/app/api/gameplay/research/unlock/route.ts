@@ -61,7 +61,7 @@ export async function POST(request: NextRequest) {
   const pb = await createPocketbaseAdminClient();
   const [researchProgress, classificationCountResult, surveyBonus] = await Promise.all([
     getResearchedProgressForUser(userId),
-    pb.collection("classifications").getList(1, 1, { filter: pb.filter("author = {:a}", { a: userId }) }),
+    pb.collection("ss_classifications").getList(1, 1, { filter: pb.filter("author = {:a}", { a: userId }) }),
     getSurveyBonusForUser(userId),
   ]);
   const classificationCount = classificationCountResult.totalItems;
@@ -84,7 +84,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Requires p4Minerals first" }, { status: 400 });
   }
   if (techType === "ngtsAccess") {
-    const planetCountResult = await pb.collection("classifications").getList(1, 1, {
+    const planetCountResult = await pb.collection("ss_classifications").getList(1, 1, {
       filter: pb.filter("author = {:a} && classificationtype = {:t}", { a: userId, t: "planet" }),
     });
     if (planetCountResult.totalItems < 4) {

@@ -42,11 +42,11 @@ export async function GET() {
     }
 
     const [userClassifications, allClassifications] = await Promise.all([
-      pb.collection("classifications").getFullList({
+      pb.collection("ss_classifications").getFullList({
         filter: pb.filter("author = {:author}", { author: userId }),
         sort: "-createdAt",
       }),
-      pb.collection("classifications").getList(1, 50, {
+      pb.collection("ss_classifications").getList(1, 50, {
         sort: "-createdAt",
       }).then((result) => result.items),
     ]);

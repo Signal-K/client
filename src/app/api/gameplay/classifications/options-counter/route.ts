@@ -43,7 +43,7 @@ export async function GET(request: NextRequest) {
     request.nextUrl.searchParams.get("classificationType") || "lidar-jovianVortexHunter";
 
   const pb = await createPocketbaseAdminClient();
-  const rows = await pb.collection("classifications").getFullList({
+  const rows = await pb.collection("ss_classifications").getFullList({
     filter: pb.filter("author = {:author} && classificationtype = {:t}", {
       author: user.id,
       t: classificationType,

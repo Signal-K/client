@@ -27,7 +27,7 @@ export async function GET() {
 
   const [probes, sunspotClassifications] = await Promise.all([
     pb.collection("defensive_probes").getFullList({ fields: "userId,count" }),
-    pb.collection("classifications").getFullList({
+    pb.collection("ss_classifications").getFullList({
       filter: pb.filter("classificationtype = {:t}", { t: "sunspot" }),
       fields: "author",
     }),

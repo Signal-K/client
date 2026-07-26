@@ -39,7 +39,7 @@ export async function GET() {
 
     const [planetClassifications, telescopeDeployments, satelliteDeployments, roverDeployments, userClassifications] =
       await Promise.all([
-        pb.collection("classifications").getFullList({
+        pb.collection("ss_classifications").getFullList({
           filter: pb.filter("author = {:author} && classificationtype = {:t}", { author: user.id, t: "planet" }),
           fields: "anomaly,legacyId",
         }).then(async (rows) => {
@@ -68,7 +68,7 @@ export async function GET() {
           filter: pb.filter("author = {:author} && automaton = {:a}", { author: user.id, a: "Rover" }),
           fields: "anomalyId",
         }),
-        pb.collection("classifications").getFullList({
+        pb.collection("ss_classifications").getFullList({
           filter: pb.filter("author = {:author}", { author: user.id }),
           fields: "anomaly",
         }),

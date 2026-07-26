@@ -38,7 +38,7 @@ export async function GET(request: NextRequest) {
     filters.push(pb.filter("author = {:author}", { author: user.id }));
   }
 
-  const result = await pb.collection("classifications").getList(1, 250, {
+  const result = await pb.collection("ss_classifications").getList(1, 250, {
     filter: filters.join(" && "),
     sort: "-createdAt",
   });
@@ -60,7 +60,7 @@ export async function GET(request: NextRequest) {
   // author's own classifications tagged with a parentPlanetLocation, grouped
   // by that location — filtered client-side since matching against a JSON
   // field's nested value isn't reliably filterable server-side here.
-  const ownClassifications = await pb.collection("classifications").getFullList({
+  const ownClassifications = await pb.collection("ss_classifications").getFullList({
     filter: pb.filter("author = {:author}", { author: user.id }),
   });
   const relatedByParent = new Map<number, Array<Record<string, unknown>>>();

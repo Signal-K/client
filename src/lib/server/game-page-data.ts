@@ -94,7 +94,7 @@ async function getRecentClassificationsForUser(userId: string): Promise<RecentCl
   return unstable_cache(
     async () => {
       const pb = await createPocketbaseAdminClient();
-      const rows = await pb.collection("classifications").getList(1, 10, {
+      const rows = await pb.collection("ss_classifications").getList(1, 10, {
         filter: pb.filter("author = {:author}", { author: userId }),
         sort: "-createdAt",
       });
@@ -145,7 +145,7 @@ export async function getGamePageDataForUser(userId: string) {
       "otherClassifications",
       async () => {
         const pb = await createPocketbaseAdminClient();
-        const result = await pb.collection("classifications").getList(1, 20, {
+        const result = await pb.collection("ss_classifications").getList(1, 20, {
           filter: pb.filter("author != {:author}", { author: userId }),
           sort: "-createdAt",
         });
@@ -194,7 +194,7 @@ export async function getGamePageDataForUser(userId: string) {
           "allUserClassifications",
           async () => {
             const pb = await createPocketbaseAdminClient();
-            const rows = await pb.collection("classifications").getFullList({
+            const rows = await pb.collection("ss_classifications").getFullList({
               filter: pb.filter("author = {:author}", { author: userId }) + " && " + anomalyIdFilter,
               fields: "anomaly",
             });
@@ -208,7 +208,7 @@ export async function getGamePageDataForUser(userId: string) {
           "cloudClassifications",
           async () => {
             const pb = await createPocketbaseAdminClient();
-            const rows = await pb.collection("classifications").getFullList({
+            const rows = await pb.collection("ss_classifications").getFullList({
               filter:
                 pb.filter("author = {:author} && classificationtype = {:t}", { author: userId, t: "cloud" }) +
                 " && " +
@@ -395,7 +395,7 @@ async function getActivityFeed(classificationIds: number[], oneWeekAgo: Date): P
   const dateFilter = pb.filter("createdAt >= {:d}", { d: oneWeekAgo.toISOString() });
 
   const [comments, votes] = await Promise.all([
-    pb.collection("comments").getFullList({
+    pb.collection("ss_comments").getFullList({
       filter: `${idFilter} && ${dateFilter}`,
       fields: "createdAt,content,classificationId,category",
     }),

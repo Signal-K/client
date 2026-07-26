@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
   const pb = await createPocketbaseAdminClient();
 
   const [classificationCount, satelliteUpgrade, planet, planetClassification] = await Promise.all([
-    pb.collection("classifications").getList(1, 1, { filter: pb.filter("author = {:a}", { a: user.id }) }),
+    pb.collection("ss_classifications").getList(1, 1, { filter: pb.filter("author = {:a}", { a: user.id }) }),
     pb
       .collection("researched")
       .getFirstListItem(pb.filter("userId = {:u} && techType = {:t}", { u: user.id, t: "satellitecount" }))
@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
       .getFirstListItem(pb.filter("legacyId = {:id}", { id: planetId }))
       .catch(() => null),
     pb
-      .collection("classifications")
+      .collection("ss_classifications")
       .getFirstListItem(
         pb.filter("author = {:a} && anomaly = {:p} && classificationtype = {:t}", {
           a: user.id,
@@ -80,7 +80,7 @@ export async function POST(request: NextRequest) {
   if (investigationMode === "planets") {
     selectedIds = [planetId];
   } else if (investigationMode === "weather") {
-    const cloudCount = await pb.collection("classifications").getList(1, 1, {
+    const cloudCount = await pb.collection("ss_classifications").getList(1, 1, {
       filter:
         pb.filter("author = {:a}", { a: user.id }) +
         " && (" +

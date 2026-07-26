@@ -8,7 +8,7 @@ interface Milestone {
     name: string;
     structure: string;
     icon: string;
-    table: "classifications" | "comments";
+    table: "ss_classifications" | "ss_comments";
     field: "classificationtype" | "category";
     value: string;
     requiredCount: number;

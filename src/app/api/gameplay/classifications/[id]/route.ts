@@ -24,7 +24,7 @@ export async function GET(
 
   const pb = await createPocketbaseAdminClient();
   const record = await pb
-    .collection("classifications")
+    .collection("ss_classifications")
     .getFirstListItem(pb.filter("legacyId = {:id}", { id: numericId }))
     .catch(() => null);
 

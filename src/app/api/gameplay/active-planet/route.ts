@@ -62,7 +62,7 @@ async function fetchActivePlanetPayload(userId: string, requestedLocation?: numb
         .collection("anomalies")
         .getFirstListItem(pb.filter("legacyId = {:location}", { location }))
         .catch(() => null),
-      pb.collection("classifications").getFullList({
+      pb.collection("ss_classifications").getFullList({
         filter: pb.filter("author = {:author} && anomaly = {:location} && classificationtype = {:type}", {
           author: userId,
           location,

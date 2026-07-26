@@ -36,7 +36,7 @@ export async function GET(request: NextRequest) {
   }
 
   const [comments, votes] = await Promise.all([
-    pb.collection("comments").getList(1, validatedLimit, { filter: commentFilters.join(" && "), sort: "-createdAt" }),
+    pb.collection("ss_comments").getList(1, validatedLimit, { filter: commentFilters.join(" && "), sort: "-createdAt" }),
     pb.collection("votes").getList(1, validatedLimit, { filter: voteFilters.join(" && "), sort: "-legacyId" }),
   ]);
 

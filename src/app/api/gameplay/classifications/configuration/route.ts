@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
 
   const pb = await createPocketbaseAdminClient();
   const classification = await pb
-    .collection("classifications")
+    .collection("ss_classifications")
     .getFirstListItem(pb.filter("legacyId = {:id}", { id: classificationId }))
     .catch(() => null);
   if (!classification) return NextResponse.json({ error: "Classification not found" }, { status: 404 });
@@ -54,7 +54,7 @@ export async function POST(request: NextRequest) {
     };
   }
 
-  await pb.collection("classifications").update(classification.id, {
+  await pb.collection("ss_classifications").update(classification.id, {
     classificationConfiguration: updatedConfiguration,
   });
 

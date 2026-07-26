@@ -16,11 +16,11 @@ export async function GET() {
   const pb = await createPocketbaseAdminClient();
 
   const [latestPlanetResult, classificationCountResult, upgrades, existingDeployResult] = await Promise.all([
-    pb.collection("classifications").getList(1, 1, {
+    pb.collection("ss_classifications").getList(1, 1, {
       filter: pb.filter("classificationtype = {:t} && author = {:a}", { t: "planet", a: user.id }),
       sort: "-createdAt",
     }),
-    pb.collection("classifications").getList(1, 1, { filter: pb.filter("author = {:a}", { a: user.id }) }),
+    pb.collection("ss_classifications").getList(1, 1, { filter: pb.filter("author = {:a}", { a: user.id }) }),
     pb.collection("researched").getFullList({
       filter:
         pb.filter("userId = {:u}", { u: user.id }) +

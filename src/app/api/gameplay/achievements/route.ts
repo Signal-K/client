@@ -54,7 +54,7 @@ export async function GET() {
   const pb = await createPocketbaseAdminClient();
 
   const [classifications, mineralCountResult] = await Promise.all([
-    pb.collection("classifications").getFullList({
+    pb.collection("ss_classifications").getFullList({
       filter: pb.filter("author = {:author}", { author: userId }),
       fields: "legacyId,anomaly,classificationtype",
     }),
@@ -111,7 +111,7 @@ export async function GET() {
         filter: anomalyFilter,
         fields: "legacyId,density,temperature",
       }),
-      pb.collection("classifications").getFullList({
+      pb.collection("ss_classifications").getFullList({
         filter: `classificationtype = "cloud" && (${classificationFilter})`,
         fields: "anomaly",
       }),

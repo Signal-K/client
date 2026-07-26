@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
   if (surveyorParam === "false") filters.push("surveyor = false");
   if (categoryParam) filters.push(pb.filter("category = {:c}", { c: categoryParam }));
 
-  const rows = await pb.collection("comments").getFullList({
+  const rows = await pb.collection("ss_comments").getFullList({
     filter: filters.join(" && "),
     sort: ascending ? "+createdAt" : "-createdAt",
   });
@@ -53,10 +53,10 @@ export async function POST(request: NextRequest) {
   }
 
   const pb = await createPocketbaseAdminClient();
-  const latest = await pb.collection("comments").getList(1, 1, { sort: "-legacyId", fields: "legacyId" });
+  const latest = await pb.collection("ss_comments").getList(1, 1, { sort: "-legacyId", fields: "legacyId" });
   const nextLegacyId = (latest.items[0]?.legacyId ?? 0) + 1;
 
-  await pb.collection("comments").create({
+  await pb.collection("ss_comments").create({
     legacyId: nextLegacyId,
     createdAt: new Date().toISOString(),
     author: user.id,

@@ -96,7 +96,7 @@ export default function ClientClassificationPage({ id }: Props) {
         return d >= start && d < end;
       });
       if (!week) return setMilestones([]);
-      const relevant = week.data?.filter((m: any) => m.table === "classifications" && m.value === type) || [];
+      const relevant = week.data?.filter((m: any) => m.table === "ss_classifications" && m.value === type) || [];
       const statuses = await Promise.all(relevant.map(async (m: any) => {
         const start = new Date(week.weekStart);
         const end = new Date(start); end.setDate(start.getDate() + 7);
