@@ -23,9 +23,19 @@ secret manager. Do not publish port 8090 publicly.
 
 The first production boot must have a PocketBase superuser and the collections
 from `pb_schema.json` imported before the Next.js service receives traffic.
-The repository's historical `pb_migrations` directory is intentionally not
-mounted by Compose: it contains destructive cleanup migrations that are not
-safe against a fresh PocketBase data directory.
+`pb_migrations/` previously held 26 auto-generated `deleted_*` migrations (an
+artifact of a local schema diff during the Clerk/PocketBase cutover) that each
+drop a core collection (`anomalies`, `classifications`, `profiles`, etc.).
+Compose never mounted that directory, but any other PocketBase deploy path
+that does pick up `pb_migrations/` (e.g. the Fly.io instance behind the
+Cloudflare Workers deploy, `.github/workflows/deploy-cloudflare.yml`) would
+run them on startup and silently wipe the live schema/data — this is the
+suspected root cause of the 2026-07-25 "blank screen for logged-in users"
+prod incident (`GET /api/gameplay/active-planet` 500s with "Missing or
+invalid collection context"). The destructive files have been deleted from
+this repo; if a PocketBase instance was affected, re-import the schema with
+`yarn pocketbase:import-schema` and restore any lost data from a `/pb_data`
+backup.
 Back up `/pb_data` before importing data or upgrading the PocketBase image.
 
 For a local instance, import the schema with:
