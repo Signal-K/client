@@ -29,8 +29,8 @@ export default async function GamePage() {
     console.log("[GamePage] auth() done", { hasUser: !!userId });
 
     if (!userId) {
-      console.log("[GamePage] no user, redirecting to /auth");
-      redirect("/auth");
+      console.log("[GamePage] no user, redirecting to /auth?next=/game");
+      redirect("/auth?next=/game");
     }
 
     console.log("[GamePage] rendering GameClient for user", userId);

@@ -1,4 +1,4 @@
-import { auth, currentUser } from "@clerk/nextjs/server";
+import { auth } from "@clerk/nextjs/server";
 
 /* v8 ignore next 22 */
 export async function getRouteUser() {
@@ -11,16 +11,16 @@ export async function getRouteUser() {
     };
   }
 
-  const clerkUser = await currentUser();
-
   return {
-    user: clerkUser
-      ? {
-          id: userId,
-          email: clerkUser.primaryEmailAddress?.emailAddress ?? null,
-          is_anonymous: Boolean(clerkUser.publicMetadata?.guest),
-        }
-      : null,
-    authError: clerkUser ? null : new Error("User not found"),
+    // Route handlers only need the authenticated subject. Avoiding
+    // currentUser() here removes an extra Clerk API request from every
+    // gameplay request and prevents a slow Clerk response from blocking the
+    // first page-data request after sign-in.
+    user: {
+      id: userId,
+      email: null,
+      is_anonymous: false,
+    },
+    authError: null,
   };
 }
