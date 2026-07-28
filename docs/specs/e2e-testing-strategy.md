@@ -30,7 +30,7 @@ E2E testing has been restructured to optimize CI/CD performance and test coverag
 **Coverage**: Core critical paths
 
 ### `yarn test:e2e` (Full Suite)
-**Runs**: All 10 e2e test files (29 tests)
+**Runs**: All standard e2e test files (30 tests)
 - auth.cy.ts
 - contributions-critical.cy.ts
 - frontend-pocketbase-persistence.cy.ts
@@ -41,6 +41,12 @@ E2E testing has been restructured to optimize CI/CD performance and test coverag
 - smoke-critical.cy.ts
 - user-flows.cy.ts
 - working-routes.cy.ts
+
+`authenticated-game.cy.ts` is intentionally opt-in and is not included in the
+standard count. Run it with `yarn test:e2e:auth` after setting
+`E2E_TEST_AUTH_ENABLED=true` and `E2E_TEST_USER_EMAIL` to a pre-created Clerk
+fixture user. It covers the authenticated `/game` boot, protected page-data,
+and profile API contracts.
 
 **When**: 
 - All commits to `main` branch
@@ -113,6 +119,10 @@ The following tests are **not** part of the standard pipeline due to environment
 - `NEXT_PUBLIC_POCKETBASE_URL`
 - `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`
 - `CLERK_SECRET_KEY`
+
+Authenticated E2E additionally requires:
+- `E2E_TEST_AUTH_ENABLED=true`
+- `E2E_TEST_USER_EMAIL` (an existing Clerk test user)
 
 ### Local PocketBase
 Run PocketBase before e2e tests that hit gameplay API routes:
