@@ -106,7 +106,7 @@ import { cn } from "@/src/lib/utils";
 import { buildClientReferralUrl } from "@/src/features/referrals/referral-links";
 
 // Icons
-import { Telescope, Satellite, Car, Package, Sun, FlaskConical } from "lucide-react";
+import { AlertTriangle, RefreshCw } from "lucide-react";
 
 type ViewMode = "base" | "telescope" | "satellite" | "rover" | "solar" | "inventory";
 type StructureSignalMap = Record<StructureId, number>;
@@ -114,6 +114,21 @@ type StructureSignalMap = Record<StructureId, number>;
 const REFERRAL_MISSION_DISMISSED_KEY = "referral_mission_prompt_dismissed_v1";
 const GAME_DATA_REFRESH_MS = 60_000;
 const INCOMING_SIGNAL_WINDOW_MS = 1_600;
+const EMPTY_DATA = {
+  profile: null,
+  classifications: [],
+  linkedAnomalies: [],
+  activityFeed: [],
+  otherClassifications: [],
+  visibleStructures: { telescope: true, satellites: false, rovers: false, balloons: false },
+  hubLeaderboard: { entries: [], currentUser: null },
+  referralCode: null,
+  referralCount: 0,
+  hasReferral: false,
+  hasRoverMineralDeposits: false,
+  incompletePlanet: null,
+  planetTargets: [],
+};
 
 function safeStorageGet(key: string): string | null {
   if (typeof window === "undefined") return null;
@@ -145,25 +160,10 @@ export default function GameClient({ initialData, user }: GameClientProps) {
   const [guidedDeployTarget, setGuidedDeployTarget] = useState<StructureId | null>(null);
   const [ambientReady, setAmbientReady] = useState(false);
 
-  const EMPTY_DATA = {
-    profile: null,
-    classifications: [],
-    linkedAnomalies: [],
-    activityFeed: [],
-    otherClassifications: [],
-    visibleStructures: { telescope: true, satellites: false, rovers: false, balloons: false },
-    hubLeaderboard: { entries: [], currentUser: null },
-    referralCode: null,
-    referralCount: 0,
-    hasReferral: false,
-    hasRoverMineralDeposits: false,
-    incompletePlanet: null,
-    planetTargets: [],
-  };
-
   // Use initialData as state so it can be updated if needed (optimistic updates or refetch)
   const [data, setData] = useState(initialData ?? EMPTY_DATA);
   const [isLoadingData, setIsLoadingData] = useState(initialData === null);
+  const [dataLoadError, setDataLoadError] = useState<string | null>(null);
   const [incomingStructures, setIncomingStructures] = useState<Set<StructureId>>(new Set());
   const previousSignalCountsRef = useRef<StructureSignalMap | null>(null);
   const incomingTimeoutsRef = useRef<Partial<Record<StructureId, ReturnType<typeof setTimeout>>>>({});
@@ -287,11 +287,21 @@ export default function GameClient({ initialData, user }: GameClientProps) {
   const refreshGameData = useCallback(async () => {
     try {
       const response = await fetch("/api/gameplay/page-data", { cache: "no-store" });
-      if (!response.ok) return;
+      if (!response.ok) {
+        setDataLoadError(
+          response.status === 401
+            ? "Your session could not be confirmed. Refresh the page to sign in again."
+            : `Station data request failed (${response.status}).`
+        );
+        return false;
+      }
       const nextData = await response.json();
       setData(nextData);
+      setDataLoadError(null);
+      return true;
     } catch {
-      // Keep the hub stable if background refresh fails.
+      setDataLoadError("The station data service is unreachable.");
+      return false;
     }
   }, []);
 
@@ -416,11 +426,13 @@ export default function GameClient({ initialData, user }: GameClientProps) {
   }), [signalCounts]);
 
   return (
-    <div className="relative flex h-[100dvh] w-full flex-col overflow-hidden bg-background text-foreground selection:bg-primary/30">
+    <div className="relative isolate flex h-[100dvh] w-full flex-col overflow-hidden bg-background text-foreground selection:bg-primary/30">
       {showAmbientLayers && ambientReady ? (
-        <TelescopeBackground variant="stars-only" />
+        <div className="pointer-events-none absolute inset-0 z-0" aria-hidden>
+          <TelescopeBackground variant="stars-only" />
+        </div>
       ) : (
-        <div className="absolute inset-0 -z-10 bg-gradient-to-b from-background to-background/80" />
+        <div className="pointer-events-none absolute inset-0 z-0 bg-gradient-to-b from-background to-background/80" aria-hidden />
       )}
 
       {/* ─── Living World Background ─── */}
@@ -446,16 +458,18 @@ export default function GameClient({ initialData, user }: GameClientProps) {
       />
 
       {/* Header Spacer to prevent overlap */}
-      <div className="h-14 shrink-0" />
+      <div className="relative z-10 h-14 shrink-0" />
 
       {/* ─── Persistent HUD Strip ─── */}
-      <HUDStrip
-        signals={Object.values(radarStations).reduce((s, r) => s + r.signals, 0)}
-        anomalies={data.linkedAnomalies?.length ?? 0}
-        classifications={data.classifications?.length ?? 0}
-      />
+      <div className="relative z-10 shrink-0">
+        <HUDStrip
+          signals={Object.values(radarStations).reduce((s, r) => s + r.signals, 0)}
+          anomalies={data.linkedAnomalies?.length ?? 0}
+          classifications={data.classifications?.length ?? 0}
+        />
+      </div>
 
-      <main className="relative flex-1 overflow-hidden pb-[80px] md:pb-0">
+      <main className="relative z-10 min-h-0 flex-1 overflow-hidden pb-[80px] md:pb-0">
         <AnimatePresence mode="wait">
           {activeView === "base" ? (
             <motion.div 
@@ -470,6 +484,50 @@ export default function GameClient({ initialData, user }: GameClientProps) {
 
                 {/* ── Left / Main column ── */}
                 <div className="flex h-full flex-col gap-2 overflow-y-auto p-2 sm:gap-4 sm:p-4 lg:gap-4 lg:p-4">
+
+                  {(isLoadingData || dataLoadError) && (
+                    <div
+                      className={cn(
+                        "flex items-center justify-between gap-3 rounded-lg border px-3 py-2 font-mono text-xs",
+                        dataLoadError
+                          ? "border-amber-400/35 bg-amber-400/10 text-amber-100"
+                          : "border-sky-400/25 bg-sky-400/10 text-sky-100"
+                      )}
+                      role={dataLoadError ? "alert" : "status"}
+                    >
+                      <div className="flex min-w-0 items-center gap-2">
+                        {dataLoadError ? (
+                          <AlertTriangle className="h-4 w-4 shrink-0 text-amber-300" aria-hidden />
+                        ) : (
+                          <RefreshCw className="h-4 w-4 shrink-0 animate-spin text-sky-300" aria-hidden />
+                        )}
+                        <div className="min-w-0">
+                          <p className="font-bold">
+                            {dataLoadError ? "Station data unavailable" : "Syncing station data…"}
+                          </p>
+                          {dataLoadError && (
+                            <p className="mt-0.5 text-[10px] text-amber-100/70">
+                              {dataLoadError} Core controls remain available.
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                      {dataLoadError && (
+                        <button
+                          type="button"
+                          className="shrink-0 rounded border border-amber-300/30 px-2.5 py-1 font-bold uppercase tracking-wider transition-colors hover:bg-amber-300/10 disabled:cursor-wait disabled:opacity-50"
+                          disabled={isLoadingData}
+                          onClick={() => {
+                            setDataLoadError(null);
+                            setIsLoadingData(true);
+                            void refreshGameData().finally(() => setIsLoadingData(false));
+                          }}
+                        >
+                          Retry
+                        </button>
+                      )}
+                    </div>
+                  )}
 
                   {/* Mission Brief — always above fold */}
                   <MissionBriefCard

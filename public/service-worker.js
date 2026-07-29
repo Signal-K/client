@@ -1,6 +1,6 @@
 // Service Worker for Star Sailors PWA
 // Keep cache scope narrow to avoid stale app chunks/API payloads after deploys.
-const CACHE_VERSION = "v2";
+const CACHE_VERSION = "v3";
 const CACHE_NAME = `star-sailors-static-${CACHE_VERSION}`;
 const OFFLINE_URL = "/offline";
 
@@ -47,8 +47,13 @@ self.addEventListener("activate", (event) => {
 
 // Fetch event strategy:
 // - Navigations: network-first with offline fallback.
-// - API and Next runtime/chunks: network-only.
+// - API, Next runtime/chunks, and application routes: browser/network managed.
 // - Selected static assets: stale-while-revalidate.
+//
+// Next.js route-data requests use application URLs such as `/game?_rsc=...`
+// without `request.mode === "navigate"`. Treating every remaining GET as a
+// static asset cached stale RSC payloads and manufactured 408 responses when a
+// route-data request failed. Only explicitly static URLs belong in this cache.
 self.addEventListener("fetch", (event) => {
   const request = event.request;
 
@@ -66,16 +71,13 @@ self.addEventListener("fetch", (event) => {
   const isApiRequest = url.pathname.startsWith("/api/");
   const isNextRuntimeRequest = url.pathname.startsWith("/_next/");
   const isNavigation = request.mode === "navigate";
+  const isCacheableStaticAsset =
+    CACHE_URLS.includes(url.pathname) ||
+    url.pathname.startsWith("/assets/") ||
+    /\.(?:avif|gif|ico|jpe?g|json|mp3|mp4|png|svg|wav|webm|webp|woff2?)$/i.test(url.pathname);
 
   if (isApiRequest || isNextRuntimeRequest) {
-    event.respondWith(
-      fetch(request).catch(() =>
-        new Response(JSON.stringify({ error: "Network unavailable" }), {
-          status: 503,
-          headers: { "Content-Type": "application/json" },
-        })
-      )
-    );
+    // Let the browser and Next.js observe the real response/error.
     return;
   }
 
@@ -83,6 +85,11 @@ self.addEventListener("fetch", (event) => {
     event.respondWith(
       fetch(request).catch(() => caches.match(OFFLINE_URL))
     );
+    return;
+  }
+
+  if (!isCacheableStaticAsset) {
+    // Application routes and RSC requests must never enter the static cache.
     return;
   }
 
@@ -98,10 +105,7 @@ self.addEventListener("fetch", (event) => {
           }
           return response;
         })
-        .catch(() => cachedResponse || new Response("Network error occurred", {
-          status: 408,
-          headers: { "Content-Type": "text/plain" },
-        }));
+        .catch(() => cachedResponse || Response.error());
 
       // stale-while-revalidate for static assets
       return cachedResponse || networkPromise;
