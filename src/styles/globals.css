@@ -186,6 +186,27 @@
     scrollbar-width: none;
   }
 
+  .game-scrollbar {
+    scrollbar-color: rgba(56, 189, 248, 0.35) rgba(2, 6, 23, 0.2);
+    scrollbar-width: thin;
+  }
+  .game-scrollbar::-webkit-scrollbar {
+    width: 8px;
+  }
+  .game-scrollbar::-webkit-scrollbar-track {
+    background: rgba(2, 6, 23, 0.2);
+  }
+  .game-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(56, 189, 248, 0.28);
+    border: 2px solid transparent;
+    border-radius: 999px;
+    background-clip: padding-box;
+  }
+  .game-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(56, 189, 248, 0.45);
+    background-clip: padding-box;
+  }
+
   /* Glow CTA button state */
   .btn-glow {
     box-shadow: var(--glow-primary-sm);

@@ -178,6 +178,21 @@ export default function GameClient({ initialData, user }: GameClientProps) {
     markTutorialComplete,
   } = useUserPreferences();
 
+  // The control station is a dark HUD even when the user's site-wide theme is
+  // light. Keep the document dark while mounted as Radix dialogs render through
+  // portals outside this component's local theme boundary.
+  useEffect(() => {
+    const documentRoot = document.documentElement;
+    const wasDark = documentRoot.classList.contains("dark");
+    documentRoot.classList.add("dark");
+
+    return () => {
+      if (!wasDark) {
+        documentRoot.classList.remove("dark");
+      }
+    };
+  }, []);
+
   const handleViewChange = useCallback((view: ViewMode) => {
     posthog?.capture("structure_tab_switched", { from: activeView, to: view });
     setActiveView(view);
@@ -426,7 +441,10 @@ export default function GameClient({ initialData, user }: GameClientProps) {
   }), [signalCounts]);
 
   return (
-    <div className="relative isolate flex h-[100dvh] w-full flex-col overflow-hidden bg-background text-foreground selection:bg-primary/30">
+    <div
+      className="dark relative isolate flex h-[100dvh] w-full flex-col overflow-hidden bg-background text-foreground selection:bg-primary/30"
+      style={{ colorScheme: "dark" }}
+    >
       {showAmbientLayers && ambientReady ? (
         <div className="pointer-events-none absolute inset-0 z-0" aria-hidden>
           <TelescopeBackground variant="stars-only" />
@@ -447,6 +465,12 @@ export default function GameClient({ initialData, user }: GameClientProps) {
           }}
         />
       )}
+
+      {/* Keep the living background atmospheric without competing with HUD text. */}
+      <div
+        className="pointer-events-none absolute inset-0 z-[1] bg-slate-950/65"
+        aria-hidden
+      />
 
       {/* ─── Command Header ─── */}
       <CommandHeader 
@@ -483,7 +507,7 @@ export default function GameClient({ initialData, user }: GameClientProps) {
               <div className="grid h-full grid-cols-1 gap-0 lg:grid-cols-[1fr_300px] lg:overflow-hidden">
 
                 {/* ── Left / Main column ── */}
-                <div className="flex h-full flex-col gap-2 overflow-y-auto p-2 sm:gap-4 sm:p-4 lg:gap-4 lg:p-4">
+                <div className="game-scrollbar flex h-full min-h-0 flex-col gap-2 overflow-y-auto overscroll-contain p-2 [&>*]:shrink-0 sm:gap-4 sm:p-4 lg:gap-4 lg:p-4">
 
                   {(isLoadingData || dataLoadError) && (
                     <div
@@ -618,7 +642,7 @@ export default function GameClient({ initialData, user }: GameClientProps) {
                 </div>
 
                 {/* ── Right column (desktop only) ── */}
-                <div className="hidden lg:flex flex-col gap-4 p-4 border-l border-border/20 overflow-y-auto">
+                <div className="game-scrollbar hidden min-h-0 flex-col gap-4 overflow-y-auto overscroll-contain border-l border-border/20 p-4 [&>*]:shrink-0 lg:flex">
                   {/* Referral — primary growth mechanic, top of right column */}
                   <SectionLabel text="Invite Contributors" />
                   {showReferralMission && (
