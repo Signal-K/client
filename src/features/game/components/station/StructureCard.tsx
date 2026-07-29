@@ -110,22 +110,22 @@ export function StructureCard({ id, state, signals = 0, isSolar = false, waitTim
       }}
       aria-label={`${cfg.label} — ${cfg.personality[state]}`}
       className={cn(
-        "relative w-full rounded-xl border overflow-hidden text-left transition-all duration-300 active:scale-[0.98] cursor-pointer",
-        // Standby: greyscale, cold, clearly off
-        isStandby && "border-border/20 grayscale opacity-50",
+        "relative w-full cursor-pointer overflow-hidden rounded-xl border text-left shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] transition-all duration-300 hover:-translate-y-0.5 hover:border-white/20 active:scale-[0.98]",
+        // Standby: subdued, but still clearly readable and interactive.
+        isStandby && "border-border/30",
         // Active: accent border + ambient glow
         isActive && cn(cfg.border, cfg.glow),
-        // Undeployed: dim border
-        isUndeployed && "border-border/15 opacity-35",
+        // Undeployed: visibly available, with its deploy action at full contrast.
+        isUndeployed && "border-border/25",
         // Solar: community glow override
         isSolar && isActive && "shadow-[0_0_28px_rgba(251,146,60,0.35),0_0_0_1px_rgba(251,146,60,0.2)]",
       )}
       style={{
         background: isStandby
-          ? "rgba(10,10,15,0.7)"
+          ? "rgba(8,15,28,0.92)"
           : isActive
             ? `radial-gradient(ellipse at 50% 0%, rgba(${cfg.glowRgb},0.08) 0%, rgba(4,10,22,0.85) 70%)`
-            : "rgba(4,10,22,0.6)",
+            : "rgba(6,12,24,0.92)",
       }}
     >
       {/* Scan-line sweep animation on incoming */}
@@ -178,12 +178,12 @@ export function StructureCard({ id, state, signals = 0, isSolar = false, waitTim
         </div>
 
         {/* Signal count / state display */}
-        <div className={cn("mb-2 text-xl font-black leading-none tabular-nums sm:text-2xl", isStandby ? "text-muted-foreground/25" : isActive ? cfg.accent : "text-muted-foreground/20")}>
+        <div className={cn("mb-2 text-xl font-black leading-none tabular-nums sm:text-2xl", isStandby ? "text-muted-foreground/60" : isActive ? cfg.accent : "text-muted-foreground/50")}>
           {isUndeployed ? "—" : signals > 0 ? signals : "·"}
         </div>
 
         {/* Status label */}
-        <div className={cn("text-[9px] font-mono uppercase tracking-widest leading-tight", isStandby ? "text-muted-foreground/40" : isActive ? "text-foreground/60" : "text-muted-foreground/20")}>
+        <div className={cn("font-mono text-[9px] uppercase leading-tight tracking-widest", isStandby ? "text-muted-foreground/70" : isActive ? "text-foreground/70" : "text-muted-foreground/60")}>
           {signals > 0 
             ? `${signals} signal${signals !== 1 ? "s" : ""} awaiting` 
             : isStandby 
@@ -210,7 +210,7 @@ export function StructureCard({ id, state, signals = 0, isSolar = false, waitTim
 
         {/* Personality copy */}
         {!isUndeployed && (
-          <p className={cn("mt-2 text-[9px] leading-relaxed sm:text-[10px]", isStandby ? "text-muted-foreground/20" : "text-muted-foreground/45")}>
+          <p className={cn("mt-2 text-[9px] leading-relaxed sm:text-[10px]", isStandby ? "text-muted-foreground/55" : "text-muted-foreground/65")}>
             {cfg.personality[state]}
           </p>
         )}

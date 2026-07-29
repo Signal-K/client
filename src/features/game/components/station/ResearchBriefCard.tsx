@@ -26,7 +26,7 @@ export function ResearchBriefCard({
         }
       }}
       className={cn(
-        "group relative w-full overflow-hidden rounded-xl border border-purple-500/20 bg-purple-950/5 p-4 transition-all hover:border-purple-500/40 hover:bg-purple-950/10 active:scale-[0.98] cursor-pointer",
+        "group relative w-full cursor-pointer overflow-hidden rounded-xl border border-purple-500/25 bg-slate-950/90 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)] backdrop-blur-sm transition-all hover:border-purple-400/50 hover:bg-slate-900/95 active:scale-[0.98]",
         className
       )}
     >

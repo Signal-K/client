@@ -82,7 +82,7 @@ export function MissionBriefCard({
   return (
     <div
       className={cn(
-        "rounded-xl border overflow-hidden",
+        "overflow-hidden rounded-xl border bg-slate-950/90 backdrop-blur-sm",
         "shadow-[inset_1px_1px_0_rgba(255,255,255,0.04),inset_-1px_-1px_0_rgba(0,0,0,0.2)]",
         v.outerBorder,
       )}

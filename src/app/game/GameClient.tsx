@@ -468,7 +468,7 @@ export default function GameClient({ initialData, user }: GameClientProps) {
 
       {/* Keep the living background atmospheric without competing with HUD text. */}
       <div
-        className="pointer-events-none absolute inset-0 z-[1] bg-slate-950/65"
+        className="pointer-events-none absolute inset-0 z-[1] bg-slate-950/80"
         aria-hidden
       />
 
@@ -504,7 +504,7 @@ export default function GameClient({ initialData, user }: GameClientProps) {
               transition={{ duration: 0.25, ease: [0.32, 0.72, 0, 1] }}
               className="h-full overflow-hidden"
             >
-              <div className="grid h-full grid-cols-1 gap-0 lg:grid-cols-[1fr_300px] lg:overflow-hidden">
+              <div className="grid h-full grid-cols-1 gap-0 lg:grid-cols-[minmax(0,1fr)_340px] lg:overflow-hidden">
 
                 {/* ── Left / Main column ── */}
                 <div className="game-scrollbar flex h-full min-h-0 flex-col gap-2 overflow-y-auto overscroll-contain p-2 [&>*]:shrink-0 sm:gap-4 sm:p-4 lg:gap-4 lg:p-4">
@@ -606,7 +606,7 @@ export default function GameClient({ initialData, user }: GameClientProps) {
                         {...radarStations}
                         onSelect={handleStructureClick}
                         states={structureStates}
-                        className="origin-top justify-center scale-[0.94] sm:scale-100 lg:justify-start"
+                        className="justify-center lg:justify-start"
                       />
                     </>
                   )}
@@ -671,16 +671,13 @@ export default function GameClient({ initialData, user }: GameClientProps) {
                     }}
                   />
 
-                  <SectionLabel text="Mission Log" />
                   <MissionLogPanel entries={logEntries} />
 
-                  <SectionLabel text="Rankings" />
                   <HubLeaderboard
                     entries={data.hubLeaderboard?.entries ?? []}
                     currentUser={data.hubLeaderboard?.currentUser ?? null}
                   />
 
-                  <SectionLabel text="Coral Lab" />
                   <CoralFishtank userId={user?.id} />
                 </div>
               </div>

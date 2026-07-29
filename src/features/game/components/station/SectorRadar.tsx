@@ -83,7 +83,12 @@ export function SectorRadar({ telescope, satellite, rover, solar, className, onS
   const stationMap: Record<string, RadarStation> = { telescope, satellite, rover, solar };
 
   return (
-    <div className={cn("flex gap-4 items-center", className)}>
+    <div
+      className={cn(
+        "flex w-full max-w-2xl items-center gap-4 rounded-xl border border-emerald-500/15 bg-slate-950/90 p-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)] backdrop-blur-sm sm:p-4",
+        className
+      )}
+    >
 
       {/* ── The radar disc ─────────────────────────────────────────────────── */}
       <div
