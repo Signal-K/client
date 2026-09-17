@@ -214,17 +214,17 @@ export const planetClassificationConfig: FormConfig = {
   options: planetClassificationOptions,
 };
 
-export const roverImgClassificationConfig: FormConfig = {
-  title: "Rover Image Classification",
-  richTextFields: 1,
-  options: roverImgClassificationOptions,
-};
+// export const roverImgClassificationConfig: FormConfig = {
+//   title: "Rover Image Classification",
+//   richTextFields: 1,
+//   options: roverImgClassificationOptions,
+// };
 
-export const zoodexSouthCoastFaunaRecoveryClassificationConfig: FormConfig = {
-  title: "South Coast Fauna Recovery",
-  richTextFields: 1,
-  options: zoodexSouthCoastFaunaRecoveryOptions,
-};
+// export const zoodexSouthCoastFaunaRecoveryClassificationConfig: FormConfig = {
+//   title: "South Coast Fauna Recovery",
+//   richTextFields: 1,
+//   options: zoodexSouthCoastFaunaRecoveryOptions,
+// };
 
 export const cloudClassificationConfig: FormConfig = {
   title: "Cloud Classification",
@@ -232,11 +232,11 @@ export const cloudClassificationConfig: FormConfig = {
   options: cloudClassificationOptions,
 };
 
-export const zoodexBurrowingOwlClassificationConfig: FormConfig = {
-  title: "Zoodex Burrowing Owl Classification",
-  richTextFields: 1,
-  options: zoodexBurrowingOwlClassificationOptions,
-};
+// export const zoodexBurrowingOwlClassificationConfig: FormConfig = {
+//   title: "Zoodex Burrowing Owl Classification",
+//   richTextFields: 1,
+//   options: zoodexBurrowingOwlClassificationOptions,
+// };
 
 export const zoodexIguanasFromAboveClassificationConfig: FormConfig = {
   title: "Zoodex Iguanas From Above Classification",
@@ -255,8 +255,8 @@ export const telescopeDiskDetectorConfig: FormConfig = {
   options: diskDetectorOptions,
 };
 
-export const zoodexNestQuestGoConfig: FormConfig = {
-  title: "Nested Quest Go",
-  richTextFields: 4,
-  richTextTitles: ['Month of EACH nest visit (put a slash / between nest visits)', 'Day of EACH nest visit(put a slash / between nest visits)', 'Number of Eggs for EACH nest visit (put a slash / between nest visits)', 'Number of Young for EACH nest visit (put a slash / between nest visits)'],
-};
+// export const zoodexNestQuestGoConfig: FormConfig = {
+//   title: "Nested Quest Go",
+//   richTextFields: 4,
+//   richTextTitles: ['Month of EACH nest visit (put a slash / between nest visits)', 'Day of EACH nest visit(put a slash / between nest visits)', 'Number of Eggs for EACH nest visit (put a slash / between nest visits)', 'Number of Young for EACH nest visit (put a slash / between nest visits)'],
+// };

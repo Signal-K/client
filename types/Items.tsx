@@ -29,7 +29,7 @@ export interface UserStructure {
     // Function (what is executed upon click)
 };
 
-export interface Automaton {
+interface Automaton {
     gif: null;
     id: number;
     item: number;
@@ -104,7 +104,7 @@ export interface StructureItemDetail {
     recipe?: Record<string, number>;
 };
 
-export interface TerrariumStructureItemDetail {
+interface TerrariumStructureItemDetail {
     id: number;
     name: string;
     description: string;

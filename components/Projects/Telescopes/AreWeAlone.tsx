@@ -4,7 +4,12 @@ import React, { useEffect, useState } from "react";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import ClassificationForm from "../(classifications)/PostForm";
 
-import { Anomaly } from "./Transiting";
+type Anomaly = {
+  id: string;
+  name: string;
+  details?: string;
+};
+
 import { useActivePlanet } from "@/context/ActivePlanet";
 
 import { Props } from "@/types/Anomalies";

@@ -349,12 +349,3 @@ export interface DrawingState {
   lines: Line[];
   shapes: Shape[];
 };
-
-export interface DrawingControls {
-  strokeColor: string;
-  strokeWidth: number;
-  drawingMode: DrawingMode;
-  onColorChange: (color: string) => void;
-  onWidthChange: (width: number) => void;
-  onModeChange: (mode: DrawingMode) => void;
-};
