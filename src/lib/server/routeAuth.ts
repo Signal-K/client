@@ -1,8 +1,20 @@
 import { auth } from "@clerk/nextjs/server";
 
-/* v8 ignore next 22 */
+/* v8 ignore start */
 export async function getRouteUser() {
-  const { userId } = await auth();
+  let userId: string | null = null;
+
+  try {
+    ({ userId } = await auth());
+  } catch {
+    // clerkMiddleware() did not run for this request, for example a server
+    // action posted back from a page the matcher does not cover. Degrade to a
+    // signed-out result instead of throwing an unhandled rejection.
+    return {
+      user: null,
+      authError: new Error("Auth context unavailable"),
+    };
+  }
 
   if (!userId) {
     return {
@@ -24,3 +36,4 @@ export async function getRouteUser() {
     authError: null,
   };
 }
+/* v8 ignore stop */
