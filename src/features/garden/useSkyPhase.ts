@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 
 export const SKY_PHASES = ["dawn", "day", "dusk", "night"] as const;
 export type SkyPhase = (typeof SKY_PHASES)[number];
-const SKY_MS = 16000;
+const SKY_MS = 14000;
 
 /** ssc.sky.cycle — compressed dawn → day → dusk → night over the same plot. */
 export function useSkyPhase(): SkyPhase {

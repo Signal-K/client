@@ -104,11 +104,14 @@ export function GardenScene({ state, onOpen, layout, phase, children }: GardenSc
         <div className={styles.skyGrain} aria-hidden="true" />
         <div className={styles.skyClouds} data-phase={phase} aria-hidden="true" />
         <div className={styles.horizonGlow} data-phase={phase} aria-hidden="true" />
+        <div className={styles.farWorld} aria-hidden="true" />
         <div className={styles.stars} />
         <div className={styles.sun} aria-hidden="true" />
         <div className={styles.moon} aria-hidden="true" />
       </div>
       <div className={styles.hills} aria-hidden="true" />
+      <div className={styles.ridge} aria-hidden="true" />
+      <div className={styles.dustMotes} aria-hidden="true" />
 
       <div className={styles.skyLife} aria-hidden="true">
         {shootingStars.map((s) => (

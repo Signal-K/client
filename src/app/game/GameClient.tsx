@@ -240,13 +240,15 @@ export default function GameClient({ user }: GameClientProps) {
         />
       </GardenScene>
 
-      <div className="fixed inset-x-4 bottom-4 z-50 mx-auto max-w-md">
-        <GameSurveys
-          userId={user?.id}
-          classifications={classifications}
-          mechanicId={garden.openPanelId ? STRUCTURE_TO_MECHANIC_ID[garden.openPanelId] : undefined}
-        />
-      </div>
+      {!showRoster && (
+        <div className="fixed inset-x-4 bottom-4 z-50 mx-auto max-w-md">
+          <GameSurveys
+            userId={user?.id}
+            classifications={classifications}
+            mechanicId={garden.openPanelId ? STRUCTURE_TO_MECHANIC_ID[garden.openPanelId] : undefined}
+          />
+        </div>
+      )}
 
       <Dialog open={showProfileModal} onOpenChange={setShowProfileModal}>
         <DialogContent className="max-w-2xl">

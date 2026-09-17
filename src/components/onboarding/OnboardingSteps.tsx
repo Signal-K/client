@@ -117,7 +117,7 @@ export function ProjectSelectionStep({ selectedProject, onSelectProject, onConti
           disabled={!selectedProject}
           className="btn-glow flex w-full items-center justify-center gap-2 rounded-full bg-primary py-4 text-sm font-black uppercase tracking-widest text-primary-foreground transition-all active:scale-95 disabled:opacity-30"
         >
-          Continue
+          Confirm
           <ArrowRight className="h-4 w-4" />
         </button>
       </div>
