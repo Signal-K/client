@@ -1,6 +1,6 @@
 // Service Worker for Star Sailors PWA
 // Keep cache scope narrow to avoid stale app chunks/API payloads after deploys.
-const CACHE_VERSION = "v3";
+const CACHE_VERSION = "v4";
 const CACHE_NAME = `star-sailors-static-${CACHE_VERSION}`;
 const OFFLINE_URL = "/offline";
 
