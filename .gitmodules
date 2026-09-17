@@ -1,6 +1,3 @@
-[submodule "app"]
-	path = app
+[submodule "citizen"]
+	path = citizen
 	url = https://github.com/signal-k/sytizen
-    branch = wb3-14--generate-asset-id-statselements-for-container
-
-# should be api, not app

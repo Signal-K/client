@@ -1,0 +1,14 @@
+@keyframes slide {
+    0% {
+      left: 0;
+    }
+    100% {
+      left: calc(100% - 8rem); /* Adjust the value depending on the size of your container */
+    }
+  }
+  
+  .rover-slide {
+    position: relative;
+    animation: slide 4s infinite alternate ease-in-out;
+    transform: scaleX(-1); /* Flips the image horizontally */
+  }  
