@@ -87,7 +87,12 @@ interface UserPreferences {
 }
 
 const STORAGE_KEY = "star-sailors-preferences";
+const DEVICE_COMPLETE_KEY = "star-sailors-onboarding-complete";
 const DEVICE_ID_KEY = "star-sailors-device-id";
+
+function prefsKey(userId?: string | null) {
+  return userId ? `${STORAGE_KEY}:${userId}` : STORAGE_KEY;
+}
 
 function storageGet(key: string): string | null {
   if (typeof window === "undefined") return null;
@@ -130,7 +135,7 @@ const defaultPreferences: UserPreferences = {
   deviceId: "",
 };
 
-export function useUserPreferences() {
+export function useUserPreferences(userId?: string | null) {
   const [preferences, setPreferences] = useState<UserPreferences>(defaultPreferences);
   const [isLoading, setIsLoading] = useState(true);
   const [needsPreferencesPrompt, setNeedsPreferencesPrompt] = useState(false);
@@ -140,36 +145,37 @@ export function useUserPreferences() {
     if (typeof window === "undefined") return;
 
     try {
-      const stored = storageGet(STORAGE_KEY);
+      const stored = storageGet(prefsKey(userId)) ?? storageGet(STORAGE_KEY);
       const currentDeviceId = getDeviceId();
+      const deviceComplete = storageGet(DEVICE_COMPLETE_KEY) === "1";
       
       if (stored) {
         const parsed = JSON.parse(stored) as UserPreferences;
-        const isCompleted = parsed.hasCompletedOnboarding;
+        const isCompleted = parsed.hasCompletedOnboarding || deviceComplete;
+        const hasInterests = Array.isArray(parsed.projectInterests) && parsed.projectInterests.length > 0;
         
-        // Check if this is a new device (different device ID)
-        if (parsed.deviceId && parsed.deviceId !== currentDeviceId) {
-          // New device - need to ask preferences again
-          if (!isCompleted) setNeedsPreferencesPrompt(true);
-          setPreferences({
-            ...parsed,
-            deviceId: currentDeviceId,
-          });
-        } else if (!parsed.projectInterests || parsed.projectInterests.length === 0) {
-          // No preferences set yet
-          if (!isCompleted) setNeedsPreferencesPrompt(true);
-          setPreferences({
-            ...parsed,
-            deviceId: currentDeviceId,
-          });
-        } else {
-          setPreferences({
-            ...parsed,
-            deviceId: currentDeviceId,
-          });
+        if (!isCompleted && !hasInterests) {
+          setNeedsPreferencesPrompt(true);
         }
+        setPreferences({
+          ...parsed,
+          hasCompletedOnboarding: isCompleted,
+          deviceId: currentDeviceId,
+        });
+        if (userId && !storageGet(prefsKey(userId))) {
+          storageSet(prefsKey(userId), JSON.stringify({
+            ...parsed,
+            hasCompletedOnboarding: isCompleted,
+            deviceId: currentDeviceId,
+          }));
+        }
+      } else if (deviceComplete) {
+        setPreferences({
+          ...defaultPreferences,
+          hasCompletedOnboarding: true,
+          deviceId: currentDeviceId,
+        });
       } else {
-        // First time - need to ask preferences
         setNeedsPreferencesPrompt(true);
         setPreferences({
           ...defaultPreferences,
@@ -186,23 +192,28 @@ export function useUserPreferences() {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [userId]);
+
+  const persist = useCallback((updated: UserPreferences) => {
+    storageSet(prefsKey(userId), JSON.stringify(updated));
+    storageSet(STORAGE_KEY, JSON.stringify(updated));
+    if (updated.hasCompletedOnboarding) storageSet(DEVICE_COMPLETE_KEY, "1");
+  }, [userId]);
 
   // Save preferences to localStorage
   const savePreferences = useCallback((newPreferences: Partial<UserPreferences>) => {
     setPreferences((prev) => {
       const updated = { ...prev, ...newPreferences };
-      
-      storageSet(STORAGE_KEY, JSON.stringify(updated));
-      
+      persist(updated);
       return updated;
     });
-  }, []);
+  }, [persist]);
 
   // Set project interests
   const setProjectInterests = useCallback((interests: ProjectType[]) => {
     savePreferences({
       projectInterests: interests,
+      hasCompletedOnboarding: true,
       lastPreferencesAsked: new Date().toISOString(),
     });
     setNeedsPreferencesPrompt(false);
@@ -211,6 +222,19 @@ export function useUserPreferences() {
   // Mark onboarding as complete
   const completeOnboarding = useCallback(() => {
     savePreferences({ hasCompletedOnboarding: true });
+    setNeedsPreferencesPrompt(false);
+  }, [savePreferences]);
+
+  const hydrateFromAccount = useCallback((input: {
+    interests?: ProjectType[];
+    returning?: boolean;
+  }) => {
+    savePreferences({
+      ...(input.interests && input.interests.length > 0 ? { projectInterests: input.interests } : {}),
+      hasCompletedOnboarding: true,
+      lastPreferencesAsked: new Date().toISOString(),
+    });
+    setNeedsPreferencesPrompt(false);
   }, [savePreferences]);
 
   // Mark structure guide as seen
@@ -240,8 +264,12 @@ export function useUserPreferences() {
 
   // Dismiss the preferences prompt without setting preferences
   const dismissPreferencesPrompt = useCallback(() => {
+    savePreferences({
+      hasCompletedOnboarding: true,
+      lastPreferencesAsked: new Date().toISOString(),
+    });
     setNeedsPreferencesPrompt(false);
-  }, []);
+  }, [savePreferences]);
 
   // Force show preferences prompt
   const showPreferencesPrompt = useCallback(() => {
@@ -265,10 +293,10 @@ export function useUserPreferences() {
           [tutorialId]: true,
         },
       };
-      storageSet(STORAGE_KEY, JSON.stringify(updated));
+      persist(updated);
       return updated;
     });
-  }, []);
+  }, [persist]);
 
   // Check if a specific tutorial has been completed
   const hasTutorialCompleted = useCallback((tutorialId: TutorialId): boolean => {
@@ -281,10 +309,10 @@ export function useUserPreferences() {
       const updated = { ...prev.completedTutorials };
       delete updated[tutorialId];
       const newPrefs = { ...prev, completedTutorials: updated };
-      storageSet(STORAGE_KEY, JSON.stringify(newPrefs));
+      persist(newPrefs);
       return newPrefs;
     });
-  }, []);
+  }, [persist]);
 
   // Reset all preferences (for testing)
   const resetPreferences = useCallback(() => {
@@ -302,6 +330,7 @@ export function useUserPreferences() {
     needsPreferencesPrompt,
     setProjectInterests,
     completeOnboarding,
+    hydrateFromAccount,
     markStructureGuideSeen,
     markDeploymentTutorialSeen,
     markMineralGuideSeen,

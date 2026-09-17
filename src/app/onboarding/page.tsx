@@ -29,7 +29,7 @@ export default function OnboardingPage() {
   const router = useRouter();
   const posthog = usePostHog();
   const { user, isLoading: authLoading } = useAuthUser();
-  const { preferences, isLoading: prefsLoading, setProjectInterests, completeOnboarding, hasTutorialCompleted, markTutorialComplete } = useUserPreferences();
+  const { preferences, isLoading: prefsLoading, setProjectInterests, completeOnboarding, hasTutorialCompleted, markTutorialComplete } = useUserPreferences(user?.id);
 
   const [showIntro, setShowIntro] = useState(false);
   const [step, setStep] = useState<Step>("intro");

@@ -10,59 +10,54 @@ import {
   type MinigameDef,
   type StructureId,
 } from "./catalog";
+import {
+  applyProjectRoster,
+  buildStructure,
+  defaultGardenState,
+  gardenStorageKey,
+  GARDEN_STORAGE_KEY_LEGACY,
+  isUntouchedLegacyGarden,
+  seedOwnedStructures,
+  type FlightRecord,
+  type GardenState,
+  type StructureRecord,
+} from "./gardenLogic";
+import type { ProjectType } from "@/src/hooks/useUserPreferences";
 
-const STORAGE_KEY = "ssc.garden.v1";
+export type { FlightRecord, GardenState, StructureRecord };
+
 const HYDRO_TICK_MS = 14000;
 const FLIGHT_TICK_MS = 500;
 const TOAST_MS = 2400;
 
-export interface StructureRecord {
-  tier: number;
-  locked: boolean;
-  tendedAt: number;
-  ready: boolean;
-  readyAt: number;
-}
-
-export interface FlightRecord {
-  status: "away" | "home";
-  sentAt: number;
-  eta: number;
-}
-
-export interface GardenState {
-  credits: number;
-  structures: Record<StructureId, StructureRecord>;
-  flights: Partial<Record<StructureId, FlightRecord>>;
-  hydroTick: number;
-}
-
-function defaultState(): GardenState {
-  const structures = {} as Record<StructureId, StructureRecord>;
-  for (const s of CATALOG.structures) {
-    structures[s.id] = {
-      tier: s.locked ? 0 : s.startTier,
-      locked: !!s.locked,
-      tendedAt: 0,
-      ready: !s.locked && !!s.minigame,
-      readyAt: 0,
-    };
-  }
-  return {
-    credits: 80,
-    structures,
-    flights: {},
-    hydroTick: Date.now(),
-  };
-}
-
-function loadState(): GardenState {
-  const base = defaultState();
-  if (typeof window === "undefined") return base;
+function readStorage(key: string): string | null {
+  if (typeof window === "undefined") return null;
   try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
-    if (!raw) return base;
+    return window.localStorage.getItem(key);
+  } catch {
+    return null;
+  }
+}
+
+function writeStorage(key: string, value: string) {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(key, value);
+  } catch {
+    // ignore
+  }
+}
+
+function loadState(userId?: string | null): GardenState {
+  const base = defaultGardenState();
+  const raw =
+    readStorage(gardenStorageKey(userId)) ??
+    (userId ? readStorage(gardenStorageKey()) : null) ??
+    readStorage(GARDEN_STORAGE_KEY_LEGACY);
+  if (!raw) return base;
+  try {
     const parsed = JSON.parse(raw);
+    if (isUntouchedLegacyGarden(parsed)) return base;
     return {
       ...base,
       ...parsed,
@@ -74,17 +69,12 @@ function loadState(): GardenState {
   }
 }
 
-function saveState(state: GardenState) {
-  if (typeof window === "undefined") return;
-  try {
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-  } catch {
-    // ignore
-  }
+function saveState(state: GardenState, userId?: string | null) {
+  writeStorage(gardenStorageKey(userId), JSON.stringify(state));
 }
 
-export function useGardenState() {
-  const [state, setState] = useState<GardenState>(() => defaultState());
+export function useGardenState(userId?: string | null) {
+  const [state, setState] = useState<GardenState>(() => defaultGardenState());
   const [hydrated, setHydrated] = useState(false);
   const [openPanelId, setOpenPanelId] = useState<StructureId | null>(null);
   const [openMinigame, setOpenMinigame] = useState<MinigameDef | null>(null);
@@ -96,14 +86,14 @@ export function useGardenState() {
 
   // Load persisted state on mount (client-only; avoids SSR/localStorage mismatch).
   useEffect(() => {
-    setState(loadState());
+    setState(loadState(userId));
     setHydrated(true);
-  }, []);
+  }, [userId]);
 
   useEffect(() => {
     if (!hydrated) return;
-    saveState(state);
-  }, [state, hydrated]);
+    saveState(state, userId);
+  }, [state, hydrated, userId]);
 
   const pushToast = useCallback((msg: string) => {
     setToast(msg);
@@ -192,6 +182,7 @@ export function useGardenState() {
     if (!def) return;
     setState((prev) => {
       const rec = prev.structures[id];
+      if (rec.locked) return prev;
       const next = rec.tier + 1;
       if (next > CATALOG.upgrade.maxTier) return prev;
       const cost = CATALOG.upgrade.costs[next - 1];
@@ -207,6 +198,27 @@ export function useGardenState() {
       };
     });
   }, [pushToast]);
+
+  const build = useCallback((id: StructureId) => {
+    const def = structureById(id);
+    setState((prev) => {
+      const result = buildStructure(prev, id);
+      if (!result.ok) {
+        if (result.reason === "credits") pushToast(`Need ${result.cost} CR to build.`);
+        return prev;
+      }
+      pushToast(`${def?.name ?? "Instrument"} is up. Classify to earn the next upgrade.`);
+      return result.state;
+    });
+  }, [pushToast]);
+
+  const applyProjects = useCallback((interests: ProjectType[]) => {
+    setState((prev) => applyProjectRoster(prev, interests));
+  }, []);
+
+  const seedOwned = useCallback((owned: StructureId[]) => {
+    setState((prev) => seedOwnedStructures(prev, owned));
+  }, []);
 
   const sendFlight = useCallback((structureId: StructureId, minigame: MinigameDef): boolean => {
     let ok = true;
@@ -275,6 +287,7 @@ export function useGardenState() {
     if (!def) return;
     setState((prev) => {
       const rec = prev.structures[structureId];
+      if (rec.locked) return prev;
       const stage = growthFor(def, rec.tier);
       const reward = CATALOG.minigames[def.minigame!].reward + rec.tier;
       return {
@@ -291,7 +304,7 @@ export function useGardenState() {
         },
       };
     });
-    pushToast("Noted. The instrument can sit.");
+    pushToast("Noted. Credits on the dirt — raise the next instrument.");
   }, [pushToast]);
 
   const startMinigame = useCallback((mgDef: MinigameDef) => {
@@ -333,6 +346,9 @@ export function useGardenState() {
     tendHydro,
     sitHabitat,
     upgrade,
+    build,
+    applyProjects,
+    seedOwned,
     sendFlight,
     collectFlight,
     addCredits,

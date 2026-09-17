@@ -1,17 +1,23 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import { usePostHog } from "posthog-js/react";
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/src/components/ui/dialog";
 import ProjectPreferencesModal from "@/src/components/onboarding/ProjectPreferencesModal";
 import { GameSurveys } from "@/src/features/surveys/components/GameSurveys";
-import { useUserPreferences } from "@/src/hooks/useUserPreferences";
+import { useUserPreferences, type ProjectType } from "@/src/hooks/useUserPreferences";
 
 import { useGardenState } from "@/src/features/garden/useGardenState";
 import { useSkyPhase } from "@/src/features/garden/useSkyPhase";
 import { hopById, type StructureId } from "@/src/features/garden/catalog";
+import {
+  projectsForStructures,
+  shouldAskForProjectRoster,
+  structuresFromAutomatons,
+  structuresFromInventoryItems,
+} from "@/src/features/garden/gardenLogic";
 import { GardenScene } from "@/src/features/garden/components/GardenScene";
 import { GardenHud } from "@/src/features/garden/components/GardenHud";
 import { GardenPanel } from "@/src/features/garden/components/GardenPanel";
@@ -44,6 +50,15 @@ function cx(...classes: Array<string | false | undefined>) {
   return classes.filter(Boolean).join(" ");
 }
 
+interface HubBootstrap {
+  username: string | null;
+  classificationPoints: number;
+  inventoryItemIds: number[];
+  automatons: string[];
+  classificationCount: number;
+  returning: boolean;
+}
+
 interface GameClientProps {
   initialData: unknown;
   user: { id?: string } | null;
@@ -51,17 +66,70 @@ interface GameClientProps {
 
 export default function GameClient({ user }: GameClientProps) {
   const posthog = usePostHog();
-  const garden = useGardenState();
+  const garden = useGardenState(user?.id);
   const phase = useSkyPhase();
   const [layout, setLayout] = useState<"portrait" | "landscape">("portrait");
   const [showProfileModal, setShowProfileModal] = useState(false);
-  const { preferences, needsPreferencesPrompt, setProjectInterests } = useUserPreferences();
+  const {
+    preferences,
+    isLoading: prefsLoading,
+    needsPreferencesPrompt,
+    setProjectInterests,
+    dismissPreferencesPrompt,
+    hydrateFromAccount,
+    showPreferencesPrompt,
+  } = useUserPreferences(user?.id);
   const [classifications, setClassifications] = useState<ClassificationForMechanicSurvey[]>([]);
+  const [accountLoading, setAccountLoading] = useState(true);
+  const [bootstrap, setBootstrap] = useState<HubBootstrap | null>(null);
+  const seededRef = useRef(false);
 
   useEffect(() => {
     posthog?.capture("garden_hub_viewed", { userId: user?.id });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    if (!user?.id) {
+      setAccountLoading(false);
+      return;
+    }
+    let cancelled = false;
+    fetch("/api/gameplay/hub/bootstrap")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data: HubBootstrap | null) => {
+        if (cancelled) return;
+        setBootstrap(data);
+      })
+      .catch(() => {
+        if (!cancelled) setBootstrap(null);
+      })
+      .finally(() => {
+        if (!cancelled) setAccountLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [user?.id]);
+
+  useEffect(() => {
+    if (!garden.hydrated || prefsLoading || accountLoading || seededRef.current) return;
+    seededRef.current = true;
+    const owned = bootstrap
+      ? [
+          ...structuresFromInventoryItems(bootstrap.inventoryItemIds ?? []),
+          ...structuresFromAutomatons(bootstrap.automatons ?? []),
+        ]
+      : [];
+    if (owned.length) garden.seedOwned(owned);
+    const inferred = projectsForStructures(owned);
+    const interests =
+      preferences.projectInterests.length > 0 ? preferences.projectInterests : inferred;
+    if (bootstrap?.returning || interests.length > 0) {
+      hydrateFromAccount({ interests, returning: !!bootstrap?.returning });
+    }
+    if (interests.length > 0) garden.applyProjects(interests);
+  }, [accountLoading, bootstrap, garden, garden.hydrated, hydrateFromAccount, preferences.projectInterests, prefsLoading]);
 
   useEffect(() => {
     if (!user?.id) return;
@@ -104,6 +172,22 @@ export default function GameClient({ user }: GameClientProps) {
     [garden]
   );
 
+  const handleSaveProjects = useCallback(
+    (prefs: ProjectType[]) => {
+      setProjectInterests(prefs);
+      garden.applyProjects(prefs);
+      posthog?.capture("onboarding_completed", { userId: user?.id, projects: prefs });
+    },
+    [garden, posthog, setProjectInterests, user?.id]
+  );
+
+  const showRoster = shouldAskForProjectRoster({
+    prefsLoading,
+    accountLoading,
+    needsPreferencesPrompt,
+    returning: !!bootstrap?.returning,
+  });
+
   if (!garden.hydrated) {
     return (
       <div className={styles.gardenPage}>
@@ -115,8 +199,15 @@ export default function GameClient({ user }: GameClientProps) {
   return (
     <div className={styles.gardenPage}>
       <GardenScene state={garden.state} onOpen={garden.openPanel} layout={layout} phase={phase}>
-        <GardenHud credits={garden.state.credits} phase={phase} onProfileClick={() => setShowProfileModal(true)} />
-        <p className={styles.hint}>Tap a tool (or the thing above it) — classify from the panel, in the sky</p>
+        <GardenHud
+          credits={garden.state.credits}
+          phase={phase}
+          onProfileClick={() => setShowProfileModal(true)}
+          onProjectsClick={showPreferencesPrompt}
+        />
+        <p className={styles.hint}>
+          Pick projects, spend CR to raise instruments, classify to earn more
+        </p>
         <div className={cx(styles.toast, !!garden.toast && styles.isOn)} role="status">
           {garden.toast}
         </div>
@@ -128,6 +219,7 @@ export default function GameClient({ user }: GameClientProps) {
           onTendHydro={garden.tendHydro}
           onSitHabitat={garden.sitHabitat}
           onUpgrade={garden.upgrade}
+          onBuild={garden.build}
           onCollectFlight={garden.collectFlight}
           onStartMinigame={garden.startMinigame}
           onHopOut={handleHopOut}
@@ -163,10 +255,10 @@ export default function GameClient({ user }: GameClientProps) {
       </Dialog>
 
       <ProjectPreferencesModal
-        isOpen={needsPreferencesPrompt}
+        isOpen={showRoster}
         initialInterests={preferences?.projectInterests ?? []}
-        onClose={() => {}}
-        onSave={(prefs) => setProjectInterests(prefs)}
+        onClose={dismissPreferencesPrompt}
+        onSave={handleSaveProjects}
       />
 
       <PWAPrompt />
