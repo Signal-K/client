@@ -22,12 +22,19 @@
   "observability": {
     "enabled": true
   },
-  // `wrangler deploy --env staging` — a constant preview target on the
-  // *.workers.dev subdomain (no custom domain), so the URL never changes
-  // between deploys. Runtime secrets (POCKETBASE_URL, CLERK_SECRET_KEY, ...)
-  // are synced from the same repo secrets as production on purpose — this
-  // shares the one ecosystem PocketBase/Clerk instance rather than standing
-  // up a second paid backend, so accounts/data are never split from prod.
+  // `wrangler deploy --env staging` — a constant preview target. Runtime
+  // secrets (POCKETBASE_URL, CLERK_SECRET_KEY, ...) are synced from the same
+  // repo secrets as production on purpose — this shares the one ecosystem
+  // PocketBase/Clerk instance rather than standing up a second paid backend,
+  // so accounts/data are never split from prod.
+  //
+  // Custom domain is staging.starsailors.space, NOT the *.workers.dev
+  // subdomain: production's Clerk instance uses a custom Frontend API proxy
+  // domain (clerk.starsailors.space) that rejects any request whose Origin
+  // isn't starsailors.space or a subdomain of it ("Invalid HTTP Origin
+  // header" / origin_invalid) — a workers.dev origin can load the app but
+  // can never sign in. staging.starsailors.space satisfies that check while
+  // still using the exact same shared Clerk/PocketBase instance.
   "env": {
     "staging": {
       "name": "starsailors-client-staging",
@@ -35,10 +42,10 @@
       "compatibility_date": "2026-07-24",
       "compatibility_flags": ["nodejs_compat"],
       "workers_dev": true,
-      // Explicit empty override — without this, wrangler inherits the
-      // top-level `routes` and reassigns the production custom domains
+      // Explicit override — without this, wrangler inherits the top-level
+      // `routes` and reassigns the production custom domains
       // (starsailors.space, www.starsailors.space) to this Worker on deploy.
-      "routes": [],
+      "routes": [{ "pattern": "staging.starsailors.space", "custom_domain": true }],
       "assets": {
         "directory": ".open-next/assets",
         "binding": "ASSETS"
