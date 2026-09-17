@@ -141,9 +141,8 @@ export default function ProjectPreferencesModal({
   };
 
   const handleSave = () => {
-    // If nothing selected, default to all projects
-    const interests = selectedProjects.length > 0 ? selectedProjects : PROJECTS.map((p) => p.id);
-    onSave(interests);
+    if (selectedProjects.length === 0) return;
+    onSave(selectedProjects);
     onClose();
   };
 
@@ -153,12 +152,11 @@ export default function ProjectPreferencesModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-h-[88vh] w-[calc(100vw-1rem)] max-w-[58rem] overflow-hidden border-border/60 bg-background/95 p-0 shadow-2xl sm:w-full">
-        <div className="relative overflow-hidden">
-          <div className="pointer-events-none absolute inset-0 star-field opacity-25" />
-          <div className="pointer-events-none absolute inset-0 sunburst-bg opacity-30" />
+      <DialogContent className="flex max-h-[min(88vh,100dvh)] min-h-0 w-[calc(100vw-1rem)] max-w-[58rem] flex-col gap-0 overflow-hidden border-border/60 bg-background/95 p-0 shadow-2xl sm:w-full">
+        <div className="pointer-events-none absolute inset-0 star-field opacity-25" />
+        <div className="pointer-events-none absolute inset-0 sunburst-bg opacity-30" />
 
-          <DialogHeader className="relative border-b border-border/40 px-4 pb-4 pt-5 sm:px-6 sm:pb-5 sm:pt-6">
+        <DialogHeader className="relative shrink-0 border-b border-border/40 px-4 pb-4 pt-5 sm:px-6 sm:pb-5 sm:pt-6">
             <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-primary">
               Mission Focus
             </span>
@@ -167,15 +165,15 @@ export default function ProjectPreferencesModal({
               Select your project roster
             </DialogTitle>
             <DialogDescription className="max-w-2xl text-sm leading-relaxed text-muted-foreground">
-              Choose the science tracks you want surfaced in the hub. We will use these
-              preferences to keep deployments and prompts aligned with your current mission goals.
+              Choose the science tracks you want surfaced in the hub. Confirm when you are
+              ready — we will keep deployments and prompts aligned with those missions.
             </DialogDescription>
-          </DialogHeader>
+        </DialogHeader>
 
-          <div className="relative max-h-[calc(88vh-172px)] overflow-y-auto px-4 py-4 sm:px-6 sm:py-5">
+        <div className="relative min-h-0 flex-1 overflow-y-auto px-4 py-4 sm:px-6 sm:py-5">
             <div className="mb-4 flex flex-wrap items-center gap-2">
               <span className="rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-primary">
-                {selectedProjects.length || PROJECTS.length} tracks armed
+                {selectedProjects.length} tracks armed
               </span>
               <button
                 type="button"
@@ -282,25 +280,28 @@ export default function ProjectPreferencesModal({
                 );
               })}
             </div>
-          </div>
+        </div>
 
-          <div className="relative flex flex-col gap-3 border-t border-border/40 bg-background/90 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+        <div className="relative z-10 flex shrink-0 flex-col gap-3 border-t border-border/40 bg-background/95 px-4 py-4 pb-[max(1rem,env(safe-area-inset-bottom))] sm:flex-row sm:items-center sm:justify-between sm:px-6">
             <div className="text-xs text-muted-foreground">
               {selectedProjects.length > 0
-                ? `${selectedProjects.length} projects selected`
-                : "No project selected. Saving now will arm all tracks by default."}
+                ? `${selectedProjects.length} project${selectedProjects.length === 1 ? "" : "s"} selected`
+                : "Select at least one track, then confirm."}
             </div>
 
             <div className="flex w-full items-center justify-end gap-3 sm:w-auto">
               <Button variant="ghost" onClick={onClose}>
                 Skip for now
               </Button>
-              <Button onClick={handleSave} className="btn-glow gap-2 rounded-full px-4 text-xs font-black uppercase tracking-[0.18em] sm:px-5 sm:text-sm">
-                Save preferences
-                <ArrowRight className="h-4 w-4" />
+              <Button
+                onClick={handleSave}
+                disabled={selectedProjects.length === 0}
+                className="btn-glow gap-2 rounded-full px-5 text-xs font-black uppercase tracking-[0.18em] sm:px-6 sm:text-sm"
+              >
+                Confirm
+                <Check className="h-4 w-4" />
               </Button>
             </div>
-          </div>
         </div>
       </DialogContent>
     </Dialog>

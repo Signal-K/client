@@ -97,11 +97,21 @@ export function GardenScene({ state, onOpen, layout, phase, children }: GardenSc
   return (
     <div className={styles.stage} data-phase={phase} data-layout={layout}>
       <div className={styles.sky} data-phase={phase}>
+        <div className={cx(styles.skyWash, styles.skyDawn, phase === "dawn" && styles.isOn)} />
+        <div className={cx(styles.skyWash, styles.skyDay, phase === "day" && styles.isOn)} />
+        <div className={cx(styles.skyWash, styles.skyDusk, phase === "dusk" && styles.isOn)} />
+        <div className={cx(styles.skyWash, styles.skyNight, phase === "night" && styles.isOn)} />
+        <div className={styles.skyGrain} aria-hidden="true" />
+        <div className={styles.skyClouds} data-phase={phase} aria-hidden="true" />
+        <div className={styles.horizonGlow} data-phase={phase} aria-hidden="true" />
+        <div className={styles.farWorld} aria-hidden="true" />
         <div className={styles.stars} />
         <div className={styles.sun} aria-hidden="true" />
         <div className={styles.moon} aria-hidden="true" />
       </div>
       <div className={styles.hills} aria-hidden="true" />
+      <div className={styles.ridge} aria-hidden="true" />
+      <div className={styles.dustMotes} aria-hidden="true" />
 
       <div className={styles.skyLife} aria-hidden="true">
         {shootingStars.map((s) => (

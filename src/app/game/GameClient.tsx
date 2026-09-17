@@ -55,7 +55,7 @@ export default function GameClient({ user }: GameClientProps) {
   const phase = useSkyPhase();
   const [layout, setLayout] = useState<"portrait" | "landscape">("portrait");
   const [showProfileModal, setShowProfileModal] = useState(false);
-  const { preferences, needsPreferencesPrompt, setProjectInterests } = useUserPreferences();
+  const { preferences, needsPreferencesPrompt, setProjectInterests, completeOnboarding, dismissPreferencesPrompt } = useUserPreferences();
   const [classifications, setClassifications] = useState<ClassificationForMechanicSurvey[]>([]);
 
   useEffect(() => {
@@ -165,8 +165,14 @@ export default function GameClient({ user }: GameClientProps) {
       <ProjectPreferencesModal
         isOpen={needsPreferencesPrompt}
         initialInterests={preferences?.projectInterests ?? []}
-        onClose={() => {}}
-        onSave={(prefs) => setProjectInterests(prefs)}
+        onClose={() => {
+          dismissPreferencesPrompt();
+          completeOnboarding();
+        }}
+        onSave={(prefs) => {
+          setProjectInterests(prefs);
+          completeOnboarding();
+        }}
       />
 
       <PWAPrompt />
