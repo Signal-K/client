@@ -71,19 +71,23 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          # Explicit top-level env — wrangler.jsonc now also defines
-          # `env.staging`, and an unqualified `deploy` warns once more than
-          # one environment exists in the config.
-          command: deploy --env ""
+          # NOTE: `--env ""` looks like the right way to pin this to the
+          # top-level environment now that wrangler.jsonc also defines
+          # `env.staging`, but wrangler-action's arg splitting drops the
+          # empty-string value and wrangler then errors with "Not enough
+          # arguments following: env" (broke prod deploy on 2026-09-17,
+          # see run 35190488025). Plain `deploy` still targets the
+          # top-level env correctly; it just logs a harmless warning.
+          command: deploy
 
       - name: Sync runtime secrets
         run: |
-          printf '%s' "$POCKETBASE_URL" | npx wrangler secret put POCKETBASE_URL --env ""
-          printf '%s' "$POCKETBASE_ADMIN_EMAIL" | npx wrangler secret put POCKETBASE_ADMIN_EMAIL --env ""
-          printf '%s' "$POCKETBASE_ADMIN_PASSWORD" | npx wrangler secret put POCKETBASE_ADMIN_PASSWORD --env ""
-          printf '%s' "$CLERK_SECRET_KEY" | npx wrangler secret put CLERK_SECRET_KEY --env ""
+          printf '%s' "$POCKETBASE_URL" | npx wrangler secret put POCKETBASE_URL
+          printf '%s' "$POCKETBASE_ADMIN_EMAIL" | npx wrangler secret put POCKETBASE_ADMIN_EMAIL
+          printf '%s' "$POCKETBASE_ADMIN_PASSWORD" | npx wrangler secret put POCKETBASE_ADMIN_PASSWORD
+          printf '%s' "$CLERK_SECRET_KEY" | npx wrangler secret put CLERK_SECRET_KEY
           if [ -n "$CLERK_WEBHOOK_SIGNING_SECRET" ]; then
-            printf '%s' "$CLERK_WEBHOOK_SIGNING_SECRET" | npx wrangler secret put CLERK_WEBHOOK_SIGNING_SECRET --env ""
+            printf '%s' "$CLERK_WEBHOOK_SIGNING_SECRET" | npx wrangler secret put CLERK_WEBHOOK_SIGNING_SECRET
           fi
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
