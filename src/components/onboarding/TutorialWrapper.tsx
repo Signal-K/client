@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useUserPreferences, TutorialId } from "@/src/hooks/useUserPreferences";
+import { useAuthUser } from "@/src/hooks/useAuthUser";
 import InteractiveTutorial, { TutorialStep } from "./InteractiveTutorial";
 import { Button } from "@/src/components/ui/button";
 import { HelpCircle, RotateCcw } from "lucide-react";
@@ -31,7 +32,7 @@ interface TutorialWrapperProps {
  * TutorialWrapper - Wraps content with an optional tutorial overlay
  * 
  * Shows a tutorial to users who haven't completed it yet.
- * Tutorial completion is tracked in localStorage via useUserPreferences.
+ * Tutorial completion is tracked on the account via useUserPreferences.
  */
 export default function TutorialWrapper({
   tutorialId,
@@ -44,12 +45,13 @@ export default function TutorialWrapper({
   onComplete,
   onSkip,
 }: TutorialWrapperProps) {
+  const { user } = useAuthUser();
   const {
     hasTutorialCompleted,
     markTutorialComplete,
     resetTutorial,
     isLoading,
-  } = useUserPreferences();
+  } = useUserPreferences(user?.id);
 
   const [showTutorial, setShowTutorial] = useState(false);
   const [hasChecked, setHasChecked] = useState(false);

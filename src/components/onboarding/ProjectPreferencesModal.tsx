@@ -141,9 +141,8 @@ export default function ProjectPreferencesModal({
   };
 
   const handleSave = () => {
-    // If nothing selected, default to all projects
-    const interests = selectedProjects.length > 0 ? selectedProjects : PROJECTS.map((p) => p.id);
-    onSave(interests);
+    if (selectedProjects.length === 0) return;
+    onSave(selectedProjects);
     onClose();
   };
 
@@ -167,15 +166,15 @@ export default function ProjectPreferencesModal({
               Select your project roster
             </DialogTitle>
             <DialogDescription className="max-w-2xl text-sm leading-relaxed text-muted-foreground">
-              Choose the science tracks you want surfaced in the hub. We will use these
-              preferences to keep deployments and prompts aligned with your current mission goals.
+              Choose the science you want to raise in the garden. Spend credits to build those
+              instruments, classify to earn more, then upgrade.
             </DialogDescription>
           </DialogHeader>
 
           <div className="relative max-h-[calc(88vh-172px)] overflow-y-auto px-4 py-4 sm:px-6 sm:py-5">
             <div className="mb-4 flex flex-wrap items-center gap-2">
               <span className="rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-primary">
-                {selectedProjects.length || PROJECTS.length} tracks armed
+                {selectedProjects.length} tracks armed
               </span>
               <button
                 type="button"
@@ -287,15 +286,19 @@ export default function ProjectPreferencesModal({
           <div className="relative flex flex-col gap-3 border-t border-border/40 bg-background/90 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
             <div className="text-xs text-muted-foreground">
               {selectedProjects.length > 0
-                ? `${selectedProjects.length} projects selected`
-                : "No project selected. Saving now will arm all tracks by default."}
+                ? `${selectedProjects.length} projects selected — next you will spend CR to build them.`
+                : "Select at least one project. Skip keeps the camp; you can arm tracks from the HUD."}
             </div>
 
             <div className="flex w-full items-center justify-end gap-3 sm:w-auto">
               <Button variant="ghost" onClick={onClose}>
                 Skip for now
               </Button>
-              <Button onClick={handleSave} className="btn-glow gap-2 rounded-full px-4 text-xs font-black uppercase tracking-[0.18em] sm:px-5 sm:text-sm">
+              <Button
+                onClick={handleSave}
+                disabled={selectedProjects.length === 0}
+                className="btn-glow gap-2 rounded-full px-4 text-xs font-black uppercase tracking-[0.18em] sm:px-5 sm:text-sm"
+              >
                 Save preferences
                 <ArrowRight className="h-4 w-4" />
               </Button>

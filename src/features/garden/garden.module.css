@@ -4,10 +4,10 @@
    instead of leaking into the rest of the app. */
 
 .gardenPage {
-  --dust: #cbb896;
-  --dust-mid: #b79d78;
-  --dust-dark: #8d7354;
-  --dust-edge: #6f5840;
+  --dust: #c49a6c;
+  --dust-mid: #b07a4c;
+  --dust-dark: #8a5534;
+  --dust-edge: #6a3c24;
   --cream: #f3eadc;
   --cream-shade: #d9ccb8;
   --cream-deep: #c4b49a;
@@ -25,9 +25,9 @@
   --hud: #f7f0e4;
   --stage-w: 390px;
   --stage-h: 844px;
-  --sky-day: #9ec9e8;
-  --sky-dusk: #f0b58a;
-  --sky-night: #1c2438;
+  --sky-day: #d4a05a;
+  --sky-dusk: #c45a6a;
+  --sky-night: #1a1428;
 
   box-sizing: border-box;
   display: grid;
@@ -48,7 +48,7 @@
 @media (orientation: landscape) {
   .gardenPage {
     display: block;
-    background: #cbb896;
+    background: #3a2418;
   }
 }
 
@@ -59,7 +59,7 @@
   aspect-ratio: 390 / 844;
   max-height: 100dvh;
   overflow: clip;
-  background: #cbb896;
+  background: #b07a4c;
   isolation: isolate;
 }
 @media (min-width: 520px) and (orientation: portrait) {
@@ -81,39 +81,86 @@
   }
 }
 
-/* ---- sky cycle (ssc.sky.cycle) ---- */
+/* ---- sky cycle (ssc.sky.cycle) — layered washes so colour actually changes ---- */
 .sky {
   position: absolute;
   inset: 0 0 36% 0;
   z-index: 0;
-  background: linear-gradient(
-    180deg,
-    var(--sky-top, #7eb8e4) 0%,
-    var(--sky-mid, #f2d3a8) 55%,
-    var(--sky-bot, #f4e2c4) 100%
-  );
-  transition: background 1.2s linear;
+  overflow: hidden;
+  background: #2a1810;
 }
-.sky[data-phase="dawn"] {
-  --sky-top: #6a9cc8;
-  --sky-mid: #f3c9a0;
-  --sky-bot: #f6e4c8;
+.skyWash {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 1.6s ease;
 }
-.sky[data-phase="day"] {
-  --sky-top: #7eb8e4;
-  --sky-mid: #c5dff2;
-  --sky-bot: #f4e6c8;
+.skyWash.isOn { opacity: 1; }
+.skyDawn {
+  background:
+    radial-gradient(120% 80% at 50% 110%, #f4b080 0%, transparent 55%),
+    linear-gradient(180deg, #5a3a78 0%, #e07858 42%, #f4c090 100%);
 }
-.sky[data-phase="dusk"] {
-  --sky-top: #3d4a78;
-  --sky-mid: #e08a6a;
-  --sky-bot: #f3c9a0;
+.skyDay {
+  background:
+    radial-gradient(90% 60% at 50% -10%, rgba(255, 236, 180, 0.7) 0%, transparent 50%),
+    linear-gradient(180deg, #c47a48 0%, #e0a05a 38%, #f0c890 72%, #e8b070 100%);
 }
-.sky[data-phase="night"] {
-  --sky-top: #121828;
-  --sky-mid: #1c2438;
-  --sky-bot: #3a3a48;
+.skyDusk {
+  background:
+    radial-gradient(80% 70% at 50% 100%, #f09050 0%, transparent 50%),
+    linear-gradient(180deg, #2a1848 0%, #8a2a58 40%, #e06848 78%, #f0a060 100%);
 }
+.skyNight {
+  background:
+    radial-gradient(70% 50% at 50% 100%, #3a2048 0%, transparent 55%),
+    linear-gradient(180deg, #080814 0%, #141228 48%, #2a1838 100%);
+}
+.skyGrain {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.28;
+  mix-blend-mode: multiply;
+  background-image:
+    repeating-linear-gradient(90deg, rgba(80, 40, 20, 0.08) 0 1px, transparent 1px 3px),
+    repeating-linear-gradient(0deg, rgba(40, 20, 10, 0.06) 0 1px, transparent 1px 4px),
+    radial-gradient(2px 2px at 12% 18%, rgba(255, 220, 160, 0.35), transparent 60%),
+    radial-gradient(1.5px 1.5px at 38% 42%, rgba(255, 200, 140, 0.25), transparent 60%),
+    radial-gradient(2px 2px at 71% 22%, rgba(255, 230, 180, 0.3), transparent 60%),
+    radial-gradient(1px 1px at 88% 61%, rgba(255, 210, 150, 0.35), transparent 60%);
+}
+.skyClouds {
+  position: absolute;
+  inset: 8% 0 30% 0;
+  pointer-events: none;
+  opacity: 0.45;
+  transition: opacity 1.6s ease, filter 1.6s ease;
+  background:
+    radial-gradient(28% 18% at 18% 40%, rgba(255, 236, 210, 0.45) 0 40%, transparent 70%),
+    radial-gradient(34% 16% at 42% 28%, rgba(255, 220, 180, 0.35) 0 42%, transparent 72%),
+    radial-gradient(30% 20% at 72% 36%, rgba(255, 210, 170, 0.4) 0 38%, transparent 70%),
+    radial-gradient(22% 14% at 88% 22%, rgba(255, 230, 200, 0.3) 0 40%, transparent 68%);
+  filter: blur(0.4px);
+}
+.skyClouds[data-phase="dusk"] { opacity: 0.55; filter: hue-rotate(-20deg) saturate(1.2); }
+.skyClouds[data-phase="night"] { opacity: 0.12; }
+.skyClouds[data-phase="dawn"] { opacity: 0.5; filter: hue-rotate(10deg); }
+.horizonGlow {
+  position: absolute;
+  left: -8%;
+  right: -8%;
+  bottom: 0;
+  height: 38%;
+  pointer-events: none;
+  background: radial-gradient(120% 80% at 50% 100%, rgba(240, 140, 70, 0.55) 0%, transparent 70%);
+  transition: opacity 1.6s ease, filter 1.6s ease;
+}
+.horizonGlow[data-phase="day"] { opacity: 0.55; filter: hue-rotate(-8deg); }
+.horizonGlow[data-phase="dusk"] { opacity: 0.85; filter: hue-rotate(-30deg) saturate(1.3); }
+.horizonGlow[data-phase="night"] { opacity: 0.2; filter: hue-rotate(40deg); }
+.horizonGlow[data-phase="dawn"] { opacity: 0.7; }
 
 .sun,
 .moon {
@@ -130,7 +177,7 @@
   background: radial-gradient(circle at 35% 35%, #fff6c8, #f0c45a 55%, #e09a40);
   box-shadow: 0 0 28px 8px rgba(255, 210, 120, 0.45);
   opacity: 1;
-  transition: opacity 1s, top 1.2s, transform 1.2s;
+  transition: opacity 1s, top 1.2s, transform 1.2s, filter 1.2s;
 }
 .moon {
   top: 11%;
@@ -139,10 +186,11 @@
   opacity: 0;
   transition: opacity 1s;
 }
-.sky[data-phase="dusk"] .sun { top: 22%; opacity: 0.85; filter: saturate(1.2); }
+.sky[data-phase="dusk"] .sun { top: 22%; opacity: 0.9; filter: saturate(1.4) hue-rotate(-18deg); }
 .sky[data-phase="night"] .sun { opacity: 0; }
 .sky[data-phase="night"] .moon { opacity: 1; }
-.sky[data-phase="dawn"] .sun { top: 20%; opacity: 0.9; }
+.sky[data-phase="dawn"] .sun { top: 20%; opacity: 0.95; filter: hue-rotate(12deg); }
+.sky[data-phase="day"] .sun { top: 8%; filter: saturate(1.15); }
 
 .stars {
   position: absolute;
@@ -175,11 +223,11 @@
   height: 16%;
   z-index: 1;
   pointer-events: none;
-  background: radial-gradient(90% 120% at 8% 120%, #c4a882 46%, transparent 47%),
-    radial-gradient(80% 110% at 28% 130%, #d2b894 44%, transparent 45%),
-    radial-gradient(100% 130% at 52% 125%, #c8ae86 48%, transparent 49%),
-    radial-gradient(85% 115% at 78% 128%, #c0a078 46%, transparent 47%),
-    radial-gradient(70% 100% at 96% 120%, #b89670 42%, transparent 43%);
+  background: radial-gradient(90% 120% at 8% 120%, #c48654 46%, transparent 47%),
+    radial-gradient(80% 110% at 28% 130%, #d49a60 44%, transparent 45%),
+    radial-gradient(100% 130% at 52% 125%, #c47a48 48%, transparent 49%),
+    radial-gradient(85% 115% at 78% 128%, #b0683c 46%, transparent 47%),
+    radial-gradient(70% 100% at 96% 120%, #a05c34 42%, transparent 43%);
   opacity: 0.92;
   transition: filter 1.2s;
 }
@@ -199,13 +247,14 @@
   top: 58%;
   bottom: 0;
   z-index: 0;
-  background: radial-gradient(14px 8px at 18% 22%, rgba(141, 115, 84, 0.35) 40%, transparent 42%),
-    radial-gradient(22px 12px at 72% 18%, rgba(141, 115, 84, 0.28) 40%, transparent 42%),
-    radial-gradient(18px 10px at 40% 48%, rgba(111, 88, 64, 0.28) 42%, transparent 44%),
-    radial-gradient(26px 14px at 86% 62%, rgba(141, 115, 84, 0.3) 40%, transparent 42%),
-    radial-gradient(16px 9px at 12% 74%, rgba(111, 88, 64, 0.25) 40%, transparent 42%),
-    radial-gradient(20px 11px at 54% 82%, rgba(141, 115, 84, 0.22) 40%, transparent 42%),
-    linear-gradient(180deg, #d8c4a0 0%, #cbb896 28%, #b79d78 72%, #a58a66 100%);
+  background: radial-gradient(18px 10px at 16% 20%, rgba(90, 48, 24, 0.4) 40%, transparent 42%),
+    radial-gradient(28px 14px at 70% 16%, rgba(120, 64, 32, 0.32) 40%, transparent 42%),
+    radial-gradient(22px 12px at 38% 46%, rgba(70, 36, 18, 0.3) 42%, transparent 44%),
+    radial-gradient(30px 16px at 88% 60%, rgba(110, 58, 28, 0.34) 40%, transparent 42%),
+    radial-gradient(16px 9px at 10% 74%, rgba(70, 36, 18, 0.28) 40%, transparent 42%),
+    radial-gradient(24px 12px at 52% 82%, rgba(120, 64, 32, 0.24) 40%, transparent 42%),
+    repeating-linear-gradient(115deg, rgba(90, 48, 24, 0.08) 0 2px, transparent 2px 11px),
+    linear-gradient(180deg, #d4a070 0%, #c48654 28%, #a8683c 72%, #8a4e2c 100%);
 }
 .plain::before {
   content: "";
@@ -214,19 +263,20 @@
   right: 0;
   top: 0;
   height: 18px;
-  background: linear-gradient(180deg, rgba(200, 174, 134, 0.55), transparent);
+  background: linear-gradient(180deg, rgba(200, 120, 70, 0.45), transparent);
   pointer-events: none;
 }
 .plainRocks {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background: radial-gradient(5px 3px at 24% 36%, #8d7354 50%, transparent 51%),
-    radial-gradient(7px 4px at 63% 28%, #a58a66 50%, transparent 51%),
-    radial-gradient(4px 3px at 8% 58%, #6f5840 50%, transparent 51%),
-    radial-gradient(6px 3px at 91% 44%, #8d7354 50%, transparent 51%),
-    radial-gradient(8px 4px at 47% 70%, #a58a66 50%, transparent 51%);
-  opacity: 0.7;
+  background: radial-gradient(6px 3px at 24% 36%, #6a3c24 50%, transparent 51%),
+    radial-gradient(8px 4px at 63% 28%, #8a5534 50%, transparent 51%),
+    radial-gradient(5px 3px at 8% 58%, #4a2818 50%, transparent 51%),
+    radial-gradient(7px 3px at 91% 44%, #6a3c24 50%, transparent 51%),
+    radial-gradient(9px 4px at 47% 70%, #8a5534 50%, transparent 51%),
+    radial-gradient(12px 5px at 33% 18%, rgba(74, 40, 24, 0.55) 50%, transparent 51%);
+  opacity: 0.78;
 }
 .yard {
   position: absolute;
@@ -268,7 +318,20 @@
 }
 .thing:focus-visible { outline: 2px solid #4f8f5a; outline-offset: 4px; border-radius: 8px; }
 .thing svg { display: block; width: 100%; height: auto; pointer-events: none; filter: drop-shadow(1px 3px 0 rgba(80, 60, 40, 0.18)); }
-.thing.isLocked { cursor: not-allowed; opacity: 0.55; filter: grayscale(0.4); }
+.thing.isLocked { cursor: pointer; opacity: 0.55; filter: grayscale(0.4); }
+.thing.isPlot { cursor: pointer; opacity: 0.85; filter: none; }
+.thing.isPlot::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 10%;
+  width: 72%;
+  height: 18%;
+  transform: translateX(-50%);
+  border: 1.5px dashed rgba(90, 48, 24, 0.45);
+  border-radius: 50%;
+  pointer-events: none;
+}
 .thing[data-tier="1"] .growthT2,
 .thing[data-tier="1"] .growthT3,
 .thing[data-tier="0"] .growthT2,

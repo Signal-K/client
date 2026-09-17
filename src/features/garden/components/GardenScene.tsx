@@ -97,6 +97,13 @@ export function GardenScene({ state, onOpen, layout, phase, children }: GardenSc
   return (
     <div className={styles.stage} data-phase={phase} data-layout={layout}>
       <div className={styles.sky} data-phase={phase}>
+        <div className={cx(styles.skyWash, styles.skyDawn, phase === "dawn" && styles.isOn)} />
+        <div className={cx(styles.skyWash, styles.skyDay, phase === "day" && styles.isOn)} />
+        <div className={cx(styles.skyWash, styles.skyDusk, phase === "dusk" && styles.isOn)} />
+        <div className={cx(styles.skyWash, styles.skyNight, phase === "night" && styles.isOn)} />
+        <div className={styles.skyGrain} aria-hidden="true" />
+        <div className={styles.skyClouds} data-phase={phase} aria-hidden="true" />
+        <div className={styles.horizonGlow} data-phase={phase} aria-hidden="true" />
         <div className={styles.stars} />
         <div className={styles.sun} aria-hidden="true" />
         <div className={styles.moon} aria-hidden="true" />
@@ -374,19 +381,31 @@ function GardenThing({
   const flight = state.flights[id];
   const away = flight?.status === "away";
   const ready = !!rec?.ready && !rec?.locked && !away;
+  const plot = !!rec?.locked && !!rec?.buildable;
+  const visibleLabel = rec?.locked
+    ? plot
+      ? `${label} · plot`
+      : `${label} · later`
+    : label;
 
   return (
     <button
-      className={cx(styles.thing, rec?.locked && styles.isLocked, away && styles.isAway, ready && styles.isReady)}
+      className={cx(
+        styles.thing,
+        rec?.locked && styles.isLocked,
+        plot && styles.isPlot,
+        away && styles.isAway,
+        ready && styles.isReady
+      )}
       data-id={id}
       data-slug={slug}
       data-tier={String(rec?.tier ?? 0)}
       type="button"
-      aria-label={label}
+      aria-label={visibleLabel}
       onClick={() => onOpen(id)}
     >
       {children}
-      <span className={styles.label}>{label}</span>
+      <span className={styles.label}>{visibleLabel}</span>
     </button>
   );
 }

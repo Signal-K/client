@@ -9,49 +9,42 @@ import { useAuthUser } from "@/src/hooks/useAuthUser";
 import { IntroSequence } from "@/src/components/onboarding/IntroSequence";
 import { IntroStep, ProjectSelectionStep, StructureIntroStep } from "@/src/components/onboarding/OnboardingSteps";
 import { SETUP_MAP } from "@/src/components/onboarding/onboarding-data";
+import type { HubOnboardingStep } from "@/src/features/onboarding/hubState";
 
-type Step = "intro" | "project-selection" | "structure-intro";
-
-const SS_ONBOARDING_STEP = "ss_onboarding_step";
-const SS_ONBOARDING_PROJECT = "ss_onboarding_project";
-
-function safeGet(key: string): string | null {
-  try { return localStorage.getItem(key); } catch { return null; }
-}
-function safeSet(key: string, value: string) {
-  try { localStorage.setItem(key, value); } catch { /* ignore */ }
-}
-function safeClear(...keys: string[]) {
-  try { keys.forEach((k) => localStorage.removeItem(k)); } catch { /* ignore */ }
-}
+type Step = HubOnboardingStep;
 
 export default function OnboardingPage() {
   const router = useRouter();
   const posthog = usePostHog();
   const { user, isLoading: authLoading } = useAuthUser();
-  const { preferences, isLoading: prefsLoading, setProjectInterests, completeOnboarding, hasTutorialCompleted, markTutorialComplete } = useUserPreferences();
+  const {
+    preferences,
+    isLoading: prefsLoading,
+    setProjectInterests,
+    completeOnboarding,
+    setOnboardingProgress,
+    hasTutorialCompleted,
+    markTutorialComplete,
+  } = useUserPreferences(user?.id);
 
   const [showIntro, setShowIntro] = useState(false);
   const [step, setStep] = useState<Step>("intro");
   const [selectedProject, setSelectedProject] = useState<ProjectType | null>(null);
   const [isPoweringUp, setIsPoweringUp] = useState(false);
 
-  // Redirect unauthenticated users and check for existing profile in background
   useEffect(() => {
     if (authLoading) return;
-    
+
     if (!user) {
       router.push("/auth");
       return;
     }
 
-    // Check if user already has a profile to skip onboarding (silent background check)
     async function checkExistingProfile() {
       try {
         const res = await fetch("/api/gameplay/profile/me");
         if (res.ok) {
           const profile = await res.json();
-          // If profile has a username, it's a returning user
           if (profile && profile.username) {
             completeOnboarding();
             router.replace("/game");
@@ -62,24 +55,21 @@ export default function OnboardingPage() {
       }
     }
 
-    // Only check if we haven't already marked onboarding as complete locally
     if (!preferences.hasCompletedOnboarding) {
       checkExistingProfile();
     }
   }, [user, authLoading, router, completeOnboarding, preferences.hasCompletedOnboarding]);
 
-  // Skip onboarding for returning users (based on local preferences)
   useEffect(() => {
     if (!prefsLoading && preferences.hasCompletedOnboarding) {
       router.replace("/game");
     }
   }, [prefsLoading, preferences.hasCompletedOnboarding, router]);
 
-  // Restore in-progress step from localStorage on mount
   useEffect(() => {
     if (prefsLoading || preferences.hasCompletedOnboarding) return;
-    const savedStep = safeGet(SS_ONBOARDING_STEP) as Step | null;
-    const savedProject = safeGet(SS_ONBOARDING_PROJECT) as ProjectType | null;
+    const savedStep = preferences.inProgressStep;
+    const savedProject = preferences.inProgressProject;
     if (savedStep && savedStep !== "intro") {
       if (savedStep === "structure-intro" && !savedProject) {
         setStep("project-selection");
@@ -87,21 +77,18 @@ export default function OnboardingPage() {
         setStep(savedStep);
         if (savedProject) setSelectedProject(savedProject);
       }
-      return; // skip intro sequence when resuming
+      return;
     }
     if (!hasTutorialCompleted("init-seen")) {
       setShowIntro(true);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [prefsLoading]);
+  }, [hasTutorialCompleted, preferences.hasCompletedOnboarding, preferences.inProgressProject, preferences.inProgressStep, prefsLoading]);
 
-  // Fire onboarding_started once on mount (for new users)
   useEffect(() => {
     if (!authLoading && user && !prefsLoading && !preferences.hasCompletedOnboarding) {
       posthog?.capture("onboarding_started", { userId: user.id });
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [authLoading, prefsLoading]);
+  }, [authLoading, posthog, prefsLoading, preferences.hasCompletedOnboarding, user]);
 
   if (authLoading || prefsLoading || !user) {
     return (
@@ -115,14 +102,13 @@ export default function OnboardingPage() {
     setIsPoweringUp(true);
     setTimeout(() => {
       setStep("project-selection");
-      safeSet(SS_ONBOARDING_STEP, "project-selection");
+      setOnboardingProgress({ step: "project-selection" });
       setIsPoweringUp(false);
     }, 2000);
   };
 
   const handleFinalise = () => {
     if (!selectedProject) return;
-    safeClear(SS_ONBOARDING_STEP, SS_ONBOARDING_PROJECT);
     setProjectInterests([selectedProject]);
     completeOnboarding();
     posthog?.capture("onboarding_completed", { userId: user.id, project: selectedProject });
@@ -141,13 +127,13 @@ export default function OnboardingPage() {
       )}
       <div className="pointer-events-none absolute inset-0 star-field opacity-30" />
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-transparent via-background/50 to-background" />
-      
+
       <main className="relative z-10 mx-auto flex h-[100dvh] max-w-lg flex-col px-6 py-8">
-        
+
         {step === "intro" && (
-          <IntroStep 
-            isPoweringUp={isPoweringUp} 
-            onPowerUp={startPowerUp} 
+          <IntroStep
+            isPoweringUp={isPoweringUp}
+            onPowerUp={startPowerUp}
           />
         )}
 
@@ -156,23 +142,22 @@ export default function OnboardingPage() {
             selectedProject={selectedProject}
             onSelectProject={(p) => {
               setSelectedProject(p);
-              safeSet(SS_ONBOARDING_PROJECT, p);
+              setOnboardingProgress({ step: "project-selection", project: p });
             }}
             onContinue={() => {
               setStep("structure-intro");
-              safeSet(SS_ONBOARDING_STEP, "structure-intro");
+              setOnboardingProgress({ step: "structure-intro", project: selectedProject });
             }}
           />
         )}
 
         {step === "structure-intro" && selectedProject && (
-          <StructureIntroStep 
+          <StructureIntroStep
             selectedProject={selectedProject}
             onFinalise={handleFinalise}
           />
         )}
 
-        {/* HUD footer */}
         <footer className="mt-8 flex items-center justify-between border-t border-border/40 pt-6">
           <div className="flex items-center gap-4">
             <div className="h-2 w-2 rounded-full bg-primary animate-pulse" />
