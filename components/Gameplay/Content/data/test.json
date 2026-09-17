@@ -1,0 +1,299 @@
+[
+  {
+    "type": "Feature",
+    "geometry": { "type": "Point", "coordinates": [47.614235, 14.680767] },
+    "properties": {
+      "cartodb_id": 1314,
+      "zm": 1,
+      "canon": 1,
+      "uid": 1314,
+      "": "Inner Rim",
+      "sector": null,
+      "grid": "O8",
+      "link": "http://starwars.wikia.com/wiki/Taanab",
+      "name_web": "Taanab",
+      "name_alt": null,
+      "name": "Taanab",
+      "point_y": 1652.43693312,
+      "point_x": 5300.39237358,
+      "y": 1652.44,
+      "x": 5300.39
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": { "type": "Point", "coordinates": [47.248021, 7.17353] },
+    "properties": {
+      "cartodb_id": 1315,
+      "zm": 0,
+      "canon": 0,
+      "uid": 1315,
+      "region": "Inner Rim",
+      "sector": "Hapes Cluster",
+      "grid": "O9",
+      "link": "http://starwars.wikia.com/wiki/Hapes",
+      "name_web": "Hapes",
+      "name_alt": null,
+      "name": "Hapes",
+      "point_y": 800.648232554,
+      "point_x": 5259.62563026,
+      "y": 800.65,
+      "x": 5259.63
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": { "type": "Point", "coordinates": [49.93943, 2.344662] },
+    "properties": {
+      "cartodb_id": 1316,
+      "zm": 0,
+      "canon": 1,
+      "uid": 1316,
+      "region": "Inner Rim",
+      "sector": "Japrael",
+      "grid": "O9",
+      "link": "http://starwars.wikia.com/wiki/Onderon",
+      "name_web": "Onderon",
+      "name_alt": null,
+      "name": "Onderon / Dxun",
+      "point_y": 261.079470419,
+      "point_x": 5559.2319352,
+      "y": 261.08,
+      "x": 5559.23
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": { "type": "Point", "coordinates": [-12.767957, -74.878873] },
+    "properties": {
+      "cartodb_id": 385,
+      "zm": 0,
+      "canon": 1,
+      "uid": 384,
+      "region": "Outer Rim",
+      "sector": "Anoat",
+      "grid": "K18",
+      "link": "http://starwars.wikia.com/wiki/Hoth",
+      "name_web": "Hoth",
+      "name_alt": null,
+      "name": "Hoth",
+      "point_y": -12880.3501824,
+      "point_x": -1421.32249164,
+      "y": -12880.35,
+      "x": -1421.32
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": { "type": "Point", "coordinates": [95.73639, -57.973099] },
+    "properties": {
+      "cartodb_id": 2045,
+      "zm": 0,
+      "canon": 1,
+      "uid": 2045,
+      "region": "Outer Rim",
+      "sector": null,
+      "grid": "S15",
+      "link": "http://starwars.wikia.com/wiki/Kamino",
+      "name_web": null,
+      "name_alt": null,
+      "name": "Kamino",
+      "point_y": -7961.66851518,
+      "point_x": 10657.3261869,
+      "y": -7961.67,
+      "x": 10657.33
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": { "type": "Point", "coordinates": [-12.845516, -74.565245] },
+    "properties": {
+      "cartodb_id": 384,
+      "zm": 0,
+      "canon": 1,
+      "uid": 383,
+      "region": "Outer Rim",
+      "sector": "Anoat",
+      "grid": "K18",
+      "link": "http://starwars.wikia.com/wiki/Bespin",
+      "name_web": "Bespin",
+      "name_alt": "Lando",
+      "name": "Bespin",
+      "point_y": -12747.8495758,
+      "point_x": -1429.95624641,
+      "y": -12747.85,
+      "x": -1429.96
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": { "type": "Point", "coordinates": [63.670403, 1.504178] },
+    "properties": {
+      "cartodb_id": 1903,
+      "zm": 0,
+      "canon": 1,
+      "uid": 1903,
+      "region": "Mid Rim",
+      "sector": "Mytaranor",
+      "grid": "P9",
+      "link": "http://starwars.wikia.com/wiki/Kashyyyk",
+      "name_web": "Kashyyyk",
+      "name_alt": null,
+      "name": "Kashyyyk",
+      "point_y": 167.463620772,
+      "point_x": 7087.75685791,
+      "y": 167.46,
+      "x": 7087.76
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": { "type": "Point", "coordinates": [83.841514, -50.36639] },
+    "properties": {
+      "cartodb_id": 1818,
+      "zm": 0,
+      "canon": 1,
+      "uid": 1818,
+      "region": "Mid Rim",
+      "sector": "Bothan Space",
+      "grid": "R14",
+      "link": "http://starwars.wikia.com/wiki/Bothawui",
+      "name_web": "Bothawui",
+      "name_alt": null,
+      "name": "Bothawui",
+      "point_y": -6509.97159392,
+      "point_x": 9333.19466406,
+      "y": -6509.97,
+      "x": 9333.19
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": { "type": "Point", "coordinates": [20.953649, -73.811051] },
+    "properties": {
+      "cartodb_id": 430,
+      "zm": 1,
+      "canon": 1,
+      "uid": 429,
+      "region": "Outer Rim",
+      "sector": "Seswenna",
+      "grid": "M18",
+      "link": "http://starwars.wikia.com/wiki/Eriadu",
+      "name_web": "Eriadu",
+      "name_alt": null,
+      "name": "Eriadu",
+      "point_y": -12439.671287,
+      "point_x": 2332.54955797,
+      "y": -12439.67,
+      "x": 2332.55
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": { "type": "Point", "coordinates": [2.406112, -78.727129] },
+    "properties": {
+      "cartodb_id": 358,
+      "zm": 0,
+      "canon": 1,
+      "uid": 357,
+      "region": "Outer Rim",
+      "sector": "Atravis",
+      "grid": "L19",
+      "link": "http://starwars.wikia.com/wiki/Mustafar",
+      "name_web": "Mustafar",
+      "name_alt": null,
+      "name": "Mustafar",
+      "point_y": -14770.1194952,
+      "point_x": 267.847196773,
+      "y": -14770.12,
+      "x": 267.85
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": { "type": "Point", "coordinates": [36.172521, -8.052519] },
+    "properties": {
+      "cartodb_id": 138,
+      "zm": 0,
+      "canon": 1,
+      "uid": 137,
+      "region": "Core",
+      "sector": null,
+      "grid": "M10",
+      "link": "http://starwars.wikia.com/wiki/Kuat",
+      "name_web": "Kuat",
+      "name_alt": null,
+      "name": "Kuat",
+      "point_y": -899.368011846,
+      "point_x": 2802.19226186,
+      "y": -899.37,
+      "x": 2802.19,
+      "icon": "kuat.png"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": { "type": "Point", "coordinates": [-12.725116, -74.565245] },
+    "properties": {
+      "cartodb_id": 384,
+      "zm": 0,
+      "canon": 1,
+      "uid": 3830,
+      "region": "Outer Rim",
+      "sector": "Anoat",
+      "grid": "K18",
+      "link": "http://starwars.wikia.com/wiki/Cloud City",
+      "name_web": "Cloud City",
+      "name_alt": "Lando",
+      "name": "Cloud City",
+      "point_y": -12747.8495758,
+      "point_x": -1429.95624641,
+      "y": -12747.85,
+      "x": -1429.96,
+      "icon": "cloud-city.png"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": { "type": "Point", "coordinates": [-12.031529, 65.344688] },
+    "properties": {
+      "cartodb_id": 682,
+      "zm": 1,
+      "canon": 0,
+      "uid": 682,
+      "region": "Outer Rim",
+      "sector": "Braxant",
+      "grid": "K3",
+      "link": "http://starwars.wikia.com/wiki/Bastion",
+      "name_web": "Bastion",
+      "name_alt": null,
+      "name": "Bastion",
+      "point_y": 9699.75524086,
+      "point_x": -1339.34364223,
+      "y": 9699.76,
+      "x": -1339.34,
+      "icon": "bastion.png"
+    }
+  },
+  {
+    "type": "Feature",
+    "geometry": { "type": "Point", "coordinates": [0, 0] },
+    "properties": {
+      "cartodb_id": 178,
+      "zm": 0,
+      "canon": 1,
+      "uid": 177,
+      "region": "Core",
+      "sector": null,
+      "grid": null,
+      "link": "http://starwars.wikia.com/wiki/Coruscant",
+      "name_web": "Coruscant",
+      "name_alt": null,
+      "name": "Coruscant",
+      "point_y": 0,
+      "point_x": 0,
+      "y": 0,
+      "x": 0
+    }
+  },{"type":"Feature","geometry":{"type":"Point","coordinates":[-10.51422,-62.443124]},"properties":{"cartodb_id":2068,"zm":1,"canon":1,"uid":2071,"region":"Expansion Region","sector":"Trans Jardeen","grid":"K15","link":"http://starwars.wikia.com/wiki/Ring_of_Kafrene","name_web":null,"name_alt":null,"name":"Ring of Kafrene","point_y":-8964.98761729,"point_x":-1170.43759979,"y":-8964.99,"x":-1170.44, "icon":"ringofkafrene.png"}}
+]

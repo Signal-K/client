@@ -1,0 +1,145 @@
+{
+  "_format": "hh-sol-cache-2",
+  "files": {
+    "/Users/buyer/Documents/Lens/client/contracts/interface/IPermissions.sol": {
+      "lastModificationDate": 1677241828801,
+      "contentHash": "d410a91edeaba88911527a2d22c333f1",
+      "sourceName": "contracts/interface/IPermissions.sol",
+      "solcConfig": {
+        "version": "0.8.11",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "IPermissions"
+      ]
+    },
+    "/Users/buyer/Documents/Lens/client/contracts/lib/TWStrings.sol": {
+      "lastModificationDate": 1677241828810,
+      "contentHash": "fd59482acf8ab3416ca64b158b1d2eda",
+      "sourceName": "contracts/lib/TWStrings.sol",
+      "solcConfig": {
+        "version": "0.8.11",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "TWStrings"
+      ]
+    },
+    "/Users/buyer/Documents/Lens/client/contracts/planetProposal.sol": {
+      "lastModificationDate": 1680517829447,
+      "contentHash": "e2afa66796f5a549f716ce4948b85907",
+      "sourceName": "contracts/planetProposal.sol",
+      "solcConfig": {
+        "version": "0.8.11",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "PlanetProposal"
+      ]
+    },
+    "/Users/buyer/Documents/Lens/client/contracts/proposal.sol": {
+      "lastModificationDate": 1679890106795,
+      "contentHash": "19440e5838649f0419127a2e817211f8",
+      "sourceName": "contracts/proposal.sol",
+      "solcConfig": {
+        "version": "0.8.11",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.11"
+      ],
+      "artifacts": [
+        "ClassificationProposal"
+      ]
+    }
+  }
+}

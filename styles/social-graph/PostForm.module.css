@@ -1,0 +1,60 @@
+.postFormWrapper {
+    display: flex;
+    gap: 0.25rem;
+}
+  
+.avatarWrapper {
+    overflow: hidden; 
+    width: 3.5rem; 
+    border-radius: 18px; 
+}
+
+.bigAvatarWrapper {
+    overflow: hidden; 
+    width: 7rem; 
+    border-radius: 18px; 
+}
+
+.textAreaWrapper {
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+    width: 100%;
+}
+
+.postAdditions {
+    display: flex;
+    padding-left: 0.25rem;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.postAdditionButton {
+    display: flex;
+    gap: 0.25rem;
+}
+
+.postAdditionButtonIcons {
+    display: flex;
+    margin-top: 0px;
+    color: #387282;
+    width: 1.5rem;
+    height: 1.5rem;
+}
+
+.submitButton {
+    padding-top: 0.15rem;
+    padding-bottom: 0.15rem; 
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;  
+    background-color: #387282;
+    border-radius: 0.375rem;
+    color: aliceblue;
+    align-items: flex-end;
+}
+
+.submitButtonWrapper {
+    text-align: right;
+    width: 40%;
+}

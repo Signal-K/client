@@ -1,0 +1,1219 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [0, 0] },
+      "properties": {
+        "name": "Bal'demnic",
+        "region": "",
+        "sector": "",
+        "cartodb_id": 24500,
+        "zm": 0,
+        "canon": 0,
+        "uid": 24500,
+        "grid": "R7",
+        "link": "https://starwars.fandom.com/wiki/Bal%27demnic",
+        "name_web": "Bal’demnic",
+        "point_y": 838.434772734,
+        "point_x": 5368.46030777,
+        "y": 838.43,
+        "x": 5368.46
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [0, 0] },
+      "properties": {
+        "name": "Bpfassh",
+        "region": "",
+        "sector": "",
+        "cartodb_id": 24501,
+        "zm": 0,
+        "canon": 0,
+        "uid": 24501,
+        "grid": "M19",
+        "link": "https://starwars.fandom.com/wiki/Bpfassh",
+        "name_web": "Bpfassh",
+        "point_y": 838.434772734,
+        "point_x": 5368.46030777,
+        "y": 838.43,
+        "x": 5368.46
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [0, 0] },
+      "properties": {
+        "name": "Bronsoon",
+        "region": "",
+        "sector": "",
+        "cartodb_id": 24502,
+        "zm": 0,
+        "canon": 0,
+        "uid": 24502,
+        "grid": "P6",
+        "link": "https://starwars.fandom.com/wiki/Bronsoon",
+        "namer_web": "Bronsoon",
+        "point_y": 838.434772734,
+        "point_x": 5368.46030777,
+        "y": 838.43,
+        "x": 5368.46
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [0, 0] },
+      "properties": {
+        "name": "Maridun",
+        "region": "",
+        "sector": "",
+        "cartodb_id": 245021,
+        "zm": 0,
+        "canon": 0,
+        "uid": 245021,
+        "grid": "Q6",
+        "link": "https://starwars.fandom.com/wiki/Maridun",
+        "name_web": "Maridun",
+        "point_y": 838.434772734,
+        "point_x": 5368.46030777,
+        "y": 838.43,
+        "x": 5368.46
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [62.853377, 56.522869] },
+      "properties": {
+        "name": "Calan",
+        "region": "Outer Rim",
+        "sector": "Nembus",
+        "cartodb_id": 24503,
+        "zm": 0,
+        "canon": 0,
+        "uid": 24503,
+        "grid": "P4",
+        "link": "https://theholo.net/wiki/index.php/Calan",
+        "name_web": "Calan",
+        "point_y": 8654.09045621,
+        "point_x": 6373.41681693,
+        "y": 8654.09,
+        "x": 6373.42
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [61.245099, 57.139128] },
+      "properties": {
+        "name": "Cana'daari",
+        "region": "Outer Rim",
+        "sector": "Nembus",
+        "cartodb_id": 24504,
+        "zm": 0,
+        "canon": 0,
+        "uid": 24504,
+        "grid": "P4",
+        "link": "",
+        "name_web": "",
+        "point_y": 7700.09045621,
+        "point_x": 6855.41681693,
+        "y": 7700.09,
+        "x": 6855.42
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [61.001099, 56.439128] },
+      "properties": {
+        "name": "Carshoulis",
+        "region": "Outer Rim",
+        "sector": "Nembus",
+        "cartodb_id": 24505,
+        "zm": 0,
+        "canon": 0,
+        "uid": 24505,
+        "grid": "P4",
+        "link": "",
+        "name_web": "",
+        "point_y": 7450.09045621,
+        "point_x": 6770.41681693,
+        "y": 7450.09,
+        "x": 6770.42
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [0, 0] },
+      "properties": {
+        "name": "Chad",
+        "region": "",
+        "sector": "",
+        "cartodb_id": 24506,
+        "zm": 0,
+        "canon": 0,
+        "uid": 24506,
+        "grid": "R7",
+        "link": "https://starwars.fandom.com/wiki/Chad/Legends",
+        "name_web": "Chad",
+        "point_y": 838.434772734,
+        "point_x": 5368.46030777,
+        "y": 838.43,
+        "x": 5368.46
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [0, 0] },
+      "properties": {
+        "name": "Chelloa",
+        "region": "",
+        "sector": "",
+        "cartodb_id": 24507,
+        "zm": 0,
+        "canon": 0,
+        "uid": 24507,
+        "grid": "M17",
+        "link": "https://starwars.fandom.com/wiki/Chelloa",
+        "name_web": "Chelloa",
+        "point_y": 838.434772734,
+        "point_x": 5368.46030777,
+        "y": 838.43,
+        "x": 5368.46
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [0, 0] },
+      "properties": {
+        "name": "Di'tai'ni",
+        "region": "",
+        "sector": "",
+        "cartodb_id": 24508,
+        "zm": 0,
+        "canon": 0,
+        "uid": 24508,
+        "grid": "R14",
+        "link": "https://starwars.fandom.com/wiki/Di%27tai%27ni",
+        "name_web": "Di’tai’ni",
+        "point_y": 838.434772734,
+        "point_x": 5368.46030777,
+        "y": 838.43,
+        "x": 5368.46
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [0, 0] },
+      "properties": {
+        "name": "Florin",
+        "region": "",
+        "sector": "",
+        "cartodb_id": 24509,
+        "zm": 0,
+        "canon": 0,
+        "uid": 24509,
+        "grid": "",
+        "link": "",
+        "name_web": "",
+        "point_y": 838.434772734,
+        "point_x": 5368.46030777,
+        "y": 838.43,
+        "x": 5368.46
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [0, 0] },
+      "properties": {
+        "name": "H'nemthe",
+        "region": "",
+        "sector": "",
+        "cartodb_id": 24510,
+        "zm": 0,
+        "canon": 0,
+        "uid": 24510,
+        "grid": "M18",
+        "link": "https://starwars.fandom.com/wiki/H%27nemthe",
+        "name_web": "H’menthe",
+        "point_y": 838.434772734,
+        "point_x": 5368.46030777,
+        "y": 838.43,
+        "x": 5368.46
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [0, 0] },
+      "properties": {
+        "name": "Jovan Station",
+        "region": "",
+        "sector": "",
+        "cartodb_id": 24511,
+        "zm": 0,
+        "canon": 0,
+        "uid": 24511,
+        "grid": "",
+        "link": "",
+        "name_web": "",
+        "point_y": 838.434772734,
+        "point_x": 5368.46030777,
+        "y": 838.43,
+        "x": 5368.46
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [0, 0] },
+      "properties": {
+        "name": "Keppa Brens",
+        "region": "",
+        "sector": "",
+        "cartodb_id": 24512,
+        "zm": 0,
+        "canon": 0,
+        "uid": 24512,
+        "grid": "",
+        "link": "",
+        "name_web": "Kreeling",
+        "point_y": 838.434772734,
+        "point_x": 5368.46030777,
+        "y": 838.43,
+        "x": 5368.46
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [0, 0] },
+      "properties": {
+        "name": "Kreeling",
+        "region": "",
+        "sector": "",
+        "cartodb_id": 24513,
+        "zm": 0,
+        "canon": 0,
+        "uid": 24513,
+        "grid": "O16",
+        "link": "https://starwars.fandom.com/wiki/Kreeling",
+        "name_web": "",
+        "point_y": 838.434772734,
+        "point_x": 5368.46030777,
+        "y": 838.43,
+        "x": 5368.46
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [0, 0] },
+      "properties": {
+        "name": "Minntooine",
+        "region": "",
+        "sector": "",
+        "cartodb_id": 24514,
+        "zm": 0,
+        "canon": 0,
+        "uid": 24514,
+        "grid": "T6",
+        "link": "https://starwars.fandom.com/wiki/Minntooine/Legends",
+        "name_web": "Minntooine",
+        "point_y": 838.434772734,
+        "point_x": 5368.46030777,
+        "y": 838.43,
+        "x": 5368.46
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [0, 0] },
+      "properties": {
+        "name": "Moonus Mandel",
+        "region": "",
+        "sector": "",
+        "cartodb_id": 24515,
+        "zm": 0,
+        "canon": 0,
+        "uid": 24515,
+        "grid": "R14",
+        "link": "https://starwars.fandom.com/wiki/Moonus_Mandel",
+        "name_web": "Moonus Mandel",
+        "point_y": 838.434772734,
+        "point_x": 5368.46030777,
+        "y": 838.43,
+        "x": 5368.46
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [0, 0] },
+      "properties": {
+        "name": "Oetrego",
+        "region": "",
+        "sector": "",
+        "cartodb_id": 24516,
+        "zm": 0,
+        "canon": 0,
+        "uid": 24516,
+        "grid": "",
+        "link": "",
+        "name_web": "",
+        "point_y": 838.434772734,
+        "point_x": 5368.46030777,
+        "y": 838.43,
+        "x": 5368.46
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [0, 0] },
+      "properties": {
+        "name": "Ord Ibanna",
+        "region": "",
+        "sector": "",
+        "cartodb_id": 24517,
+        "zm": 0,
+        "canon": 0,
+        "uid": 24517,
+        "grid": "M17",
+        "link": "https://starwars.fandom.com/wiki/Ord_Ibanna",
+        "name_web": "Ord Ibanna",
+        "point_y": 838.434772734,
+        "point_x": 5368.46030777,
+        "y": 838.43,
+        "x": 5368.46
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [0, 0] },
+      "properties": {
+        "name": "Orto",
+        "region": "",
+        "sector": "",
+        "cartodb_id": 24518,
+        "zm": 0,
+        "canon": 0,
+        "uid": 24518,
+        "grid": "M19",
+        "link": "https://starwars.fandom.com/wiki/Orto/Legends",
+        "name_web": "Orto",
+        "point_y": 838.434772734,
+        "point_x": 5368.46030777,
+        "y": 838.43,
+        "x": 5368.46
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [0, 0] },
+      "properties": {
+        "name": "Parwa",
+        "region": "",
+        "sector": "",
+        "cartodb_id": 24519,
+        "zm": 0,
+        "canon": 0,
+        "uid": 24519,
+        "grid": "",
+        "link": "",
+        "name_web": "",
+        "point_y": 838.434772734,
+        "point_x": 5368.46030777,
+        "y": 838.43,
+        "x": 5368.46
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [0, 0] },
+      "properties": {
+        "name": "Rior",
+        "region": "",
+        "sector": "",
+        "cartodb_id": 24520,
+        "zm": 0,
+        "canon": 0,
+        "uid": 24520,
+        "grid": "",
+        "link": "",
+        "name_web": "",
+        "point_y": 838.434772734,
+        "point_x": 5368.46030777,
+        "y": 838.43,
+        "x": 5368.46
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [0, 0] },
+      "properties": {
+        "name": "Secundus Ando",
+        "region": "",
+        "sector": "",
+        "cartodb_id": 24521,
+        "zm": 0,
+        "canon": 0,
+        "uid": 24521,
+        "grid": "Q15",
+        "link": "https://starwars.fandom.com/wiki/Secundus_Ando/Legends",
+        "name_web": "Secundus Ando",
+        "point_y": 838.434772734,
+        "point_x": 5368.46030777,
+        "y": 838.43,
+        "x": 5368.46
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [0, 0] },
+      "properties": {
+        "name": "Raxus Secundus",
+        "region": "",
+        "sector": "",
+        "cartodb_id": 24522,
+        "zm": 0,
+        "canon": 0,
+        "uid": 24522,
+        "grid": "S5",
+        "link": "https://starwars.fandom.com/wiki/Raxus_Secundus",
+        "name_web": "Raxus Secundus",
+        "point_y": 838.434772734,
+        "point_x": 5368.46030777,
+        "y": 838.43,
+        "x": 5368.46
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [0, 0] },
+      "properties": {
+        "name": "Shalyvane",
+        "region": "",
+        "sector": "",
+        "cartodb_id": 24523,
+        "zm": 0,
+        "canon": 0,
+        "uid": 24523,
+        "grid": "S5",
+        "link": "https://starwars.fandom.com/wiki/Shalyvane",
+        "name_web": "Shalyvane",
+        "point_y": 838.434772734,
+        "point_x": 5368.46030777,
+        "y": 838.43,
+        "x": 5368.46
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [0, 0] },
+      "properties": {
+        "name": "Skeebo",
+        "region": "",
+        "sector": "",
+        "cartodb_id": 24524,
+        "zm": 0,
+        "canon": 0,
+        "uid": 24524,
+        "grid": "U8",
+        "link": "https://starwars.fandom.com/wiki/Skeebo",
+        "name_web": "Skeebo",
+        "point_y": 838.434772734,
+        "point_x": 5368.46030777,
+        "y": 838.43,
+        "x": 5368.46
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [0, 0] },
+      "properties": {
+        "name": "Syngra",
+        "region": "",
+        "sector": "",
+        "cartodb_id": 24525,
+        "zm": 0,
+        "canon": 0,
+        "uid": 24525,
+        "grid": "",
+        "link": "",
+        "name_web": "",
+        "point_y": 838.434772734,
+        "point_x": 5368.46030777,
+        "y": 838.43,
+        "x": 5368.46
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [0, 0] },
+      "properties": {
+        "name": "Ton Falk",
+        "region": "",
+        "sector": "",
+        "cartodb_id": 24526,
+        "zm": 0,
+        "canon": 0,
+        "uid": 24526,
+        "grid": "T5",
+        "link": "https://starwars.fandom.com/wiki/Ton-Falk",
+        "name_web": "Ton Falk",
+        "point_y": 838.434772734,
+        "point_x": 5368.46030777,
+        "y": 838.43,
+        "x": 5368.46
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [0, 0] },
+      "properties": {
+        "name": "Tramanos",
+        "region": "",
+        "sector": "",
+        "cartodb_id": 24527,
+        "zm": 0,
+        "canon": 0,
+        "uid": 24527,
+        "grid": "N17",
+        "link": "https://starwars.fandom.com/wiki/Tramanos",
+        "name_web": "Tramanos",
+        "point_y": 838.434772734,
+        "point_x": 5368.46030777,
+        "y": 838.43,
+        "x": 5368.46
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [0, 0] },
+      "properties": {
+        "name": "Trandosha",
+        "region": "",
+        "sector": "",
+        "cartodb_id": 24528,
+        "zm": 0,
+        "canon": 0,
+        "uid": 24528,
+        "Grid": "P9",
+        "link": "https://starwars.fandom.com/wiki/Trandosha",
+        "web_name": "Trandosha",
+        "point_y": 838.434772734,
+        "point_x": 5368.46030777,
+        "y": 838.43,
+        "x": 5368.46
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [0, 0] },
+      "properties": {
+        "name": "Umgul",
+        "region": "",
+        "sector": "",
+        "cartodb_id": 24529,
+        "zm": 0,
+        "canon": 0,
+        "uid": 24529,
+        "grid": "N16",
+        "link": "https://starwars.fandom.com/wiki/Umgul/Legends",
+        "name_web": "Umgul",
+        "point_y": 838.434772734,
+        "point_x": 5368.46030777,
+        "y": 838.43,
+        "x": 5368.46
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [0, 0] },
+      "properties": {
+        "name": "Vandelhelm",
+        "region": "",
+        "sector": "",
+        "cartodb_id": 24530,
+        "zm": 0,
+        "canon": 0,
+        "uid": 24530,
+        "grid": "M15",
+        "link": "https://starwars.fandom.com/wiki/Vandelhelm",
+        "name_web": "Vandelhelm",
+        "point_y": 838.434772734,
+        "point_x": 5368.46030777,
+        "y": 838.43,
+        "x": 5368.46
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [0, 0] },
+      "properties": {
+        "name": "Yablari",
+        "region": "",
+        "sector": "",
+        "cartodb_id": 24531,
+        "zm": 0,
+        "canon": 0,
+        "uid": 24531,
+        "grid": "R6",
+        "link": "https://starwars.fandom.com/wiki/Yablari/Legends",
+        "name_web": "Yablari",
+        "point_y": 838.434772734,
+        "point_x": 5368.46030777,
+        "y": 838.43,
+        "x": 5368.46
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [0, 0] },
+      "properties": {
+        "name": "Yablon/Worxer",
+        "region": "",
+        "sector": "",
+        "cartodb_id": 24532,
+        "zm": 0,
+        "canon": 0,
+        "uid": 24532,
+        "grid": "M20",
+        "link": "https://starwars.fandom.com/wiki/Worxer",
+        "name_web": "Yablon/Worxer",
+        "point_y": 838.434772734,
+        "point_x": 5368.46030777,
+        "y": 838.43,
+        "x": 5368.46
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [0, 0] },
+      "properties": {
+        "name": "ZeHeth",
+        "region": "",
+        "sector": "",
+        "cartodb_id": 24533,
+        "zm": 0,
+        "canon": 0,
+        "uid": 24533,
+        "grid": "N16",
+        "link": "https://starwars.fandom.com/wiki/ZeHeth",
+        "name_web": "ZeHeth",
+        "point_y": 838.434772734,
+        "point_x": 5368.46030777,
+        "y": 838.43,
+        "x": 5368.46
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [0, 0] },
+      "properties": {
+        "name": "Titan",
+        "region": "",
+        "sector": "",
+        "cartodb_id": 24534,
+        "zm": 0,
+        "canon": 0,
+        "uid": 24534,
+        "grid": "",
+        "link": "",
+        "name_web": "",
+        "point_y": 838.434772734,
+        "point_x": 5368.46030777,
+        "y": 838.43,
+        "x": 5368.46
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [0, 0] },
+      "properties": {
+        "name": "Akrit’tar",
+        "region": "",
+        "sector": "",
+        "cartodb_id": 24535,
+        "zm": 0,
+        "canon": 0,
+        "uid": 24535,
+        "grid": "T9",
+        "link": "https://starwars.fandom.com/wiki/Akrit%27tar",
+        "name_web": "Akrit’tar",
+        "point_y": 838.434772734,
+        "point_x": 5368.46030777,
+        "y": 838.43,
+        "x": 5368.46
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [0, 0] },
+      "properties": {
+        "name": "Amar",
+        "region": "",
+        "sector": "",
+        "cartodb_id": 24536,
+        "zm": 0,
+        "canon": 0,
+        "uid": 24536,
+        "grid": "O10",
+        "link": "https://starwars.fandom.com/wiki/Amar",
+        "name_web": "Amar",
+        "point_y": 838.434772734,
+        "point_x": 5368.46030777,
+        "y": 838.43,
+        "x": 5368.46
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [0, 0] },
+      "properties": {
+        "name": "Ambria",
+        "region": "",
+        "sector": "",
+        "cartodb_id": 24537,
+        "zm": 0,
+        "canon": 0,
+        "uid": 24537,
+        "grid": "O10",
+        "link": "https://starwars.fandom.com/wiki/Ambria",
+        "name_web": "Ambria",
+        "point_y": 838.434772734,
+        "point_x": 5368.46030777,
+        "y": 838.43,
+        "x": 5368.46
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [0, 0] },
+      "properties": {
+        "name": "Astation",
+        "region": "",
+        "sector": "",
+        "cartodb_id": 24538,
+        "zm": 0,
+        "canon": 0,
+        "uid": 24538,
+        "grid": "",
+        "link": "",
+        "name_web": "",
+        "point_y": 838.434772734,
+        "point_x": 5368.46030777,
+        "y": 838.43,
+        "x": 5368.46
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [0, 0] },
+      "properties": {
+        "name": "Bonadan",
+        "region": "",
+        "sector": "",
+        "cartodb_id": 24539,
+        "zm": 0,
+        "canon": 0,
+        "uid": 24539,
+        "grid": "Q4",
+        "link": "https://starwars.fandom.com/wiki/Bonadan",
+        "name_web": "Bonadan",
+        "point_y": 838.434772734,
+        "point_x": 5368.46030777,
+        "y": 838.43,
+        "x": 5368.46
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [0, 0] },
+      "properties": {
+        "name": "Felacat",
+        "region": "",
+        "sector": "",
+        "cartodb_id": 24540,
+        "zm": 0,
+        "canon": 0,
+        "uid": 24540,
+        "grid": "R15",
+        "link": "https://starwars.fandom.com/wiki/Felacat",
+        "name_web": "Felacat",
+        "point_y": 838.434772734,
+        "point_x": 5368.46030777,
+        "y": 838.43,
+        "x": 5368.46
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [0, 0] },
+      "properties": {
+        "name": "Huc",
+        "region": "",
+        "sector": "",
+        "cartodb_id": 24541,
+        "zm": 0,
+        "canon": 0,
+        "uid": 24541,
+        "grid": "",
+        "link": "",
+        "name_web": "",
+        "point_y": 838.434772734,
+        "point_x": 5368.46030777,
+        "y": 838.43,
+        "x": 5368.46
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [0, 0] },
+      "properties": {
+        "name": "Voss",
+        "region": "",
+        "sector": "",
+        "cartodb_id": 24542,
+        "zm": 0,
+        "canon": 0,
+        "uid": 24542,
+        "grid": "S6",
+        "link": "https://starwars.fandom.com/wiki/Voss",
+        "name_web": "Voss",
+        "point_y": 838.434772734,
+        "point_x": 5368.46030777,
+        "y": 838.43,
+        "x": 5368.46
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [0, 0] },
+      "properties": {
+        "name": "Junkfort Station",
+        "region": "",
+        "sector": "",
+        "cartodb_id": 24543,
+        "zm": 0,
+        "canon": 0,
+        "uid": 24543,
+        "grid": "S8",
+        "link": "https://starwars.fandom.com/wiki/Junkfort_Station",
+        "name_web": "Junkfort Station",
+        "point_y": 838.434772734,
+        "point_x": 5368.46030777,
+        "y": 838.43,
+        "x": 5368.46
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [0, 0] },
+      "properties": {
+        "name": "Kintan",
+        "region": "",
+        "sector": "",
+        "cartodb_id": 24544,
+        "zm": 0,
+        "canon": 0,
+        "uid": 24544,
+        "grid": "S9",
+        "link": "https://starwars.fandom.com/wiki/Kintan/Legends",
+        "name_web": "Kintan",
+        "point_y": 838.434772734,
+        "point_x": 5368.46030777,
+        "y": 838.43,
+        "x": 5368.46
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [0, 0] },
+      "properties": {
+        "name": "Klytonia",
+        "region": "",
+        "sector": "",
+        "cartodb_id": 24545,
+        "zm": 0,
+        "canon": 0,
+        "uid": 24545,
+        "grid": "U11",
+        "link": "https://starwars.fandom.com/wiki/Klytonia_system",
+        "name_web": "Klytonia",
+        "point_y": 838.434772734,
+        "point_x": 5368.46030777,
+        "y": 838.43,
+        "x": 5368.46
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [0, 0] },
+      "properties": {
+        "name": "Latharra",
+        "region": "",
+        "sector": "",
+        "cartodb_id": 24546,
+        "zm": 0,
+        "canon": 0,
+        "uid": 24546,
+        "grid": "S14",
+        "link": "https://starwars.fandom.com/wiki/Latharra",
+        "name_web": "Latharra",
+        "point_y": 838.434772734,
+        "point_x": 5368.46030777,
+        "y": 838.43,
+        "x": 5368.46
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [0, 0] },
+      "properties": {
+        "name": "Lijuter",
+        "region": "",
+        "sector": "",
+        "cartodb_id": 24547,
+        "zm": 0,
+        "canon": 0,
+        "uid": 24547,
+        "grid": "S8",
+        "link": "https://starwars.fandom.com/wiki/Lijuter",
+        "name_web": "Lijuter",
+        "point_y": 838.434772734,
+        "point_x": 5368.46030777,
+        "y": 838.43,
+        "x": 5368.46
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [0, 0] },
+      "properties": {
+        "name": "Malrev IV",
+        "region": "",
+        "sector": "",
+        "cartodb_id": 24548,
+        "zm": 0,
+        "canon": 0,
+        "uid": 24548,
+        "grid": "P6",
+        "link": "https://starwars.fandom.com/wiki/Malrev_IV",
+        "name_web": "Malrev IV",
+        "point_y": 838.434772734,
+        "point_x": 5368.46030777,
+        "y": 838.43,
+        "x": 5368.46
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [0, 0] },
+      "properties": {
+        "name": "Nahso Minor",
+        "region": "",
+        "sector": "",
+        "cartodb_id": 24549,
+        "zm": 0,
+        "canon": 0,
+        "uid": 24549,
+        "grid": "N9",
+        "link": "https://starwars.fandom.com/wiki/Nahsu_Minor",
+        "name_web": "Nahsu Minor",
+        "point_y": 838.434772734,
+        "point_x": 5368.46030777,
+        "y": 838.43,
+        "x": 5368.46
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [0, 0] },
+      "properties": {
+        "name": "Rigel VII",
+        "region": "",
+        "sector": "",
+        "cartodb_id": 24550,
+        "zm": 0,
+        "canon": 0,
+        "uid": 24550,
+        "grid": "U11",
+        "link": "https://starwars.fandom.com/wiki/Rigel_VII",
+        "name_web": "Rigel VII",
+        "point_y": 838.434772734,
+        "point_x": 5368.46030777,
+        "y": 838.43,
+        "x": 5368.46
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [0, 0] },
+      "properties": {
+        "name": "Sakiya",
+        "region": "",
+        "sector": "",
+        "cartodb_id": 24551,
+        "zm": 0,
+        "canon": 0,
+        "uid": 24551,
+        "grid": "S11",
+        "link": "https://starwars.fandom.com/wiki/Sakiya",
+        "name_web": "Sakiya",
+        "point_y": 838.434772734,
+        "point_x": 5368.46030777,
+        "y": 838.43,
+        "x": 5368.46
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [0, 0] },
+      "properties": {
+        "name": "Skynam",
+        "region": "",
+        "sector": "",
+        "cartodb_id": 24552,
+        "zm": 0,
+        "canon": 0,
+        "uid": 24552,
+        "grid": "",
+        "link": "",
+        "name_web": "",
+        "point_y": 838.434772734,
+        "point_x": 5368.46030777,
+        "y": 838.43,
+        "x": 5368.46
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [0, 0] },
+      "properties": {
+        "name": "Sleheyron",
+        "region": "",
+        "sector": "",
+        "cartodb_id": 24553,
+        "zm": 0,
+        "canon": 0,
+        "uid": 24553,
+        "grid": "S10",
+        "link": "https://starwars.fandom.com/wiki/Sleheyron/Legends",
+        "name_web": "Sleheyron",
+        "point_y": 838.434772734,
+        "point_x": 5368.46030777,
+        "y": 838.43,
+        "x": 5368.46
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [0, 0] },
+      "properties": {
+        "name": "Stars’ End",
+        "grid": "",
+        "link": "",
+        "name_web": "",
+        "point_y": 838.434772734,
+        "point_x": 5368.46030777,
+        "y": 838.43,
+        "x": 5368.46
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [0, 0] },
+      "properties": {
+        "name": "ThonBoka",
+        "region": "",
+        "sector": "",
+        "cartodb_id": 24554,
+        "zm": 0,
+        "canon": 0,
+        "uid": 24554,
+        "grid": "U8",
+        "link": "https://starwars.fandom.com/wiki/ThonBoka",
+        "name_web": "ThonBoka",
+        "point_y": 838.434772734,
+        "point_x": 5368.46030777,
+        "y": 838.43,
+        "x": 5368.46
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [0, 0] },
+      "properties": {
+        "name": "Tieos",
+        "grid": "S15",
+        "region": "",
+        "sector": "",
+        "cartodb_id": 24555,
+        "zm": 0,
+        "canon": 0,
+        "uid": 24555,
+        "link": "https://starwars.fandom.com/wiki/Tieos",
+        "name_web": "Tieos",
+        "point_y": 838.434772734,
+        "point_x": 5368.46030777,
+        "y": 838.43,
+        "x": 5368.46
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [0, 0] },
+      "properties": {
+        "name": "Tiss’sharl",
+        "region": "",
+        "sector": "",
+        "cartodb_id": 24556,
+        "zm": 0,
+        "canon": 0,
+        "uid": 24556,
+        "grid": "R4",
+        "link": "https://starwars.fandom.com/wiki/Tiss%27sharl",
+        "name_web": "Tiss’sharl",
+        "point_y": 838.434772734,
+        "point_x": 5368.46030777,
+        "y": 838.43,
+        "x": 5368.46
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [0, 0] },
+      "properties": {
+        "name": "Tocoya",
+        "region": "",
+        "sector": "",
+        "cartodb_id": 24557,
+        "zm": 0,
+        "canon": 0,
+        "uid": 24557,
+        "grid": "",
+        "link": "",
+        "name_web": "",
+        "point_y": 838.434772734,
+        "point_x": 5368.46030777,
+        "y": 838.43,
+        "x": 5368.46
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": { "type": "Point", "coordinates": [0, 0] },
+      "properties": {
+        "name": "Vodran",
+        "region": "",
+        "sector": "",
+        "cartodb_id": 24558,
+        "zm": 0,
+        "canon": 0,
+        "uid": 24558,
+        "grid": "",
+        "link": "",
+        "name_web": "",
+        "point_y": 838.434772734,
+        "point_x": 5368.46030777,
+        "y": 838.43,
+        "x": 5368.46
+      }
+    }
+  ]
+}
