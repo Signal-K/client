@@ -141,8 +141,9 @@ export default function ProjectPreferencesModal({
   };
 
   const handleSave = () => {
-    if (selectedProjects.length === 0) return;
-    onSave(selectedProjects);
+    const interests =
+      selectedProjects.length > 0 ? selectedProjects : PROJECTS.map((p) => p.id);
+    onSave(interests);
     onClose();
   };
 
@@ -152,7 +153,7 @@ export default function ProjectPreferencesModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="flex max-h-[min(88vh,100dvh)] min-h-0 w-[calc(100vw-1rem)] max-w-[58rem] flex-col gap-0 overflow-hidden border-border/60 bg-background/95 p-0 shadow-2xl sm:w-full">
+      <DialogContent className="left-0 top-0 flex h-[100dvh] max-h-[100dvh] w-full max-w-none translate-x-0 translate-y-0 flex-col gap-0 overflow-hidden rounded-none border-0 bg-background p-0 shadow-none sm:left-[50%] sm:top-[50%] sm:h-[min(52rem,calc(100dvh-2rem))] sm:max-h-[calc(100dvh-2rem)] sm:w-[calc(100vw-2rem)] sm:max-w-[58rem] sm:translate-x-[-50%] sm:translate-y-[-50%] sm:rounded-lg sm:border sm:border-border/60 sm:bg-background/95 sm:shadow-2xl">
         <div className="pointer-events-none absolute inset-0 star-field opacity-25" />
         <div className="pointer-events-none absolute inset-0 sunburst-bg opacity-30" />
 
@@ -282,24 +283,24 @@ export default function ProjectPreferencesModal({
             </div>
         </div>
 
-        <div className="relative z-10 flex shrink-0 flex-col gap-3 border-t border-border/40 bg-background/95 px-4 py-4 pb-[max(1rem,env(safe-area-inset-bottom))] sm:flex-row sm:items-center sm:justify-between sm:px-6">
-            <div className="text-xs text-muted-foreground">
-              {selectedProjects.length > 0
-                ? `${selectedProjects.length} project${selectedProjects.length === 1 ? "" : "s"} selected — confirm, then spend CR to build them.`
-                : "Select at least one track, then confirm. Skip keeps the camp; you can arm tracks from the HUD."}
-            </div>
-
-            <div className="flex w-full items-center justify-end gap-3 sm:w-auto">
-              <Button variant="ghost" onClick={onClose}>
+        <div className="relative z-20 mt-auto flex shrink-0 flex-col gap-3 border-t border-border bg-background px-4 py-4 pb-[max(1rem,env(safe-area-inset-bottom))] sm:px-6">
+            <Button
+              data-testid="onboarding-confirm"
+              onClick={handleSave}
+              size="lg"
+              className="btn-glow h-14 w-full gap-2 rounded-full text-base font-black uppercase tracking-[0.18em]"
+            >
+              Confirm
+              <Check className="h-5 w-5" />
+            </Button>
+            <div className="flex items-center justify-between gap-3">
+              <p className="text-xs text-muted-foreground">
+                {selectedProjects.length > 0
+                  ? `${selectedProjects.length} project${selectedProjects.length === 1 ? "" : "s"} selected`
+                  : "Nothing picked yet — Confirm will arm every track."}
+              </p>
+              <Button variant="ghost" onClick={onClose} className="shrink-0">
                 Skip for now
-              </Button>
-              <Button
-                onClick={handleSave}
-                disabled={selectedProjects.length === 0}
-                className="btn-glow gap-2 rounded-full px-5 text-xs font-black uppercase tracking-[0.18em] sm:px-6 sm:text-sm"
-              >
-                Confirm
-                <Check className="h-4 w-4" />
               </Button>
             </div>
         </div>
