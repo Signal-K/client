@@ -697,6 +697,11 @@ export default function GameClient({ initialData, user }: GameClientProps) {
                 onBack={() => handleViewChange("base")} 
               />
               <div className="flex-1 overflow-y-auto p-4 md:p-6">
+                <GameSurveys
+                  userId={user?.id}
+                  classifications={data.classifications ?? []}
+                  mechanicId={activeView}
+                />
                 <ErrorBoundary label={activeView}>
                   {activeView === "telescope" && <TelescopeTab />}
                   {activeView === "satellite" && <SatelliteTab />}
@@ -763,7 +768,6 @@ export default function GameClient({ initialData, user }: GameClientProps) {
 
       <PWAPrompt />
       <PushNotificationPrompt />
-      <GameSurveys userId={user?.id} classifications={data.classifications ?? []} />
 
       <StationNav 
         active={activeView} 

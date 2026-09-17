@@ -4,11 +4,9 @@ import "@/styles/globals.css";
 import { SessionContextProvider } from "@/src/lib/auth/session-context";
 import { useEffect, ReactNode, useState } from "react";
 import { ActivePlanetProvider } from "@/src/lib/context/ActivePlanet";
-import { Analytics } from "@vercel/analytics/react";
 import { usePostHog } from "posthog-js/react";
 import { useAuthUser } from "@/src/hooks/useAuthUser";
 import { getOrCreateAnalyticsSessionToken } from "@/src/lib/analytics/session-token";
-import { SpeedInsights } from "@vercel/speed-insights/next";
 
 function RootLayoutInner({ children }: { children: ReactNode }) {
   const posthog = usePostHog();
@@ -66,8 +64,6 @@ export default function RootLayoutClient({ children, fontClassName }: { children
                 </main>
               </div>
             </RootLayoutInner>
-            <Analytics />
-            <SpeedInsights />
           </ActivePlanetProvider>
         </SessionContextProvider>
       </body>

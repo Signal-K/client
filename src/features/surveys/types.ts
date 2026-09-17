@@ -5,6 +5,28 @@ export type MicroSurveyQuestion = {
   required?: boolean;
 };
 
+export type MechanicId =
+  | "telescope"
+  | "satellite"
+  | "rover"
+  | "solar"
+  | "inventory";
+
+export type MechanicCoverageTag =
+  | "comprehension"
+  | "clarity"
+  | "confidence"
+  | "pace"
+  | "intent";
+
+export type MechanicQuestion = {
+  id: string;
+  mechanicId: MechanicId;
+  prompt: string;
+  options: readonly [string, string, string];
+  coverage: MechanicCoverageTag;
+};
+
 export type MechanicMicroSurvey = {
   id: string;
   title: string;
@@ -27,4 +49,12 @@ export type ProjectType =
 export type ProjectEngagementSurvey = MechanicMicroSurvey & {
   projectType: ProjectType;
   contributionThreshold: number;
+};
+
+export type PlaythroughSurveyPlan = {
+  id: string;
+  quota: number;
+  questionIds: string[];
+  answeredIds: string[];
+  skippedIds: string[];
 };

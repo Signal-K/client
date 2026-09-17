@@ -12,6 +12,13 @@
     { "pattern": "starsailors.space", "custom_domain": true },
     { "pattern": "www.starsailors.space", "custom_domain": true }
   ],
+  "vars": {
+    "NEXT_PUBLIC_POSTHOG_KEY": "phc_65umDftbbTkrm1V6azue6OeU4u5c8iJcaHm4JtJ95di",
+    "NEXT_PUBLIC_POSTHOG_HOST": "https://us.posthog.com",
+    "posthog_api_key": "phc_65umDftbbTkrm1V6azue6OeU4u5c8iJcaHm4JtJ95di",
+    "posthog_project_id": "199773",
+    "posthog_region": "US Cloud"
+  },
   "observability": {
     "enabled": true
   }

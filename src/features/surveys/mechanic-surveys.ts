@@ -201,10 +201,107 @@ export const MECHANIC_SURVEYS: readonly MechanicMicroSurvey[] = [
   },
 ];
 
-export const SURVEY_DISPLAY_DELAY_MS = 5000; // Reduced for testing
+export const SURVEY_DISPLAY_DELAY_MS = 800;
+
+export const PLAYTHROUGH_SURVEY_MIN = 3;
+export const PLAYTHROUGH_SURVEY_MAX = 5;
+
+export const MECHANIC_CLASSIFICATION_TYPES: Record<
+  import("@/src/features/surveys/types").MechanicId,
+  readonly string[]
+> = {
+  telescope: ["planet", "telescope-tess", "telescope-minorPlanet"],
+  satellite: ["cloud", "lidar-jovianVortexHunter"],
+  rover: ["rover"],
+  solar: ["telescope-sunspot", "sunspot"],
+  inventory: [],
+};
+
+export const MECHANIC_QUESTION_BANKS: Record<
+  import("@/src/features/surveys/types").MechanicId,
+  readonly import("@/src/features/surveys/types").MechanicQuestion[]
+> = {
+  telescope: [
+    { id: "tel_what_v1", mechanicId: "telescope", coverage: "comprehension", prompt: "What were you just looking at?", options: ["A light-curve dip", "A planet photo", "Not sure"] },
+    { id: "tel_next_v1", mechanicId: "telescope", coverage: "clarity", prompt: "Was the next action obvious?", options: ["No", "Mostly", "Yes"] },
+    { id: "tel_sure_v1", mechanicId: "telescope", coverage: "confidence", prompt: "How sure were you of that mark?", options: ["Guessing", "Okay", "Confident"] },
+    { id: "tel_pace_v1", mechanicId: "telescope", coverage: "pace", prompt: "How did this pass feel?", options: ["Too slow", "Fine", "Rushed"] },
+    { id: "tel_hop_v1", mechanicId: "telescope", coverage: "intent", prompt: "Would you fly a longer planet-hunting mission?", options: ["Not now", "Maybe", "Yes"] },
+    { id: "tel_data_v1", mechanicId: "telescope", coverage: "comprehension", prompt: "Did the plot mean something to you?", options: ["No idea", "Sort of", "I know what a transit is"] },
+    { id: "tel_ui_v1", mechanicId: "telescope", coverage: "clarity", prompt: "Could you tell signal from noise?", options: ["No", "With effort", "Easily"] },
+    { id: "tel_again_v1", mechanicId: "telescope", coverage: "intent", prompt: "Would you classify another target?", options: ["Done for now", "One more", "Keep going"] },
+  ],
+  satellite: [
+    { id: "sat_what_v1", mechanicId: "satellite", coverage: "comprehension", prompt: "What were you tagging?", options: ["Clouds / atmosphere", "The planet itself", "Not sure"] },
+    { id: "sat_next_v1", mechanicId: "satellite", coverage: "clarity", prompt: "Was the tagging step obvious?", options: ["No", "Mostly", "Yes"] },
+    { id: "sat_sure_v1", mechanicId: "satellite", coverage: "confidence", prompt: "How sure were those labels?", options: ["Guessing", "Okay", "Confident"] },
+    { id: "sat_pace_v1", mechanicId: "satellite", coverage: "pace", prompt: "Downlink pace", options: ["Too slow", "Fine", "Rushed"] },
+    { id: "sat_hop_v1", mechanicId: "satellite", coverage: "intent", prompt: "Would you run a dedicated atmosphere mission?", options: ["Not now", "Maybe", "Yes"] },
+    { id: "sat_map_v1", mechanicId: "satellite", coverage: "clarity", prompt: "Could you read the map / image?", options: ["Unclear", "Usable", "Clear"] },
+    { id: "sat_again_v1", mechanicId: "satellite", coverage: "intent", prompt: "Another orbital pass?", options: ["Done", "One more", "Keep going"] },
+  ],
+  rover: [
+    { id: "rov_what_v1", mechanicId: "rover", coverage: "comprehension", prompt: "What was the rover asking you to do?", options: ["Label terrain", "Drive somewhere", "Not sure"] },
+    { id: "rov_next_v1", mechanicId: "rover", coverage: "clarity", prompt: "Was the next waypoint obvious?", options: ["No", "Mostly", "Yes"] },
+    { id: "rov_sure_v1", mechanicId: "rover", coverage: "confidence", prompt: "How sure were those terrain labels?", options: ["Guessing", "Okay", "Confident"] },
+    { id: "rov_pace_v1", mechanicId: "rover", coverage: "pace", prompt: "Drive / classify pace", options: ["Too slow", "Fine", "Rushed"] },
+    { id: "rov_hop_v1", mechanicId: "rover", coverage: "intent", prompt: "Would you take a longer rover outing?", options: ["Not now", "Maybe", "Yes"] },
+    { id: "rov_ctrl_v1", mechanicId: "rover", coverage: "clarity", prompt: "Did the controls make sense?", options: ["Clunky", "Usable", "Natural"] },
+    { id: "rov_again_v1", mechanicId: "rover", coverage: "intent", prompt: "Another traverse?", options: ["Dock", "One more", "Keep going"] },
+  ],
+  solar: [
+    { id: "sol_what_v1", mechanicId: "solar", coverage: "comprehension", prompt: "What were you counting?", options: ["Sunspots / active regions", "The whole Sun", "Not sure"] },
+    { id: "sol_next_v1", mechanicId: "solar", coverage: "clarity", prompt: "Was the count step obvious?", options: ["No", "Mostly", "Yes"] },
+    { id: "sol_sure_v1", mechanicId: "solar", coverage: "confidence", prompt: "How sure was that count?", options: ["Guessing", "Okay", "Confident"] },
+    { id: "sol_pace_v1", mechanicId: "solar", coverage: "pace", prompt: "Watch pace", options: ["Too slow", "Fine", "Rushed"] },
+    { id: "sol_hop_v1", mechanicId: "solar", coverage: "intent", prompt: "Would you run a dedicated solar watch?", options: ["Not now", "Maybe", "Yes"] },
+    { id: "sol_img_v1", mechanicId: "solar", coverage: "clarity", prompt: "Could you see the active regions?", options: ["Too faint", "Usable", "Clear"] },
+    { id: "sol_again_v1", mechanicId: "solar", coverage: "intent", prompt: "Another capture?", options: ["Done", "One more", "Keep going"] },
+  ],
+  inventory: [
+    { id: "inv_what_v1", mechanicId: "inventory", coverage: "comprehension", prompt: "Do you know what this cargo is for?", options: ["No", "Sort of", "Yes"] },
+    { id: "inv_next_v1", mechanicId: "inventory", coverage: "clarity", prompt: "Can you find what you need?", options: ["No", "With effort", "Easily"] },
+    { id: "inv_sure_v1", mechanicId: "inventory", coverage: "confidence", prompt: "Does this inventory feel like yours?", options: ["Random", "Okay", "Mine"] },
+    { id: "inv_pace_v1", mechanicId: "inventory", coverage: "pace", prompt: "Sorting this stash", options: ["Tedious", "Fine", "Quick"] },
+    { id: "inv_hop_v1", mechanicId: "inventory", coverage: "intent", prompt: "Would you bring this cargo into another game?", options: ["Not needed", "Maybe", "Yes"] },
+  ],
+};
 
 export function surveyStorageKey(surveyId: string, userId: string): string {
   return `starsailors_mechanic_survey_${surveyId}_${userId}_v1`;
+}
+
+export function playthroughStorageKey(userId: string, mechanicId: string): string {
+  return `starsailors_playthrough_${mechanicId}_${userId}_v1`;
+}
+
+export function pickPlaythroughQuota(random: () => number = Math.random): number {
+  return (
+    PLAYTHROUGH_SURVEY_MIN +
+    Math.floor(random() * (PLAYTHROUGH_SURVEY_MAX - PLAYTHROUGH_SURVEY_MIN + 1))
+  );
+}
+
+export function shuffleInPlace<T>(items: T[], random: () => number = Math.random): T[] {
+  for (let i = items.length - 1; i > 0; i--) {
+    const j = Math.floor(random() * (i + 1));
+    const tmp = items[i];
+    items[i] = items[j];
+    items[j] = tmp;
+  }
+  return items;
+}
+
+export function samplePlaythroughQuestions(
+  mechanicId: import("@/src/features/surveys/types").MechanicId,
+  quota: number,
+  alreadyUsedIds: readonly string[] = [],
+  random: () => number = Math.random,
+): import("@/src/features/surveys/types").MechanicQuestion[] {
+  const bank = MECHANIC_QUESTION_BANKS[mechanicId] ?? [];
+  const unused = bank.filter((q) => !alreadyUsedIds.includes(q.id));
+  const pool = unused.length >= quota ? unused : [...bank];
+  return shuffleInPlace([...pool], random).slice(0, Math.min(quota, pool.length));
 }
 
 // ── Project engagement surveys ───────────────────────────────────────────────

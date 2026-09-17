@@ -5,21 +5,31 @@ import { useGameSurveys } from "../hooks/useGameSurveys";
 import { useProjectEngagementSurveys } from "../hooks/useProjectEngagementSurveys";
 import type { ClassificationForSurvey } from "../hooks/useProjectEngagementSurveys";
 import type { ClassificationForMechanicSurvey } from "../hooks/useGameSurveys";
+import InMechanicSurveyStep from "./InMechanicSurveyStep";
 import MechanicPulseSurvey from "./MechanicPulseSurvey";
 
 interface GameSurveysProps {
   userId?: string;
   classifications?: ClassificationForSurvey[];
+  mechanicId?: string;
 }
 
-export function GameSurveys({ userId, classifications = [] }: GameSurveysProps) {
+export function GameSurveys({
+  userId,
+  classifications = [],
+  mechanicId,
+}: GameSurveysProps) {
   const posthog = usePostHog();
 
   const {
-    activeSurvey: activeMechanicSurvey,
+    activeQuestion,
     dismissSurvey: dismissMechanic,
     completeSurvey: completeMechanic,
-  } = useGameSurveys(userId, classifications as ClassificationForMechanicSurvey[]);
+    shownCount,
+    quota,
+    playthroughId,
+    classificationType,
+  } = useGameSurveys(userId, classifications as ClassificationForMechanicSurvey[], mechanicId);
 
   const {
     activeSurvey: activeEngagementSurvey,
@@ -27,40 +37,74 @@ export function GameSurveys({ userId, classifications = [] }: GameSurveysProps) 
     completeSurvey: completeEngagement,
   } = useProjectEngagementSurveys(userId, classifications);
 
-  // Mechanic surveys take priority; engagement surveys surface after they are dismissed/completed
-  const isEngagement = !activeMechanicSurvey && Boolean(activeEngagementSurvey);
-  const activeSurvey = activeMechanicSurvey ?? activeEngagementSurvey;
+  const showEngagement = !activeQuestion && Boolean(activeEngagementSurvey) && mechanicId !== "base";
 
-  if (!activeSurvey) return null;
+  if (activeQuestion) {
+    return (
+      <InMechanicSurveyStep
+        question={activeQuestion}
+        step={shownCount + 1}
+        of={quota}
+        playthroughId={playthroughId}
+        classificationType={classificationType}
+        onSkip={() => {
+          posthog?.capture("mechanic_survey_skipped", {
+            $survey_id: activeQuestion.id,
+            mechanic: activeQuestion.mechanicId,
+            coverage: activeQuestion.coverage,
+            playthrough_id: playthroughId,
+            classification_type: classificationType,
+            playthrough_step: shownCount + 1,
+            playthrough_quota: quota,
+          });
+          dismissMechanic();
+        }}
+        onSubmit={(answer) => {
+          posthog?.capture("survey sent", {
+            $survey_id: activeQuestion.id,
+            $survey_name: activeQuestion.prompt,
+            $survey_response: answer,
+            mechanic: activeQuestion.mechanicId,
+            coverage: activeQuestion.coverage,
+            playthrough_id: playthroughId,
+            classification_type: classificationType,
+            playthrough_step: shownCount + 1,
+            playthrough_quota: quota,
+          });
+          posthog?.capture("mechanic_survey_answered", {
+            $survey_id: activeQuestion.id,
+            mechanic: activeQuestion.mechanicId,
+            coverage: activeQuestion.coverage,
+            answer,
+            playthrough_id: playthroughId,
+            classification_type: classificationType,
+            playthrough_step: shownCount + 1,
+            playthrough_quota: quota,
+          });
+          completeMechanic();
+        }}
+      />
+    );
+  }
 
-  const handleDismiss = isEngagement ? dismissEngagement : dismissMechanic;
-  const handleComplete = isEngagement ? completeEngagement : completeMechanic;
+  if (!showEngagement || !activeEngagementSurvey) return null;
 
   return (
-    // Responsive positioning:
-    // Mobile  — full-width minus 12px gutters, 80px above the bottom edge
-    // sm+     — pinned to bottom-right corner, capped at max-w-sm
-    <div className="fixed bottom-20 left-2 right-2 z-50 mx-auto max-w-[22rem] animate-in slide-in-from-bottom-4 fade-in duration-500 sm:bottom-24 sm:left-auto sm:right-4 sm:w-full sm:max-w-sm">
+    <div className="mb-4">
       <MechanicPulseSurvey
-        survey={activeSurvey}
-        onDismiss={handleDismiss}
+        survey={activeEngagementSurvey}
+        onDismiss={dismissEngagement}
         onSubmit={(answers) => {
           const capturePayload: Record<string, string | undefined> = {
-            $survey_id: activeSurvey.id,
-            $survey_name: activeSurvey.title,
+            $survey_id: activeEngagementSurvey.id,
+            $survey_name: activeEngagementSurvey.title,
             ...Object.fromEntries(
-              Object.entries(answers).map(([k, v]) => [`$survey_response_${k}`, v])
+              Object.entries(answers).map(([k, v]) => [`$survey_response_${k}`, v]),
             ),
           };
-
-          // For project engagement surveys, record the authenticated Clerk user id
-          // so responses can be linked back to accounts for follow-up.
-          if (isEngagement && userId) {
-            capturePayload.user_uuid = userId;
-          }
-
+          if (userId) capturePayload.user_uuid = userId;
           posthog?.capture("survey sent", capturePayload);
-          handleComplete();
+          completeEngagement();
         }}
       />
     </div>

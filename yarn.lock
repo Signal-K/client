@@ -4103,16 +4103,6 @@
   dependencies:
     "@use-gesture/core" "10.3.1"
 
-"@vercel/analytics@^1.5.0":
-  version "1.6.1"
-  resolved "https://registry.npmjs.org/@vercel/analytics/-/analytics-1.6.1.tgz"
-  integrity sha512-oH9He/bEM+6oKlv3chWuOOcp8Y6fo6/PSro8hEkgCW3pu9/OiCXiUpRUogDh3Fs3LH2sosDrx8CxeOLBEE+afg==
-
-"@vercel/speed-insights@^1.2.0":
-  version "1.3.1"
-  resolved "https://registry.npmjs.org/@vercel/speed-insights/-/speed-insights-1.3.1.tgz"
-  integrity sha512-PbEr7FrMkUrGYvlcLHGkXdCkxnylCWePx7lPxxq36DNdfo9mcUjLOmqOyPDHAOgnfqgGGdmE3XI9L/4+5fr+vQ==
-
 "@vitest/coverage-v8@3.2.4":
   version "3.2.4"
   resolved "https://registry.yarnpkg.com/@vitest/coverage-v8/-/coverage-v8-3.2.4.tgz#a2d8d040288c1956a1c7d0a0e2cdcfc7a3319f13"

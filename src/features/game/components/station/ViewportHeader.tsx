@@ -1,5 +1,5 @@
 import { ChevronLeft } from "lucide-react";
-import { cn } from "@/src/lib/utils";
+import { getStationChrome } from "./station-chrome";
 
 interface ViewportHeaderProps {
   label: string;
@@ -7,26 +7,9 @@ interface ViewportHeaderProps {
   onBack: () => void;
 }
 
-const stationMeta: Record<string, {
-  full: string;
-  moduleId: string;
-  accentRgb: string;
-  borderColor: string;
-}> = {
-  telescope: { full: "Telescope Array",  moduleId: "OBS-01",   accentRgb: "136,192,208", borderColor: "rgba(136,192,208,0.25)" },
-  satellite: { full: "Satellite Control", moduleId: "COMMS-01", accentRgb: "56,189,248",  borderColor: "rgba(56,189,248,0.25)"  },
-  rover:     { full: "Rover Operations",  moduleId: "GND-01",   accentRgb: "251,191,36",  borderColor: "rgba(251,191,36,0.25)"  },
-  solar:     { full: "Solar Watch",       moduleId: "PWR-01",   accentRgb: "251,146,60",  borderColor: "rgba(251,146,60,0.25)"  },
-  inventory: { full: "Cargo Bay",         moduleId: "AUX-02",   accentRgb: "167,139,250", borderColor: "rgba(167,139,250,0.25)" },
-};
-
 export function ViewportHeader({ label, stationId, onBack }: ViewportHeaderProps) {
-  const meta = stationMeta[stationId] ?? {
-    full: label,
-    moduleId: "MOD-??",
-    accentRgb: "136,192,208",
-    borderColor: "rgba(136,192,208,0.2)",
-  };
+  const meta = getStationChrome(stationId);
+  const title = meta.moduleId === "MOD-??" ? label : meta.full;
 
   return (
     <header
@@ -78,7 +61,7 @@ export function ViewportHeader({ label, stationId, onBack }: ViewportHeaderProps
             className="text-sm font-black leading-none"
             style={{ color: "rgba(255,255,255,0.9)" }}
           >
-            {meta.full}
+            {title}
           </p>
         </div>
 

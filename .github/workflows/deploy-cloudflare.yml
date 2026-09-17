@@ -61,6 +61,11 @@ jobs:
           NEXT_PUBLIC_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL: ${{ vars.NEXT_PUBLIC_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL }}
           NEXT_PUBLIC_CLERK_SIGN_UP_FALLBACK_REDIRECT_URL: ${{ vars.NEXT_PUBLIC_CLERK_SIGN_UP_FALLBACK_REDIRECT_URL }}
           NEXT_PUBLIC_POCKETBASE_URL: ${{ secrets.POCKETBASE_URL }}
+          NEXT_PUBLIC_POSTHOG_KEY: ${{ vars.NEXT_PUBLIC_POSTHOG_KEY }}
+          NEXT_PUBLIC_POSTHOG_HOST: https://us.posthog.com
+          posthog_api_key: ${{ vars.NEXT_PUBLIC_POSTHOG_KEY }}
+          posthog_project_id: ${{ vars.POSTHOG_PROJECT_ID }}
+          posthog_region: US Cloud
 
       - uses: cloudflare/wrangler-action@v3
         with:

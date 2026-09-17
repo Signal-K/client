@@ -80,8 +80,6 @@
     "@react-three/drei": "^9.121.5",
     "@react-three/fiber": "^8.17.14",
     "@types/node": "^22.7.8",
-    "@vercel/analytics": "^1.5.0",
-    "@vercel/speed-insights": "^1.2.0",
     "antd": "^5.19.3",
     "axios": "^1.6.8",
     "class-variance-authority": "^0.7.0",
