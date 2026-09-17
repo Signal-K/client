@@ -17,6 +17,7 @@ export interface GardenPanelProps {
   onTendHydro: () => void;
   onSitHabitat: () => void;
   onUpgrade: (id: StructureId) => void;
+  onBuild: (id: StructureId) => void;
   onCollectFlight: (id: StructureId) => void;
   onStartMinigame: (mg: MinigameDef) => void;
   onHopOut: (hopId: string) => void;
@@ -31,6 +32,7 @@ export function GardenPanel({
   onTendHydro,
   onSitHabitat,
   onUpgrade,
+  onBuild,
   onCollectFlight,
   onStartMinigame,
   onHopOut,
@@ -69,6 +71,7 @@ export function GardenPanel({
             onTendHydro={onTendHydro}
             onSitHabitat={onSitHabitat}
             onUpgrade={onUpgrade}
+            onBuild={onBuild}
             onCollectFlight={onCollectFlight}
             onStartMinigame={onStartMinigame}
             onHopOut={onHopOut}
@@ -89,6 +92,7 @@ function PanelBody({
   onTendHydro,
   onSitHabitat,
   onUpgrade,
+  onBuild,
   onCollectFlight,
   onStartMinigame,
   onHopOut,
@@ -102,6 +106,7 @@ function PanelBody({
   onTendHydro: () => void;
   onSitHabitat: () => void;
   onUpgrade: (id: StructureId) => void;
+  onBuild: (id: StructureId) => void;
   onCollectFlight: (id: StructureId) => void;
   onStartMinigame: (mg: MinigameDef) => void;
   onHopOut: (hopId: string) => void;
@@ -114,16 +119,34 @@ function PanelBody({
   const nextCost = CATALOG.upgrade.costs[next - 1];
   const canUpgrade = !rec.locked && next <= CATALOG.upgrade.maxTier;
   const hop = def.hop ? hopById(def.hop) : null;
+  const buildCost = def.buildCost ?? 0;
+  const canBuild = rec.locked && rec.buildable && buildCost > 0;
 
   return (
     <>
       <h2>{def.name}{rec.locked ? "" : `  T${rec.tier}`}</h2>
       <p className={styles.meta}>{def.blurb}</p>
-      <p className={styles.capacity}>{capacityLabel}</p>
+      <p className={styles.capacity}>
+        {rec.locked
+          ? rec.buildable
+            ? `Plot ready · ${buildCost} CR to raise`
+            : def.locked
+              ? "Later session"
+              : "Pick this project in your roster to unlock the plot"
+          : capacityLabel}
+      </p>
       <div className={styles.actions}>
-        {rec.locked ? (
+        {canBuild ? (
+          <button
+            className={cx(styles.btn, styles.btnPrimary)}
+            disabled={credits < buildCost}
+            onClick={() => onBuild(def.id)}
+          >
+            Build {def.name} · {buildCost} CR
+          </button>
+        ) : rec.locked ? (
           <button className={styles.btn} disabled onClick={onDeferredToast}>
-            Rover minigames — dedicated session later
+            {def.locked ? "Rover minigames — dedicated session later" : "Choose this project first"}
           </button>
         ) : def.id === "ssc.structure.hydro" ? (
           <button className={cx(styles.btn, styles.btnPrimary)} onClick={onTendHydro}>

@@ -165,8 +165,8 @@ export default function ProjectPreferencesModal({
               Select your project roster
             </DialogTitle>
             <DialogDescription className="max-w-2xl text-sm leading-relaxed text-muted-foreground">
-              Choose the science tracks you want surfaced in the hub. Confirm when you are
-              ready — we will keep deployments and prompts aligned with those missions.
+              Choose the science you want to raise in the garden. Confirm when you are
+              ready, then spend credits to build those instruments and classify to earn more.
             </DialogDescription>
         </DialogHeader>
 
@@ -285,8 +285,8 @@ export default function ProjectPreferencesModal({
         <div className="relative z-10 flex shrink-0 flex-col gap-3 border-t border-border/40 bg-background/95 px-4 py-4 pb-[max(1rem,env(safe-area-inset-bottom))] sm:flex-row sm:items-center sm:justify-between sm:px-6">
             <div className="text-xs text-muted-foreground">
               {selectedProjects.length > 0
-                ? `${selectedProjects.length} project${selectedProjects.length === 1 ? "" : "s"} selected`
-                : "Select at least one track, then confirm."}
+                ? `${selectedProjects.length} project${selectedProjects.length === 1 ? "" : "s"} selected — confirm, then spend CR to build them.`
+                : "Select at least one track, then confirm. Skip keeps the camp; you can arm tracks from the HUD."}
             </div>
 
             <div className="flex w-full items-center justify-end gap-3 sm:w-auto">

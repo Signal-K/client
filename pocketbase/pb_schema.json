@@ -1062,5 +1062,37 @@
     "updateRule": null,
     "deleteRule": null,
     "_note": "Deprecated per prisma/schema.prisma comment \u2014 evaluate for removal instead of migrating."
+  },
+  {
+    "name": "ss_hub_state",
+    "type": "base",
+    "fields": [
+      {
+        "name": "userId",
+        "type": "text",
+        "required": true
+      },
+      {
+        "name": "onboarding",
+        "type": "json"
+      },
+      {
+        "name": "garden",
+        "type": "json"
+      },
+      {
+        "name": "updatedAt",
+        "type": "date"
+      }
+    ],
+    "indexes": [
+      "CREATE UNIQUE INDEX idx_ss_hub_state_userId ON ss_hub_state (userId)"
+    ],
+    "listRule": null,
+    "viewRule": null,
+    "createRule": null,
+    "updateRule": null,
+    "deleteRule": null,
+    "_note": "Account-scoped garden hub onboarding/roster and garden JSON. Gameplay routes read/write via the admin client; do not treat localStorage as the source of truth."
   }
 ]

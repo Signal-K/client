@@ -41,6 +41,8 @@ export interface StructureDef {
   hop: HopId | null;
   startTier: number;
   locked: boolean;
+  /** Credits to raise this instrument from a plot. Camp structures omit this. */
+  buildCost?: number;
   growth: GrowthStage[];
 }
 
@@ -211,6 +213,7 @@ export const CATALOG = {
       hop: "ssc.hop.landnam",
       startTier: 1,
       locked: false,
+      buildCost: 24,
       growth: stages([
         [1, "telescope-t1", { subjects: 1, label: "Small dome" }],
         [2, "telescope-t2", { subjects: 1, label: "Longer barrel" }],
@@ -227,6 +230,7 @@ export const CATALOG = {
       hop: null,
       startTier: 1,
       locked: false,
+      buildCost: 18,
       growth: stages([
         [1, "satellite-t1", { subjects: 1, label: "Small dish" }],
         [2, "satellite-t2", { subjects: 1, label: "Wider dish" }],
@@ -243,6 +247,7 @@ export const CATALOG = {
       hop: null,
       startTier: 1,
       locked: false,
+      buildCost: 18,
       growth: stages([
         [1, "solar-t1", { panels: 1, label: "One panel" }],
         [2, "solar-t2", { panels: 2, label: "Two panels" }],

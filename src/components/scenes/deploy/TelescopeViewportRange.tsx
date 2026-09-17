@@ -27,7 +27,7 @@ export default function DeployTelescopeViewport() {
   const posthog = usePostHog();
   
   // Get stored telescope focus preference
-  const { preferences, setTelescopeFocus, isLoading: prefsLoading } = useUserPreferences();
+  const { preferences, setTelescopeFocus, isLoading: prefsLoading } = useUserPreferences(session?.user.id);
 
   // Deployment type - defaults to "planetary" (most popular), can be changed via sidebar
   const [deploymentType, setDeploymentType] = useState<DeploymentType | null>(null)

@@ -384,19 +384,31 @@ function GardenThing({
   const flight = state.flights[id];
   const away = flight?.status === "away";
   const ready = !!rec?.ready && !rec?.locked && !away;
+  const plot = !!rec?.locked && !!rec?.buildable;
+  const visibleLabel = rec?.locked
+    ? plot
+      ? `${label} · plot`
+      : `${label} · later`
+    : label;
 
   return (
     <button
-      className={cx(styles.thing, rec?.locked && styles.isLocked, away && styles.isAway, ready && styles.isReady)}
+      className={cx(
+        styles.thing,
+        rec?.locked && styles.isLocked,
+        plot && styles.isPlot,
+        away && styles.isAway,
+        ready && styles.isReady
+      )}
       data-id={id}
       data-slug={slug}
       data-tier={String(rec?.tier ?? 0)}
       type="button"
-      aria-label={label}
+      aria-label={visibleLabel}
       onClick={() => onOpen(id)}
     >
       {children}
-      <span className={styles.label}>{label}</span>
+      <span className={styles.label}>{visibleLabel}</span>
     </button>
   );
 }

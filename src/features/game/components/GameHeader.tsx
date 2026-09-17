@@ -42,12 +42,12 @@ export default function GameHeader({
   const { signOut } = useClerk();
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [projectPreferencesOpen, setProjectPreferencesOpen] = useState(false);
-  const { preferences, savePreferences } = useUserPreferences();
+  const { preferences, setProjectInterests } = useUserPreferences(user?.id);
 
   const isAnonymousUser = Boolean((user as any)?.is_anonymous);
 
   const handleProjectPreferencesSave = (interests: ProjectType[]) => {
-    savePreferences({ projectInterests: interests });
+    setProjectInterests(interests);
   };
 
   const handleLogout = async () => {
