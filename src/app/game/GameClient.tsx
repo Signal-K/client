@@ -11,12 +11,25 @@ import { useUserPreferences } from "@/src/hooks/useUserPreferences";
 
 import { useGardenState } from "@/src/features/garden/useGardenState";
 import { useSkyPhase } from "@/src/features/garden/useSkyPhase";
-import { hopById } from "@/src/features/garden/catalog";
+import { hopById, type StructureId } from "@/src/features/garden/catalog";
 import { GardenScene } from "@/src/features/garden/components/GardenScene";
 import { GardenHud } from "@/src/features/garden/components/GardenHud";
 import { GardenPanel } from "@/src/features/garden/components/GardenPanel";
 import { SkyClassify } from "@/src/features/garden/components/SkyClassify";
 import styles from "@/src/features/garden/garden.module.css";
+import type { MechanicId } from "@/src/features/surveys/types";
+import type { ClassificationForMechanicSurvey } from "@/src/features/surveys/hooks/useGameSurveys";
+
+// The garden panel opens on `ssc.*` catalog ids; MECHANIC_SURVEYS still
+// speaks the pre-garden bare-word vocabulary. Structures with no citizen-
+// science minigame (habitat, hydro, pad, probe) have no mechanic survey and
+// map to undefined on purpose.
+const STRUCTURE_TO_MECHANIC_ID: Partial<Record<StructureId, MechanicId>> = {
+  "ssc.structure.telescope": "telescope",
+  "ssc.structure.satellite": "satellite",
+  "ssc.structure.solar": "solar",
+  "ssc.structure.rover": "rover",
+};
 
 const CompleteProfileForm = dynamic(() => import("@/src/components/profile/setup/FinishProfile"), {
   loading: () => <div className="p-4 text-xs text-muted-foreground">Loading profile form…</div>,
@@ -43,11 +56,28 @@ export default function GameClient({ user }: GameClientProps) {
   const [layout, setLayout] = useState<"portrait" | "landscape">("portrait");
   const [showProfileModal, setShowProfileModal] = useState(false);
   const { preferences, needsPreferencesPrompt, setProjectInterests } = useUserPreferences();
+  const [classifications, setClassifications] = useState<ClassificationForMechanicSurvey[]>([]);
 
   useEffect(() => {
     posthog?.capture("garden_hub_viewed", { userId: user?.id });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    if (!user?.id) return;
+    let cancelled = false;
+    fetch(`/api/gameplay/classifications?author=${encodeURIComponent(user.id)}&limit=500`)
+      .then((res) => (res.ok ? res.json() : { classifications: [] }))
+      .then((data) => {
+        if (!cancelled) setClassifications(data.classifications ?? []);
+      })
+      .catch(() => {
+        if (!cancelled) setClassifications([]);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [user?.id]);
 
   useEffect(() => {
     const mq = window.matchMedia("(orientation: landscape)");
@@ -116,7 +146,11 @@ export default function GameClient({ user }: GameClientProps) {
       </GardenScene>
 
       <div className="fixed inset-x-4 bottom-4 z-50 mx-auto max-w-md">
-        <GameSurveys userId={user?.id} mechanicId={garden.openPanelId ?? "garden"} />
+        <GameSurveys
+          userId={user?.id}
+          classifications={classifications}
+          mechanicId={garden.openPanelId ? STRUCTURE_TO_MECHANIC_ID[garden.openPanelId] : undefined}
+        />
       </div>
 
       <Dialog open={showProfileModal} onOpenChange={setShowProfileModal}>
