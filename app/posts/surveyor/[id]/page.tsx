@@ -100,7 +100,7 @@ export default function SurveyorPostPage({ params }: { params: { id: string } })
                               content={classification.content || "No content available"}
                               category={classification.classificationtype || "Unknown"}
                               images={classification.media || []} classificationId={0} anomalyId={classification.id.toString()} votes={0} classificationType={classification.classificationtype || ''}                />
-                <StructuresOnPlanet author={classification.author} />
+                {/* <StructuresOnPlanet author={classification.author} /> */}
               </div>
             )}
           </div>

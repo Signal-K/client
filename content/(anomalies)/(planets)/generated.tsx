@@ -63,11 +63,11 @@ const GeneratedStarterPlanet: React.FC = () => {
 
     if (loading) {
         return <div>Loading...</div>;
-    }
+    };
 
     if (error) {
         return <div>Error: {error}</div>;
-    }
+    };
 
     const totalClassifications = classifications.length;
     const anomalyTypes = new Set(classifications.map(c => c.classificationtype)).size;

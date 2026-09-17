@@ -11,7 +11,7 @@ interface UpgradeItemProps {
   onUpgrade: () => void;
   color: string;
   disabled?: boolean;
-};
+}
 
 export const UpgradeItem: React.FC<UpgradeItemProps> = ({
   title,
@@ -23,7 +23,7 @@ export const UpgradeItem: React.FC<UpgradeItemProps> = ({
   color,
   disabled = false,
 }) => (
-  <div className="bg-[#0a1929] border border-[#1e3a5f] p-4 rounded-md">
+  <div className="bg-transparent border border-[#1e3a5f] p-4 rounded-md">
     <div className="flex items-center justify-between">
       <div>
         <p className="font-medium text-white">{title}</p>
@@ -40,13 +40,13 @@ export const UpgradeItem: React.FC<UpgradeItemProps> = ({
         className="text-white border-[#1e3a5f]"
         style={{
           backgroundColor: color,
-          boxShadow: `0 0 10px ${color}80`, // ~50% opacity
+          boxShadow: `0 0 10px ${color}80`, // 50% opacity glow
         }}
       >
         {current < max ? (
           <>
             UPGRADE <ArrowRight className="ml-2 w-4 h-4" />
-            <span className="ml-2 bg-[#0a1929] px-2 py-1 rounded text-sm text-[#f72585]">
+            <span className="ml-2 bg-transparent px-2 py-1 rounded text-sm text-[#f72585]">
               {cost}
             </span>
           </>

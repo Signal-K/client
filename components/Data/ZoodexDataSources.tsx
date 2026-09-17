@@ -4,12 +4,12 @@ import { CameraIcon, CloudDrizzleIcon, DogIcon, MicroscopeIcon, SunDimIcon, Tele
 import { BurrowingOwlIcon } from '../../content/Icons/BurrowingOwl';
 import { FishIcon } from '../../content/Icons/FishIcon';
 import { StarterTelescopeTess } from '../Projects/Telescopes/Transiting';
-import { DailyMinorPlanet } from '../Projects/Telescopes/DailyMinorPlanet';
+// import { DailyMinorPlanet } from '../Projects/Telescopes/DailyMinorPlanet';
 import { PlanetFourProject } from '../Projects/Satellite/PlanetFour';
 import { StarterSunspot } from '../Projects/Telescopes/Sunspots';
 import { TelescopeDiskDetector } from '../Projects/Telescopes/DiskDetector';
 // import CameraComponent from '../Projects/Zoodex/Upload/Camera';
-import { DataSourcesModal } from './unlockNewDataSources';
+// import { DataSourcesModal } from './unlockNewDataSources';
 import { BurrowingOwl } from '../Projects/Zoodex/burrowingOwls';
 import { PenguinWatch } from '../Projects/Zoodex/penguinWatch';
 import { ZoodexIguanas } from '../Projects/Zoodex/iguanasFromAbove';
@@ -137,7 +137,7 @@ export const telescopeDataSources = [
                 activeStructure: 3103,
                 researched: 'telescope-minorPlanets',
                 techId: 1,
-                dynamicComponent: <DailyMinorPlanet />
+                // dynamicComponent: <DailyMinorPlanet />
             },
             {
                 name: 'Planet Four',
@@ -172,7 +172,7 @@ export const telescopeDataSources = [
                 activeStructure: 3103,
                 researched: 'telescope-sunspots',
                 techId: 5,
-                dynamicComponent: <StarterSunspot anomalyid={40} />
+                // dynamicComponent: <StarterSunspot anomalyid={40} />
             }
         ] 
     },
@@ -234,39 +234,39 @@ export const lidarDataSources = [
     },
 ];
 
-export const physicsLabDataSources = [
-    {
-        category: 'Particle Accelerator',
-        items: [
-            {
-                name: 'Cosmic Muon Images',
-                description: 'Using Muon Tomography we can probe the internal structure of massive objects, like volcanoes, with particles from stars and galaxies far far away... help us identify these particles inside our detectors',
-                identifier: 'physicslab-cosmicMuons',
-                researchId: 'muon-cosmic-muon-images',
-                researcher: 'zooniverse/reinforce',
-                unlocked: false,
-                compatiblePlanetTypes: ['Frozen', 'Hellhole', 'Arid', 'Lush', 'IceGiant', 'GasGiant'],
-                bestPlanetType: ['Hellhole'],
-                tutorialMission: 20000002,
-                activeStructure: 31010,
-                techId: 6,
-            },
-            {
-                name: 'Name that Neutrino',
-                description: 'When a neutrino interacts in ice, a signal or light pattern is produced. Classify the shape of the signals to help us understand the pattern and movement of these particles',
-                identifier: 'physicslab-neutrinoName',
-                researchId: 'name-that-neutrino',
-                researcher: 'zooniverse/icecubeobservatory',
-                unlocked: false,
-                compatiblePlanetTypes: ['Frozen', 'Hellhole', 'Arid', 'Lush', 'IceGiant', 'GasGiant'],
-                bestPlanetType: ['Frozen'],
-                tutorialMission: 20000001,
-                activeStructure: 31010,
-                techId: 6,
-            },
-        ],
-    },
-];
+// export const physicsLabDataSources = [
+//     {
+//         category: 'Particle Accelerator',
+//         items: [
+//             {
+//                 name: 'Cosmic Muon Images',
+//                 description: 'Using Muon Tomography we can probe the internal structure of massive objects, like volcanoes, with particles from stars and galaxies far far away... help us identify these particles inside our detectors',
+//                 identifier: 'physicslab-cosmicMuons',
+//                 researchId: 'muon-cosmic-muon-images',
+//                 researcher: 'zooniverse/reinforce',
+//                 unlocked: false,
+//                 compatiblePlanetTypes: ['Frozen', 'Hellhole', 'Arid', 'Lush', 'IceGiant', 'GasGiant'],
+//                 bestPlanetType: ['Hellhole'],
+//                 tutorialMission: 20000002,
+//                 activeStructure: 31010,
+//                 techId: 6,
+//             },
+//             {
+//                 name: 'Name that Neutrino',
+//                 description: 'When a neutrino interacts in ice, a signal or light pattern is produced. Classify the shape of the signals to help us understand the pattern and movement of these particles',
+//                 identifier: 'physicslab-neutrinoName',
+//                 researchId: 'name-that-neutrino',
+//                 researcher: 'zooniverse/icecubeobservatory',
+//                 unlocked: false,
+//                 compatiblePlanetTypes: ['Frozen', 'Hellhole', 'Arid', 'Lush', 'IceGiant', 'GasGiant'],
+//                 bestPlanetType: ['Frozen'],
+//                 tutorialMission: 20000001,
+//                 activeStructure: 31010,
+//                 techId: 6,
+//             },
+//         ],
+//     },
+// ];
 
 export const roverDataSources = [
     {
