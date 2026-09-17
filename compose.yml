@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  nextapp:
+    container_name: nextapp
+    build:
+      context: ./
+      dockerfile: next.dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://flask:5001 
+    volumes:
+      - ./:/app
+      - /app/node_modules
+    working_dir: /app
+    command: "npm run dev"
+    networks:
+      - app-network
+
+  flask:
+    container_name: flask
+    build:
+      context: ./citizen
+      dockerfile: Dockerfile
+    ports:
+      - "5001:5001"
+    environment:
+      - FLASK_APP=app.py
+      - FLASK_ENV=development
+    volumes:
+      - ./citizen:/app
+    working_dir: /app
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
