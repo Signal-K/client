@@ -21,5 +21,38 @@
   },
   "observability": {
     "enabled": true
+  },
+  // `wrangler deploy --env staging` — a constant preview target on the
+  // *.workers.dev subdomain (no custom domain), so the URL never changes
+  // between deploys. Runtime secrets (POCKETBASE_URL, CLERK_SECRET_KEY, ...)
+  // are synced from the same repo secrets as production on purpose — this
+  // shares the one ecosystem PocketBase/Clerk instance rather than standing
+  // up a second paid backend, so accounts/data are never split from prod.
+  "env": {
+    "staging": {
+      "name": "starsailors-client-staging",
+      "main": ".open-next/worker.js",
+      "compatibility_date": "2026-07-24",
+      "compatibility_flags": ["nodejs_compat"],
+      "workers_dev": true,
+      // Explicit empty override — without this, wrangler inherits the
+      // top-level `routes` and reassigns the production custom domains
+      // (starsailors.space, www.starsailors.space) to this Worker on deploy.
+      "routes": [],
+      "assets": {
+        "directory": ".open-next/assets",
+        "binding": "ASSETS"
+      },
+      "vars": {
+        "NEXT_PUBLIC_POSTHOG_KEY": "phc_65umDftbbTkrm1V6azue6OeU4u5c8iJcaHm4JtJ95di",
+        "NEXT_PUBLIC_POSTHOG_HOST": "https://us.posthog.com",
+        "posthog_api_key": "phc_65umDftbbTkrm1V6azue6OeU4u5c8iJcaHm4JtJ95di",
+        "posthog_project_id": "199773",
+        "posthog_region": "US Cloud"
+      },
+      "observability": {
+        "enabled": true
+      }
+    }
   }
 }

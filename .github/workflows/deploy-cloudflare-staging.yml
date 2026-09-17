@@ -1,16 +1,19 @@
-name: Deploy to Cloudflare Workers
+name: Deploy to Cloudflare Workers (Staging)
 
-# Client is a full Next.js app (API routes, server actions, server-side
-# Pocketbase admin auth) -- not a static SPA like Atlas, so this deploys via
-# the OpenNext Cloudflare adapter (Workers + Assets), not cloudflare/pages-action.
+# Constant preview target for signal-k/client: same OpenNext Cloudflare
+# adapter as production, deployed to the wrangler.jsonc `env.staging`
+# Worker (workers.dev subdomain, no custom domain — the URL never changes
+# between deploys). Points at the SAME shared PocketBase + Clerk instance as
+# production (not a separate staging backend) so accounts/data stay one
+# ecosystem; only the frontend Worker differs.
 on:
   push:
-    branches: [main, master]
+    branches: [staging]
   workflow_dispatch: {}
 
 concurrency:
-  group: cloudflare-production
-  cancel-in-progress: false
+  group: cloudflare-staging
+  cancel-in-progress: true
 
 jobs:
   deploy:
@@ -71,19 +74,16 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          # Explicit top-level env — wrangler.jsonc now also defines
-          # `env.staging`, and an unqualified `deploy` warns once more than
-          # one environment exists in the config.
-          command: deploy --env ""
+          command: deploy --env staging
 
       - name: Sync runtime secrets
         run: |
-          printf '%s' "$POCKETBASE_URL" | npx wrangler secret put POCKETBASE_URL --env ""
-          printf '%s' "$POCKETBASE_ADMIN_EMAIL" | npx wrangler secret put POCKETBASE_ADMIN_EMAIL --env ""
-          printf '%s' "$POCKETBASE_ADMIN_PASSWORD" | npx wrangler secret put POCKETBASE_ADMIN_PASSWORD --env ""
-          printf '%s' "$CLERK_SECRET_KEY" | npx wrangler secret put CLERK_SECRET_KEY --env ""
+          printf '%s' "$POCKETBASE_URL" | npx wrangler secret put POCKETBASE_URL --env staging
+          printf '%s' "$POCKETBASE_ADMIN_EMAIL" | npx wrangler secret put POCKETBASE_ADMIN_EMAIL --env staging
+          printf '%s' "$POCKETBASE_ADMIN_PASSWORD" | npx wrangler secret put POCKETBASE_ADMIN_PASSWORD --env staging
+          printf '%s' "$CLERK_SECRET_KEY" | npx wrangler secret put CLERK_SECRET_KEY --env staging
           if [ -n "$CLERK_WEBHOOK_SIGNING_SECRET" ]; then
-            printf '%s' "$CLERK_WEBHOOK_SIGNING_SECRET" | npx wrangler secret put CLERK_WEBHOOK_SIGNING_SECRET --env ""
+            printf '%s' "$CLERK_WEBHOOK_SIGNING_SECRET" | npx wrangler secret put CLERK_WEBHOOK_SIGNING_SECRET --env staging
           fi
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
