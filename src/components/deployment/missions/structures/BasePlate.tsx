@@ -59,7 +59,7 @@ const MissionShell = ({
     async function getProfile() {
       setLoading(true);
       const res = await fetch("/api/gameplay/profile/me");
-      const payload = await res.json();
+      const payload = await res.json().catch(() => null);
 
       if (!ignore) {
         if (!res.ok) {

@@ -11,17 +11,25 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const pb = await createPocketbaseAdminClient();
-  const profile = await pb
-    .collection("profiles")
-    .getFirstListItem(pb.filter("userId = {:id}", { id: user.id }))
-    .catch(() => null);
+  try {
+    const pb = await createPocketbaseAdminClient();
+    const profile = await pb
+      .collection("profiles")
+      .getFirstListItem(pb.filter("userId = {:id}", { id: user.id }))
+      .catch(() => null);
 
-  return NextResponse.json({
-    avatar_url: profile?.avatarUrl ?? null,
-    username: profile?.username ?? null,
-    full_name: profile?.fullName ?? null,
-    referral_code: profile?.referralCode ?? null,
-    location: profile?.location != null ? String(profile.location) : null,
-  });
+    return NextResponse.json({
+      avatar_url: profile?.avatarUrl ?? null,
+      username: profile?.username ?? null,
+      full_name: profile?.fullName ?? null,
+      referral_code: profile?.referralCode ?? null,
+      location: profile?.location != null ? String(profile.location) : null,
+    });
+  } catch (error: any) {
+    console.error("Error fetching profile:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch profile", details: error?.message },
+      { status: 500 }
+    );
+  }
 }
