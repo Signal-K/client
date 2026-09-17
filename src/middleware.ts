@@ -22,5 +22,12 @@ export default clerkMiddleware(async (auth, request) => {
 });
 
 export const config = {
-  matcher: ["/", "/game/:path*", "/api/:path*"],
+  matcher: [
+    // Run on every page route (so a server action posted back from any page
+    // has clerkMiddleware() in the request chain), skipping only Next.js
+    // internals and static files.
+    "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
+    // Always run for API routes.
+    "/(api|trpc)(.*)",
+  ],
 };
