@@ -1,16 +1,16 @@
 "use client";
 
 import React, { useEffect, useState, useRef } from "react";
-import { AvatarGenerator } from "@/components/Account/Avatar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ThumbsUp, MessageSquare, Share2 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
-import html2canvas from "html2canvas";
 import { CommentCard } from "../Comments/CommentSingle";
+import { AvatarGenerator } from '@/components/Account/Avatar';
+import html2canvas from 'html2canvas';
 import { SurveyorComments } from "./Surveyor/SurveyorPostCard";
 
 export interface CommentProps {
@@ -18,25 +18,29 @@ export interface CommentProps {
   author: string;
   content: string;
   created_at: string;
+  isSurveyor?: boolean;
+  configuration?: {
+      planetType?: string;
+  };
   username?: string;
-}
+};
 
 export interface PostCardSingleProps {
-  classificationId: number;
-  title: string;
-  anomalyId: string;
-  author: string;
-  content: string;
-  votes: number;
-  category: string;
-  tags?: string[];
-  classificationConfig?: any;
-  images: string[];
-  classificationType: string;
-  onVote?: () => void;
-  children?: React.ReactNode;
-  commentStatus?: boolean;
-}
+    classificationId: number;
+    title: string;
+    anomalyId: string;
+    author: string;
+    content: string;
+    votes: number;
+    category: string;
+    tags?: string[];
+    classificationConfig?: any;
+    images: string[];
+    classificationType: string;
+    onVote?: () => void;
+    children?: React.ReactNode;
+    commentStatus?: boolean;
+};
 
 export function PostCardSingle({
   classificationId,
@@ -46,25 +50,32 @@ export function PostCardSingle({
   votes,
   category,
   tags,
-  anomalyId,
+  anomalyId, 
   classificationConfig,
   images,
   classificationType,
   commentStatus,
   onVote,
+  // enableNewCommentingMethod = false,
 }: PostCardSingleProps) {
   const supabase = useSupabaseClient();
   const session = useSession();
-
+  
   const [comments, setComments] = useState<CommentProps[]>([]);
   const [loadingComments, setLoadingComments] = useState<boolean>(true);
   const [voteCount, setVoteCount] = useState(votes);
   const [newComment, setNewComment] = useState<string>("");
+  const [commentInputs, setCommentInputs] = useState<Record<number, string>>({});
   const [isSharing, setIsSharing] = useState(false);
-  const [showStats, setShowStats] = useState(false);
   const shareCardRef = useRef<HTMLDivElement>(null);
+  const [showStats, setShowStats] = useState(false);
 
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const [surveyorComments, setSurveyorComments] = useState<any[]>([]);
+  const [nonSurveyorComments, setNonSurveyorComments] = useState<any[]>([]);
+
+  useEffect(() => {
+    fetchComments();
+  }, [classificationId]);
 
   const fetchComments = async () => {
     setLoadingComments(true);
@@ -75,44 +86,47 @@ export function PostCardSingle({
         .eq("classification_id", classificationId)
         .order("created_at", { ascending: false });
 
+        if (classificationConfig?.classificationType === "telescope-minorPlanet" || classificationConfig?.classificationType === "planet") {
+          const surveyor = comments.filter((comment) => comment.isSurveyor);
+          const nonSurveyor = comments.filter((comment) => !comment.isSurveyor);
+          setSurveyorComments(surveyor);
+          setNonSurveyorComments(nonSurveyor);
+        };
+
       if (error) throw error;
       setComments(data);
     } catch (error) {
       console.error("Error fetching comments:", error);
     } finally {
       setLoadingComments(false);
-    }
+    };
   };
 
-  useEffect(() => {
-    fetchComments();
-  }, [classificationId]);
-
   const handleVoteClick = async () => {
-    if (!session?.user?.id) return;
+    if (!session?.user?.id) return;  
 
     try {
       const { error } = await supabase.from("votes").insert([
         {
           user_id: session.user.id,
-          classification_id: classificationId,
+          classification_id: classificationId, 
           anomaly_id: anomalyId,
         },
       ]);
-
+  
       if (error) {
         console.error("Error inserting vote: ", error);
         return;
-      }
-
+      };
+  
       setVoteCount((prev) => prev + 1);
     } catch (error) {
       console.error("Error handling vote:", error);
-    }
-
+    };
+  
     if (onVote) onVote();
   };
-
+  
   const handleAddComment = async () => {
     if (!newComment.trim()) return;
 
@@ -133,8 +147,10 @@ export function PostCardSingle({
       fetchComments();
     } catch (error) {
       console.error("Error adding comment:", error);
-    }
+    };
   };
+
+  const [currentIndex, setCurrentIndex] = React.useState(0);
 
   const goToNextImage = () => {
     setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
@@ -146,13 +162,34 @@ export function PostCardSingle({
     );
   };
 
+  // For sharing
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement | null>(null);
+
+  const toggleDropdown = () => {
+    setDropdownOpen((prev) => !prev);
+  };
+
+  const handleCopyLink = () => {
+    const link = `https://starsailors.space/posts/${classificationId}`;
+    navigator.clipboard.writeText(link).then(() => {
+      alert("Link copied to clipboard!");
+    });
+  };
+
+  const openPostInNewTab = () => {
+    window.open(`/posts/${classificationId}`, "_blank");
+  };
+
   const handleShare = async () => {
     if (!shareCardRef.current) return;
     setIsSharing(true);
-
+  
     const safeTitle = title || "post";
-    const imgs = Array.from(shareCardRef.current.querySelectorAll("img"));
-    const imagePromises = imgs.map((img: HTMLImageElement) =>
+    
+    // Ensure all images are loaded
+    const images = Array.from(shareCardRef.current.querySelectorAll('img'));
+    const imagePromises = images.map((img: HTMLImageElement) =>
       new Promise<void>((resolve, reject) => {
         if (img.complete) {
           resolve();
@@ -162,47 +199,54 @@ export function PostCardSingle({
         }
       })
     );
-
+  
     try {
       await Promise.all(imagePromises);
+  
       const canvas = await html2canvas(shareCardRef.current, {
-        useCORS: true,
+        useCORS: true, 
         scrollX: 0,
-        scrollY: -window.scrollY,
+        scrollY: -window.scrollY, 
       });
-
-      canvas.toBlob((blob) => {
-        if (blob) {
-          const link = document.createElement("a");
-          link.href = URL.createObjectURL(blob);
-          link.download = `${safeTitle.toLowerCase().replace(/\s+/g, "-")}-share.png`;
-          link.click();
-        }
-      }, "image/png");
+  
+      canvas.toBlob(
+        (blob) => {
+          if (blob) {
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = `${safeTitle.toLowerCase().replace(/\s+/g, "-")}-share.png`;
+            link.click();
+          }
+        },
+        "image/png",
+        1.0
+      );
     } catch (error) {
       console.error("Error sharing post: ", error);
     } finally {
       setIsSharing(false);
-    }
-  };
+    };
+  };  
+
+  // useEffect(() => {
+  //   console.log("Images prop received:", images);
+  // }, [images]);  
 
   return (
     <div ref={shareCardRef}>
       <Card className="w-full mx-auto my-8 bg-card text-card-foreground border-primary">
         <CardHeader>
           <div className="flex items-center space-x-4">
-            {session && <AvatarGenerator author={session.user.id} />}
+            {session && <AvatarGenerator author={session?.user.id} />}
             <div>
               <CardTitle>{title}</CardTitle>
               <p className="text-sm text-muted-foreground">by {author}</p>
             </div>
           </div>
         </CardHeader>
-
         <CardContent>
           <Badge variant="secondary">{category}</Badge>
           <p>{content}</p>
-
           {images.length > 0 && (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
               <div className="relative col-span-1">
@@ -242,7 +286,6 @@ export function PostCardSingle({
             </div>
           )}
         </CardContent>
-
         <CardFooter className="flex items-center justify-between space-x-2">
           <div className="flex gap-2">
             <Button onClick={handleVoteClick} size="sm">
@@ -253,7 +296,9 @@ export function PostCardSingle({
             </Button>
           </div>
           <Button
-            onClick={handleShare}
+            onClick={() => {
+              handleShare();
+            }}
             size="sm"
             disabled={isSharing}
             variant="outline"
@@ -263,7 +308,6 @@ export function PostCardSingle({
             {isSharing ? "Sharing..." : "Share"}
           </Button>
         </CardFooter>
-
         {commentStatus !== false && (
           <CardContent>
             {!showStats && (
@@ -279,24 +323,13 @@ export function PostCardSingle({
                   <Button onClick={handleAddComment} className="w-full">
                     Submit Comment
                   </Button>
-                  <Button onClick={() => setShowStats(true)} variant="outline">
-                    View or propose surveyor stats
+                  <Button onClick={() => setShowStats(!showStats)} variant="outline">
+                    Propose new stats
                   </Button>
                 </CardFooter>
               </div>
             )}
-
-            {showStats ? (
-              <div className="mt-4 space-y-2">
-                <SurveyorComments
-                  classificationId={classificationId}
-                  author={author}
-                  anomalyId={anomalyId}
-                  classificationConfig={classificationConfig}
-                  commentStatus={commentStatus}
-                />
-              </div>
-            ) : (
+            {!showStats ? (
               <div className="mt-4 space-y-2">
                 {loadingComments ? (
                   <p>Loading comments...</p>
@@ -311,11 +344,22 @@ export function PostCardSingle({
                       replyCount={0}
                       classificationId={classificationId}
                       parentCommentId={classificationId}
+                      isSurveyor={comment.isSurveyor}
                     />
                   ))
                 ) : (
                   <p>No comments yet. Be the first to comment!</p>
                 )}
+              </div>
+            ) : (
+              <div className="mt-4 space-y-2">
+                <SurveyorComments
+                  classificationId={classificationId}
+                  author={author}
+                  anomalyId={anomalyId}
+                  classificationConfig={classificationConfig}
+                  commentStatus={commentStatus}
+                />
               </div>
             )}
           </CardContent>
@@ -323,4 +367,4 @@ export function PostCardSingle({
       </Card>
     </div>
   );
-}
+};

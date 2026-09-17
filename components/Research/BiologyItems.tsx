@@ -119,7 +119,7 @@ export default function BiologyResearch() {
                         </h3>
                         <UpgradeItem
                             title="Camera Count ++"
-                            description="Add more field cameras to capture diverse lifeforms and behavioral patterns"
+                            description="Increase observation capabilities"
                             current={userCapacities.cameraCount}
                             max={3}
                             cost={getUpgradeCost(userCapacities.cameraCount)}
@@ -132,7 +132,7 @@ export default function BiologyResearch() {
                         />
                         <UpgradeItem
                             title="Sensor Count ++"
-                            description="Install additional sensors to gather increased environmental and biological data."
+                            description="Increase sensor capabilities"
                             current={userCapacities.sensorCount}
                             max={3}
                             cost={getUpgradeCost(userCapacities.sensorCount)}
@@ -145,7 +145,7 @@ export default function BiologyResearch() {
                         />
                         <UpgradeItem
                             title="Station Size ++"
-                            description="Expand your research stations to support more experiments and equipment"
+                            description="Increase the size of your research station"
                             current={userCapacities.stationSize}
                             max={3}
                             cost={getUpgradeCost(userCapacities.stationSize)}
@@ -157,9 +157,9 @@ export default function BiologyResearch() {
                             color="#4cc9f0"
                         />
                     </div>
-                    {/* <div className="">
+                    <div className="">
                         <GreenhouseResearchStations />
-                    </div> */}
+                    </div>
                 </div>
             </TechSection>
         </>

@@ -4,13 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
 import ClassificationForm from "@/components/Projects/(classifications)/PostForm";
-type Anomaly = {
-  id: string;
-  name: string;
-  content?: string;
-  details?: string;
-};
-
+import { Anomaly } from "./Transiting";
 import { Button } from "@/components/ui/button";
 
 interface TelescopeProps {

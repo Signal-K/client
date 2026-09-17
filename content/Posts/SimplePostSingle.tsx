@@ -1,15 +1,12 @@
-'use client';
-
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import StructuresOnPlanet from '@/components/Structures/Structures';
 import { AvatarGenerator } from '@/components/Account/Avatar';
 import { Button } from '@/components/ui/button';
-import { Share2, ThumbsUpIcon, ThumbsDownIcon, MessageCircle } from 'lucide-react';
+import { Share2, ThumbsUpIcon } from 'lucide-react';
+// import PlanetGenerator from '@/components/Data/Generator/Astronomers/PlanetHunters/PlanetGenerator';
 import html2canvas from 'html2canvas';
-import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
-import { CommentForm } from '../Comments/CommentForm';
-import CommentsList from '../Comments/CommentListById';
-import { useRouter } from 'next/navigation';
 
 interface SimplePostSingleProps {
   title: string;
@@ -18,7 +15,8 @@ interface SimplePostSingleProps {
   content: string;
   category: string;
   images: string[];
-}
+  classificationConfiguration?: any;
+};
 
 export function SimplePostSingle({
   id,
@@ -27,160 +25,148 @@ export function SimplePostSingle({
   content,
   category,
   images,
+  classificationConfiguration,
 }: SimplePostSingleProps) {
-  const router = useRouter();
-
-  const supabase = useSupabaseClient();
-  const session = useSession();
-
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [voteTotal, setVoteTotal] = useState<number>(0);
-  const [userVote, setUserVote] = useState<'up' | 'down' | null>(null); 
-  const [showCommentForm, setShowCommentForm] = useState(false);
-  const [isLightboxOpen, setIsLightboxOpen] = useState(false);
-
+  const [isSharing, setIsSharing] = useState<boolean>(false);
   const shareCardRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    fetchVotes();
-  }, [id, session?.user?.id]);
-
-  const fetchVotes = async () => {
-    try {
-      const { data: votes, error } = await supabase
-        .from('votes')
-        .select('vote_type, user_id')
-        .eq('classification_id', id);
-
-      if (error) throw error;
-
-      const upvotes = votes.filter((v) => v.vote_type === 'up').length;
-      const downvotes = votes.filter((v) => v.vote_type === 'down').length;
-
-      setVoteTotal(upvotes - downvotes);
-
-      if (session?.user?.id) {
-        const userVote = votes.find((v) => v.user_id === session.user.id);
-        setUserVote(userVote?.vote_type || null);
-      }
-    } catch (error) {
-      console.error('Error fetching votes:', error);
-    }
+  const goToNextImage = () => {
+    setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
   };
 
-  const handleVote = async (type: 'up' | 'down') => {
-    if (!session) return;
-
-    try {
-      const { data: existingVote } = await supabase
-        .from('votes')
-        .select('*')
-        .eq('user_id', session.user.id)
-        .eq('classification_id', id)
-        .maybeSingle();
-
-      if (existingVote) {
-        if (existingVote.vote_type === type) {
-          await supabase.from('votes').delete().eq('id', existingVote.id);
-          setUserVote(null);
-        } else {
-          await supabase.from('votes').update({ vote_type: type }).eq('id', existingVote.id);
-          setUserVote(type);
-        }
-      } else {
-        await supabase.from('votes').insert({
-          user_id: session.user.id,
-          classification_id: id,
-          vote_type: type,
-        });
-        setUserVote(type);
-      }
-
-      fetchVotes();
-    } catch (error) {
-      console.error('Voting error:', error);
-    }
+  const goToPreviousImage = () => {
+    setCurrentIndex((prevIndex) =>
+      prevIndex === 0 ? images.length - 1 : prevIndex - 1
+    );
   };
 
-  const goToNextImage = () => setCurrentIndex((prev) => (prev + 1) % images.length);
-  const goToPreviousImage = () => setCurrentIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
-  const toggleDropdown = () => setDropdownOpen((prev) => !prev);
-  const toggleCommentForm = () => setShowCommentForm((prev) => !prev);
+  // For sharing
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement | null>(null);
+
+  const toggleDropdown = () => {
+    setDropdownOpen((prev) => !prev);
+  };
 
   const handleCopyLink = () => {
     const link = `https://starsailors.space/posts/${id}`;
-    navigator.clipboard.writeText(link).then(() => alert('Link copied to clipboard!'));
+    navigator.clipboard.writeText(link).then(() => {
+      alert('Link copied to clipboard!');
+    });
   };
 
-  const openPostInNewTab = () => window.open(`/posts/${id}`, '_blank');
+  const openPostInNewTab = () => {
+    window.open(`/posts/${id}`, '_blank');
+  };
 
   const handleShare = async () => {
-    if (!shareCardRef.current) return;
+    if (!shareCardRef.current) {
+      return;
+    };
+
+    setIsSharing(true);
+
+    const safeTitle = title || 'post';
 
     const images = Array.from(shareCardRef.current.querySelectorAll('img'));
     const imagePromises = images.map((img: HTMLImageElement) =>
       new Promise<void>((resolve, reject) => {
-        if (img.complete) return resolve();
-        img.onload = () => resolve();
-        img.onerror = () => reject(new Error('image failed to load'));
+        if (img.complete) {
+          resolve();
+        } else {
+          img.onload = () => resolve();
+          img.onerror = () => reject(new Error("image failed to load"));
+        };
       })
     );
 
-    await Promise.all(imagePromises);
+    try {
+      await Promise.all(imagePromises);
+      const canvas = await html2canvas(shareCardRef.current, {
+        useCORS: true,
+        scrollX: 0,
+        scrollY: -window.scrollY,
+      });
 
-    const canvas = await html2canvas(shareCardRef.current, {
-      useCORS: true,
-      scrollX: 0,
-      scrollY: -window.scrollY,
-    });
-
-    canvas.toBlob((blob) => {
-      if (blob) {
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
-        link.download = `${title.toLowerCase().replace(/\s+/g, '-')}-share.png`;
-        link.click();
-      }
-    }, 'image/png');
+      canvas.toBlob(
+        (blob) => {
+          if (blob) {
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = `${safeTitle.toLowerCase().replace(/\s+/g, "-")}-share.png`;
+            link.click();
+          }
+        },
+        "image/png",
+        1.0,
+      );
+    } catch (error: any) {
+      console.error("Error sharing post: ", error);
+    } finally {
+      setIsSharing(false);
+    };
   };
 
   return (
-    <div className="flex items-center justify-center w-full px-4 overflow-hidden" ref={shareCardRef}>
-      <Card className="w-full max-w-4xl md:w-4/5 max-h-screen bg-white border border-[#D8DEE9] shadow-2xl rounded-xl overflow-y-auto">
+    <div className="flex items-center justify-center" ref={shareCardRef}>
+      <Card className="w-full max-w-lg backdrop-blur-md border border-white/10 shadow-lg rounded-lg relative">
+        <div
+          className="absolute top-2 right-2 z-10"
+          ref={dropdownRef}
+        >
+          <Button
+            onClick={toggleDropdown}
+            className="flex items-center gap-2 justify-center"
+          >
+            <Share2 className="mr-2" /> Share
+          </Button>
+          {dropdownOpen && (
+            <div className="absolute top-10 right-0 bg-white/30 backdrop-blur-md border border-white/10 shadow-lg rounded-lg p-4">
+              <Button onClick={handleCopyLink} className="w-full mb-2">
+                Copy Link
+              </Button>
+              <Button onClick={openPostInNewTab} className="w-full">
+                Open
+              </Button>
+              <Button onClick={handleShare} className="w-full mt-2">
+                Download Post
+              </Button>
+            </div>
+          )}
+        </div>
+
         <CardHeader>
           <div className="flex items-center space-x-4">
             <AvatarGenerator author={author} />
             <div>
-              <CardTitle className="text-[#2E3440]">{title}</CardTitle>
-              <p className="text-sm text-[#4C566A]">by {author}</p>
+              <CardTitle>{title}</CardTitle>
+              <p className="text-sm text-muted-foreground">by {author}</p>
             </div>
           </div>
         </CardHeader>
-
         <CardContent>
-          <p className="text-xs font-semibold text-[#5E81AC] uppercase mb-1 tracking-wide">{category}</p>
-          <p className="text-[#2E3440]">{content}</p>
-
+          <p className="text-sm font-medium text-muted-foreground mb-2">{category}</p>
+          <p className="mb-4">{content}</p>
           {images.length > 0 && (
             <div className="relative">
               <img
                 src={images[currentIndex]}
                 alt={`Image ${currentIndex + 1}`}
-                className="w-full max-h-[400px] object-contain cursor-pointer rounded-lg transition-all duration-200" // 🔧 UPDATED
-                onClick={() => setIsLightboxOpen(true)}
+                className="rounded-lg w-full"
               />
+
               {images.length > 1 && (
                 <>
                   <button
                     onClick={goToPreviousImage}
-                    className="absolute top-1/2 left-4 transform -translate-y-1/2 bg-[#4C566A]/60 text-white rounded-full p-2"
+                    className="absolute top-1/2 left-4 transform -translate-y-1/2 bg-gray-800 text-white rounded-full p-2 focus:outline-none"
                   >
                     &#8592;
                   </button>
                   <button
                     onClick={goToNextImage}
-                    className="absolute top-1/2 right-4 transform -translate-y-1/2 bg-[#4C566A]/60 text-white rounded-full p-2"
+                    className="absolute top-1/2 right-4 transform -translate-y-1/2 bg-gray-800 text-white rounded-full p-2 focus:outline-none"
                   >
                     &#8594;
                   </button>
@@ -189,102 +175,19 @@ export function SimplePostSingle({
                       <button
                         key={index}
                         onClick={() => setCurrentIndex(index)}
-                        className={`h-2 w-2 rounded-full transition ${
-                          currentIndex === index ? 'bg-[#5E81AC]' : 'bg-[#D8DEE9]'
+                        className={`h-2 w-2 rounded-full ${
+                          currentIndex === index ? 'bg-white' : 'bg-gray-400'
                         }`}
-                      />
+                      ></button>
                     ))}
                   </div>
                 </>
               )}
             </div>
           )}
-
-          {isLightboxOpen && (
-            <div className="fixed inset-0 bg-black bg-opacity-80 z-50 flex items-center justify-center">
-              <button
-                className="absolute top-4 right-4 text-white text-2xl"
-                onClick={() => setIsLightboxOpen(false)}
-              >
-                ✕
-              </button>
-              <img
-                src={images[currentIndex]}
-                alt={`Enlarged image ${currentIndex + 1}`}
-                className="max-w-[90%] max-h-[40%] object-contain rounded-lg"
-              />
-            </div>
-          )}
-
-          <div className="w-full flex justify-between items-center px-0 pb-2 pt-2 border-t border-[#D8DEE9] text-[#2E3440] text-sm bg-white/80">
-            <div className="flex items-center gap-6">
-              <button
-                onClick={() => handleVote('up')}
-                className={`flex items-center gap-1 transition ${
-                  userVote === 'up' ? 'text-[#A3BE8C]' : 'text-[#4C566A] hover:text-[#88C0D0]'
-                }`}
-              >
-                <ThumbsUpIcon className="w-5 h-5" />
-                Upvote
-              </button>
-              <button
-                onClick={() => handleVote('down')}
-                className={`flex items-center gap-1 transition ${
-                  userVote === 'down' ? 'text-[#BF616A]' : 'text-[#4C566A] hover:text-[#D08770]'
-                }`}
-              >
-                <ThumbsDownIcon className="w-5 h-5" />
-                Downvote
-              </button>
-              <div className="text-sm font-semibold text-[#2E3440]">
-                Score:{' '}
-                <span className={voteTotal >= 0 ? 'text-green-600' : 'text-red-600'}>{voteTotal}</span>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-4">
-              <button
-                onClick={toggleCommentForm}
-                className="flex items-center gap-1 text-[#4C566A] hover:text-[#A3BE8C] transition"
-              >
-                <MessageCircle className="w-5 h-5" />
-                Comment
-              </button>
-              <div className="relative">
-                <button
-                  onClick={toggleDropdown}
-                  className="flex items-center gap-1 text-[#4C566A] hover:text-[#EBCB8B] transition"
-                >
-                  <Share2 className="w-5 h-5" />
-                  Share
-                </button>
-                {dropdownOpen && (
-                  <div className="absolute bottom-10 right-0 bg-white/90 backdrop-blur-md border border-[#D8DEE9] shadow-xl rounded-lg p-4 z-20">
-                    <Button onClick={handleCopyLink} className="w-full mb-2 bg-[#88C0D0] text-white hover:bg-[#81A1C1]">
-                      Copy Link
-                    </Button>
-                    <Button onClick={openPostInNewTab} className="w-full mb-2 bg-[#5E81AC] text-white hover:bg-[#4C566A]">
-                      Open
-                    </Button>
-                    <Button onClick={handleShare} className="w-full bg-[#A3BE8C] text-white hover:bg-[#8FBC8F]">
-                      Download Post
-                    </Button>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-
-                <Button
-                  onClick={() => router.push(`/next/${id}`)}
-                  variant='outline'
-                >
-                  Details
-                </Button>
-
-          <CommentForm classificationId={parseInt(id)} onSubmit={() => setShowCommentForm(false)} />
-          <CommentsList classificationId={id} />
         </CardContent>
+        {/* <PlanetGenerator classificationId={String(id)} classificationConfig={classificationConfiguration} author={author} /> */}
+        {/* <StructuresOnPlanet author={author} /> */}
       </Card>
     </div>
   );

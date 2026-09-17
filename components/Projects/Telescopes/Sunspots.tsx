@@ -166,14 +166,11 @@ const SunspotDetectorTutorial: React.FC<TelescopeProps> = ({
     );
 };
 
-type Anomaly = {
-  id: string;
-  name: string;
-  details?: string;
-};
+import { Anomaly } from "./Transiting";
+import PreferredTerrestrialClassifications from "@/components/Structures/Missions/PickPlanet";
 import ImageAnnotator from "../(classifications)/Annotating/Annotator";
 
-export function StarterSunspot() {
+export function StarterSunspot({ anomalyid }: SelectedAnomalyProps ) {
     const supabase = useSupabaseClient();
     const session = useSession();
 
@@ -253,11 +250,30 @@ export function StarterSunspot() {
                         assetMentioned={imageUrl}
                         structureItemId={3103}
                         missionNumber={5055655555}
-                        // parentPlanetLocation={anomalyid?.toString() || ''}
+                        parentPlanetLocation={anomalyid?.toString() || ''}
                         annotationType="Sunspots"
                     />
                 )}
             </div>
+        </div>
+    );
+};
+
+export function SunspotsWrapper() {
+    const [selectedAnomaly, setSelectedAnomaly] = useState<number | null>(null);
+
+    return (
+        <div className="space-y-8">
+            {!selectedAnomaly && (
+                <PreferredTerrestrialClassifications
+                    onSelectAnomaly={setSelectedAnomaly}
+                />
+            )}
+            {selectedAnomaly && (
+                <StarterSunspot 
+                    anomalyid={selectedAnomaly}
+                />
+            )}
         </div>
     );
 };

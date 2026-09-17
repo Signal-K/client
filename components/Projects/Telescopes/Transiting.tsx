@@ -5,130 +5,169 @@ import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
 import { useActivePlanet } from '@/context/ActivePlanet'; 
 import ClassificationForm from '@/components/Projects/(classifications)/PostForm';
 import { planetClassificationConfig } from '@/components/Projects/(classifications)/FormConfigurations';
-// import PreferredTerrestrialClassifications from '@/components/Structures/Missions/PickPlanet';
+import PreferredTerrestrialClassifications from '@/components/Structures/Missions/PickPlanet';
 import ImageAnnotator from '../(classifications)/Annotating/Annotator';
 import { Button } from "@/components/ui/button";
-import { useRouter } from 'next/navigation';
 
-type Anomaly = {
-  id: number;
-  anomalySet: string;
-  avatar_url?: string;
-  content?: any;
+export interface Anomaly {
+    id: bigint;
+    content: string;
+    avatar_url?: string; 
 };
 
-export function StarterTelescopeTess() {
-  const supabase = useSupabaseClient()
-  const session = useSession()
-  const router = useRouter()
+interface SelectedAnomProps {
+    anomalyid?: number;
+}; 
 
-  const [selectedAnomaly, setSelectedAnomaly] = useState<Anomaly | null>(null)
-  const [imageUrls, setImageUrls] = useState<string[]>([])
-  const [loading, setLoading] = useState<boolean>(true)
-  const [error, setError] = useState<string | null>(null)
-  const [showTutorial, setShowTutorial] = useState(false)
+export function StarterTelescopeTessWithId({ anomalyid }: SelectedAnomProps) {
+  const supabase = useSupabaseClient();
+  const session = useSession();
 
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ""
+  const [anomaly, setAnomaly] = useState<Anomaly | null>(null);
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchRandomLinkedAnomaly = async () => {
-      if (!session) {
-        setLoading(false)
-        return
-      }
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+  const [loading, setLoading] = useState<boolean>(true);
 
-      try {
-        const { data: linkedAnomalies, error: linkedError } = await supabase
-          .from("linked_anomalies")
-          .select(`
-            id,
-            anomaly_id,
-            anomalies!inner (
-              id,
-              anomalySet,
-              avatar_url,
-              content
-            )
-          `)
-          .eq("author", session.user.id)
-          .eq("anomalies.anomalySet", "telescope-tess")
-
-        if (linkedError) throw linkedError
-
-        if (!linkedAnomalies || linkedAnomalies.length === 0) {
-          router.push("/deploy")
-          return
-        }
-
-        // Pick a random anomaly from the list
-        const randomIndex = Math.floor(Math.random() * linkedAnomalies.length)
-        const anomaly = linkedAnomalies[randomIndex]?.anomalies as unknown as Anomaly
-
-        setSelectedAnomaly(anomaly)
-
-        const urls: string[] = []
-        if (anomaly.avatar_url) urls.push(anomaly.avatar_url)
-        urls.push(`${supabaseUrl}/storage/v1/object/public/anomalies/${anomaly.id}/Sector1.png`)
-
-        setImageUrls(urls)
-      } catch (err: any) {
-        console.error("Error fetching linked anomaly:", err.message || err)
-        setError("Unable to load anomaly.")
-      } finally {
-        setLoading(false)
-      }
+  const fetchAnomalies = async () => {
+    if (!session) {
+      setLoading(false);
+      return;
     }
 
-    fetchRandomLinkedAnomaly()
-  }, [session])
+    try {
+      const { data: anomalyData, error } = await supabase
+        .from('anomalies')
+        .select('*')
+        .eq('anomalySet', 'telescope-tess')
+        .eq('id', anomalyid);
 
-  if (error) return <div className="text-red-500 p-4">{error}</div>
-  if (loading) return <div className="text-white p-4">Loading...</div>
-  if (!selectedAnomaly || imageUrls.length === 0)
-    return <div className="text-white p-4">No anomaly found.</div>
+      if (error) {
+        console.log(error);
+        setLoading(false);
+        return;
+      };
+
+      setAnomaly(anomalyData[0]);
+      setImageUrl(`${supabaseUrl}/storage/v1/object/public/anomalies/${anomalyid}/Sector1.png`);
+    } catch (error: any) {
+      console.error(error);
+      setLoading(false);
+      return;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchAnomalies();
+  }, [session]);
+
+  if (loading) return <p>Loading...</p>;
 
   return (
-    <div className="w-full h-screen overflow-hidden flex flex-col gap-2 px-4 py-6">
-      {/* Button Bar */}
-      <div className="w-full rounded-xl backdrop-blur-md bg-white/10 shadow-md p-2 flex justify-end">
-        <Button variant="outline" onClick={() => setShowTutorial(true)}>
-          Want a walkthrough? Start the tutorial
-        </Button>
-      </div>
 
-      {/* Tutorial OR Annotator */}
-      <div className="flex-1 w-full rounded-xl bg-white/10 backdrop-blur-md shadow-md p-2 overflow-hidden">
-        {showTutorial ? (
-          <div className="w-full h-full overflow-auto">
-            <FirstTelescopeClassification anomalyid="6" />
-          </div>
-        ) : (
-          <div className="w-full h-full overflow-hidden grid grid-rows-[auto_1fr] sm:grid-rows-none sm:grid-cols-1">
-            <ImageAnnotator
-              anomalyType="planet"
-              missionNumber={1372001}
-              structureItemId={3103}
-              assetMentioned={selectedAnomaly.id.toString()}
-              annotationType="PH"
-              initialImageUrl={imageUrls[1]}
-              anomalyId={selectedAnomaly.id.toString()}
-              className="h-full max-h-[calc(100vh-10rem)] sm:max-h-full"
-            />
-          </div>
-        )}
-      </div>
+        <ImageAnnotator
+          anomalyType="planet"
+          missionNumber={1372001}
+          structureItemId={3103}
+          assetMentioned={anomalyid?.toString()}
+          annotationType="PH"
+          initialImageUrl={imageUrl || ''}
+          anomalyId={anomalyid?.toString()}
+        />
+  );
+};
 
-      <style jsx global>{`
-        @media (max-width: 640px) {
-          html, body {
-            overflow: hidden;
-            height: 100vh;
-          }
-        }
-      `}</style>
-    </div>
-  )
-}
+export function StarterTelescopeTess({ anomalyid }: SelectedAnomProps) {
+    const supabase = useSupabaseClient();
+    const session = useSession();
+
+    const { activePlanet } = useActivePlanet();
+
+    const [anomalies, setAnomalies] = useState<Anomaly[]>([]);
+    const [selectedAnomaly, setSelectedAnomaly] = useState<Anomaly | null>(null);
+    const [imageUrls, setImageUrls] = useState<string[]>([]);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [error, setError] = useState<string | null>(null);
+    const [showTutorial, setShowTutorial] = useState(false);
+
+    useEffect(() => {
+        const fetchAnomalies = async () => {
+            if (!session) {
+                setLoading(false);
+                return;
+            };
+
+            try {
+                const { data: anomalyData, error: anomalyError } = await supabase
+                    .from("anomalies")
+                    .select("*")
+                    .eq("anomalySet", "telescope-tess");
+                if (anomalyError) throw anomalyError;
+
+                setAnomalies(anomalyData || []);
+                if (anomalyData?.length > 0) {
+                    const randomAnomaly = anomalyData[Math.floor(Math.random() * anomalyData.length)];
+                    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://your-default-supabase-url.com';
+                    const imageList = [];
+
+                    if (randomAnomaly?.avatar_url) {
+                        imageList.push(randomAnomaly.avatar_url);
+                    };
+
+                    if (randomAnomaly?.id) {
+                        const sectorUrl = `${supabaseUrl}/storage/v1/object/public/anomalies/${randomAnomaly.id}/Sector1.png`;
+                        imageList.push(sectorUrl);
+                    };
+
+                    setImageUrls(imageList);
+                    setSelectedAnomaly(randomAnomaly);
+                }
+            } catch (error: any) {
+                console.error("Error fetching anomalies:", error.message || error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchAnomalies();
+    }, [session, supabase]);
+
+    if (error) return <div><p>{error}</p></div>;
+    if (loading) return <div><p>Loading...</p></div>;
+    if (!anomalies.length) return <div><p>No anomaly found.</p></div>;
+
+    if (showTutorial) {
+        return (
+            <div className="w-full">
+                <FirstTelescopeClassification anomalyid="6" />
+            </div>
+        );
+    }
+
+    return (
+        <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg overflow-y-auto max-h-[90vh] rounded-lg">
+            <div className="mt-6 w-full flex justify-center">
+                <Button variant="outline" onClick={() => setShowTutorial(true)}>
+                    Want a walkthrough? Start the tutorial
+                </Button>
+            </div>
+            <div className="p-4 rounded-md relative w-full">
+                {selectedAnomaly && (
+                    <ImageAnnotator
+                        anomalyType='planet'
+                        missionNumber={1372001}
+                        structureItemId={3103}
+                        assetMentioned={selectedAnomaly.id.toString()}
+                        annotationType='PH'
+                        initialImageUrl={imageUrls[1]}
+                        anomalyId={selectedAnomaly.id.toString()}
+                    />
+                )}
+            </div>
+        </div>
+    );
+};
 
 interface TelescopeProps {
     anomalyid: string;
@@ -205,7 +244,7 @@ export const FirstTelescopeClassification: React.FC<TelescopeProps> = ({ anomaly
                                 className="w-24 h-24 mb-2"
                             />
                         </div>
-                        <div className="max-w-4xl mx-auto rounded-lg text-[#F7F5E9] rounded-md bg-clip-padding backdrop-filter backdrop-blur-md bg-opacity-70">
+                        <div className="max-w-4xl mx-auto rounded-lg bg-[#1D2833] text-[#F7F5E9] rounded-md bg-clip-padding backdrop-filter backdrop-blur-md bg-opacity-70">
                             <div className='relative'>
                                 <div className='absolute inset-0 w-full h-full bg-[#2C4F64] rounded-md bg-clip-padding backdrop-filter backdrop-blur-sm bg-opacity-0'></div>
                                 <div className='bg-white bg-opacity-90'>

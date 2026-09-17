@@ -4,21 +4,21 @@ import { useState } from "react"
 import { Canvas } from "@react-three/fiber"
 import { OrbitControls, Stars } from "@react-three/drei"
 import { Cog } from "lucide-react"
-import type { PlanetConfig } from "@/app/planets/paint/[id]/planet-config"
+import type { PlanetConfig } from "@/utils/planet-physics"
 import Planet from "./planet"
 import SettingsPanel from "./SettingsPanel"
 
 interface PlanetViewerProps {
   planetConfig: PlanetConfig
   onConfigChange: (config: Partial<PlanetConfig>) => void
-}
+};
 
 export default function PlanetViewer({ planetConfig, onConfigChange }: PlanetViewerProps) {
   const [showSettings, setShowSettings] = useState(false)
 
   return (
-    <div className="w-full h-full bg-black relative overflow-hidden">
-      <Canvas camera={{ position: [0, 0, 10], fov: 45 }} style={{ width: "100%", height: "100%" }}>
+    <div className="w-full h-screen relative">
+      <Canvas camera={{ position: [0, 0, 10], fov: 45 }}>
         <ambientLight intensity={0.3} />
         <pointLight position={[10, 10, 10]} intensity={1.5} />
         <Planet config={planetConfig} />
@@ -63,5 +63,5 @@ export default function PlanetViewer({ planetConfig, onConfigChange }: PlanetVie
         </div>
       )}
     </div>
-  )
+  );
 };

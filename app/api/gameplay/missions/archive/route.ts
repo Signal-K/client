@@ -1,12 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
-import { MineralDepositsNoAction } from "@/app/components/(structures)/Mining/AvailableDeposits";
-import { Mission } from "@/app/components/(structures)/StructuresForMission";
 
 interface UserMissionInstance {
     id: number;
     user: string;
     time_of_completion: string; 
     mission: number;
+};
+
+export interface Mission {
+    id: number;
+    name: string;
+    sequence?: number;
+    description?: string;
+    rewards?: number[];
+    classificationModule?: string;
+    structure?: number;
+    chapter?: number;
+    component?: React.ComponentType<any>;
 };
 
 const missions: Mission[] = [
@@ -120,7 +130,7 @@ const missions: Mission[] = [
         chapter: 1, 
         classificationModule: "Zoodex",
         sequence: 3,
-        component: MineralDepositsNoAction,
+        // component: MineralDepositsNoAction,
         structure: 3104
     },
     // Telescope mission group (t.m.) (MG-T-##)
@@ -287,7 +297,7 @@ const missions: Mission[] = [
         chapter: 1, 
         classificationModule: "Zoodex",
         sequence: 3,
-        component: MineralDepositsNoAction,
+        // component: MineralDepositsNoAction,
     },
     // Telescope mission group (t.m.) (MG-T-##)
     {
@@ -312,7 +322,7 @@ const missions: Mission[] = [
     {
         id: 1372002, name: "Repair your telescope", classificationModule: "Telescope", chapter: 1,
         // sequence: 5+,
-        component: MineralDepositsNoAction,
+        // component: MineralDepositsNoAction,
     },
     {
         id: 13712602, name: "Repair your Zoodex module", classificationModule: "Zoodex", chapter: 1, 

@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { SatelliteDishIcon } from "lucide-react";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { TechSection } from "./TechSection";
-import { UpgradeItem } from "./UpgradeItem"; 
+import { UpgradeItem } from "./UpgradeItem";
 import TotalPoints from "../Structures/Missions/Stardust/Total";
 
 type CapacityKey = 'probeCount' | 'balloonCount';
@@ -109,7 +109,7 @@ export default function MeteorologyResearch() {
                         </h3>
                         <UpgradeItem
                             title="Probe Count ++"
-                            description="Build additional probes to expand climate data collection capabilities"
+                            description="Increase your probe count to explore more terrariums simultaneously"
                             current={userCapacities.probeCount}
                             max={3}
                             cost={getUpgradeCost(userCapacities.probeCount)}

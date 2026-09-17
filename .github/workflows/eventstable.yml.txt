@@ -1,0 +1,41 @@
+name: Supabase Table Check and Query
+
+on:
+  push:
+    branches:
+      - '**' 
+  pull_request:
+    branches:
+      - '**'
+
+jobs:
+  query:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up PostgreSQL client
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client
+
+      - name: Query Supabase tables (events and zoo)
+        run: |
+          # Set the Supabase credentials as environment variables
+          SUPABASE_URL=${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY }}
+          
+          # Get the PostgreSQL connection string for Supabase
+          DB_HOST="${SUPABASE_URL#https://}"
+          DB_NAME="postgres"
+          DB_USER="postgres"
+          DB_PASSWORD="${SUPABASE_ANON_KEY}"
+
+          # Connect to the Supabase database and query the events and zoo tables
+          PGPASSWORD=$DB_PASSWORD psql -h $DB_HOST -U $DB_USER -d $DB_NAME -c "SELECT * FROM events;"
+          PGPASSWORD=$DB_PASSWORD psql -h $DB_HOST -U $DB_USER -d $DB_NAME -c "SELECT * FROM zoo;"
+
+      - name: Post query results to GitHub
+        run: |
+          echo "Query results from events and zoo tables."

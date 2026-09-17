@@ -4,20 +4,13 @@ import React, { useState, useEffect } from "react";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import ClassificationForm from "../(classifications)/PostForm";
 
+import { Anomaly } from "../Telescopes/Transiting";
 import { useActivePlanet } from "@/context/ActivePlanet";
+import { PreferredGaseousClassifications } from "@/components/Structures/Missions/PickPlanet";
 import ImageAnnotator from "../(classifications)/Annotating/Annotator";
 import { Button } from "@/components/ui/button";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL; 
-type Anomaly = {
-  id: number;
-  anomalySet: string;
-  content?: any;
-};
-
-interface Props {
-    anomalyid: number;
-};
 
 export function StarterJovianVortexHunter({
     anomalyid
@@ -147,128 +140,181 @@ export function StarterJovianVortexHunter({
     );
 };
 
-export function LidarJVHSatelliteWithId() {
+interface Props {
+    anomalyid: number;
+};
+
+export function LidarJVHSatelliteWithId({
+    anomalyid
+}: Props) {
     const supabase = useSupabaseClient();
     const session = useSession();
 
     const [anomaly, setAnomaly] = useState<Anomaly | null>(null);
     const [imageUrl, setImageUrl] = useState<string | null>(null);
-    const [parentClassificationId, setParentClassificationId] = useState<number | null>(null);
-    const [loading, setLoading] = useState<boolean>(true);
 
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+    const [loading, setLoading] = useState<boolean>(true);
 
     async function fetchAnomaly() {
         if (!session) {
             setLoading(false);
             return;
-        }
-
-        setLoading(true);
+        };
 
         try {
-            // Try exact match first
-            const { data: linkedAnomalies, error: linkedError } = await supabase
-                .from("linked_anomalies")
-                .select(`
-                    id,
-                    anomaly_id,
-                    classification_id,
-                    anomalies (
-                        id,
-                        anomalySet,
-                        content
-                    )
-                `)
-                .eq("author", session.user.id)
-                .filter("anomalies.anomalySet", "eq", "lidar-jovianVortexHunter")
-                .limit(1);
+            const {
+                data: anomalyData,
+                error: anomalyError
+            } = await supabase
+                .from('anomalies')
+                .select('*')
+                .eq('anomalySet', 'lidar-jovianVortexHunter')
+                .eq('id', anomalyid);
 
-            if (linkedError) throw linkedError;
-
-            let selectedAnomaly: Anomaly | null = null;
-            let classificationId: number | null = null;
-
-            if (linkedAnomalies && linkedAnomalies.length > 0 && linkedAnomalies[0].anomalies) {
-                selectedAnomaly = linkedAnomalies[0].anomalies as unknown as Anomaly;
-                classificationId = linkedAnomalies[0].classification_id;
-                console.log("Using previously linked JVH anomaly:", selectedAnomaly.id);
+            if (anomalyError) {
+                console.error(anomalyError);
+                setLoading(false);
+                return;
             } else {
-                // Try fallback: first linked anomaly with a classification_id
-                const { data: fallbackLinked, error: fallbackLinkedError } = await supabase
-                    .from("linked_anomalies")
-                    .select(`
-                        id,
-                        anomaly_id,
-                        classification_id,
-                        anomalies (
-                            id,
-                            anomalySet,
-                            content
-                        )
-                    `)
-                    .eq("author", session.user.id)
-                    .not("classification_id", "is", null)
-                    .limit(1);
-
-                if (fallbackLinkedError) throw fallbackLinkedError;
-
-                if (fallbackLinked && fallbackLinked.length > 0 && fallbackLinked[0].anomalies) {
-                    selectedAnomaly = fallbackLinked[0].anomalies as unknown as Anomaly;
-                    classificationId = fallbackLinked[0].classification_id;
-                    console.log("Using fallback linked JVH anomaly with classification_id:", selectedAnomaly.id);
-                } else {
-                    // Final fallback: random anomaly from the anomalySet
-                    const { data: anomalies, error: fallbackError } = await supabase
-                        .from("anomalies")
-                        .select("*")
-                        .eq("anomalySet", "lidar-jovianVortexHunter");
-
-                    if (fallbackError) throw fallbackError;
-
-                    if (!anomalies || anomalies.length === 0) {
-                        console.error("No JVH anomalies available");
-                        setAnomaly(null);
-                        return;
-                    }
-
-                    const randomIndex = Math.floor(Math.random() * anomalies.length);
-                    selectedAnomaly = anomalies[randomIndex] as Anomaly;
-                    classificationId = null;
-                    console.log("Using fallback JVH anomaly:", selectedAnomaly.id);
-                }
-            }
-
-            if (!selectedAnomaly) {
-                throw new Error("Anomaly selection failed");
-            }
-
-            setAnomaly(selectedAnomaly);
-            setParentClassificationId(classificationId);
-            setImageUrl(`${supabaseUrl}/storage/v1/object/public/telescope/lidar-jovianVortexHunter/${selectedAnomaly.id}.png`);
+                setAnomaly(anomalyData[0]);
+                setImageUrl(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/telescope/lidar-jovianVortexHunter/${anomalyid}.png`);
+            };
         } catch (error: any) {
-            console.error("Error fetching JVH anomaly:", error.message);
-            setAnomaly(null);
+            console.error(error);
+            setLoading(false);
+            return;
         } finally {
             setLoading(false);
-        }
-    }
+        };
+    };
 
     useEffect(() => {
         fetchAnomaly();
     }, [session]);
 
     if (loading) {
-        return <p>Loading...</p>;
-    }
-
-    if (!anomaly || !imageUrl) {
-        return <p>No anomaly found.</p>;
-    }
+        return (
+            <p>
+                Loading...
+            </p>
+        );
+    };
 
     return (
-        <div className="w-full h-screen flex flex-col items-center justify-center bg-gradient-to-br from-[#E5EEF4] to-[#D8E5EC] px-4 py-6 overflow-hidden">
-            <div className="w-full max-w-4xl h-full flex flex-col rounded-xl bg-white shadow-lg p-4 overflow-hidden">
+        <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg overflow-y-auto max-h-[90vh] rounded-lg"> 
+            {imageUrl && (
+                <ImageAnnotator
+                    anomalyId={anomalyid.toString()}
+                    anomalyType="lidar-jovianVortexHunter"
+                    missionNumber={200000072}
+                    assetMentioned={imageUrl}
+                    structureItemId={3105}
+                    initialImageUrl={imageUrl}
+                    annotationType="JVH"
+                />
+            )}
+        </div>
+    );
+};
+
+export function LidarJVHSatellite({ anomalyid }: Props) {
+    const supabase = useSupabaseClient();
+    const session = useSession();
+
+    const [anomaly, setAnomaly] = useState<Anomaly | null>(null);
+    const [imageUrl, setImageUrl] = useState<string | null>(null);
+
+    const [loading, setLoading] = useState<boolean>(true);
+    const [showTutorial, setShowTutorial] = useState(false);
+
+    useEffect(() => {
+        async function fetchAnomaly() {
+            if (!session) {
+                setLoading(false);
+                return;
+            };
+
+            try {
+                const { data: anomalyData, error: anomalyError } = await supabase
+                    .from("anomalies")
+                    .select("*")
+                    .eq("anomalySet", "lidar-jovianVortexHunter");
+
+                if (anomalyError) {
+                    throw anomalyError;
+                };
+
+                const randomAnomaly = anomalyData[Math.floor(Math.random() * anomalyData.length)] as Anomaly;
+                setAnomaly(randomAnomaly);
+                setImageUrl(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/telescope/lidar-jovianVortexHunter/${randomAnomaly.id}.png`);
+            } catch (error: any) {
+                console.error("Error fetching anomaly", error.message);
+                setAnomaly(null);
+            } finally {
+                setLoading(false);
+            };
+        };
+
+        if (session) {
+            fetchAnomaly();
+        };
+    }, [session]);
+
+    const handleShowTutorial = () => {
+        setShowTutorial(true);
+    };
+
+        const fetchAnomaly = async () => {
+            if (!session) {
+                console.error("No session found");
+                setLoading(false);
+                return;
+            };
+        
+            setLoading(true);
+        
+            try {
+                const { data: anomalies, error } = await supabase
+                    .from('anomalies')
+                    .select('*')
+                    .eq('anomalySet', 'lidar-jovianVortexHunter');
+        
+                if (error) throw error;
+        
+                if (!anomalies || anomalies.length === 0) {
+                    console.error("No anomalies found for the given type");
+                    setAnomaly(null);
+                } else {
+                    const randomIndex = Math.floor(Math.random() * anomalies.length);
+                    const anomaly = anomalies[randomIndex];
+                    setAnomaly(anomaly);
+                    setImageUrl(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/telescope/lidar-jovianVortexHunter/${anomaly.id}.png`);
+                }
+            } catch (error) {
+                console.error("Error fetching anomaly", error);
+                setAnomaly(null);
+            } finally {
+                setLoading(false);
+            };    
+    };   
+
+    if (loading) {
+        return (
+            <div><p>Loading...</p></div>
+        );
+    };
+
+    if (!anomaly) {
+        return (
+            <div>
+                <p>No anomaly found.</p>
+            </div>
+        );
+    };
+
+    return (
+        <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg overflow-y-auto max-h-[90vh] rounded-lg"> 
+            {imageUrl && (
                 <ImageAnnotator
                     anomalyId={anomaly.id.toString()}
                     anomalyType="lidar-jovianVortexHunter"
@@ -277,9 +323,35 @@ export function LidarJVHSatelliteWithId() {
                     structureItemId={3105}
                     initialImageUrl={imageUrl}
                     annotationType="JVH"
-                    parentClassificationId={parentClassificationId ?? undefined}
+                    parentPlanetLocation={anomalyid.toString()} 
                 />
-            </div>
+            )}
+            {!showTutorial && (
+                <Button
+                    className="mb-4"
+                    onClick={handleShowTutorial}
+                >
+                    Show Tutorial
+                </Button>
+            )}
+            {showTutorial && (
+                <StarterJovianVortexHunter anomalyid={anomalyid} />
+            )}
         </div>
     );
+};
+
+export function JVHWrapper() {
+  const [selectedAnomaly, setSelectedAnomaly] = useState<number | null>(null);
+  const [part, setPart] = useState(1);
+
+  return (
+    <div className="space-y-8">
+      {!selectedAnomaly && (
+        <PreferredGaseousClassifications onSelectAnomaly={setSelectedAnomaly} />
+      )}
+      {selectedAnomaly && <LidarJVHSatellite anomalyid={selectedAnomaly} />}
+      {/* <p>{selectedAnomaly}</p> */}
+    </div>
+  );
 };

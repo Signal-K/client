@@ -1,117 +1,172 @@
-'use client'
+'use client';
 
 import { useRouter } from "next/navigation";
 import Home from "@/app/page";
 import GameNavbar from "@/components/Layout/Tes";
+import { TelescopeDiskDetector } from "@/components/Projects/Telescopes/DiskDetector";
+import SunspotSteps from "@/components/Projects/Telescopes/Sunspots/SunspotShell";
+import DailyMinorPlanetMissions from "@/components/Structures/Missions/Astronomers/DailyMinorPlanet/DailyMinorPlanet";
+import PlanetHuntersSteps from "@/components/Structures/Missions/Astronomers/PlanetHunters/PlanetHunters";
+import AstronomyResearch from "@/components/Research/AstronomyItems";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { useSession } from "@supabase/auth-helpers-react";
-import TelescopeViewport from "@/components/Structures/Telescope/telescope-viewport";
+import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
+import {
+  BuildingIcon,
+  MoonStarIcon,
+  SunIcon,
+  TelescopeIcon,
+  TestTubeDiagonalIcon,
+  Trophy
+} from "lucide-react";
 import { useState } from "react";
 
 export default function TelescopeOnEarthPage() {
-  const router = useRouter();
+  const supabase = useSupabaseClient();
   const session = useSession();
-  const [simpleMode, setSimpleMode] = useState(false); // default: viewport mode
+  const router = useRouter();
+
+  const [activeComponent, setActiveComponent] = useState<React.ReactNode | null>(null);
 
   if (!session) return <Home />;
 
+  const actions = [
+    {
+      icon: <Trophy className="w-6 h-6 text-[#D08770]" />,
+      text: "Upgrades",
+      dynamicComponent: <AstronomyResearch />,
+    },
+  ];
+
+  const buttons = [
+    {
+      icon: <TelescopeIcon className="w-6 h-6 text-[#88C0D0]" />,
+      text: "Discover planets",
+      dynamicComponent: <PlanetHuntersSteps />,
+    },
+    {
+      icon: <SunIcon className="w-6 h-6 text-[#EBCB8B]" />,
+      text: "Sunspot data",
+      dynamicComponent: <SunspotSteps />,
+    },
+    {
+      icon: <TestTubeDiagonalIcon className="w-6 h-6 text-[#B48EAD]" />,
+      text: "Find early solar systems",
+      dynamicComponent: <TelescopeDiskDetector />,
+    },
+    {
+      icon: <MoonStarIcon className="w-6 h-6 text-[#A3BE8C]" />,
+      text: "Discover asteroids",
+      dynamicComponent: <DailyMinorPlanetMissions />,
+    },
+  ];
+
+  const handleComponentChange = (component: React.ReactNode) => {
+    setActiveComponent(component);
+  };
+
+  const handleBack = () => {
+    setActiveComponent(null);
+  };
+
   return (
     <div className="relative min-h-screen w-full flex flex-col">
-      {/* Background Image */}
       <img
         className="absolute inset-0 w-full h-full object-cover"
         src="/assets/Backdrops/Earth.png"
         alt="Earth Background"
       />
 
-      {/* Navbar */}
-      <div className="w-full z-10">
+      <div className="w-full">
         <GameNavbar />
       </div>
 
-      {/* Dialog Wrapper */}
-      <div className="flex justify-center items-center flex-grow z-10 px-4">
+      <div className="flex flex-row space-y-4">
         <Dialog
           defaultOpen
           onOpenChange={(open) => {
-            if (!open) router.push("/");
+            if (!open) {
+              router.push("/");
+            }
           }}
         >
           <DialogContent
-            className={`p-0 w-full max-w-[90vw] h-[85vh] overflow-hidden flex flex-col ${
-              !simpleMode
-                ? "bg-transparent shadow-none"
-                : "bg-white/80 backdrop-blur-sm rounded-2xl p-4"
-            }`}
-            style={{ color: "#2E3440" }}
+            className="p-6 rounded-3xl text-white max-w-3xl w-full h-[80vh] overflow-hidden flex flex-col justify-start"
+            style={{
+              background: "linear-gradient(135deg, rgba(191, 223, 245, 0.9), rgba(158, 208, 218, 0.85))",
+              color: "#2E3440",
+            }}
           >
-            {/* Mode Toggle */}
-            <div className="flex justify-end mb-2 px-4 pt-4">
-              <button
-                onClick={() => setSimpleMode(!simpleMode)}
-                className="bg-[#88C0D0] text-white px-4 py-1 rounded-md text-sm hover:bg-[#81A1C1] transition"
-              >
-                {simpleMode ? "View Telescope" : "All projects"}
-              </button>
-            </div>
+            {/* Back button when showing dynamic content */}
+            {activeComponent && (
+              <div className="w-full flex justify-end">
+                <button
+                  onClick={handleBack}
+                  className="text-[#4C566A] hover:text-[#BF616A] font-medium mb-2"
+                >
+                  ← Back
+                </button>
+              </div>
+            )}
 
-            {/* Content */}
-            <div className="flex-grow overflow-hidden">
-              {!simpleMode ? (
-                <div className="h-full w-full overflow-hidden">
-                  <TelescopeViewport />
-                </div>
+            {/* Content switcher */}
+            <div className="flex-grow overflow-y-auto w-full">
+              {activeComponent ? (
+                <div className="w-full h-full">{activeComponent}</div>
               ) : (
-                <SimpleTelescopePanel router={router} />
+                <>
+                  <div className="flex justify-between items-center">
+                    <div className="flex items-center space-x-2">
+                      <BuildingIcon className="w-8 h-8 text-[#A3BE8C]" />
+                      <h1 className="text-2xl font-bold text-[#2E3440]">Telescope</h1>
+                    </div>
+                  </div>
+
+                  <div className="flex justify-center my-4">
+                    <img
+                      src="/assets/Items/TransitingTelescope.png"
+                      alt="Telescope"
+                      className="w-20 h-20"
+                      width="80"
+                      height="80"
+                      style={{ aspectRatio: "80/80", objectFit: "cover" }}
+                    />
+                  </div>
+
+                  <div className="flex items-center justify-center my-4 space-x-4">
+                    {actions.map((action, index) => (
+                      <div
+                        key={index}
+                        className="flex flex-col items-center cursor-pointer"
+                        onClick={() => handleComponentChange(action.dynamicComponent)}
+                      >
+                        {action.icon}
+                        <p className="text-xs text-[#4C566A]">{action.text}</p>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="gap-4 mt-6">
+                    <div className="flex flex-col items-center my-4 space-y-4">
+                      {buttons.map((button, index) => (
+                        <div
+                          key={index}
+                          className="flex items-center justify-center bg-[#D8DEE9]/60 text-[#2E3440] font-bold py-2 px-4 rounded-md shadow-sm hover:bg-[#E5E9F0] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#81A1C1] cursor-pointer"
+                          onClick={() => handleComponentChange(button.dynamicComponent)}
+                          style={{ width: "100%", maxWidth: "240px" }}
+                        >
+                          <div className="flex items-center justify-center">
+                            <div className="flex-shrink-0">{button.icon}</div>
+                            <p className="ml-2 text-sm text-[#3B4252]">{button.text}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </>
               )}
             </div>
           </DialogContent>
         </Dialog>
-      </div>
-    </div>
-  );
-}
-
-function SimpleTelescopePanel({ router }: { router: any }) {
-  const actions = [
-    {
-      icon: "🔧",
-      text: "Upgrades",
-      onClick: () => router.push('/research'),
-    },
-  ];
-
-  const buttons = [
-    { icon: "🔭", text: "Discover planets", route: "planet-hunters" },
-    { icon: "☀️", text: "Sunspot data", route: "sunspots" },
-    { icon: "🧪", text: "Find early solar systems", route: "disk-detective" },
-    { icon: "🌑", text: "Discover asteroids", route: "daily-minor-planet" },
-  ];
-
-  return (
-    <div className="flex flex-col items-center justify-center space-y-6 h-full w-full overflow-y-auto">
-      <div className="flex space-x-6">
-        {actions.map((action, i) => (
-          <button
-            key={i}
-            onClick={action.onClick}
-            className="text-[#2E3440] bg-[#D8DEE9] px-3 py-2 rounded shadow-sm text-sm hover:bg-[#E5E9F0]"
-          >
-            {action.icon} {action.text}
-          </button>
-        ))}
-      </div>
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full max-w-md">
-        {buttons.map((btn, i) => (
-          <button
-            key={i}
-            onClick={() => router.push(`/structures/telescope/${btn.route}`)}
-            className="flex items-center justify-center bg-[#D8DEE9] text-[#2E3440] py-3 px-4 rounded shadow hover:bg-[#E5E9F0]"
-          >
-            <span className="mr-2">{btn.icon}</span> {btn.text}
-          </button>
-        ))}
       </div>
     </div>
   );

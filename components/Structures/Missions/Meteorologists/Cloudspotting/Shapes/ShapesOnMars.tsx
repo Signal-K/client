@@ -2,9 +2,8 @@ import React, { useEffect, useState } from "react";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import MissionShell from "../../../BasePlate";
 import { CloudCogIcon, FolderCog, HelpCircle, PaintBucket, Vote } from "lucide-react";
-// import { CloudspottingShapesWrapper } from "@/components/Projects/Lidar/CloudspottingOnMarsShapes";
+import { CloudspottingShapesWrapper } from "@/components/Projects/Lidar/CloudspottingOnMarsShapes";
 import { Mission } from "../CloudspottingOnMars";
-import { StarterCoMShapes } from "@/components/Projects/Lidar/CloudspottingOnMarsShapes";
 
 interface MissionPoints {
     [key: number]: number;
@@ -30,7 +29,7 @@ const CloudspottingOnMarsShapes = () => {
                 icon: CloudCogIcon,
                 points: 2,
                 completedCount: 0,
-                internalComponent: () => <StarterCoMShapes />,
+                internalComponent: () => <CloudspottingShapesWrapper />,
                 color: 'text-blue-500',
             },
             {

@@ -170,11 +170,7 @@ export const IguanasFromAboveTutorial: React.FC<ZoodexProps> = ({ anomalyId }) =
   );
 };
 
-type Anomaly = {
-  id: string;
-  name: string;
-  details?: string;
-};
+import { Anomaly } from "../Telescopes/Transiting";
 
 export function ZoodexIguanas() {
   const supabase = useSupabaseClient();
@@ -295,5 +291,28 @@ export function ZoodexIguanas() {
         </div>
       )}
     </div>
+  );
+};
+
+interface IguanaPassProps {
+  anomalyid: string;
+};
+
+export function IguanasFromAbovePassed ( { anomalyid }: IguanaPassProps ) {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const imageUrl = `${supabaseUrl}/storage/v1/object/public/zoodex/zoodex-iguanasFromAbove/${anomalyid}.jpeg`;
+
+  return (
+      <div className="flex flex-col items-center">
+          <div className="max-w-4xl mx-auto bg-[#1D2833] text-[#F7F5E9] rounded-md">
+              <img src={imageUrl} alt="Iguana" className="w-64 h-64 object-contain" />
+              <ClassificationForm 
+                  anomalyId={anomalyid} 
+                  anomalyType="zoodex-iguanasFromAbove" 
+                  missionNumber={3000004} 
+                  assetMentioned={imageUrl!} 
+              />
+          </div>
+      </div>
   );
 };

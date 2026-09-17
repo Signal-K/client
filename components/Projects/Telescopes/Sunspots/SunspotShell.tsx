@@ -3,20 +3,9 @@ import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import MissionShell from "@/components/Structures/Missions/BasePlate";
 import { CloudCogIcon, FolderCog, HelpCircle, PaintBucket, Sun, Vote } from "lucide-react";
 
+import { MissionStep } from "@/components/Structures/Missions/Astronomers/PlanetHunters/PlanetHunters";
 import { Mission } from "@/components/Structures/Missions/Astronomers/SatellitePhotos/AI4M/AIForMars";
-import { StarterSunspot } from "../Sunspots";
-
-export interface MissionStep {
-  id: number;
-  title: string;
-  description: string;
-  points?: number;
-  icon: React.ElementType;
-  action: () => void;
-  completedCount: number;
-  color: string;
-  chapter: number;
-};
+import { SunspotsWrapper } from "../Sunspots";
 
 const SunspotSteps = () => {
     const supabase = useSupabaseClient();
@@ -46,7 +35,7 @@ const SunspotSteps = () => {
             icon: Sun,
             points: 2,
             completedCount: 0,
-            internalComponent: () => <StarterSunspot />,
+            internalComponent: () => <SunspotsWrapper />,
             color: 'text-yellow-500',
         },
         // comments, voting, etc...
