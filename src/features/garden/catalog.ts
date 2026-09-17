@@ -1,0 +1,363 @@
+/**
+ * SSC naming catalog — public ids for the garden hub.
+ * Ported from signal-k/tickets-please `workspace/projects/ssc/garden-mockup/js/catalog.js`.
+ * Keep this file and that one in sync — the naming doc says catalog wins if prose and code disagree.
+ */
+
+export type StructureId =
+  | "ssc.structure.habitat"
+  | "ssc.structure.hydro"
+  | "ssc.structure.telescope"
+  | "ssc.structure.satellite"
+  | "ssc.structure.solar"
+  | "ssc.structure.pad"
+  | "ssc.structure.probe"
+  | "ssc.structure.rover";
+
+export type MinigameId =
+  | "ssc.minigame.planet_hunters"
+  | "ssc.minigame.clouds"
+  | "ssc.minigame.solar"
+  | "ssc.minigame.probe_return"
+  | "ssc.minigame.supply"
+  | "ssc.minigame.rover";
+
+export type HopId = "ssc.hop.landnam";
+
+export interface GrowthStage {
+  tier: number;
+  sprite: string;
+  capacity: Record<string, unknown> & { label: string };
+  readyMs: number;
+}
+
+export interface StructureDef {
+  id: StructureId;
+  slug: string;
+  name: string;
+  verb: string;
+  blurb: string;
+  minigame: MinigameId | null;
+  hop: HopId | null;
+  startTier: number;
+  locked: boolean;
+  growth: GrowthStage[];
+}
+
+export interface MinigameDef {
+  id: MinigameId;
+  name: string;
+  structure: StructureId;
+  reward: number;
+  hop: HopId | null;
+  classifyIn: "sky" | null;
+  cost?: number;
+  flightMs?: number;
+  deferred?: boolean;
+}
+
+export interface HopDef {
+  id: HopId;
+  label: string;
+  href: string;
+  blurb: string;
+}
+
+const LANDNAM = "https://playlandnam.space";
+const READY_MS = [0, 20000, 14000, 9000];
+
+const MINIGAMES: Record<MinigameId, MinigameDef> = {
+  "ssc.minigame.planet_hunters": {
+    id: "ssc.minigame.planet_hunters",
+    name: "Planet Hunters",
+    structure: "ssc.structure.telescope",
+    reward: 12,
+    hop: "ssc.hop.landnam",
+    classifyIn: "sky",
+  },
+  "ssc.minigame.clouds": {
+    id: "ssc.minigame.clouds",
+    name: "Cloud Watch",
+    structure: "ssc.structure.satellite",
+    reward: 8,
+    hop: null,
+    classifyIn: "sky",
+  },
+  "ssc.minigame.solar": {
+    id: "ssc.minigame.solar",
+    name: "Sunspots",
+    structure: "ssc.structure.solar",
+    reward: 8,
+    hop: null,
+    classifyIn: "sky",
+  },
+  "ssc.minigame.probe_return": {
+    id: "ssc.minigame.probe_return",
+    name: "Probe flight",
+    structure: "ssc.structure.probe",
+    reward: 16,
+    flightMs: 14000,
+    hop: null,
+    classifyIn: "sky",
+  },
+  "ssc.minigame.supply": {
+    id: "ssc.minigame.supply",
+    name: "Supply run",
+    structure: "ssc.structure.pad",
+    reward: 14,
+    cost: 10,
+    flightMs: 11000,
+    hop: "ssc.hop.landnam",
+    classifyIn: "sky",
+  },
+  "ssc.minigame.rover": {
+    id: "ssc.minigame.rover",
+    name: "Rover (deferred)",
+    structure: "ssc.structure.rover",
+    reward: 0,
+    deferred: true,
+    hop: null,
+    classifyIn: null,
+  },
+};
+
+function stages(rows: [number, string, Record<string, unknown> & { label: string }][]): GrowthStage[] {
+  return rows.map(([tier, sprite, capacity]) => ({
+    tier,
+    sprite,
+    capacity,
+    readyMs: READY_MS[tier] || 0,
+  }));
+}
+
+export const CATALOG = {
+  currency: {
+    id: "ssc.currency.credits" as const,
+    label: "CR",
+    name: "Credits",
+  },
+  sky: {
+    id: "ssc.sky.cycle" as const,
+    shootingStar: { id: "ssc.sky.shooting_star" as const },
+    ambientLaunch: { id: "ssc.sky.ambient_launch" as const },
+    subject: { id: "ssc.sky.subject" as const },
+  },
+  sandbox: { id: "ssc.sandbox.garden" as const },
+  flow: {
+    panel: {
+      id: "ssc.flow.panel" as const,
+      blurb: "Tap structure or sky subject → entity panel. Never skip the panel into play.",
+    },
+    skyClassify: {
+      id: "ssc.flow.sky_classify" as const,
+      blurb: "Classification plays in the sky area. The camp stays visible.",
+    },
+  },
+  upgrade: {
+    id: "ssc.upgrade.structure_tier" as const,
+    maxTier: 3,
+    costs: [0, 40, 90],
+    readyMs: READY_MS,
+    blurb: "Growth stages. More sprite, more capacity — not a bigger copy of the same silhouette.",
+  },
+  hops: {
+    landnam: {
+      id: "ssc.hop.landnam" as const,
+      label: "Open Landnam",
+      href: LANDNAM,
+      blurb: "The long-session game. Rockets, mining, TESS — not this garden.",
+    } satisfies HopDef,
+  },
+  structures: [
+    {
+      id: "ssc.structure.habitat",
+      slug: "habitat",
+      name: "Habitat",
+      verb: "Home",
+      blurb: "The greenhouse you tend. Upgrade for a fatter garden, not a second flagship.",
+      minigame: null,
+      hop: null,
+      startTier: 1,
+      locked: false,
+      growth: stages([
+        [1, "habitat-t1", { idleBonus: 0, label: "Small greenhouse" }],
+        [2, "habitat-t2", { idleBonus: 1, label: "Taller glass, more plants" }],
+        [3, "habitat-t3", { idleBonus: 2, label: "Lush annex" }],
+      ]),
+    },
+    {
+      id: "ssc.structure.hydro",
+      slug: "hydro",
+      name: "Garden",
+      verb: "Tend",
+      blurb: "Beds on the dirt. Water them; they tick credits while you are away.",
+      minigame: null,
+      hop: null,
+      startTier: 1,
+      locked: false,
+      growth: stages([
+        [1, "hydro-t1", { beds: 2, label: "Two beds" }],
+        [2, "hydro-t2", { beds: 4, label: "Four beds" }],
+        [3, "hydro-t3", { beds: 6, label: "Six beds" }],
+      ]),
+    },
+    {
+      id: "ssc.structure.telescope",
+      slug: "telescope",
+      name: "Telescope",
+      verb: "Point",
+      blurb: "Planet Hunters from this dome. A dip on the curve is the arrival.",
+      minigame: "ssc.minigame.planet_hunters",
+      hop: "ssc.hop.landnam",
+      startTier: 1,
+      locked: false,
+      growth: stages([
+        [1, "telescope-t1", { subjects: 1, label: "Small dome" }],
+        [2, "telescope-t2", { subjects: 1, label: "Longer barrel" }],
+        [3, "telescope-t3", { subjects: 1, label: "Dome plus annex" }],
+      ]),
+    },
+    {
+      id: "ssc.structure.satellite",
+      slug: "satellite",
+      name: "Satellite",
+      verb: "Scan",
+      blurb: "Clouds from orbit. Classify the shape, then let the dish sit.",
+      minigame: "ssc.minigame.clouds",
+      hop: null,
+      startTier: 1,
+      locked: false,
+      growth: stages([
+        [1, "satellite-t1", { subjects: 1, label: "Small dish" }],
+        [2, "satellite-t2", { subjects: 1, label: "Wider dish" }],
+        [3, "satellite-t3", { subjects: 1, label: "Dual dish" }],
+      ]),
+    },
+    {
+      id: "ssc.structure.solar",
+      slug: "solar",
+      name: "Solar",
+      verb: "Watch",
+      blurb: "Sunspot groups on the disk. Count, then leave the panels in the light.",
+      minigame: "ssc.minigame.solar",
+      hop: null,
+      startTier: 1,
+      locked: false,
+      growth: stages([
+        [1, "solar-t1", { panels: 1, label: "One panel" }],
+        [2, "solar-t2", { panels: 2, label: "Two panels" }],
+        [3, "solar-t3", { panels: 3, label: "Three-panel array" }],
+      ]),
+    },
+    {
+      id: "ssc.structure.pad",
+      slug: "pad",
+      name: "Pad",
+      verb: "Send",
+      blurb: "A hull on dirt. Send a crate, greet a return. Hop to Landnam for the deep flights.",
+      minigame: "ssc.minigame.supply",
+      hop: "ssc.hop.landnam",
+      startTier: 1,
+      locked: false,
+      growth: stages([
+        [1, "pad-t1", { hull: "small", label: "Dirt pad and small lander" }],
+        [2, "pad-t2", { hull: "marked", label: "Marked pad" }],
+        [3, "pad-t3", { hull: "fat", label: "Fatter hull" }],
+      ]),
+    },
+    {
+      id: "ssc.structure.probe",
+      slug: "probe",
+      name: "Probe",
+      verb: "Dispatch",
+      blurb: "Send the little ship. Wait. Collect the pile when it comes home.",
+      minigame: "ssc.minigame.probe_return",
+      hop: null,
+      startTier: 1,
+      locked: false,
+      growth: stages([
+        [1, "probe-t1", { legs: 2, label: "Tripod" }],
+        [2, "probe-t2", { legs: 2, label: "Extra antenna" }],
+        [3, "probe-t3", { legs: 3, label: "Extra leg" }],
+      ]),
+    },
+    {
+      id: "ssc.structure.rover",
+      slug: "rover",
+      name: "Rover",
+      verb: "Later",
+      blurb: "Locked. Rover minigames need their own session — not this garden pass.",
+      minigame: "ssc.minigame.rover",
+      hop: null,
+      startTier: 0,
+      locked: true,
+      growth: [],
+    },
+  ] satisfies StructureDef[],
+  minigames: MINIGAMES,
+};
+
+const ID_RE = /^ssc\.(structure|minigame|hop|currency|upgrade|sky|sandbox|flow)\.[a-z][a-z0-9_]*$/;
+
+export function allIds(): string[] {
+  const ids: string[] = [
+    CATALOG.currency.id,
+    CATALOG.sky.id,
+    CATALOG.sky.shootingStar.id,
+    CATALOG.sky.ambientLaunch.id,
+    CATALOG.sky.subject.id,
+    CATALOG.sandbox.id,
+    CATALOG.flow.panel.id,
+    CATALOG.flow.skyClassify.id,
+    CATALOG.upgrade.id,
+    CATALOG.hops.landnam.id,
+  ];
+  for (const s of CATALOG.structures) ids.push(s.id);
+  for (const key of Object.keys(CATALOG.minigames)) ids.push(key);
+  return ids;
+}
+
+export function assertNaming(): number {
+  const ids = allIds();
+  const seen = new Set<string>();
+  const bad: string[] = [];
+  for (const id of ids) {
+    if (!ID_RE.test(id)) bad.push("shape: " + id);
+    if (seen.has(id)) bad.push("dup: " + id);
+    seen.add(id);
+  }
+  for (const s of CATALOG.structures) {
+    if (s.minigame && !CATALOG.minigames[s.minigame]) {
+      bad.push("missing minigame for " + s.id);
+    }
+    if (s.locked) {
+      if (s.growth.length) bad.push("locked growth: " + s.id);
+    } else if (!s.growth || s.growth.length !== CATALOG.upgrade.maxTier) {
+      bad.push("growth stages: " + s.id);
+    }
+  }
+  for (const mg of Object.values(CATALOG.minigames)) {
+    const host = CATALOG.structures.find((s) => s.id === mg.structure);
+    if (!host) bad.push("minigame host missing: " + mg.id);
+    if (!mg.deferred && mg.classifyIn !== "sky") {
+      bad.push("classifyIn sky: " + mg.id);
+    }
+  }
+  if (bad.length) {
+    throw new Error("SSC catalog naming failed:\n" + bad.join("\n"));
+  }
+  return ids.length;
+}
+
+export function structureById(id: string | null | undefined): StructureDef | null {
+  return CATALOG.structures.find((s) => s.id === id) || null;
+}
+
+export function hopById(id: string | null | undefined): HopDef | null {
+  return Object.values(CATALOG.hops).find((h) => h.id === id) || null;
+}
+
+export function growthFor(structure: StructureDef | null, tier: number): GrowthStage | null {
+  if (!structure || !structure.growth) return null;
+  return structure.growth.find((g) => g.tier === tier) || null;
+}

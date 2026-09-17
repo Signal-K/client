@@ -1,721 +1,124 @@
 "use client";
 
-import { Suspense, useState, useEffect, useMemo, useCallback, useRef } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useCallback, useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import { usePostHog } from "posthog-js/react";
 
-// Dynamic heavy components
-const TelescopeBackground = dynamic(
-  () =>
-    import("@/src/components/classification/telescope/telescope-background").then(
-      (m) => m.TelescopeBackground
-    ),
-  {
-    ssr: false,
-    loading: () => (
-      <div className="absolute inset-0 -z-10 bg-gradient-to-b from-background to-background/80" />
-    ),
-  }
-);
-const CompleteProfileForm = dynamic(
-  () => import("@/src/components/profile/setup/FinishProfile"),
-  {
-    loading: () => (
-      <div className="p-4 text-xs text-muted-foreground">Loading profile form…</div>
-    ),
-  }
-);
-const PWAPrompt = dynamic(() => import("@/src/components/pwa/PWAPrompt"), {
-  loading: () => null,
-});
-
-// Dynamic tab content components
-const TelescopeTab = dynamic(() => import("@/src/components/tabs/TelescopeTab"), {
-  loading: () => (
-    <div className="p-4 text-xs text-muted-foreground font-mono">Loading telescope…</div>
-  ),
-});
-const SatelliteTab = dynamic(() => import("@/src/components/tabs/SatelliteTab"), {
-  loading: () => (
-    <div className="p-4 text-xs text-muted-foreground font-mono">Loading satellite…</div>
-  ),
-});
-const RoverTab = dynamic(() => import("@/src/components/tabs/RoverTab"), {
-  loading: () => <div className="p-4 text-xs text-muted-foreground font-mono">Loading rover…</div>,
-});
-const SolarTab = dynamic(() => import("@/src/components/tabs/SolarTab"), {
-  loading: () => <div className="p-4 text-xs text-muted-foreground font-mono">Loading solar…</div>,
-});
-const InventoryTab = dynamic(() => import("@/src/components/tabs/InventoryTab"), {
-  loading: () => (
-    <div className="p-4 text-xs text-muted-foreground font-mono">Loading cargo bay…</div>
-  ),
-});
-
-// UI Components
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/src/components/ui/dialog";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-} from "@/src/components/ui/sheet";
-import AnonymousUserPrompt from "@/src/components/profile/auth/AnonymousUserPrompt";
-import { ErrorBoundary } from "@/src/components/ui/ErrorBoundary";
-
-// Station UI components — critical path (statically imported)
-import { CommandHeader }    from "@/src/features/game/components/station/CommandHeader";
-import { MissionBriefCard } from "@/src/features/game/components/station/MissionBriefCard";
-import { StationNav }       from "@/src/features/game/components/station/StationNav";
-import { ViewportHeader }   from "@/src/features/game/components/station/ViewportHeader";
-import { SectionLabel }     from "@/src/features/game/components/station/SectionLabel";
-import { MissionLogPanel, buildLogEntries } from "@/src/features/game/components/station/MissionLogPanel";
-import { SectorRadar }     from "@/src/features/game/components/station/SectorRadar";
-import { HUDStrip }        from "@/src/features/game/components/station/HUDStrip";
-import { StructureCard, StructureState, StructureId } from "@/src/features/game/components/station/StructureCard";
-import { ResearchBriefCard } from "@/src/features/game/components/station/ResearchBriefCard";
-
-// Station UI components — deferred (right column / overlays)
-const AgencyNetworkCard  = dynamic(() => import("@/src/features/game/components/station/AgencyNetworkCard").then(m => ({ default: m.AgencyNetworkCard })), { ssr: false });
-const CoralFishtank      = dynamic(() => import("@/src/features/game/components/station/CoralFishtank").then(m => ({ default: m.CoralFishtank })), { ssr: false });
-const HubLeaderboard     = dynamic(() => import("@/src/features/game/components/station/HubLeaderboard").then(m => ({ default: m.HubLeaderboard })), { ssr: false });
-const GuidedDeployOverlay = dynamic(() => import("@/src/features/game/components/station/GuidedDeployOverlay").then(m => ({ default: m.GuidedDeployOverlay })), { ssr: false });
-const LivingWorldBg      = dynamic(() => import("@/src/features/game/components/station/LivingWorldBg").then(m => ({ default: m.LivingWorldBg })), { ssr: false });
-
-// Preserved feature components
-import RecentActivity from "@/src/components/social/activity/RecentActivity";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/src/components/ui/dialog";
 import ProjectPreferencesModal from "@/src/components/onboarding/ProjectPreferencesModal";
-import PushNotificationPrompt from "@/src/features/notifications/components/PushNotificationPrompt";
 import { GameSurveys } from "@/src/features/surveys/components/GameSurveys";
-import ReferralMissionPrompt from "@/src/features/game/components/ReferralMissionPrompt";
-
-// Hooks
 import { useUserPreferences } from "@/src/hooks/useUserPreferences";
-import type { TutorialId } from "@/src/hooks/useUserPreferences";
-import UseDarkMode from "@/src/hooks/useDarkMode";
 
-// Types / utils
-import { cn } from "@/src/lib/utils";
+import { useGardenState } from "@/src/features/garden/useGardenState";
+import { useSkyPhase } from "@/src/features/garden/useSkyPhase";
+import { hopById } from "@/src/features/garden/catalog";
+import { GardenScene } from "@/src/features/garden/components/GardenScene";
+import { GardenHud } from "@/src/features/garden/components/GardenHud";
+import { GardenPanel } from "@/src/features/garden/components/GardenPanel";
+import { SkyClassify } from "@/src/features/garden/components/SkyClassify";
+import styles from "@/src/features/garden/garden.module.css";
 
-import { buildClientReferralUrl } from "@/src/features/referrals/referral-links";
+const CompleteProfileForm = dynamic(() => import("@/src/components/profile/setup/FinishProfile"), {
+  loading: () => <div className="p-4 text-xs text-muted-foreground">Loading profile form…</div>,
+});
+const PWAPrompt = dynamic(() => import("@/src/components/pwa/PWAPrompt"), { loading: () => null });
+const PushNotificationPrompt = dynamic(
+  () => import("@/src/features/notifications/components/PushNotificationPrompt"),
+  { ssr: false }
+);
 
-// Icons
-import { AlertTriangle, RefreshCw } from "lucide-react";
-
-type ViewMode = "base" | "telescope" | "satellite" | "rover" | "solar" | "inventory";
-type StructureSignalMap = Record<StructureId, number>;
-
-const REFERRAL_MISSION_DISMISSED_KEY = "referral_mission_prompt_dismissed_v1";
-const GAME_DATA_REFRESH_MS = 60_000;
-const INCOMING_SIGNAL_WINDOW_MS = 1_600;
-const EMPTY_DATA = {
-  profile: null,
-  classifications: [],
-  linkedAnomalies: [],
-  activityFeed: [],
-  otherClassifications: [],
-  visibleStructures: { telescope: true, satellites: false, rovers: false, balloons: false },
-  hubLeaderboard: { entries: [], currentUser: null },
-  referralCode: null,
-  referralCount: 0,
-  hasReferral: false,
-  hasRoverMineralDeposits: false,
-  incompletePlanet: null,
-  planetTargets: [],
-};
-
-function safeStorageGet(key: string): string | null {
-  if (typeof window === "undefined") return null;
-  try { return window.localStorage.getItem(key); } catch { return null; }
-}
-function safeStorageSet(key: string, value: string) {
-  if (typeof window === "undefined") return;
-  try { window.localStorage.setItem(key, value); } catch { /* ignore */ }
+function cx(...classes: Array<string | false | undefined>) {
+  return classes.filter(Boolean).join(" ");
 }
 
 interface GameClientProps {
-    initialData: any;
-    user: any;
+  initialData: unknown;
+  user: { id?: string } | null;
 }
 
-export default function GameClient({ initialData, user }: GameClientProps) {
+export default function GameClient({ user }: GameClientProps) {
   const posthog = usePostHog();
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const initialView = (searchParams.get("view") as ViewMode) || "base";
+  const garden = useGardenState();
+  const phase = useSkyPhase();
+  const [layout, setLayout] = useState<"portrait" | "landscape">("portrait");
+  const [showProfileModal, setShowProfileModal] = useState(false);
+  const { preferences, needsPreferencesPrompt, setProjectInterests } = useUserPreferences();
 
-  const [activeView, setActiveView]           = useState<ViewMode>(initialView);
-  const [notificationsOpen, setNotificationsOpen] = useState(false);
-  const [showProfileModal, setShowProfileModal]   = useState(false);
-  const [showPreferencesModal, setShowPreferencesModal] = useState(false);
-  const [openedViewports, setOpenedViewports] = useState<Set<ViewMode>>(new Set());
-  const [referralMissionDismissed, setReferralMissionDismissed] = useState(true);
-  // Guided deploy overlay
-  const [guidedDeployTarget, setGuidedDeployTarget] = useState<StructureId | null>(null);
-  const [ambientReady, setAmbientReady] = useState(false);
-
-  // Use initialData as state so it can be updated if needed (optimistic updates or refetch)
-  const [data, setData] = useState(initialData ?? EMPTY_DATA);
-  const [isLoadingData, setIsLoadingData] = useState(initialData === null);
-  const [dataLoadError, setDataLoadError] = useState<string | null>(null);
-  const [incomingStructures, setIncomingStructures] = useState<Set<StructureId>>(new Set());
-  const previousSignalCountsRef = useRef<StructureSignalMap | null>(null);
-  const incomingTimeoutsRef = useRef<Partial<Record<StructureId, ReturnType<typeof setTimeout>>>>({});
-
-  const { isDark } = UseDarkMode();
-  const {
-    preferences,
-    isLoading: preferencesLoading,
-    needsPreferencesPrompt,
-    setProjectInterests,
-    hasTutorialCompleted,
-    markTutorialComplete,
-  } = useUserPreferences();
-
-  // The control station is a dark HUD even when the user's site-wide theme is
-  // light. Keep the document dark while mounted as Radix dialogs render through
-  // portals outside this component's local theme boundary.
   useEffect(() => {
-    const documentRoot = document.documentElement;
-    const wasDark = documentRoot.classList.contains("dark");
-    documentRoot.classList.add("dark");
+    posthog?.capture("garden_hub_viewed", { userId: user?.id });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
+  useEffect(() => {
+    const mq = window.matchMedia("(orientation: landscape)");
+    const sync = () => setLayout(mq.matches ? "landscape" : "portrait");
+    sync();
+    if (mq.addEventListener) mq.addEventListener("change", sync);
+    else mq.addListener(sync);
     return () => {
-      if (!wasDark) {
-        documentRoot.classList.remove("dark");
-      }
+      if (mq.removeEventListener) mq.removeEventListener("change", sync);
+      else mq.removeListener(sync);
     };
   }, []);
 
-  const handleViewChange = useCallback((view: ViewMode) => {
-    posthog?.capture("structure_tab_switched", { from: activeView, to: view });
-    setActiveView(view);
-    if (view !== "base") {
-      setOpenedViewports((prev) => new Set(prev).add(view));
-    }
-    // Update URL without full navigation
-    const params = new URLSearchParams(window.location.search);
-    if (view === "base") params.delete("view");
-    else params.set("view", view);
-    // Remove the from=apt param if present
-    params.delete("from");
-    router.replace(`/game?${params.toString()}`, { scroll: false });
-  }, [router, posthog, activeView]);
+  const handleDeferredToast = useCallback(
+    () => garden.pushToast("Deferred on purpose (SSC-7)."),
+    [garden]
+  );
 
-  const handleQuickDeploy = useCallback((id: StructureId) => {
-    posthog?.capture("quick_deploy_used", { structure: id });
-    markTutorialComplete(`${id}-deploy` as TutorialId);
-  }, [markTutorialComplete, posthog]);
+  const handleHopOut = useCallback(
+    (hopId: string) => {
+      const hop = hopById(hopId);
+      if (hop) garden.hopOut(hop);
+    },
+    [garden]
+  );
 
-  const handleStructureClick = useCallback((id: StructureId) => {
-    const tutorialKey = `${id}-deploy` as TutorialId;
-    if (!hasTutorialCompleted(tutorialKey)) {
-      setGuidedDeployTarget(id);
-    } else {
-      handleViewChange(id);
-    }
-  }, [hasTutorialCompleted, handleViewChange]);
-
-  // Hub viewed + apt redirect tracking
-  useEffect(() => {
-    posthog?.capture("game_hub_viewed", { userId: user?.id });
-    if (searchParams.get("from") === "apt") {
-      posthog?.capture("apt_logged_in_redirect", { userId: user?.id });
-    }
-    if (searchParams.get("from") === "landing") {
-      posthog?.capture("landing_logged_in_redirect", { userId: user?.id });
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  // Derived data
-  const logEntries = useMemo(() => buildLogEntries(data.classifications, data.linkedAnomalies), [data]);
-
-  const radarStations = useMemo(() => {
-    const counts = {
-      telescope: 0,
-      satellite: 0,
-      rover: 0,
-      solar: 0,
-    };
-    data.linkedAnomalies.forEach((a: any) => {
-      const type = a.anomaly?.anomalytype;
-      if (type === "telescope") counts.telescope++;
-      else if (type === "satellite") counts.satellite++;
-      else if (type === "rover") counts.rover++;
-      else if (type === "solar") counts.solar++;
-    });
-
-    return {
-      telescope: { deployed: data.visibleStructures.telescope, signals: counts.telescope },
-      satellite: { deployed: data.visibleStructures.satellites, signals: counts.satellite },
-      rover:     { deployed: data.visibleStructures.rovers,    signals: counts.rover },
-      solar:     { deployed: data.visibleStructures.balloons,  signals: counts.solar },
-    };
-  }, [data.linkedAnomalies, data.visibleStructures]);
-
-  const signalCounts = useMemo<StructureSignalMap>(() => ({
-    telescope: radarStations.telescope.signals,
-    satellite: radarStations.satellite.signals,
-    rover: radarStations.rover.signals,
-    solar: radarStations.solar.signals,
-  }), [radarStations]);
-
-  const referralCode = typeof data.referralCode === "string" ? data.referralCode : null;
-  const referralCount = Number(data.referralCount ?? 0);
-  const userHasReferral = Boolean(data.hasReferral);
-  const showReferralMission = !referralMissionDismissed && !userHasReferral;
-  const showAmbientLayers = activeView === "base";
-  const activeProjectCount = preferences?.projectInterests?.length ?? 0;
-  const missionFocusLabel = activeProjectCount > 0
-    ? `Mission focus: ${activeProjectCount} track${activeProjectCount === 1 ? "" : "s"}`
-    : "+ Select mission focus";
-
-  const structureStates = useMemo<Record<StructureId, StructureState>>(() => ({
-    telescope: !radarStations.telescope.deployed ? "undeployed" : incomingStructures.has("telescope") ? "incoming" : radarStations.telescope.signals > 0 ? "active" : "standby",
-    satellite: !radarStations.satellite.deployed ? "undeployed" : incomingStructures.has("satellite") ? "incoming" : radarStations.satellite.signals > 0 ? "active" : "standby",
-    rover: !radarStations.rover.deployed ? "undeployed" : incomingStructures.has("rover") ? "incoming" : radarStations.rover.signals > 0 ? "active" : "standby",
-    solar: !radarStations.solar.deployed ? "undeployed" : incomingStructures.has("solar") ? "incoming" : radarStations.solar.signals > 0 ? "active" : "standby",
-  }), [incomingStructures, radarStations]);
-
-  const primaryMissionView = useMemo<ViewMode | null>(() => {
-    const priority: StructureId[] = ["telescope", "satellite", "rover", "solar"];
-    for (const view of priority) {
-      if (structureStates[view] === "incoming" || structureStates[view] === "active") {
-        return view;
-      }
-    }
-    for (const view of priority) {
-      if (radarStations[view].deployed) {
-        return view;
-      }
-    }
-    return null;
-  }, [radarStations, structureStates]);
-
-  const refreshGameData = useCallback(async () => {
-    try {
-      const response = await fetch("/api/gameplay/page-data", { cache: "no-store" });
-      if (!response.ok) {
-        setDataLoadError(
-          response.status === 401
-            ? "Your session could not be confirmed. Refresh the page to sign in again."
-            : `Station data request failed (${response.status}).`
-        );
-        return false;
-      }
-      const nextData = await response.json();
-      setData(nextData);
-      setDataLoadError(null);
-      return true;
-    } catch {
-      setDataLoadError("The station data service is unreachable.");
-      return false;
-    }
-  }, []);
-
-  // If server passed no initialData (cold start / timeout protection), fetch immediately
-  useEffect(() => {
-    if (!isLoadingData) return;
-    refreshGameData().finally(() => setIsLoadingData(false));
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
-    let isRefreshing = false;
-
-    const refreshIfVisible = async () => {
-      if (document.visibilityState !== "visible" || isRefreshing) return;
-      isRefreshing = true;
-      try {
-        await refreshGameData();
-      } finally {
-        isRefreshing = false;
-      }
-    };
-
-    const intervalId = window.setInterval(() => {
-      void refreshIfVisible();
-    }, GAME_DATA_REFRESH_MS);
-
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === "visible") {
-        void refreshIfVisible();
-      }
-    };
-
-    window.addEventListener("focus", handleVisibilityChange);
-    document.addEventListener("visibilitychange", handleVisibilityChange);
-
-    return () => {
-      window.clearInterval(intervalId);
-      window.removeEventListener("focus", handleVisibilityChange);
-      document.removeEventListener("visibilitychange", handleVisibilityChange);
-    };
-  }, [refreshGameData]);
-
-  useEffect(() => {
-    const previous = previousSignalCountsRef.current;
-    previousSignalCountsRef.current = signalCounts;
-    if (!previous) return;
-
-    (Object.keys(signalCounts) as StructureId[]).forEach((structureId) => {
-      if (signalCounts[structureId] <= previous[structureId]) return;
-
-      setIncomingStructures((current) => {
-        const next = new Set(current);
-        next.add(structureId);
-        return next;
-      });
-
-      const existingTimeout = incomingTimeoutsRef.current[structureId];
-      if (existingTimeout) {
-        clearTimeout(existingTimeout);
-      }
-
-      incomingTimeoutsRef.current[structureId] = setTimeout(() => {
-        setIncomingStructures((current) => {
-          const next = new Set(current);
-          next.delete(structureId);
-          return next;
-        });
-        delete incomingTimeoutsRef.current[structureId];
-      }, INCOMING_SIGNAL_WINDOW_MS);
-    });
-  }, [signalCounts]);
-
-  useEffect(() => () => {
-    Object.values(incomingTimeoutsRef.current).forEach((timeoutId) => {
-      if (timeoutId) {
-        clearTimeout(timeoutId);
-      }
-    });
-  }, []);
-
-  useEffect(() => {
-    setReferralMissionDismissed(safeStorageGet(REFERRAL_MISSION_DISMISSED_KEY) === "1");
-  }, []);
-
-  useEffect(() => {
-    let cancelled = false;
-    let timeoutId: ReturnType<typeof setTimeout> | null = null;
-    let idleId: number | null = null;
-
-    const enableAmbient = () => {
-      if (!cancelled) {
-        setAmbientReady(true);
-      }
-    };
-
-    const supportsIdleCallback =
-      typeof window !== "undefined" && typeof window.requestIdleCallback === "function";
-
-    if (supportsIdleCallback) {
-      idleId = window.requestIdleCallback(enableAmbient, { timeout: 300 });
-    } else {
-      timeoutId = globalThis.setTimeout(enableAmbient, 180);
-    }
-
-    return () => {
-      cancelled = true;
-      if (idleId !== null && typeof window !== "undefined" && typeof window.cancelIdleCallback === "function") {
-        window.cancelIdleCallback(idleId);
-      }
-      if (timeoutId !== null) {
-        globalThis.clearTimeout(timeoutId);
-      }
-    };
-  }, []);
-
-  const alerts = useMemo<Partial<Record<ViewMode, boolean>>>(() => ({
-    telescope: signalCounts.telescope > 0,
-    satellite: signalCounts.satellite > 0,
-    rover: signalCounts.rover > 0,
-    solar: signalCounts.solar > 0,
-  }), [signalCounts]);
+  if (!garden.hydrated) {
+    return (
+      <div className={styles.gardenPage}>
+        <div className={styles.stage} />
+      </div>
+    );
+  }
 
   return (
-    <div
-      className="dark relative isolate flex h-[100dvh] w-full flex-col overflow-hidden bg-background text-foreground selection:bg-primary/30"
-      style={{ colorScheme: "dark" }}
-    >
-      {showAmbientLayers && ambientReady ? (
-        <div className="pointer-events-none absolute inset-0 z-0" aria-hidden>
-          <TelescopeBackground variant="stars-only" />
+    <div className={styles.gardenPage}>
+      <GardenScene state={garden.state} onOpen={garden.openPanel} layout={layout} phase={phase}>
+        <GardenHud credits={garden.state.credits} phase={phase} onProfileClick={() => setShowProfileModal(true)} />
+        <p className={styles.hint}>Tap a tool (or the thing above it) — classify from the panel, in the sky</p>
+        <div className={cx(styles.toast, !!garden.toast && styles.isOn)} role="status">
+          {garden.toast}
         </div>
-      ) : (
-        <div className="pointer-events-none absolute inset-0 z-0 bg-gradient-to-b from-background to-background/80" aria-hidden />
-      )}
 
-      {/* ─── Living World Background ─── */}
-      {showAmbientLayers && ambientReady && (
-        <LivingWorldBg
-          classifications={data.classifications ?? []}
-          deployed={{
-            telescope: radarStations.telescope.deployed,
-            satellite: radarStations.satellite.deployed,
-            rover:     radarStations.rover.deployed,
-            solar:     radarStations.solar.deployed,
-          }}
+        <GardenPanel
+          state={garden.state}
+          openPanelId={garden.openPanelId}
+          onClose={garden.closePanel}
+          onTendHydro={garden.tendHydro}
+          onSitHabitat={garden.sitHabitat}
+          onUpgrade={garden.upgrade}
+          onCollectFlight={garden.collectFlight}
+          onStartMinigame={garden.startMinigame}
+          onHopOut={handleHopOut}
+          onDeferredToast={handleDeferredToast}
         />
-      )}
 
-      {/* Keep the living background atmospheric without competing with HUD text. */}
-      <div
-        className="pointer-events-none absolute inset-0 z-[1] bg-slate-950/80"
-        aria-hidden
-      />
-
-      {/* ─── Command Header ─── */}
-      <CommandHeader 
-        stardust={Number(data.profile?.classificationPoints || 0)}
-        hasAlerts={data.activityFeed?.length > 0}
-        onAlertsClick={() => setNotificationsOpen(true)}
-        onProfileClick={() => setShowProfileModal(true)}
-        agencyId={data.profile?.username || data.profile?.id}
-      />
-
-      {/* Header Spacer to prevent overlap */}
-      <div className="relative z-10 h-14 shrink-0" />
-
-      {/* ─── Persistent HUD Strip ─── */}
-      <div className="relative z-10 shrink-0">
-        <HUDStrip
-          signals={Object.values(radarStations).reduce((s, r) => s + r.signals, 0)}
-          anomalies={data.linkedAnomalies?.length ?? 0}
-          classifications={data.classifications?.length ?? 0}
+        <SkyClassify
+          openMinigame={garden.openMinigame}
+          onCloseMinigame={garden.closeMinigame}
+          onCompleteSkyClassify={garden.completeSkyClassify}
+          probeGrainOpen={garden.probeGrainOpen}
+          onCloseProbeGrain={garden.closeProbeGrain}
+          onSendFlight={garden.sendFlight}
+          onHopOut={handleHopOut}
         />
+      </GardenScene>
+
+      <div className="fixed inset-x-4 bottom-4 z-50 mx-auto max-w-md">
+        <GameSurveys userId={user?.id} mechanicId={garden.openPanelId ?? "garden"} />
       </div>
 
-      <main className="relative z-10 min-h-0 flex-1 overflow-hidden pb-[80px] md:pb-0">
-        <AnimatePresence mode="wait">
-          {activeView === "base" ? (
-            <motion.div 
-              key="base"
-              initial={{ opacity: 0, scale: 1.06 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.94 }}
-              transition={{ duration: 0.25, ease: [0.32, 0.72, 0, 1] }}
-              className="h-full overflow-hidden"
-            >
-              <div className="grid h-full grid-cols-1 gap-0 lg:grid-cols-[minmax(0,1fr)_340px] lg:overflow-hidden">
-
-                {/* ── Left / Main column ── */}
-                <div className="game-scrollbar flex h-full min-h-0 flex-col gap-2 overflow-y-auto overscroll-contain p-2 [&>*]:shrink-0 sm:gap-4 sm:p-4 lg:gap-4 lg:p-4">
-
-                  {(isLoadingData || dataLoadError) && (
-                    <div
-                      className={cn(
-                        "flex items-center justify-between gap-3 rounded-lg border px-3 py-2 font-mono text-xs",
-                        dataLoadError
-                          ? "border-amber-400/35 bg-amber-400/10 text-amber-100"
-                          : "border-sky-400/25 bg-sky-400/10 text-sky-100"
-                      )}
-                      role={dataLoadError ? "alert" : "status"}
-                    >
-                      <div className="flex min-w-0 items-center gap-2">
-                        {dataLoadError ? (
-                          <AlertTriangle className="h-4 w-4 shrink-0 text-amber-300" aria-hidden />
-                        ) : (
-                          <RefreshCw className="h-4 w-4 shrink-0 animate-spin text-sky-300" aria-hidden />
-                        )}
-                        <div className="min-w-0">
-                          <p className="font-bold">
-                            {dataLoadError ? "Station data unavailable" : "Syncing station data…"}
-                          </p>
-                          {dataLoadError && (
-                            <p className="mt-0.5 text-[10px] text-amber-100/70">
-                              {dataLoadError} Core controls remain available.
-                            </p>
-                          )}
-                        </div>
-                      </div>
-                      {dataLoadError && (
-                        <button
-                          type="button"
-                          className="shrink-0 rounded border border-amber-300/30 px-2.5 py-1 font-bold uppercase tracking-wider transition-colors hover:bg-amber-300/10 disabled:cursor-wait disabled:opacity-50"
-                          disabled={isLoadingData}
-                          onClick={() => {
-                            setDataLoadError(null);
-                            setIsLoadingData(true);
-                            void refreshGameData().finally(() => setIsLoadingData(false));
-                          }}
-                        >
-                          Retry
-                        </button>
-                      )}
-                    </div>
-                  )}
-
-                  {/* Mission Brief — always above fold */}
-                  <MissionBriefCard
-                    variant={
-                      Object.values(radarStations).some(r => r.signals > 0) ? "alert"
-                      : Object.values(radarStations).some(r => r.deployed) ? "progress"
-                      : "boot"
-                    }
-                    title={
-                      Object.values(radarStations).some(r => r.signals > 0)
-                        ? "Signals detected — awaiting classification"
-                        : Object.values(radarStations).some(r => r.deployed)
-                          ? "Station active — all systems nominal"
-                          : "No structures deployed"
-                    }
-                    subtitle={
-                      !Object.values(radarStations).some(r => r.deployed)
-                        ? "Deploy your first structure to begin receiving signals."
-                        : Object.values(radarStations).some(r => r.signals > 0)
-                          ? "Your live structures have fresh work queued. Jump straight to the active viewport."
-                        : undefined
-                    }
-                    actionLabel={
-                      !Object.values(radarStations).some(r => r.deployed)
-                        ? "Deploy now"
-                        : primaryMissionView
-                          ? "Resume your mission"
-                          : undefined
-                    }
-                    onAction={
-                      !Object.values(radarStations).some(r => r.deployed)
-                        ? () => handleViewChange("telescope")
-                        : primaryMissionView
-                          ? () => handleViewChange(primaryMissionView)
-                          : undefined
-                    }
-                  />
-
-                  {/* Research Entry — visible as soon as user has any stardust or is past boot */}
-                  {(data.profile?.classificationPoints > 0 || Object.values(radarStations).some(r => r.deployed)) && (
-                    <ResearchBriefCard 
-                      availableStardust={Number(data.profile?.classificationPoints || 0)}
-                      onNavigate={() => router.push("/research")}
-                    />
-                  )}
-
-                  {/* Sector Radar — only shown once structures are deployed */}
-                  {Object.values(radarStations).some(r => r.deployed) && (
-                    <>
-                      <SectionLabel text="Sector Radar" />
-                      <SectorRadar
-                        {...radarStations}
-                        onSelect={handleStructureClick}
-                        states={structureStates}
-                        className="justify-center lg:justify-start"
-                      />
-                    </>
-                  )}
-
-                  {/* Structure cards — horizontal scroll on mobile, 4-col grid on sm+ */}
-                  <SectionLabel text="Station Systems" />
-                  <div className="flex gap-2 overflow-x-auto pb-1 sm:grid sm:grid-cols-4 sm:overflow-x-visible sm:pb-0 sm:gap-3">
-                    {(["telescope","satellite","rover","solar"] as const).map((id) => {
-                      const station = radarStations[id];
-                      const state = structureStates[id];
-                      return (
-                        <div key={id} className="min-w-[calc(50%-4px)] sm:min-w-0">
-                          <StructureCard
-                            id={id}
-                            state={state}
-                            signals={station.signals}
-                            isSolar={id === "solar"}
-                            onClick={() => handleStructureClick(id)}
-                            onQuickDeploy={() => handleQuickDeploy(id)}
-                          />
-                        </div>
-                      );
-                    })}
-                  </div>
-
-                  {/* Add project button — post-onboarding */}
-                  <button
-                    onClick={() => setShowPreferencesModal(true)}
-                    className="self-start rounded-full border border-border/30 px-4 py-1.5 text-[11px] font-bold text-muted-foreground/60 transition-colors hover:border-border/60 hover:text-foreground"
-                  >
-                    {missionFocusLabel}
-                  </button>
-                </div>
-
-                {/* ── Right column (desktop only) ── */}
-                <div className="game-scrollbar hidden min-h-0 flex-col gap-4 overflow-y-auto overscroll-contain border-l border-border/20 p-4 [&>*]:shrink-0 lg:flex">
-                  {/* Referral — primary growth mechanic, top of right column */}
-                  <SectionLabel text="Invite Contributors" />
-                  {showReferralMission && (
-                    <ReferralMissionPrompt
-                      referralCode={referralCode}
-                      onOpenReferral={() => router.push("/referrals")}
-                      onDismiss={() => {
-                        safeStorageSet(REFERRAL_MISSION_DISMISSED_KEY, "1");
-                        setReferralMissionDismissed(true);
-                      }}
-                      onCopyInvite={() => {
-                        if (!referralCode) return;
-                        navigator.clipboard.writeText(buildClientReferralUrl(referralCode) || referralCode);
-                      }}
-                      className="mb-4"
-                    />
-                  )}
-                  <AgencyNetworkCard 
-                    referralCode={referralCode}
-                    referralsCount={referralCount}
-                    userId={user?.id}
-                    onCopyInvite={() => {
-                      if (referralCode) {
-                        navigator.clipboard.writeText(buildClientReferralUrl(referralCode) || `${window.location.origin}/auth?ref=${referralCode}`);
-                      }
-                    }}
-                  />
-
-                  <MissionLogPanel entries={logEntries} />
-
-                  <HubLeaderboard
-                    entries={data.hubLeaderboard?.entries ?? []}
-                    currentUser={data.hubLeaderboard?.currentUser ?? null}
-                  />
-
-                  <CoralFishtank userId={user?.id} />
-                </div>
-              </div>
-            </motion.div>
-          ) : (
-            <motion.div 
-              key="viewport"
-              initial={{ opacity: 0, scale: 0.92 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 1.06 }}
-              transition={{ duration: 0.25, ease: [0.32, 0.72, 0, 1] }}
-              className="flex h-full flex-col"
-            >
-              <ViewportHeader 
-                label={activeView.toUpperCase()}
-                stationId={activeView} 
-                onBack={() => handleViewChange("base")} 
-              />
-              <div className="flex-1 overflow-y-auto p-4 md:p-6">
-                <GameSurveys
-                  userId={user?.id}
-                  classifications={data.classifications ?? []}
-                  mechanicId={activeView}
-                />
-                <ErrorBoundary label={activeView}>
-                  {activeView === "telescope" && <TelescopeTab />}
-                  {activeView === "satellite" && <SatelliteTab />}
-                  {activeView === "rover"     && <RoverTab />}
-                  {activeView === "solar"     && <SolarTab />}
-                  {activeView === "inventory" && <InventoryTab />}
-                </ErrorBoundary>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </main>
-
-      {/* ─── Modals & Overlays ─── */}
       <Dialog open={showProfileModal} onOpenChange={setShowProfileModal}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
@@ -725,58 +128,17 @@ export default function GameClient({ initialData, user }: GameClientProps) {
         </DialogContent>
       </Dialog>
 
-      <Sheet open={notificationsOpen} onOpenChange={setNotificationsOpen}>
-        <SheetContent side="right" className="w-[400px] sm:w-[540px]">
-          <SheetHeader>
-            <SheetTitle>Notifications</SheetTitle>
-          </SheetHeader>
-          <div className="py-6">
-             <RecentActivity 
-                activityFeed={data.activityFeed}
-                otherClassifications={data.otherClassifications}
-             />
-          </div>
-        </SheetContent>
-      </Sheet>
-
       <ProjectPreferencesModal
-        isOpen={showPreferencesModal || needsPreferencesPrompt}
+        isOpen={needsPreferencesPrompt}
         initialInterests={preferences?.projectInterests ?? []}
-        onClose={() => setShowPreferencesModal(false)}
-        onSave={(prefs) => {
-          setProjectInterests(prefs);
-          setShowPreferencesModal(false);
-          void refreshGameData();
-        }}
+        onClose={() => {}}
+        onSave={(prefs) => setProjectInterests(prefs)}
       />
-
-      {guidedDeployTarget && (
-        <GuidedDeployOverlay
-          structureId={guidedDeployTarget}
-          onComplete={() => {
-            markTutorialComplete(`${guidedDeployTarget}-deploy` as TutorialId);
-            setGuidedDeployTarget(null);
-            handleViewChange(guidedDeployTarget);
-          }}
-          onSkip={() => {
-            markTutorialComplete(`${guidedDeployTarget}-deploy` as TutorialId);
-            setGuidedDeployTarget(null);
-            handleViewChange(guidedDeployTarget);
-          }}
-        />
-      )}
 
       <PWAPrompt />
-      <PushNotificationPrompt />
-
-      <StationNav 
-        active={activeView} 
-        onSelect={handleViewChange} 
-        alerts={alerts} 
-      />
+      <div className="fixed bottom-4 left-4 z-50 max-w-sm">
+        <PushNotificationPrompt />
+      </div>
     </div>
   );
 }
-
-// Framer motion imports
-import { motion, AnimatePresence } from "framer-motion";

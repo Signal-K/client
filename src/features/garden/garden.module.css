@@ -1,0 +1,765 @@
+/* SSC garden — portrait TSP settlement. Ported from signal-k/tickets-please
+   garden-mockup/css/garden.css. Page-level resets (`html, body`, `:root`) are
+   rescoped onto `.gardenPage` / `.stage` so this stays local to the garden hub
+   instead of leaking into the rest of the app. */
+
+.gardenPage {
+  --dust: #cbb896;
+  --dust-mid: #b79d78;
+  --dust-dark: #8d7354;
+  --dust-edge: #6f5840;
+  --cream: #f3eadc;
+  --cream-shade: #d9ccb8;
+  --cream-deep: #c4b49a;
+  --plant: #6f9a5e;
+  --plant-deep: #3d6b45;
+  --glass: #9fd4c8;
+  --solar: #3a5a8c;
+  --window: #e8c96a;
+  --ink: #3a3228;
+  --ink-soft: #6a5c4c;
+  --paper: rgba(247, 240, 228, 0.92);
+  --hair: rgba(58, 50, 40, 0.16);
+  --ok: #4f8f5a;
+  --warn: #c48a2a;
+  --hud: #f7f0e4;
+  --stage-w: 390px;
+  --stage-h: 844px;
+  --sky-day: #9ec9e8;
+  --sky-dusk: #f0b58a;
+  --sky-night: #1c2438;
+
+  box-sizing: border-box;
+  display: grid;
+  place-items: center;
+  height: 100dvh;
+  overflow: clip;
+  background: #1a1714;
+  color: var(--ink);
+  font-family: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  touch-action: manipulation;
+}
+.gardenPage *,
+.gardenPage *::before,
+.gardenPage *::after {
+  box-sizing: border-box;
+}
+@media (orientation: landscape) {
+  .gardenPage {
+    display: block;
+    background: #cbb896;
+  }
+}
+
+.stage {
+  position: relative;
+  width: min(100vw, var(--stage-w));
+  height: min(100dvh, var(--stage-h));
+  aspect-ratio: 390 / 844;
+  max-height: 100dvh;
+  overflow: clip;
+  background: #cbb896;
+  isolation: isolate;
+}
+@media (min-width: 520px) and (orientation: portrait) {
+  .stage {
+    width: min(430px, 92vw);
+    height: min(92dvh, 900px);
+    border-radius: 28px;
+    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.45), 0 0 0 10px #2a241c;
+  }
+}
+@media (orientation: landscape) {
+  .stage {
+    width: 100vw;
+    height: 100dvh;
+    max-height: none;
+    aspect-ratio: auto;
+    border-radius: 0;
+    box-shadow: none;
+  }
+}
+
+/* ---- sky cycle (ssc.sky.cycle) ---- */
+.sky {
+  position: absolute;
+  inset: 0 0 36% 0;
+  z-index: 0;
+  background: linear-gradient(
+    180deg,
+    var(--sky-top, #7eb8e4) 0%,
+    var(--sky-mid, #f2d3a8) 55%,
+    var(--sky-bot, #f4e2c4) 100%
+  );
+  transition: background 1.2s linear;
+}
+.sky[data-phase="dawn"] {
+  --sky-top: #6a9cc8;
+  --sky-mid: #f3c9a0;
+  --sky-bot: #f6e4c8;
+}
+.sky[data-phase="day"] {
+  --sky-top: #7eb8e4;
+  --sky-mid: #c5dff2;
+  --sky-bot: #f4e6c8;
+}
+.sky[data-phase="dusk"] {
+  --sky-top: #3d4a78;
+  --sky-mid: #e08a6a;
+  --sky-bot: #f3c9a0;
+}
+.sky[data-phase="night"] {
+  --sky-top: #121828;
+  --sky-mid: #1c2438;
+  --sky-bot: #3a3a48;
+}
+
+.sun,
+.moon {
+  position: absolute;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  left: 50%;
+  margin-left: -22px;
+  pointer-events: none;
+}
+.sun {
+  top: 9%;
+  background: radial-gradient(circle at 35% 35%, #fff6c8, #f0c45a 55%, #e09a40);
+  box-shadow: 0 0 28px 8px rgba(255, 210, 120, 0.45);
+  opacity: 1;
+  transition: opacity 1s, top 1.2s, transform 1.2s;
+}
+.moon {
+  top: 11%;
+  background: radial-gradient(circle at 30% 30%, #f4f0e4, #c8c4b8);
+  box-shadow: 0 0 18px rgba(220, 220, 240, 0.35);
+  opacity: 0;
+  transition: opacity 1s;
+}
+.sky[data-phase="dusk"] .sun { top: 22%; opacity: 0.85; filter: saturate(1.2); }
+.sky[data-phase="night"] .sun { opacity: 0; }
+.sky[data-phase="night"] .moon { opacity: 1; }
+.sky[data-phase="dawn"] .sun { top: 20%; opacity: 0.9; }
+
+.stars {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  background-image: radial-gradient(1px 1px at 12% 18%, #fff, transparent),
+    radial-gradient(1.5px 1.5px at 28% 12%, #fff, transparent),
+    radial-gradient(1px 1px at 44% 22%, #ffe, transparent),
+    radial-gradient(1px 1px at 62% 8%, #fff, transparent),
+    radial-gradient(1.5px 1.5px at 78% 16%, #fff, transparent),
+    radial-gradient(1px 1px at 88% 28%, #ffe, transparent),
+    radial-gradient(1px 1px at 18% 32%, #fff, transparent),
+    radial-gradient(1px 1px at 70% 30%, #fff, transparent),
+    radial-gradient(1px 1px at 8% 8%, #fff, transparent),
+    radial-gradient(1px 1px at 36% 6%, #ffe, transparent),
+    radial-gradient(1.5px 1.5px at 54% 14%, #fff, transparent),
+    radial-gradient(1px 1px at 92% 10%, #fff, transparent),
+    radial-gradient(1px 1px at 48% 36%, #ffe, transparent),
+    radial-gradient(1px 1px at 66% 42%, #fff, transparent);
+  transition: opacity 1.2s;
+}
+.sky[data-phase="dusk"] .stars { opacity: 0.35; }
+.sky[data-phase="night"] .stars { opacity: 0.9; }
+
+.hills {
+  position: absolute;
+  left: -12%;
+  right: -12%;
+  bottom: 36%;
+  height: 16%;
+  z-index: 1;
+  pointer-events: none;
+  background: radial-gradient(90% 120% at 8% 120%, #c4a882 46%, transparent 47%),
+    radial-gradient(80% 110% at 28% 130%, #d2b894 44%, transparent 45%),
+    radial-gradient(100% 130% at 52% 125%, #c8ae86 48%, transparent 49%),
+    radial-gradient(85% 115% at 78% 128%, #c0a078 46%, transparent 47%),
+    radial-gradient(70% 100% at 96% 120%, #b89670 42%, transparent 43%);
+  opacity: 0.92;
+  transition: filter 1.2s;
+}
+.stage[data-phase="night"] .hills { filter: brightness(0.45) saturate(0.7); }
+.stage[data-phase="dusk"] .hills { filter: brightness(0.75) saturate(1.1); }
+
+/* ---- world / TSP side-on plain (not a floating island) ---- */
+.world {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+}
+.plain {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 58%;
+  bottom: 0;
+  z-index: 0;
+  background: radial-gradient(14px 8px at 18% 22%, rgba(141, 115, 84, 0.35) 40%, transparent 42%),
+    radial-gradient(22px 12px at 72% 18%, rgba(141, 115, 84, 0.28) 40%, transparent 42%),
+    radial-gradient(18px 10px at 40% 48%, rgba(111, 88, 64, 0.28) 42%, transparent 44%),
+    radial-gradient(26px 14px at 86% 62%, rgba(141, 115, 84, 0.3) 40%, transparent 42%),
+    radial-gradient(16px 9px at 12% 74%, rgba(111, 88, 64, 0.25) 40%, transparent 42%),
+    radial-gradient(20px 11px at 54% 82%, rgba(141, 115, 84, 0.22) 40%, transparent 42%),
+    linear-gradient(180deg, #d8c4a0 0%, #cbb896 28%, #b79d78 72%, #a58a66 100%);
+}
+.plain::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 18px;
+  background: linear-gradient(180deg, rgba(200, 174, 134, 0.55), transparent);
+  pointer-events: none;
+}
+.plainRocks {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(5px 3px at 24% 36%, #8d7354 50%, transparent 51%),
+    radial-gradient(7px 4px at 63% 28%, #a58a66 50%, transparent 51%),
+    radial-gradient(4px 3px at 8% 58%, #6f5840 50%, transparent 51%),
+    radial-gradient(6px 3px at 91% 44%, #8d7354 50%, transparent 51%),
+    radial-gradient(8px 4px at 47% 70%, #a58a66 50%, transparent 51%);
+  opacity: 0.7;
+}
+.yard {
+  position: absolute;
+  left: 22%;
+  width: 52%;
+  top: 8%;
+  height: 42%;
+  background: radial-gradient(ellipse at 50% 45%, rgba(122, 96, 64, 0.38) 0 46%, transparent 62%);
+  pointer-events: none;
+}
+.path {
+  position: absolute;
+  left: 10%;
+  top: 18%;
+  width: 28%;
+  height: 22%;
+  background: radial-gradient(ellipse at 80% 40%, rgba(122, 96, 64, 0.28) 0 40%, transparent 58%);
+  pointer-events: none;
+  transform: rotate(-8deg);
+}
+
+.plot {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+}
+
+.thing {
+  position: absolute;
+  border: 0;
+  padding: 10px;
+  min-width: 64px;
+  min-height: 72px;
+  background: transparent;
+  cursor: pointer;
+  transform: translate(-50%, -92%);
+  -webkit-tap-highlight-color: transparent;
+  z-index: 3;
+}
+.thing:focus-visible { outline: 2px solid #4f8f5a; outline-offset: 4px; border-radius: 8px; }
+.thing svg { display: block; width: 100%; height: auto; pointer-events: none; filter: drop-shadow(1px 3px 0 rgba(80, 60, 40, 0.18)); }
+.thing.isLocked { cursor: not-allowed; opacity: 0.55; filter: grayscale(0.4); }
+.thing[data-tier="1"] .growthT2,
+.thing[data-tier="1"] .growthT3,
+.thing[data-tier="0"] .growthT2,
+.thing[data-tier="0"] .growthT3,
+.thing[data-tier="2"] .growthT3 { display: none; }
+.thing.isReady .label::before {
+  content: "";
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-right: 5px;
+  border-radius: 50%;
+  background: #5ad07e;
+  vertical-align: middle;
+  box-shadow: 0 0 0 2px #f3eadc;
+}
+.thing.isAway { opacity: 0.35; }
+.thing[data-slug="pad"].isAway,
+.thing[data-slug="probe"].isAway { opacity: 1; }
+.thing.isAway .parkedHull { opacity: 0; transition: opacity 0.3s; }
+.thing .label {
+  position: absolute;
+  left: 50%;
+  bottom: -2px;
+  transform: translate(-50%, 100%);
+  font-size: 9px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  background: rgba(243, 234, 220, 0.88);
+  padding: 1px 6px;
+  border-radius: 99px;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Camp clustered around the habitat — not a scatter row. */
+.thing[data-slug="habitat"] { left: 50%; top: 62%; width: 30%; z-index: 3; }
+.thing[data-slug="hydro"] { left: 50%; top: 73%; width: 26%; z-index: 6; }
+.thing[data-slug="telescope"] { left: 32%; top: 62%; width: 16%; z-index: 4; }
+.thing[data-slug="satellite"] { left: 68%; top: 61%; width: 15%; z-index: 4; }
+.thing[data-slug="solar"] { left: 80%; top: 68%; width: 16%; z-index: 5; }
+.thing[data-slug="pad"] { left: 14%; top: 72%; width: 20%; z-index: 5; }
+.thing[data-slug="probe"] { left: 26%; top: 80%; width: 12%; z-index: 7; }
+.thing[data-slug="rover"] { left: 90%; top: 76%; width: 16%; min-height: 88px; z-index: 9; }
+.crew { left: 44%; top: 76%; width: 8%; z-index: 6; pointer-events: none; padding: 0; min-width: 0; min-height: 0; animation: stroll 18s ease-in-out infinite; }
+.crewB { left: 56%; top: 77%; animation: strollB 22s ease-in-out infinite; }
+.crew svg,
+.crewB svg { animation: bob 3.2s ease-in-out infinite; }
+
+.plantSway { transform-origin: 50% 90%; animation: sway 4.5s ease-in-out infinite; }
+.dishIdle { transform-origin: 50% 80%; animation: dish 9s ease-in-out infinite; }
+.solarGlint { animation: glint 5s ease-in-out infinite; }
+
+.stage[data-phase="night"] .plain { filter: brightness(0.52) saturate(0.7); }
+.stage[data-phase="dusk"] .plain { filter: brightness(0.86) saturate(1.05); }
+
+/* Classified object sits in the sky above its instrument. */
+.subject {
+  position: absolute;
+  width: 64px;
+  min-width: 56px;
+  min-height: 48px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  z-index: 7;
+  transform: translate(-50%, -50%);
+  animation: hover 3.2s ease-in-out infinite;
+  filter: drop-shadow(0 4px 6px rgba(40, 30, 20, 0.18));
+}
+.subject svg { display: block; width: 100%; height: auto; pointer-events: none; }
+.subject.isOff { opacity: 0; pointer-events: none; }
+.subject::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 88%;
+  width: 2px;
+  height: 78px;
+  transform: translateX(-50%);
+  background: repeating-linear-gradient(to bottom, rgba(58, 50, 40, 0.4) 0 3px, transparent 3px 7px);
+  pointer-events: none;
+}
+.subject[data-kind="transit"] { left: 32%; top: 34%; width: 72px; }
+.subject[data-kind="cloud"] { left: 68%; top: 30%; width: 82px; }
+.subject[data-kind="sun"] { left: 82%; top: 36%; width: 62px; }
+.subject[data-kind="crate"] { left: 14%; top: 36%; width: 52px; }
+.subject[data-kind="speck"] { left: 26%; top: 38%; width: 44px; }
+.stage[data-phase="night"] .subject[data-kind="sun"],
+.stage[data-phase="dusk"] .subject[data-kind="sun"] { opacity: 0; pointer-events: none; }
+
+.skyLife {
+  position: absolute;
+  inset: 0 0 36% 0;
+  z-index: 4;
+  pointer-events: none;
+  overflow: hidden;
+}
+.shootingStar {
+  position: absolute;
+  width: 160px;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, #fff8e0 40%, #fff);
+  border-radius: 3px;
+  transform: rotate(-28deg);
+  animation: streak 1.35s linear forwards;
+  box-shadow: 0 0 10px 2px rgba(255, 248, 220, 0.95);
+}
+.ambientLaunch {
+  position: absolute;
+  left: 14%;
+  top: 68%;
+  width: 52px;
+  z-index: 8;
+  pointer-events: none;
+  opacity: 0;
+  transform: translate(-50%, -80%);
+}
+.ambientLaunch.isFlying { opacity: 1; animation: lift 4.2s ease-in forwards; }
+.ambientLaunch.isLanding { opacity: 1; animation: land 2.6s ease-out forwards; }
+.ambientLaunch .exhaust { animation: burn 0.18s ease-in-out infinite alternate; }
+
+.probeShip {
+  position: absolute;
+  left: 26%;
+  top: 78%;
+  width: 28px;
+  height: 28px;
+  z-index: 12;
+  pointer-events: none;
+  opacity: 0;
+}
+.probeShip.isFlying { opacity: 1; animation: fly 2.4s ease-in forwards; }
+.probeShip.isLanding { opacity: 1; animation: flyHome 2.4s ease-out forwards; }
+
+@keyframes sway {
+  0%, 100% { transform: rotate(-3deg); }
+  50% { transform: rotate(4deg); }
+}
+@keyframes bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+@keyframes dish {
+  0%, 100% { transform: rotate(-8deg); }
+  50% { transform: rotate(10deg); }
+}
+@keyframes glint {
+  0%, 80%, 100% { opacity: 1; }
+  90% { opacity: 0.7; }
+}
+@keyframes fly {
+  0% { transform: translate(-50%, -70%) scale(1); opacity: 1; }
+  70% { transform: translate(-40px, -280px) scale(0.5); opacity: 0.9; }
+  100% { transform: translate(-80px, -360px) scale(0.2); opacity: 0; }
+}
+@keyframes hover {
+  0%, 100% { transform: translate(-50%, -50%); }
+  50% { transform: translate(-50%, calc(-50% - 8px)); }
+}
+@keyframes streak {
+  0% { opacity: 0; transform: rotate(-28deg) translateX(0); }
+  12% { opacity: 1; }
+  100% { opacity: 0; transform: rotate(-28deg) translateX(220px); }
+}
+@keyframes lift {
+  0% { transform: translate(-50%, -80%) scale(1.15); opacity: 1; }
+  70% { opacity: 1; }
+  100% { transform: translate(-24px, -520px) scale(0.38); opacity: 0; }
+}
+@keyframes land {
+  0% { transform: translate(-24px, -520px) scale(0.38); opacity: 0; }
+  18% { opacity: 1; }
+  100% { transform: translate(-50%, -80%) scale(1.15); opacity: 0; }
+}
+@keyframes flyHome {
+  0% { transform: translate(-80px, -360px) scale(0.2); opacity: 0; }
+  20% { opacity: 1; }
+  100% { transform: translate(-50%, -70%) scale(1); opacity: 0; }
+}
+@keyframes burn {
+  from { opacity: 0.55; }
+  to { opacity: 1; }
+}
+@keyframes stroll {
+  0%, 100% { left: 44%; }
+  50% { left: 58%; }
+}
+@keyframes strollB {
+  0%, 100% { left: 56%; }
+  50% { left: 40%; }
+}
+
+.stage[data-phase="night"] .thing svg { filter: drop-shadow(1px 3px 0 rgba(20, 20, 40, 0.35)) brightness(0.72); }
+.stage[data-phase="night"] .windowGlow { opacity: 1; }
+
+/* ---- HUD ---- */
+.hud {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  right: 14px;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  pointer-events: none;
+}
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--paper);
+  border: 1px solid var(--hair);
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 650;
+  font-size: 14px;
+  box-shadow: 0 4px 12px rgba(60, 40, 20, 0.08);
+  pointer-events: auto;
+}
+.chip .coin {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #ffe08a, #e0a030);
+  box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.15);
+}
+.phaseChip {
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  font-weight: 600;
+}
+
+.toast {
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  bottom: 18px;
+  z-index: 22;
+  text-align: center;
+  font-size: 13px;
+  color: var(--ink);
+  background: var(--paper);
+  border-radius: 12px;
+  padding: 10px 14px;
+  box-shadow: 0 8px 24px rgba(40, 30, 20, 0.16);
+  opacity: 0;
+  transform: translateY(8px);
+  pointer-events: none;
+  transition: opacity 0.25s, transform 0.25s;
+}
+.toast.isOn { opacity: 1; transform: none; }
+
+/* ---- sheet (ssc.flow.panel) ---- */
+.sheetScrim {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  background: rgba(28, 22, 16, 0.35);
+  border: 0;
+  padding: 0;
+}
+.sheet {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 31;
+  background: var(--hud);
+  border-radius: 20px 20px 0 0;
+  padding: 18px 18px 28px;
+  box-shadow: 0 -12px 40px rgba(20, 16, 12, 0.2);
+  transform: translateY(110%);
+  transition: transform 0.28s ease;
+  pointer-events: none;
+  max-height: 70%;
+  overflow-y: auto;
+}
+.sheet.isOpen { transform: none; pointer-events: auto; }
+.sheet h2 { margin: 0 0 4px; font-size: 18px; font-weight: 700; }
+.sheet .meta { margin: 0 0 8px; font-size: 13px; color: var(--ink-soft); line-height: 1.4; }
+.sheet .capacity { margin: 0 0 12px; font-size: 12px; font-weight: 650; color: var(--ok); min-height: 1em; }
+.actions { display: flex; flex-direction: column; gap: 8px; }
+.btn {
+  appearance: none;
+  border: 1px solid var(--hair);
+  background: #fffaf3;
+  color: var(--ink);
+  border-radius: 12px;
+  padding: 12px 14px;
+  font: inherit;
+  font-weight: 650;
+  font-size: 15px;
+  text-align: left;
+  cursor: pointer;
+}
+.btn:disabled { opacity: 0.45; cursor: not-allowed; }
+.btnPrimary { background: #4f8f5a; color: #f7f0e4; border-color: transparent; }
+.btnHop { background: #3a5a8c; color: #f4f0e8; border-color: transparent; }
+.btnGhost { background: transparent; text-align: center; font-weight: 550; color: var(--ink-soft); }
+
+/* ---- classify in the sky area (ssc.flow.sky_classify) ---- */
+.minigame {
+  position: absolute;
+  inset: 0 0 6% 0;
+  z-index: 28;
+  background: linear-gradient(180deg, rgba(18, 28, 42, 0.9), rgba(28, 40, 56, 0.86));
+  backdrop-filter: blur(10px);
+  color: #e8e4dc;
+  display: none;
+  flex-direction: column;
+  padding: 14px 14px 16px;
+  border-radius: 0 0 20px 20px;
+  box-shadow: 0 12px 32px rgba(12, 16, 24, 0.28);
+}
+.minigame.isOpen { display: flex; }
+.minigame header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.minigame h2 { margin: 0; font-size: 16px; flex: 1; }
+.minigame .gid { font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; color: #91adc2; }
+.mgClose {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: #c8c4b8;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 650;
+  cursor: pointer;
+  padding: 4px 0 4px 8px;
+}
+.mgPlay {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+/* Real, full-production classify components mount inside .mgPlay. They keep
+   their own internal layout/scroll — the overlay grows to fit them rather
+   than clipping or shrinking their UI. */
+.mgPlay > :global(.ssc-real-mount) {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+.prompt { margin: 0; font-size: 14px; color: #c8c4b8; line-height: 1.4; }
+.choices { display: grid; gap: 8px; }
+.choice {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: #243040;
+  color: inherit;
+  border-radius: 12px;
+  padding: 14px;
+  font: inherit;
+  cursor: pointer;
+  display: block;
+  width: 100%;
+}
+.spots {
+  position: relative;
+  height: 140px;
+  border-radius: 50%;
+  width: 140px;
+  margin: 4px auto;
+  background: radial-gradient(circle at 40% 35%, #ffe08a, #e09a30 55%, #b86a18);
+  box-shadow: 0 0 40px rgba(240, 180, 80, 0.35);
+}
+.spot {
+  position: absolute;
+  width: 18px;
+  height: 14px;
+  border-radius: 50%;
+  background: #6a4018;
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+  border: 0;
+}
+.spot.isOn { box-shadow: 0 0 0 3px #5ad07e; }
+.dipBtn {
+  margin-top: auto;
+  border: 0;
+  background: #70d9ea;
+  color: #041018;
+  font: inherit;
+  font-weight: 700;
+  border-radius: 12px;
+  padding: 14px;
+  cursor: pointer;
+  display: block;
+  width: 100%;
+}
+.result {
+  text-align: center;
+  padding: 24px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+  justify-content: center;
+}
+.result strong { display: block; font-size: 28px; color: #f5a623; margin-bottom: 8px; }
+
+.hint {
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  bottom: 72px;
+  z-index: 5;
+  text-align: center;
+  font-size: 12px;
+  color: var(--ink-soft);
+  pointer-events: none;
+}
+.hint.isOff { opacity: 0; }
+
+/* ---- landscape / desktop (TSP native camera) ---- */
+.stage[data-layout="landscape"] .sky { inset: 0 0 42% 0; }
+.stage[data-layout="landscape"] .hills { bottom: 40%; height: 22%; }
+.stage[data-layout="landscape"] .plain { top: 54%; }
+.stage[data-layout="landscape"] .skyLife { inset: 0 0 42% 0; }
+.stage[data-layout="landscape"] .yard { left: 30%; width: 34%; top: 4%; height: 58%; }
+.stage[data-layout="landscape"] .path { left: 12%; width: 24%; top: 14%; height: 36%; }
+
+.stage[data-layout="landscape"] .thing { min-width: 72px; }
+.stage[data-layout="landscape"] .thing[data-slug="pad"] { left: 16%; top: 72%; width: clamp(88px, 10vw, 140px); }
+.stage[data-layout="landscape"] .thing[data-slug="probe"] { left: 25%; top: 78%; width: clamp(56px, 6vw, 88px); }
+.stage[data-layout="landscape"] .thing[data-slug="telescope"] { left: 36%; top: 68%; width: clamp(80px, 8vw, 120px); }
+.stage[data-layout="landscape"] .thing[data-slug="habitat"] { left: 50%; top: 66%; width: clamp(140px, 14vw, 210px); }
+.stage[data-layout="landscape"] .thing[data-slug="hydro"] { left: 50%; top: 80%; width: clamp(120px, 12vw, 180px); }
+.stage[data-layout="landscape"] .thing[data-slug="satellite"] { left: 64%; top: 68%; width: clamp(72px, 8vw, 110px); }
+.stage[data-layout="landscape"] .thing[data-slug="solar"] { left: 75%; top: 72%; width: clamp(80px, 9vw, 130px); }
+.stage[data-layout="landscape"] .thing[data-slug="rover"] { left: 88%; top: 76%; width: clamp(80px, 8vw, 120px); }
+.stage[data-layout="landscape"] .crew { left: 46%; top: 82%; width: clamp(36px, 4vw, 52px); }
+.stage[data-layout="landscape"] .crewB { left: 54%; top: 83%; }
+
+.stage[data-layout="landscape"] .subject::before { height: 56px; }
+.stage[data-layout="landscape"] .subject[data-kind="crate"] { left: 16%; top: 42%; width: 56px; }
+.stage[data-layout="landscape"] .subject[data-kind="speck"] { left: 25%; top: 44%; width: 48px; }
+.stage[data-layout="landscape"] .subject[data-kind="transit"] { left: 36%; top: 38%; width: 76px; }
+.stage[data-layout="landscape"] .subject[data-kind="cloud"] { left: 64%; top: 36%; width: 88px; }
+.stage[data-layout="landscape"] .subject[data-kind="sun"] { left: 75%; top: 40%; width: 64px; }
+
+.stage[data-layout="landscape"] .ambientLaunch { left: 16%; top: 70%; width: 56px; }
+.stage[data-layout="landscape"] .probeShip { left: 25%; top: 76%; }
+
+.stage[data-layout="landscape"] .hud { top: 18px; left: 22px; right: 22px; }
+.stage[data-layout="landscape"] .hint { left: 20%; right: 20%; bottom: 22px; }
+.stage[data-layout="landscape"] .toast { left: 28%; right: 28%; bottom: 22px; }
+
+.stage[data-layout="landscape"] .sheet {
+  left: auto;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: min(380px, 34vw);
+  border-radius: 20px 0 0 20px;
+  transform: translateX(110%);
+  padding: 22px 22px 28px;
+  max-height: none;
+}
+.stage[data-layout="landscape"] .sheet.isOpen { transform: none; }
+
+.stage[data-layout="landscape"] .minigame {
+  inset: 0 0 10% 0;
+  padding: 18px 16vw 20px;
+  border-radius: 0 0 24px 24px;
+}
+.stage[data-layout="landscape"] .mgPlay { max-width: 900px; margin: 0 auto; width: 100%; }
+.stage[data-layout="landscape"] .spots { width: 160px; height: 160px; }
+
+@keyframes strollWide {
+  0%, 100% { left: 46%; }
+  50% { left: 56%; }
+}
+@keyframes strollBWide {
+  0%, 100% { left: 54%; }
+  50% { left: 44%; }
+}
+.stage[data-layout="landscape"] .crew { animation: strollWide 18s ease-in-out infinite; }
+.stage[data-layout="landscape"] .crewB { animation: strollBWide 22s ease-in-out infinite; }
