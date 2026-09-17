@@ -1,4 +1,4 @@
-// import { CapacityLevel } from "@/components/Structures/Auto/ActiveAutomaton";
+import { CapacityLevel } from "@/app/components/(vehicles)/(automatons)/ActiveAutomaton";
 
 interface Recipe {
     [key: string]: number;
@@ -12,7 +12,7 @@ export interface MineralDeposit {
     mineral: string;
     quantity: number;
   };
-}; 
+};
 
 type SpeedLevel = 1 | 2 | 3;
 
@@ -29,7 +29,7 @@ export interface UserStructure {
     // Function (what is executed upon click)
 };
 
-interface Automaton {
+export interface Automaton {
     gif: null;
     id: number;
     item: number;
@@ -40,25 +40,19 @@ interface Automaton {
     configuration: {
       Power: number;
       Speed: SpeedLevel; 
-      Capacity: Number;
+      Capacity: CapacityLevel;
     };
 };  
 
 export interface InventoryItem {
-    item: number;
-    owner: string;
-    anomaly: number;
     id: number;
     name: string;
-    quantity?: number;
     description: string;
     cost: number;
     icon_url: string;
     ItemCategory: string;
     parentItem: number | null;
-    locationType?: string;
     itemLevel: number;
-    gif?: string;
     recipe?: Recipe;
 };
 
@@ -76,35 +70,7 @@ export interface InventoryStructureItem {
     locationType: string | null;
 };
 
-export interface TerrariumInventoryStructureItem {
-    configuration: {};
-    itemDetail: any;
-    id: number;
-    item: number;
-    owner: string;
-    quantity: number;
-    notes: string | null;
-    time_of_deploy: string | null;
-    // anomaly: number | null;
-    terrarium: number;
-    parentItem: number | null;
-    locationType: string | null;
-};
-
 export interface StructureItemDetail {
-    id: number;
-    name: string;
-    description: string;
-    cost: number;
-    icon_url: string;
-    ItemCategory: string;
-    locationType: string | null;
-    parentItem: number | null;
-    itemLevel: number;
-    recipe?: Record<string, number>;
-};
-
-interface TerrariumStructureItemDetail {
     id: number;
     name: string;
     description: string;

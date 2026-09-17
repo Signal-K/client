@@ -16,14 +16,13 @@ const Login = () => {
     }, [session, router]);
 
     return (
-        // <div className='container' style={{ padding: '50px 0 100px 0' }}>
-        //     {!session ? (
-        //         <LoginPage />
-        //     ) : (
-        //         <p>Logged in</p>
-        //     )}
-        // </div>
-        <LoginPage />
+        <div className='container' style={{ padding: '50px 0 100px 0' }}>
+            {!session ? (
+                <LoginPage />
+            ) : (
+                <p>Logged in</p>
+            )}
+        </div>
     );
 };
 

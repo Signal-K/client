@@ -9,8 +9,6 @@ import { MicroscopeIcon, CodeIcon, FilesIcon } from "lucide-react";
 import { Flexbox } from 'react-layout-kit';
 import { createStyles } from 'antd-style';
 import { rgba } from 'polished';
-import { Card, CardContent } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
 
 interface AuthPageProps {
   children: ReactNode;
@@ -59,8 +57,6 @@ const Navbar = () => {
 };
 
 function SupabaseAuthWrapper({ children }: { children: ReactNode }) {
-  const supabase = useSupabaseClient();
-
     const { styles } = useStyles();
 
   return (
@@ -71,7 +67,7 @@ function SupabaseAuthWrapper({ children }: { children: ReactNode }) {
         <div className="md:w-1/2 w-full flex flex-col justify-center items-center bg-gray-100 p-10">
           <div className="w-full h-full relative">
             <Image
-              src="assets/Backdrops/background1.jpg"
+              src="https://qwbufbmxkjfaikoloudl.supabase.co/storage/v1/object/public/media/garden.png"
               alt="Application UI"
               layout="fill"
               objectFit="cover"
@@ -92,51 +88,11 @@ function SupabaseAuthWrapper({ children }: { children: ReactNode }) {
       >
         <strong className="font-extrabold text-transparent text-8xl bg-clip-text bg-gradient-to-r from-green-200 to-amber-300" style={{ fontSize: 'min(56px, 8vw)' }}>Star Sailors</strong>
         </Flexbox>
-        <p className="max-w-[600px] text-blue-800 md:text-xl">Explore the cosmos & catalogue discoveries in different scientific disciplines</p>
+        <p className="max-w-[600px] text-muted-foreground md:text-xl">Explore the cosmos & catalogue discoveries in different scientific disciplines</p>
           <div className="max-w-md w-full mx-auto py-5">
-            <Card>
-          <CardContent>
-          <div className="relative my-4">
-            <div className="absolute inset-0 flex items-center">
-              <Separator className="w-full" />
+            <div className="bg-gray-100 p-8 rounded-lg shadow-lg">
+              {children}
             </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-background px-2 text-muted-foreground">Or continue with</span>
-            </div>
-          </div>
-          <Auth
-            supabaseClient={supabase}
-            providers={["google"]}
-            socialLayout="horizontal"
-            theme="light"
-          />
-          
-          <div className="flex flex-col gap-3 mt-6">
-            <h3 className="text-lg font-semibold">Connect</h3>
-            <Link 
-              href="https://threads.net/droidology" 
-              className="flex items-center gap-2 p-2 rounded-md bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:from-purple-600 hover:to-pink-600 transition-colors"
-            >
-              <MicroscopeIcon className="h-5 w-5" />
-              Threads
-            </Link>
-            <Link 
-              href="https://github.com/signal-k" 
-              className="flex items-center gap-2 p-2 rounded-md bg-gradient-to-r from-gray-800 to-gray-900 text-white hover:from-gray-900 hover:to-black transition-colors"
-            >
-              <CodeIcon className="h-5 w-5" />
-              Github
-            </Link>
-            <Link 
-              href="https://github.com/signal-k/manuscript" 
-              className="flex items-center gap-2 p-2 rounded-md bg-gradient-to-r from-blue-500 to-cyan-500 text-white hover:from-blue-600 hover:to-cyan-600 transition-colors"
-            >
-              <FilesIcon className="h-5 w-5" />
-              Documentation
-            </Link>
-          </div>
-        </CardContent>
-        </Card>
           </div>
         </div>
       </div>
