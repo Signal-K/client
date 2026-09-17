@@ -36,7 +36,7 @@ function RootLayoutInner({ children }: { children: ReactNode }) {
     }
 
     navigator.serviceWorker
-      .register("/service-worker.js?v=20260729-1", { scope: "/" })
+      .register("/service-worker.js?v=20260917-confirm", { scope: "/" })
       .catch((error) => console.error("Service Worker registration failed:", error));
   }, []);
 

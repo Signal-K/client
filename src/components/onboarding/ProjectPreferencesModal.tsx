@@ -1,15 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { cn } from "@/src/lib/utils";
 import { Button } from "@/src/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from "@/src/components/ui/dialog";
+import { Dialog, DialogTitle, DialogDescription } from "@/src/components/ui/dialog";
 import {
   Telescope,
   Globe,
@@ -20,6 +15,7 @@ import {
   Check,
   Sparkles,
   ArrowRight,
+  X,
 } from "lucide-react";
 import { ProjectType } from "@/src/hooks/useUserPreferences";
 
@@ -153,25 +149,69 @@ export default function ProjectPreferencesModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="left-0 top-0 flex h-[100dvh] max-h-[100dvh] w-full max-w-none translate-x-0 translate-y-0 flex-col gap-0 overflow-hidden rounded-none border-0 bg-background p-0 shadow-none sm:left-[50%] sm:top-[50%] sm:h-[min(52rem,calc(100dvh-2rem))] sm:max-h-[calc(100dvh-2rem)] sm:w-[calc(100vw-2rem)] sm:max-w-[58rem] sm:translate-x-[-50%] sm:translate-y-[-50%] sm:rounded-lg sm:border sm:border-border/60 sm:bg-background/95 sm:shadow-2xl">
-        <div className="pointer-events-none absolute inset-0 star-field opacity-25" />
-        <div className="pointer-events-none absolute inset-0 sunburst-bg opacity-30" />
+      <DialogPrimitive.Portal>
+        <DialogPrimitive.Overlay className="fixed inset-0 z-[400] bg-black/70" />
+        <DialogPrimitive.Content
+          style={{
+            position: "fixed",
+            inset: 0,
+            zIndex: 401,
+            display: "flex",
+            flexDirection: "column",
+            width: "100%",
+            height: "100dvh",
+            maxWidth: "none",
+            transform: "none",
+            padding: 0,
+            overflow: "hidden",
+            background: "hsl(var(--background))",
+          }}
+        >
+          <header
+            style={{
+              flexShrink: 0,
+              display: "flex",
+              alignItems: "flex-start",
+              justifyContent: "space-between",
+              gap: 12,
+              padding: "16px 16px 12px",
+              borderBottom: "1px solid hsl(var(--border))",
+            }}
+          >
+            <div style={{ minWidth: 0, flex: 1, paddingRight: 8 }}>
+              <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-primary">
+                Mission Focus
+              </p>
+              <DialogTitle className="mt-2 flex items-center gap-2 text-xl font-black tracking-tight sm:text-2xl">
+                <Sparkles className="h-5 w-5 text-primary" />
+                Select your project roster
+              </DialogTitle>
+              <DialogDescription className="mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground">
+                Pick the science you want, then tap Confirm.
+              </DialogDescription>
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
+              <Button
+                type="button"
+                data-testid="onboarding-confirm"
+                onClick={handleSave}
+                className="btn-glow h-11 rounded-full px-5 text-sm font-black uppercase tracking-[0.16em]"
+              >
+                Confirm
+                <Check className="ml-1 h-4 w-4" />
+              </Button>
+              <DialogPrimitive.Close
+                type="button"
+                onClick={onClose}
+                className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-border"
+                aria-label="Close"
+              >
+                <X className="h-5 w-5" />
+              </DialogPrimitive.Close>
+            </div>
+          </header>
 
-        <DialogHeader className="relative shrink-0 border-b border-border/40 px-4 pb-4 pt-5 sm:px-6 sm:pb-5 sm:pt-6">
-            <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-primary">
-              Mission Focus
-            </span>
-            <DialogTitle className="mt-2 flex items-center gap-2 pr-8 text-xl font-black tracking-tight sm:text-2xl">
-              <Sparkles className="h-5 w-5 text-primary" />
-              Select your project roster
-            </DialogTitle>
-            <DialogDescription className="max-w-2xl text-sm leading-relaxed text-muted-foreground">
-              Choose the science you want to raise in the garden. Confirm when you are
-              ready, then spend credits to build those instruments and classify to earn more.
-            </DialogDescription>
-        </DialogHeader>
-
-        <div className="relative min-h-0 flex-1 overflow-y-auto px-4 py-4 sm:px-6 sm:py-5">
+          <div style={{ flex: 1, minHeight: 0, overflowY: "auto", padding: "16px" }}>
             <div className="mb-4 flex flex-wrap items-center gap-2">
               <span className="rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-primary">
                 {selectedProjects.length} tracks armed
@@ -281,11 +321,19 @@ export default function ProjectPreferencesModal({
                 );
               })}
             </div>
-        </div>
+          </div>
 
-        <div className="relative z-20 mt-auto flex shrink-0 flex-col gap-3 border-t border-border bg-background px-4 py-4 pb-[max(1rem,env(safe-area-inset-bottom))] sm:px-6">
+          <footer
+            style={{
+              flexShrink: 0,
+              padding: "12px 16px calc(12px + env(safe-area-inset-bottom))",
+              borderTop: "1px solid hsl(var(--border))",
+              background: "hsl(var(--background))",
+            }}
+          >
             <Button
-              data-testid="onboarding-confirm"
+              type="button"
+              data-testid="onboarding-confirm-footer"
               onClick={handleSave}
               size="lg"
               className="btn-glow h-14 w-full gap-2 rounded-full text-base font-black uppercase tracking-[0.18em]"
@@ -293,18 +341,19 @@ export default function ProjectPreferencesModal({
               Confirm
               <Check className="h-5 w-5" />
             </Button>
-            <div className="flex items-center justify-between gap-3">
+            <div className="mt-3 flex items-center justify-between gap-3">
               <p className="text-xs text-muted-foreground">
                 {selectedProjects.length > 0
                   ? `${selectedProjects.length} project${selectedProjects.length === 1 ? "" : "s"} selected`
                   : "Nothing picked yet — Confirm will arm every track."}
               </p>
-              <Button variant="ghost" onClick={onClose} className="shrink-0">
+              <Button type="button" variant="ghost" onClick={onClose} className="shrink-0">
                 Skip for now
               </Button>
             </div>
-        </div>
-      </DialogContent>
+          </footer>
+        </DialogPrimitive.Content>
+      </DialogPrimitive.Portal>
     </Dialog>
   );
 }
