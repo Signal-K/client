@@ -1,0 +1,22 @@
+{
+    "name": "Star Sailors",
+     "short_name": "Star Sailors",
+    "description": "Explore the cosmos",
+     "start_url": "/",
+     "display": "standalone",
+     "background_color": "#FFFFFF",
+     "theme_color": "#FFFFFF",
+     "orientation": "portrait",
+     "icons": [
+       {
+         "src": "https://i.ibb.co/qrSP4gq/Removebg.png",
+         "sizes": "192x192",
+         "type": "image/png"
+       },
+       {
+         "src": "https://i.ibb.co/qrSP4gq/Removebg.png",
+         "sizes": "512x512",
+         "type": "image/png"
+       }
+     ]
+   }
