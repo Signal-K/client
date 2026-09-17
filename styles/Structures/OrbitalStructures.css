@@ -1,0 +1,54 @@
+.relative {
+    position: relative;
+  }
+  
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+  }
+  
+  .flex {
+    display: flex;
+  }
+  
+  .flex-col {
+    flex-direction: column;
+  }
+  
+  .items-center {
+    align-items: center;
+  }
+  
+  .space-y-2 > * + * {
+    margin-top: 0.5rem;
+  }
+  
+  .w-16 {
+    width: 4rem;
+  }
+  
+  .h-16 {
+    height: 4rem;
+  }
+  
+  .w-14 {
+    width: 3.5rem;
+  }
+  
+  .h-14 {
+    height: 3.5rem;
+  }
+  
+  .cursor-pointer {
+    cursor: pointer;
+  }
+  
+  .hovering-structure {
+    transition: transform 0.2s;
+  }
+  
+  .hovering-structure:hover {
+    transform: scale(1.1);
+  }
+  
