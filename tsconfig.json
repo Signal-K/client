@@ -1,45 +1,20 @@
 {
   "compilerOptions": {
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "target": "es5",
+    "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
-    "strict": true,
+    "skipLibCheck": true,
+    "strict": false,
+    "forceConsistentCasingInFileNames": true,
     "noEmit": true,
+    "esModuleInterop": true,
     "module": "esnext",
-    "moduleResolution": "bundler",
+    "moduleResolution": "node",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
-    "incremental": true,
-    "paths": {
-      "@/*": [
-        "./*"
-      ]
-    },
-    "plugins": [
-      {
-        "name": "next"
-      }
-    ],
-    "target": "ES2017",
-    "skipLibCheck": true,
-    "esModuleInterop": true
+    "incremental": true
   },
-  "include": [
-    "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
-    ".next/types/**/*.ts",
-    "app/components/_[archive]/Classifications/Zoodex/CapturePage.jsx",
-    "app/components/_[archive]/Classifications/Zoodex/Mobx.jsx",
-    "components/topographic-map.jsx",
-    "components/enhanced-weather-events.jsx", "content/Comments/SurveyorForm.tsx.tst",
-  ],
-  "exclude": [
-    "node_modules",
-    "app/components/Data/Generator/Astronomer/DailyMinorPlanet.tsx"
-  ]
+  "exclude": ["node_modules"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "components/PostFormCard.jsx", "constants/contracts.ts", "pages/posts.tsx/index.jsx", "components/Lens/Utterances.jsx", "components/Lens/Utterances.jsx", "components/Posts/ProfileCard.tsx", "components/Posts/ProfileCard.tsx", "context/UserContext.js", "context/UserContext.js", "components/PostCard.jsx", "components/PostCard.jsx", "components/Core/Sidebar.jsx", "components/Core/Sidebar.jsx", "components/Core/Layout.tsx", "components/Core/Layout.tsx", "components/Gameplay/Generator/Notebooks/Notebook.js", "components/Gameplay/Generator/Notebooks/Notebook.js", "components/Governance/Connections/ConnectWallet.js", "components/Governance/Connections/ConnectWallet.js", "components/Governance/Navbar.jsx", "components/Governance/Navbar.jsx", "pages/governance/vote.jsx", "pages/governance/vote.jsx", "components/Gameplay/Models/Character/CharacterCanvas.jsx", "components/Gameplay/Models/Character/Interface.jsx", "components/Journal/Discussion/Reply.js", "pages/tests/planet.tsx"  ]
 }

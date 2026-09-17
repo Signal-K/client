@@ -1,5 +1,1 @@
-.env.local
-.env
-citizen/buckets
-citizen/supabase
-citizen/archive
+api
