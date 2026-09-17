@@ -6,6 +6,11 @@
 .pnp.js
 .env
 
+citizen
+/citizen
+supabase
+/supabase
+
 # testing
 /coverage
 .env
