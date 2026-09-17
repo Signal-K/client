@@ -9,7 +9,7 @@ import BiomeAggregator from "@/components/Data/Generator/BiomeAggregator";
 import SatellitePlanetFourAggregator, { SatellitePlanetFourClassification } from "@/components/Structures/Missions/Astronomers/SatellitePhotos/P4/P4Aggregator";
 import AI4MAggregator from "@/components/Structures/Missions/Astronomers/SatellitePhotos/AI4M/AI4MAggregator";
 import BuildTerrariumStructures from "@/components/Structures/Build/BuildOnTerrariums";
-import StructuresOnTerrarium from "@/components/Structures/StructuresOnTerrarium";
+// import StructuresOnTerrarium from "@/components/Structures/StructuresOnTerrarium";
 import { Badge } from "@/components/ui/badge";
 import { Camera, Clock } from "lucide-react";
 import Image from "next/image"

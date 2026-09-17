@@ -2,43 +2,65 @@
 @tailwind components;
 @tailwind utilities;
 
+.dark {
+  --background: 220 16% 12%;
+  --foreground: 220 16% 90%;
+
+  --card: 220 16% 16%;
+  --card-foreground: 220 16% 90%;
+
+  --popover: 220 16% 16%;
+  --popover-foreground: 220 16% 90%;
+
+  --primary: 184 51% 58%; /* #5FCBC3 teal-glow */
+  --primary-foreground: 220 16% 12%;
+
+  --secondary: 196 34% 50%; /* soft sci-fi blue */
+  --secondary-foreground: 220 16% 96%;
+
+  --muted: 220 16% 20%;
+  --muted-foreground: 220 16% 60%;
+
+  --accent: 196 44% 69%; /* #88c0d0 holographic blue */
+  --accent-foreground: 220 16% 12%;
+
+  --destructive: 354 42% 56%;
+  --destructive-foreground: 220 16% 96%;
+
+  --border: 220 16% 30%;
+  --input: 220 16% 20%;
+
+  --ring: 184 51% 58%;
+}
+
 :root {
-  /* Background & Foreground Colors */
-  --background: #ECEFF4; /* Nord Polar Night light */
-  --foreground: #2E3440; /* Nord Night text */
-  
-  /* Card & Popover */
-  --card: #E5E9F0; /* Nord Snow Storm variant */
-  --card-foreground: #2E3440; /* Nord Night text */
-  --popover: #E5E9F0; /* Nord Snow Storm variant */
-  --popover-foreground: #2E3440; /* Nord Night text */
-  
-  /* Primary Colors */
-  --primary: #B48EAD; /* Novadust cosmic lavender */
-  --primary-foreground: #ECEFF4; /* Light-on-dark */
-  
-  /* Secondary Colors */
-  --secondary: #4C566A; /* Nord Frost shade */
-  --secondary-foreground: #ECEFF4; /* Light-on-dark */
-  
-  /* Muted & Accent Colors */
-  --muted: #D8DEE9; /* Subtle border */
-  --muted-foreground: #2E3440; /* Nord Night text */
-  --accent: #B48EAD; /* Novadust cosmic lavender */
-  --accent-foreground: #ECEFF4; /* Light-on-dark */
-  
-  /* Destructive Colors */
-  --destructive: #BF616A; /* Red */
-  --destructive-foreground: #ECEFF4; /* Light-on-dark */
-  
-  /* Borders & Inputs */
-  --border: #D8DEE9; /* Subtle border */
-  --input: #FFFFFF; /* Neutral base */
-  
-  /* Ring (focus state) */
-  --ring: #B48EAD; /* Novadust cosmic lavender */
-  
-  /* Radius for rounded corners */
+  --background: 220 16% 96%;
+  --foreground: 220 16% 22%;
+
+  --card: 218 27% 92%;
+  --card-foreground: 220 16% 22%;
+  --popover: 218 27% 92%;
+  --popover-foreground: 220 16% 22%;
+
+  --primary: 184 51% 58%; /* #5FCBC3 */
+  --primary-foreground: 220 16% 96%;
+
+  --secondary: 196 34% 50%;
+  --secondary-foreground: 220 16% 96%;
+
+  --muted: 218 27% 88%;
+  --muted-foreground: 220 16% 22%;
+  --accent: 196 44% 69%; /* #88c0d0 */
+  --accent-foreground: 220 16% 96%;
+
+  --destructive: 354 42% 56%;
+  --destructive-foreground: 220 16% 96%;
+
+  --border: 218 27% 88%;
+  --input: 0 0% 100%;
+
+  --ring: 184 51% 58%;
+
   --radius: 0.5rem;
 }
 
@@ -121,7 +143,7 @@ body {
   background-color: hsl(var(--accent));
   clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
   transform: translate(-50%, -50%) rotate(45deg);
-};
+}
 
 .sci-fi-background {
   background-color: #1D2833;
@@ -230,4 +252,47 @@ body {
 .writing-vertical {
   writing-mode: vertical-rl;
   text-orientation: mixed;
+}
+
+.texture-container {
+  background-color: #0a0a0c; /* rich black-blue base */
+  background-image:
+    radial-gradient(circle at 30% 40%, rgba(0, 255, 200, 0.06) 0%, transparent 25%),
+    radial-gradient(circle at 70% 80%, rgba(255, 100, 200, 0.05) 0%, transparent 30%),
+
+    repeating-linear-gradient(
+      0deg,
+      rgba(255, 255, 255, 0.015) 0px,
+      rgba(255, 255, 255, 0.015) 1px,
+      transparent 1px,
+      transparent 40px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.015) 0px,
+      rgba(255, 255, 255, 0.015) 1px,
+      transparent 1px,
+      transparent 40px
+    ),
+
+    linear-gradient(145deg, rgba(255, 255, 255, 0.015) 1px, transparent 1px),
+    linear-gradient(225deg, rgba(255, 255, 255, 0.01) 1px, transparent 1px);
+    
+  background-size:
+    600px 600px,
+    800px 800px,
+    40px 40px,
+    40px 40px,
+    200px 200px,
+    300px 300px;
+
+  background-position:
+    center,
+    bottom right,
+    top left,
+    top left,
+    top right,
+    bottom left;
+
+  background-repeat: repeat;
 }

@@ -2,13 +2,144 @@ import { Telescope } from "lucide-react";
 import { NextRequest, NextResponse } from "next/server";
 
 const milestones = [
+    {
+        weekStart: '2025-07-13',
+        data: [
+            {
+                name: "Verify other users' discoveries and get some of the earnings in return",
+                structure: "Telescope",
+                group: "Astronomy",
+                icon: 'Telescope',
+                extendedDescription: ',',
+                xp: 1,
+                completionInfo: '',
+                rewardInfo: '',
+                table: 'votes',
+                field: 'vote_type',
+                value: 'up',
+                requiredCount: 2,
+            },
+            {
+                name: "Contribute to someone else's discovery by commenting",
+                structure: "Telescope",
+                group: "Astronomy",
+                icon: "Telescope",
+                extendedDescription: '',
+                xp: 1,
+                completionInfo: '',
+                rewardInfo: '',
+                table: 'comments',
+                field: 'surveyor',
+                value: 'TRUE',
+                requiredCount: 1,
+            },
+        ],
+    },
+    {
+        weekStart: '2025-07-06',
+        data: [
+            {
+                name: "Verify other users' discoveries and get some of the earnings in return",
+                structure: "Telescope",
+                group: "Astronomy",
+                icon: 'Telescope',
+                extendedDescription: ',',
+                xp: 1,
+                completionInfo: '',
+                rewardInfo: '',
+                table: 'votes',
+                field: 'vote_type',
+                value: 'up',
+                requiredCount: 2,
+            },
+            {
+                name: "Contribute to someone else's discovery by commenting",
+                structure: "Telescope",
+                group: "Astronomy",
+                icon: "Telescope",
+                extendedDescription: '',
+                xp: 1,
+                completionInfo: '',
+                rewardInfo: '',
+                table: 'comments',
+                field: 'surveyor',
+                value: 'TRUE',
+                requiredCount: 1,
+            },
+        ],
+    },
+    {
+        weekStart: '2025-06-29',
+        data: [
+            {
+                name: "Contribute to someone else's discovery by commenting",
+                structure: "Telescope",
+                group: "Astronomy",
+                icon: "Telescope",
+                extendedDescription: '',
+                xp: 1,
+                completionInfo: '',
+                rewardInfo: '',
+                table: 'comments',
+                field: 'surveyor',
+                value: 'TRUE',
+                requiredCount: 1,
+            },
+            {
+                name: "Train our automatons - discover 3 obstacles",
+                structure: "WeatherBalloon",
+                group: "Meteorology",
+                icon: "SnowflakeIcon",
+                extendedDescription: '',
+                xp: 3,
+                completionInfo: '',
+                rewardInfo: '',
+                table: 'classifications',
+                field: 'classificationtype',
+                value: 'automaton-aiForMars',
+                requiredCount: 3,
+            },
+        ],
+    },
+            {
+        weekStart: '2025-06-15',
+        data: [
+            {
+                name: 'Propose 3 planet candidates',
+                structure: "Telescope",
+                group: 'Astronomy',
+                icon: "Telescope",
+                extendedDescription: '',
+                xp: 3,
+                completionInfo: '',
+                rewardInfo: '',
+                table: "classifications",
+                field: "classificationtype",
+                value: "planet",
+                requiredCount: 3,
+            },
+            {
+                name: 'Review satellite data',
+                structure: "WeatherBalloon",
+                group: 'Meteorology',
+                icon: "SnowflakeIcon",
+                extendedDescription: '',
+                xp: 2,
+                completionInfo: '',
+                rewardInfo: '',
+                table: "classifications",
+                field: "classificationtype",
+                value: "satellite-planetFour",
+                requiredCount: 2,
+            },
+        ],
+    },
         {
-        weekStart: '2025-05-25',
+        weekStart: '2025-06-06',
         data: [
             {
                 name: 'Propose 5 planet candidates',
                 structure: "Telescope",
-                // group: 'Meteorology',
                 group: 'Astronomy',
                 icon: "Telescope",
                 extendedDescription: '',
@@ -339,8 +470,18 @@ const communityMilestones = [
 ];
 
 export async function GET(req: NextRequest) {
+    const today = new Date();
+    
+    // Sort milestones descending by weekStart
+    const sortedMilestones = milestones
+        .map(m => ({ ...m, weekStartDate: new Date(m.weekStart) }))
+        .filter(m => m.weekStartDate <= today)
+        .sort((a, b) => b.weekStartDate.getTime() - a.weekStartDate.getTime());
+
+    const mostRecentMilestone = sortedMilestones[0];
+
     return NextResponse.json({
-        playerMilestones: milestones,
-        communityMilestones: communityMilestones,
+        playerMilestones: mostRecentMilestone ? [mostRecentMilestone] : [],
+        communityMilestones: communityMilestones, // or filter this too if needed
     });
 };

@@ -4,7 +4,12 @@ import React, { useEffect, useState } from "react";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import { useActivePlanet } from "@/context/ActivePlanet";
 import ClassificationForm from "@/components/Projects/(classifications)/PostForm";
-import { Anomaly } from "../Telescopes/Transiting";
+type Anomaly = {
+  id: string;
+  name: string;
+  details?: string;
+  content?: string;
+};
 import { Button } from "@/components/ui/button";
 
 interface ZoodexProps {

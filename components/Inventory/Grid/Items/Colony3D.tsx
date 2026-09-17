@@ -101,7 +101,7 @@ export function Colony3D() {
             rotation: [0, 0, 0],
           }}
         >
-          <Environment preset="sunset" />
+          {/* <Environment preset="sunset" /> */}
           
           {/* Structures */}
           <Structures 

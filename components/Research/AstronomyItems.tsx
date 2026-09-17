@@ -104,11 +104,11 @@ export default function AstronomyResearch() {
         <div className="space-y-6">
           <div>
             <h3 className="text-lg font-semibold text-[#4cc9f0] mb-4 border-b border-[#1e3a5f] pb-2">
-              AVAILABLE UPGRADES
+              AVAILABLE UPGRADES 
             </h3>
             <UpgradeItem
               title="Probe Count ++"
-              description="Increase your probe count to explore more terrariums simultaneously"
+              description="Increase your probe count to explore more planets & space objects simultaneously"
               current={userCapacities.probeCount}
               max={3}
               cost={getUpgradeCost(userCapacities.probeCount)}
@@ -121,7 +121,7 @@ export default function AstronomyResearch() {
             />
             <UpgradeItem
               title="Probe Distance ++"
-              description="Increase the range of your probes"
+              description="Extend the reach of your probes to discover objects farther from Earth"
               current={userCapacities.probeDistance}
               max={5}
               cost={getUpgradeCost(userCapacities.probeDistance)}
