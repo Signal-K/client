@@ -22,3 +22,7 @@ export interface Classification {
     classificationtype: string | null;
     classificationConfiguration: Record<string, any> | null;
 };
+
+export interface Props {
+    anomalyid: number | bigint;
+};

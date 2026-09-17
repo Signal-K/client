@@ -1,17 +1,9 @@
-const withPWA = require("@ducanh2912/next-pwa").default({
-	dest: "public",
-  });
-  
-  /** @type {import('next').NextConfig} */
-  const nextConfig = {
+/** @type {import('next').NextConfig} */
+const nextConfig = {
 	reactStrictMode: true,
 	swcMinify: true,
 	images: {
 	  unoptimized: true,
-	},
-	pwa: {
-		dest: 'public',
-		mode: 'production'
 	},
 	async rewrites() {
 	  return [
@@ -40,13 +32,22 @@ const withPWA = require("@ducanh2912/next-pwa").default({
 		  ...config.resolve.alias,
 		},
 	  };
-	  if (!isServer) {
+	  
+	  if (isServer) {
+		// Exclude `konva` and `canvas` from server-side builds
+		config.externals = [
+		  ...(config.externals || []),
+		  { 'konva': 'konva', 'canvas': 'canvas' }
+		];
+	  } else {
+		// Adjust node configuration for client-side
 		config.node = {
 		  ...config.node,
 		};
 	  }
+	  
 	  return config;
 	},
-  };
+};
   
-  module.exports = withPWA(nextConfig);  
+module.exports = nextConfig;

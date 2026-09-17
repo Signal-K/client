@@ -33,7 +33,7 @@ export const ActivePlanetProvider: React.FC<{ children: ReactNode }> = ({ childr
       if (!session) return;
 
       try {
-        const { data: profile, error: profileError } = await supabase
+        let { data: profile, error: profileError } = await supabase
           .from("profiles")
           .select("location")
           .eq("id", session.user.id)
@@ -41,10 +41,22 @@ export const ActivePlanetProvider: React.FC<{ children: ReactNode }> = ({ childr
 
         if (profileError) throw profileError;
 
+        let location = profile?.location ?? 30;
+
+        // If the location is null, update it to 30
+        if (profile?.location === null) {
+          const { error: updateError } = await supabase
+            .from('profiles')
+            .update({ location: 30 })
+            .eq('id', session.user.id);
+
+          if (updateError) throw updateError;
+        }
+
         const { data: planet, error: planetError } = await supabase
           .from("anomalies")
           .select("*")
-          .eq("id", profile.location)
+          .eq("id", location)
           .single();
 
         if (planetError) throw planetError;

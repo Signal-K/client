@@ -18,21 +18,21 @@ services:
     networks:
       - app-network
 
-  flask:
-    container_name: flask
-    build:
-      context: ./citizen
-      dockerfile: Dockerfile
-    ports:
-      - "5001:5001"
-    environment:
-      - FLASK_APP=app.py
-      - FLASK_ENV=development
-    volumes:
-      - ./citizen:/app
-    working_dir: /app
-    networks:
-      - app-network
+  # flask:
+  #   container_name: flask
+  #   build:
+  #     context: ./citizen
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - "5001:5001"
+  #   environment:
+  #     - FLASK_APP=app.py
+  #     - FLASK_ENV=development
+  #   volumes:
+  #     - ./citizen:/app
+  #   working_dir: /app
+  #   networks:
+  #     - app-network
 
 networks:
   app-network:

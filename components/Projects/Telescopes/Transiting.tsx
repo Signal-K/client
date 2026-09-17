@@ -1,0 +1,265 @@
+"use client";
+
+import React, { useEffect, useState } from 'react';
+import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
+import { useActivePlanet } from '@/context/ActivePlanet'; 
+import ClassificationForm from '@/components/Projects/(classifications)/PostForm';
+import { planetClassificationConfig } from '@/components/Projects/(classifications)/FormConfigurations';
+import PreferredTerrestrialClassifications from '@/components/Structures/Missions/PickPlanet';
+import ImageAnnotator from '../(classifications)/Annotating/Annotator';
+import { Button } from "@/components/ui/button";
+
+export interface Anomaly {
+    id: bigint;
+    content: string;
+    avatar_url?: string; 
+};
+
+interface SelectedAnomProps {
+    anomalyid?: number;
+}; 
+
+export function StarterTelescopeTessWithId({ anomalyid }: SelectedAnomProps) {
+  const supabase = useSupabaseClient();
+  const session = useSession();
+
+  const [anomaly, setAnomaly] = useState<Anomaly | null>(null);
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
+
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+  const [loading, setLoading] = useState<boolean>(true);
+
+  const fetchAnomalies = async () => {
+    if (!session) {
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const { data: anomalyData, error } = await supabase
+        .from('anomalies')
+        .select('*')
+        .eq('anomalySet', 'telescope-tess')
+        .eq('id', anomalyid);
+
+      if (error) {
+        console.log(error);
+        setLoading(false);
+        return;
+      };
+
+      setAnomaly(anomalyData[0]);
+      setImageUrl(`${supabaseUrl}/storage/v1/object/public/anomalies/${anomalyid}/Sector1.png`);
+    } catch (error: any) {
+      console.error(error);
+      setLoading(false);
+      return;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchAnomalies();
+  }, [session]);
+
+  if (loading) return <p>Loading...</p>;
+
+  return (
+
+        <ImageAnnotator
+          anomalyType="planet"
+          missionNumber={1372001}
+          structureItemId={3103}
+          assetMentioned={anomalyid?.toString()}
+          annotationType="PH"
+          initialImageUrl={imageUrl || ''}
+          anomalyId={anomalyid?.toString()}
+        />
+  );
+};
+
+export function StarterTelescopeTess({ anomalyid }: SelectedAnomProps) {
+    const supabase = useSupabaseClient();
+    const session = useSession();
+
+    const { activePlanet } = useActivePlanet();
+
+    const [anomalies, setAnomalies] = useState<Anomaly[]>([]);
+    const [selectedAnomaly, setSelectedAnomaly] = useState<Anomaly | null>(null);
+    const [imageUrls, setImageUrls] = useState<string[]>([]);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [error, setError] = useState<string | null>(null);
+    const [showTutorial, setShowTutorial] = useState(false);
+
+    useEffect(() => {
+        const fetchAnomalies = async () => {
+            if (!session) {
+                setLoading(false);
+                return;
+            };
+
+            try {
+                const { data: anomalyData, error: anomalyError } = await supabase
+                    .from("anomalies")
+                    .select("*")
+                    .eq("anomalySet", "telescope-tess");
+                if (anomalyError) throw anomalyError;
+
+                setAnomalies(anomalyData || []);
+                if (anomalyData?.length > 0) {
+                    const randomAnomaly = anomalyData[Math.floor(Math.random() * anomalyData.length)];
+                    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://your-default-supabase-url.com';
+                    const imageList = [];
+
+                    if (randomAnomaly?.avatar_url) {
+                        imageList.push(randomAnomaly.avatar_url);
+                    };
+
+                    if (randomAnomaly?.id) {
+                        const sectorUrl = `${supabaseUrl}/storage/v1/object/public/anomalies/${randomAnomaly.id}/Sector1.png`;
+                        imageList.push(sectorUrl);
+                    };
+
+                    setImageUrls(imageList);
+                    setSelectedAnomaly(randomAnomaly);
+                }
+            } catch (error: any) {
+                console.error("Error fetching anomalies:", error.message || error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchAnomalies();
+    }, [session, supabase]);
+
+    if (error) return <div><p>{error}</p></div>;
+    if (loading) return <div><p>Loading...</p></div>;
+    if (!anomalies.length) return <div><p>No anomaly found.</p></div>;
+
+    if (showTutorial) {
+        return (
+            <div className="w-full">
+                <FirstTelescopeClassification anomalyid="6" />
+            </div>
+        );
+    }
+
+    return (
+        <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg overflow-y-auto max-h-[90vh] rounded-lg">
+            <div className="mt-6 w-full flex justify-center">
+                <Button variant="outline" onClick={() => setShowTutorial(true)}>
+                    Want a walkthrough? Start the tutorial
+                </Button>
+            </div>
+            <div className="p-4 rounded-md relative w-full">
+                {selectedAnomaly && (
+                    <ImageAnnotator
+                        anomalyType='planet'
+                        missionNumber={1372001}
+                        structureItemId={3103}
+                        assetMentioned={selectedAnomaly.id.toString()}
+                        annotationType='PH'
+                        initialImageUrl={imageUrls[1]}
+                        anomalyId={selectedAnomaly.id.toString()}
+                    />
+                )}
+            </div>
+        </div>
+    );
+};
+
+interface TelescopeProps {
+    anomalyid: string;
+};
+
+export const FirstTelescopeClassification: React.FC<TelescopeProps> = ({ anomalyid }) => {
+    const supabase = useSupabaseClient();
+    const session = useSession();
+
+    const { activePlanet } = useActivePlanet();
+
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const imageUrl = `${supabaseUrl}/storage/v1/object/public/anomalies/${anomalyid || activePlanet?.id}/Binned.png`;
+
+    const [part, setPart] = useState(1);
+    const [line, setLine] = useState(1);
+
+    const nextLine = () => setLine(prevLine => prevLine + 1);
+    const nextPart = () => {
+        setPart(2);
+        setLine(1); 
+    };
+
+    const tutorialContent = (
+        <div className="flex flex-col items-start gap-4 pb-4 relative w-full max-w-lg overflow-y-auto max-h-[90vh] rounded-lg">
+            <div className="p-4 bg-[#2C3A4A] border border-[#85DDA2] rounded-md shadow-md relative w-full">
+                <div className="relative">
+                    <div className="absolute top-1/2 left-[-16px] transform -translate-y-1/2 w-0 h-0 border-t-8 border-t-[#2C3A4A] border-r-8 border-r-transparent"></div>
+                    {part === 1 && (
+                        <>
+                            {line === 1 && <p className="text-[#EEEAD1]">Hello there! To start your journey, you'll need to discover your first planet.</p>}
+                            {line === 2 && <p className="text-[#EEEAD1]">To determine if a planet is real, you'll need to examine a lightcurve and identify patterns in dips and variations.</p>}
+                            {line === 3 && <p className="text-[#EEEAD1]">Look for regular dips—these often signal a planet passing in front of its star and can confirm its orbit.</p>}
+                            {line === 4 && <p className="text-[#EEEAD1]">Pay attention to the shape of these dips: a sharp, symmetrical dip usually indicates a genuine planet transit...</p>}
+                            {line === 5 && <p className="text-[#EEEAD1]">...While asymmetrical or irregular shapes might suggest something else.</p>}
+                            {line === 6 && <p className="text-[#EEEAD1]">Let's give it a try! Identify the dips in this lightcurve:</p>}
+                            {line < 6 && <button onClick={nextLine} className="mt-4 px-4 py-2 bg-[#D689E3] text-white rounded">Next</button>}
+                            {line === 6 && <button onClick={nextPart} className="mt-4 px-4 py-2 bg-[#D689E3] text-white rounded">Continue</button>}
+                            {line < 6 && (
+                                <div className="flex justify-center mt-4 w-full h-64">
+                                    {line === 1 && <img src="/assets/Template.png" alt="Step 1" className="max-w-full max-h-full object-contain" />}
+                                    {line === 2 && <img src="/assets/Docs/Curves/Step2.png" alt="Step 2" className="max-w-full max-h-full object-contain bg-white" />}
+                                    {line === 3 && <img src="/assets/Docs/Curves/Step1.png" alt="Step 3" className="max-w-full max-h-full object-contain bg-white" />}
+                                    {line === 4 && <img src="/assets/Docs/Curves/Step3.png" alt="Step 4" className="max-w-full max-h-full object-contain bg-white" />}
+                                    {line === 5 && <img src="/assets/Docs/Curves/Step4.png" alt="Step 5" className="max-w-full max-h-full object-contain bg-white" />}
+                                </div>
+                            )}
+                        </>
+                    )}
+                    {part === 2 && (
+                        <>
+                            {line === 1 && (
+                                <p className="text-[#EEEAD1]">Great job! Once you've identified your planet, you can share your findings with the rest of the space sailors community.</p>
+                            )}
+                        </>
+                    )}
+                </div>
+            </div>
+        </div>
+    );
+
+    return (
+        <div className="rounded-lg">
+            <div className="flex flex-col items-center">
+                {part === 1 && (
+                    <div className="mb-2">{tutorialContent}</div>
+                )}
+                {part === 2 && (
+                    <>
+                        <div className="mb-2">
+                            <img
+                                src='https://github.com/Signal-K/client/blob/SGV2-154/public/assets/Archive/Inventory/Structures/TelescopeReceiver.png?raw=true'
+                                alt='telescope'
+                                className="w-24 h-24 mb-2"
+                            />
+                        </div>
+                        <div className="max-w-4xl mx-auto rounded-lg bg-[#1D2833] text-[#F7F5E9] rounded-md bg-clip-padding backdrop-filter backdrop-blur-md bg-opacity-70">
+                            <div className='relative'>
+                                <div className='absolute inset-0 w-full h-full bg-[#2C4F64] rounded-md bg-clip-padding backdrop-filter backdrop-blur-sm bg-opacity-0'></div>
+                                <div className='bg-white bg-opacity-90'>
+                                    <img
+                                        src={imageUrl}
+                                        alt={`Active Planet ${activePlanet?.id}`}
+                                        className="relative z-10 w-128 h-128 object-contain"
+                                    />
+                                </div>
+                            </div>
+                            <ClassificationForm anomalyId={anomalyid} anomalyType='planet' missionNumber={3000001} assetMentioned={imageUrl} />
+                        </div>
+                    </>
+                )}
+            </div>
+        </div>
+    );
+};

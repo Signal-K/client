@@ -1,28 +1,21 @@
-/** @type {import('tailwindcss').Config} */
 module.exports = {
   darkMode: ["class"],
-  content: [
-    "./pages/**/*.{ts,tsx}",
-    "./components/**/*.{ts,tsx}",
-    "./app/**/*.{ts,tsx}",
-    "./src/**/*.{ts,tsx}",
-  ],
+  content: ["./pages/**/*.{ts,tsx}", "./components/**/*.{ts,tsx}", "./app/**/*.{ts,tsx}", "./src/**/*.{ts,tsx}"],
   theme: {
-    container: {
-      center: true,
-      padding: "2rem",
-      screens: {
-        "2xl": "1400px",
-      },
-    },
     extend: {
-      spacing: {
-        '2/3': '66.666667%',
-        '3/4': '75%',
-        '13': '5.25rem',
+      keyframes: {
+        shimmer: {
+          "0%": { transform: "translateX(-100%)" },
+          "100%": { transform: "translateX(100%)" },
+        },
+        scan: {
+          "0%": { backgroundPosition: "0 0" },
+          "100%": { backgroundPosition: "0 -200%" },
+        },
       },
-      height: {
-        screen: ["100vh", "100dvh"],
+      animation: {
+        shimmer: "shimmer 2s infinite",
+        scan: "scan 4s linear infinite",
       },
       colors: {
         border: "hsl(var(--border))",
@@ -64,25 +57,8 @@ module.exports = {
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
       },
-      keyframes: {
-        "accordion-down": {
-          from: { height: 0 },
-          to: { height: "var(--radix-accordion-content-height)" },
-        },
-        "accordion-up": {
-          from: { height: "var(--radix-accordion-content-height)" },
-          to: { height: 0 },
-        },
-      },
-      animation: {
-        "accordion-down": "accordion-down 0.2s ease-out",
-        "accordion-up": "accordion-up 0.2s ease-out",
-      },
-    },
-    aspectRatio: {
-      '1': '1',
     },
   },
-  
-  plugins: [require("daisyui")],
-};
+  plugins: [require("tailwindcss-animate")],
+}
+

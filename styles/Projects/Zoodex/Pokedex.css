@@ -1,0 +1,97 @@
+/* Pokedex-specific styles */
+@keyframes scanLine {
+    0% {
+      transform: translateY(0%);
+    }
+    100% {
+      transform: translateY(100%);
+    }
+  }
+  
+  .animate-scanLine {
+    animation: scanLine 2s linear infinite;
+  }
+  
+  /* Pulse animation for indicators */
+  @keyframes pokedexPulse {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.5;
+    }
+  }
+  
+  .pokedex-pulse {
+    animation: pokedexPulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }  
+
+@keyframes scanLine {
+    0% {
+      transform: translateY(0%);
+    }
+    100% {
+      transform: translateY(100%);
+    }
+  }
+  
+  .animate-scanLine {
+    animation: scanLine 2s linear infinite;
+  }
+  
+  /* Pokedex color scheme */
+  .pokedex-dark-bg {
+    background-color: #1d2833;
+  }
+  
+  .pokedex-light-bg {
+    background-color: #f7f5e9;
+  }
+  
+  .pokedex-medium-bg {
+    background-color: #2c4f64;
+  }
+  
+  .pokedex-accent {
+    background-color: #5fcbc3;
+  }
+  
+  .pokedex-highlight {
+    background-color: #ff695d;
+  }
+  
+  .pokedex-text-light {
+    color: #f7f5e9;
+  }
+  
+  .pokedex-text-accent {
+    color: #5fcbc3;
+  }
+  
+  .pokedex-text-highlight {
+    color: #ff695d;
+  }
+  
+  .pokedex-border-accent {
+    border-color: #5fcbc3;
+  }
+  
+  .pokedex-border-highlight {
+    border-color: #ff695d;
+  }
+  
+  /* Pulse animation for indicators */
+  @keyframes pokedexPulse {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.5;
+    }
+  }
+  
+  .pokedex-pulse {
+    animation: pokedexPulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+};  
