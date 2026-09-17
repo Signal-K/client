@@ -123,7 +123,7 @@ export function useGameSurveys(
 
       const remaining = next.questionIds
         .map((id) => questionById(mechanicId, id))
-        .filter((q): q is MechanicQuestion => Boolean(q) && !used.has(q.id));
+        .filter((q): q is MechanicQuestion => q != null && !used.has(q.id));
 
       setActiveQuestion(remaining[0] ?? null);
     }, SURVEY_DISPLAY_DELAY_MS);
