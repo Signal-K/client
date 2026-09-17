@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 
 import { getRouteUser } from "@/lib/server/routeAuth";
 import { createPocketbaseAdminClient } from "@/lib/pocketbase/adminClient";
+import { loadHubState } from "@/lib/server/hubState";
+import { emptyHubState, hasAccountOnboarding } from "@/src/features/onboarding/hubState";
 
 export const dynamic = "force-dynamic";
 
@@ -23,7 +25,7 @@ export async function GET() {
 
   const pb = await createPocketbaseAdminClient();
 
-  const [profile, inventory, linked, classifications] = await Promise.all([
+  const [profile, inventory, linked, classifications, hubState] = await Promise.all([
     safe(
       () =>
         pb
@@ -62,6 +64,7 @@ export async function GET() {
       },
       { totalItems: 0 }
     ),
+    safe(() => loadHubState(user.id), emptyHubState()),
   ]);
 
   const inventoryItemIds = [
@@ -81,7 +84,11 @@ export async function GET() {
   const username = (profile?.username as string | undefined) ?? null;
   const classificationCount = classifications.totalItems ?? 0;
   const returning = Boolean(
-    username || inventoryItemIds.length || automatons.length || classificationCount > 0
+    username ||
+      inventoryItemIds.length ||
+      automatons.length ||
+      classificationCount > 0 ||
+      hasAccountOnboarding(hubState.onboarding)
   );
 
   return NextResponse.json({
@@ -91,5 +98,6 @@ export async function GET() {
     automatons,
     classificationCount,
     returning,
+    hubState,
   });
 }

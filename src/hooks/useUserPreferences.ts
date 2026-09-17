@@ -1,112 +1,49 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
+import {
+  defaultOnboarding,
+  hasAccountOnboarding,
+  mergeOnboarding,
+  needsRosterPrompt,
+  type HubOnboarding,
+  type HubOnboardingStep,
+  type ProjectType,
+  type StructureType,
+  type TelescopeFocusType,
+  type TutorialId,
+} from "@/src/features/onboarding/hubState";
+import {
+  clearOnboardingLeftovers,
+  fetchHubState,
+  patchHubState,
+  readOnboardingLeftovers,
+} from "@/src/features/onboarding/hubStateClient";
 
-// Project types available in Star Sailors
-export type ProjectType = 
-  | "planet-hunting"      // TESS/NGTS exoplanet discovery
-  | "asteroid-hunting"    // Daily Minor Planet
-  | "cloud-tracking"      // Cloudspotting on Mars, JVH
-  | "rover-training"      // AI for Mars terrain classification
-  | "ice-tracking"        // Planet Four seasonal changes
-  | "solar-monitoring";   // Sunspot classification
+export type { ProjectType, TelescopeFocusType, TutorialId };
 
-// Structure types
-type StructureType = "telescope" | "satellite" | "rover" | "solar";
-
-// Telescope focus types
-export type TelescopeFocusType = "stellar" | "planetary";
-
-// Tutorial identifiers - comprehensive list of all tutorials in the app
-export type TutorialId = 
-  // Overall app tutorials
-  | "welcome-tour"           // First-time welcome tour
-  | "game-overview"          // Overall game mechanics
-  // Structure tutorials
-  | "telescope-intro"        // What is the telescope?
-  | "satellite-intro"        // What is the satellite?
-  | "rover-intro"            // What is the rover?
-  | "solar-intro"            // What is the solar observatory?
-  // Deployment tutorials
-  | "telescope-deploy"       // How to deploy telescope
-  | "satellite-deploy"       // How to deploy satellite
-  | "rover-deploy"           // How to deploy rover
-  | "solar-deploy"           // Solar observatory deployment tutorial
-  // Project-specific tutorials
-  | "planet-hunting"         // TESS planet hunting
-  | "asteroid-hunting"       // Minor planet/asteroid detection
-  | "cloud-tracking"         // Mars cloud spotting
-  | "jovian-vortex"          // Jupiter storm hunting
-  | "ice-tracking"           // Planet Four ice/fans
-  | "solar-monitoring"       // Sunspot classification
-  | "rover-terrain"          // AI for Mars
-  // Page tutorials
-  | "research-page"          // Research page intro
-  | "inventory-page"         // Inventory/minerals page
-  | "leaderboard-page"       // Leaderboard explanation
-  // Feature tutorials
-  | "mineral-guide"          // Where do minerals come from
-  | "stardust-guide"         // What is stardust
-  | "init-seen";            // One-time initialization sequence on first visit
-
-// Track which tutorials have been completed
-interface TutorialCompletion {
-  [key: string]: boolean;
-}
-
-interface UserPreferences {
-  // Project interests (what the user wants to focus on)
-  projectInterests: ProjectType[];
-  
-  // Has the user completed the initial onboarding?
-  hasCompletedOnboarding: boolean;
-  
-  // Has the user seen the structure explanations?
-  hasSeenStructureGuide: boolean;
-  
-  // Has the user seen the deployment tutorial?
-  hasSeenDeploymentTutorial: boolean;
-  
-  // Has the user seen the mineral explanation?
-  hasSeenMineralGuide: boolean;
-  
-  // Track individual tutorial completions
-  completedTutorials: TutorialCompletion;
-  
-  // Preferred structure order on dashboard
-  structureOrder: StructureType[];
-  
-  // Telescope focus preference (stellar vs planetary)
-  telescopeFocus: TelescopeFocusType | null;
-  
-  // Last time preferences were asked (to avoid asking too often)
-  lastPreferencesAsked: string | null;
-  
-  // Device ID for cross-device detection
+export interface UserPreferences extends HubOnboarding {
   deviceId: string;
 }
 
-const STORAGE_KEY = "star-sailors-preferences";
-const DEVICE_COMPLETE_KEY = "star-sailors-onboarding-complete";
 const DEVICE_ID_KEY = "star-sailors-device-id";
-
-function prefsKey(userId?: string | null) {
-  return userId ? `${STORAGE_KEY}:${userId}` : STORAGE_KEY;
-}
 
 function storageGet(key: string): string | null {
   if (typeof window === "undefined") return null;
-  try { return localStorage.getItem(key); } catch { return null; }
+  try {
+    return localStorage.getItem(key);
+  } catch {
+    return null;
+  }
 }
 
 function storageSet(key: string, value: string) {
   if (typeof window === "undefined") return;
-  try { localStorage.setItem(key, value); } catch { /* ignore */ }
-}
-
-function storageRemove(key: string) {
-  if (typeof window === "undefined") return;
-  try { localStorage.removeItem(key); } catch { /* ignore */ }
+  try {
+    localStorage.setItem(key, value);
+  } catch {
+    /* ignore */
+  }
 }
 
 function generateDeviceId(): string {
@@ -115,113 +52,93 @@ function generateDeviceId(): string {
 
 function getDeviceId(): string {
   if (typeof window === "undefined") return "";
-  return storageGet(DEVICE_ID_KEY) ?? (() => {
-    const id = generateDeviceId();
-    storageSet(DEVICE_ID_KEY, id);
-    return id;
-  })();
+  return (
+    storageGet(DEVICE_ID_KEY) ??
+    (() => {
+      const id = generateDeviceId();
+      storageSet(DEVICE_ID_KEY, id);
+      return id;
+    })()
+  );
 }
 
-const defaultPreferences: UserPreferences = {
-  projectInterests: [],
-  hasCompletedOnboarding: false,
-  hasSeenStructureGuide: false,
-  hasSeenDeploymentTutorial: false,
-  hasSeenMineralGuide: false,
-  completedTutorials: {},
-  structureOrder: ["telescope", "satellite", "rover", "solar"],
-  telescopeFocus: null,
-  lastPreferencesAsked: null,
-  deviceId: "",
-};
+function withDevice(onboarding: HubOnboarding): UserPreferences {
+  return { ...onboarding, deviceId: getDeviceId() };
+}
+
+const defaultPreferences: UserPreferences = withDevice(defaultOnboarding());
 
 export function useUserPreferences(userId?: string | null) {
   const [preferences, setPreferences] = useState<UserPreferences>(defaultPreferences);
   const [isLoading, setIsLoading] = useState(true);
   const [needsPreferencesPrompt, setNeedsPreferencesPrompt] = useState(false);
+  const authenticatedRef = useRef(false);
 
-  // Load preferences from localStorage
   useEffect(() => {
-    if (typeof window === "undefined") return;
+    let cancelled = false;
 
-    try {
-      const stored = storageGet(prefsKey(userId)) ?? storageGet(STORAGE_KEY);
-      const currentDeviceId = getDeviceId();
-      const deviceComplete = storageGet(DEVICE_COMPLETE_KEY) === "1";
-      
-      if (stored) {
-        const parsed = JSON.parse(stored) as UserPreferences;
-        const isCompleted = parsed.hasCompletedOnboarding || deviceComplete;
-        const hasInterests = Array.isArray(parsed.projectInterests) && parsed.projectInterests.length > 0;
-        
-        if (!isCompleted && !hasInterests) {
-          setNeedsPreferencesPrompt(true);
-        }
-        setPreferences({
-          ...parsed,
-          hasCompletedOnboarding: isCompleted,
-          deviceId: currentDeviceId,
-        });
-        if (userId && !storageGet(prefsKey(userId))) {
-          storageSet(prefsKey(userId), JSON.stringify({
-            ...parsed,
-            hasCompletedOnboarding: isCompleted,
-            deviceId: currentDeviceId,
-          }));
-        }
-      } else if (deviceComplete) {
-        setPreferences({
-          ...defaultPreferences,
-          hasCompletedOnboarding: true,
-          deviceId: currentDeviceId,
-        });
-      } else {
-        setNeedsPreferencesPrompt(true);
-        setPreferences({
-          ...defaultPreferences,
-          deviceId: currentDeviceId,
-        });
+    async function hydrate() {
+      const remote = await fetchHubState();
+      if (cancelled) return;
+
+      authenticatedRef.current = remote.authenticated;
+      if (!remote.authenticated) {
+        setPreferences(withDevice(defaultOnboarding()));
+        setNeedsPreferencesPrompt(false);
+        setIsLoading(false);
+        return;
       }
-    } catch (error) {
-      console.error("Error loading preferences:", error);
-      setPreferences({
-        ...defaultPreferences,
-        deviceId: getDeviceId(),
-      });
-      setNeedsPreferencesPrompt(true);
-    } finally {
+
+      let onboarding = remote.onboarding;
+      if (!hasAccountOnboarding(onboarding)) {
+        const leftover = readOnboardingLeftovers(userId);
+        if (leftover) {
+          onboarding = mergeOnboarding(onboarding, leftover);
+          void patchHubState({ onboarding });
+        }
+      }
+      clearOnboardingLeftovers(userId);
+      setPreferences(withDevice(onboarding));
+      setNeedsPreferencesPrompt(needsRosterPrompt(onboarding));
       setIsLoading(false);
     }
+
+    void hydrate();
+    return () => {
+      cancelled = true;
+    };
   }, [userId]);
 
-  const persist = useCallback((updated: UserPreferences) => {
-    storageSet(prefsKey(userId), JSON.stringify(updated));
-    storageSet(STORAGE_KEY, JSON.stringify(updated));
-    if (updated.hasCompletedOnboarding) storageSet(DEVICE_COMPLETE_KEY, "1");
-  }, [userId]);
+  const persist = useCallback((updated: HubOnboarding) => {
+    if (!authenticatedRef.current) return;
+    void patchHubState({ onboarding: updated });
+  }, []);
 
-  // Save preferences to localStorage
   const savePreferences = useCallback((newPreferences: Partial<UserPreferences>) => {
     setPreferences((prev) => {
-      const updated = { ...prev, ...newPreferences };
+      const updated = mergeOnboarding(prev, newPreferences);
       persist(updated);
-      return updated;
+      return withDevice(updated);
     });
   }, [persist]);
 
-  // Set project interests
   const setProjectInterests = useCallback((interests: ProjectType[]) => {
     savePreferences({
       projectInterests: interests,
       hasCompletedOnboarding: true,
       lastPreferencesAsked: new Date().toISOString(),
+      inProgressStep: null,
+      inProgressProject: null,
     });
     setNeedsPreferencesPrompt(false);
   }, [savePreferences]);
 
-  // Mark onboarding as complete
   const completeOnboarding = useCallback(() => {
-    savePreferences({ hasCompletedOnboarding: true });
+    savePreferences({
+      hasCompletedOnboarding: true,
+      inProgressStep: null,
+      inProgressProject: null,
+    });
     setNeedsPreferencesPrompt(false);
   }, [savePreferences]);
 
@@ -237,32 +154,36 @@ export function useUserPreferences(userId?: string | null) {
     setNeedsPreferencesPrompt(false);
   }, [savePreferences]);
 
-  // Mark structure guide as seen
+  const setOnboardingProgress = useCallback((input: {
+    step?: HubOnboardingStep | null;
+    project?: ProjectType | null;
+  }) => {
+    savePreferences({
+      ...(input.step !== undefined ? { inProgressStep: input.step } : {}),
+      ...(input.project !== undefined ? { inProgressProject: input.project } : {}),
+    });
+  }, [savePreferences]);
+
   const markStructureGuideSeen = useCallback(() => {
     savePreferences({ hasSeenStructureGuide: true });
   }, [savePreferences]);
 
-  // Mark deployment tutorial as seen
   const markDeploymentTutorialSeen = useCallback(() => {
     savePreferences({ hasSeenDeploymentTutorial: true });
   }, [savePreferences]);
 
-  // Mark mineral guide as seen
   const markMineralGuideSeen = useCallback(() => {
     savePreferences({ hasSeenMineralGuide: true });
   }, [savePreferences]);
 
-  // Update structure order
   const setStructureOrder = useCallback((order: StructureType[]) => {
     savePreferences({ structureOrder: order });
   }, [savePreferences]);
 
-  // Set telescope focus preference
   const setTelescopeFocus = useCallback((focus: TelescopeFocusType | null) => {
     savePreferences({ telescopeFocus: focus });
   }, [savePreferences]);
 
-  // Dismiss the preferences prompt without setting preferences
   const dismissPreferencesPrompt = useCallback(() => {
     savePreferences({
       hasCompletedOnboarding: true,
@@ -271,58 +192,48 @@ export function useUserPreferences(userId?: string | null) {
     setNeedsPreferencesPrompt(false);
   }, [savePreferences]);
 
-  // Force show preferences prompt
   const showPreferencesPrompt = useCallback(() => {
     setNeedsPreferencesPrompt(true);
   }, []);
 
-  // Check if a specific project is in user's interests
   const isProjectInterested = useCallback((project: ProjectType) => {
-    // If no preferences set, show all projects
     if (preferences.projectInterests.length === 0) return true;
     return preferences.projectInterests.includes(project);
   }, [preferences.projectInterests]);
 
-  // Mark a specific tutorial as completed
   const markTutorialComplete = useCallback((tutorialId: TutorialId) => {
     setPreferences((prev) => {
-      const updated = {
-        ...prev,
+      const updated = mergeOnboarding(prev, {
         completedTutorials: {
           ...prev.completedTutorials,
           [tutorialId]: true,
         },
-      };
+      });
       persist(updated);
-      return updated;
+      return withDevice(updated);
     });
   }, [persist]);
 
-  // Check if a specific tutorial has been completed
   const hasTutorialCompleted = useCallback((tutorialId: TutorialId): boolean => {
     return preferences.completedTutorials?.[tutorialId] === true;
   }, [preferences.completedTutorials]);
 
-  // Reset a specific tutorial (allow user to replay)
   const resetTutorial = useCallback((tutorialId: TutorialId) => {
     setPreferences((prev) => {
-      const updated = { ...prev.completedTutorials };
-      delete updated[tutorialId];
-      const newPrefs = { ...prev, completedTutorials: updated };
-      persist(newPrefs);
-      return newPrefs;
+      const completedTutorials = { ...prev.completedTutorials };
+      delete completedTutorials[tutorialId];
+      const updated = mergeOnboarding(prev, { completedTutorials });
+      persist(updated);
+      return withDevice(updated);
     });
   }, [persist]);
 
-  // Reset all preferences (for testing)
   const resetPreferences = useCallback(() => {
-    storageRemove(STORAGE_KEY);
-    setPreferences({
-      ...defaultPreferences,
-      deviceId: getDeviceId(),
-    });
+    const next = defaultOnboarding();
+    persist(next);
+    setPreferences(withDevice(next));
     setNeedsPreferencesPrompt(true);
-  }, []);
+  }, [persist]);
 
   return {
     preferences,
@@ -331,6 +242,7 @@ export function useUserPreferences(userId?: string | null) {
     setProjectInterests,
     completeOnboarding,
     hydrateFromAccount,
+    setOnboardingProgress,
     markStructureGuideSeen,
     markDeploymentTutorialSeen,
     markMineralGuideSeen,

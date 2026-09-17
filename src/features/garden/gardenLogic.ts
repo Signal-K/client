@@ -1,4 +1,4 @@
-import type { ProjectType } from "@/src/hooks/useUserPreferences";
+import type { ProjectType } from "@/src/features/onboarding/hubState";
 import {
   CATALOG,
   structureById,
@@ -221,6 +221,36 @@ export function isUntouchedLegacyGarden(parsed: Partial<GardenState> | null | un
   if (records.some((rec) => rec.tendedAt)) return false;
   const flights = parsed.flights ? Object.keys(parsed.flights) : [];
   return flights.length === 0;
+}
+
+export function hydrateGardenState(parsed: unknown): GardenState {
+  const base = defaultGardenState();
+  if (!parsed || typeof parsed !== "object") return base;
+  const garden = parsed as Partial<GardenState>;
+  if (isUntouchedLegacyGarden(garden)) return base;
+  return {
+    ...base,
+    ...garden,
+    structures: { ...base.structures, ...(garden.structures || {}) },
+    flights: garden.flights || {},
+  };
+}
+
+export function isPristineGarden(state: GardenState | null | undefined): boolean {
+  if (!state) return true;
+  const fresh = defaultGardenState();
+  if (state.credits !== fresh.credits) return false;
+  if (Object.keys(state.flights || {}).length) return false;
+  for (const def of CATALOG.structures) {
+    const rec = state.structures[def.id];
+    const base = fresh.structures[def.id];
+    if (!rec) continue;
+    if (rec.locked !== base.locked) return false;
+    if (rec.tier !== base.tier) return false;
+    if (rec.buildable) return false;
+    if (rec.tendedAt) return false;
+  }
+  return true;
 }
 
 export function shouldAskForProjectRoster(args: {

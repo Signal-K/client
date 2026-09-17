@@ -14,64 +14,26 @@ import {
   applyProjectRoster,
   buildStructure,
   defaultGardenState,
-  gardenStorageKey,
-  GARDEN_STORAGE_KEY_LEGACY,
-  isUntouchedLegacyGarden,
+  isPristineGarden,
   seedOwnedStructures,
   type FlightRecord,
   type GardenState,
   type StructureRecord,
 } from "./gardenLogic";
-import type { ProjectType } from "@/src/hooks/useUserPreferences";
+import type { ProjectType } from "@/src/features/onboarding/hubState";
+import {
+  clearGardenLeftovers,
+  fetchHubState,
+  patchHubState,
+  readGardenLeftovers,
+} from "@/src/features/onboarding/hubStateClient";
 
 export type { FlightRecord, GardenState, StructureRecord };
 
 const HYDRO_TICK_MS = 14000;
 const FLIGHT_TICK_MS = 500;
 const TOAST_MS = 2400;
-
-function readStorage(key: string): string | null {
-  if (typeof window === "undefined") return null;
-  try {
-    return window.localStorage.getItem(key);
-  } catch {
-    return null;
-  }
-}
-
-function writeStorage(key: string, value: string) {
-  if (typeof window === "undefined") return;
-  try {
-    window.localStorage.setItem(key, value);
-  } catch {
-    // ignore
-  }
-}
-
-function loadState(userId?: string | null): GardenState {
-  const base = defaultGardenState();
-  const raw =
-    readStorage(gardenStorageKey(userId)) ??
-    (userId ? readStorage(gardenStorageKey()) : null) ??
-    readStorage(GARDEN_STORAGE_KEY_LEGACY);
-  if (!raw) return base;
-  try {
-    const parsed = JSON.parse(raw);
-    if (isUntouchedLegacyGarden(parsed)) return base;
-    return {
-      ...base,
-      ...parsed,
-      structures: { ...base.structures, ...(parsed.structures || {}) },
-      flights: parsed.flights || {},
-    };
-  } catch {
-    return base;
-  }
-}
-
-function saveState(state: GardenState, userId?: string | null) {
-  writeStorage(gardenStorageKey(userId), JSON.stringify(state));
-}
+const GARDEN_PATCH_MS = 800;
 
 export function useGardenState(userId?: string | null) {
   const [state, setState] = useState<GardenState>(() => defaultGardenState());
@@ -81,19 +43,65 @@ export function useGardenState(userId?: string | null) {
   const [probeGrainOpen, setProbeGrainOpen] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const persistTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const persistEnabled = useRef(false);
+  const skipNextPersist = useRef(true);
   const stateRef = useRef(state);
   stateRef.current = state;
 
-  // Load persisted state on mount (client-only; avoids SSR/localStorage mismatch).
+  const queueGardenPersist = useCallback(() => {
+    if (!persistEnabled.current) return;
+    if (persistTimer.current) clearTimeout(persistTimer.current);
+    persistTimer.current = setTimeout(() => {
+      persistTimer.current = null;
+      void patchHubState({ garden: stateRef.current });
+    }, GARDEN_PATCH_MS);
+  }, []);
+
   useEffect(() => {
-    setState(loadState(userId));
-    setHydrated(true);
+    let cancelled = false;
+    async function hydrate() {
+      const remote = await fetchHubState();
+      if (cancelled) return;
+      const leftover = readGardenLeftovers(userId);
+      if (remote.garden && !isPristineGarden(remote.garden)) {
+        setState(remote.garden);
+      } else if (leftover) {
+        setState(leftover);
+        if (remote.authenticated) void patchHubState({ garden: leftover });
+      } else {
+        setState(defaultGardenState());
+      }
+      persistEnabled.current = false;
+      skipNextPersist.current = true;
+      clearGardenLeftovers(userId);
+      setHydrated(true);
+    }
+    void hydrate();
+    return () => {
+      cancelled = true;
+    };
   }, [userId]);
 
   useEffect(() => {
     if (!hydrated) return;
-    saveState(state, userId);
-  }, [state, hydrated, userId]);
+    if (skipNextPersist.current) {
+      skipNextPersist.current = false;
+      return;
+    }
+    persistEnabled.current = true;
+    queueGardenPersist();
+  }, [hydrated, queueGardenPersist, state]);
+
+  useEffect(() => () => {
+    if (persistTimer.current) {
+      clearTimeout(persistTimer.current);
+      persistTimer.current = null;
+    }
+    if (persistEnabled.current) {
+      void patchHubState({ garden: stateRef.current });
+    }
+  }, []);
 
   const pushToast = useCallback((msg: string) => {
     setToast(msg);

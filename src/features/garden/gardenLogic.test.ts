@@ -1,10 +1,12 @@
 import { describe, expect, it } from "vitest";
-import type { ProjectType } from "@/src/hooks/useUserPreferences";
+import type { ProjectType } from "../onboarding/hubState";
 import { assertNaming } from "./catalog";
 import {
   applyProjectRoster,
   buildStructure,
   defaultGardenState,
+  hydrateGardenState,
+  isPristineGarden,
   isUntouchedLegacyGarden,
   projectsForStructures,
   seedOwnedStructures,
@@ -104,6 +106,13 @@ describe("account recovery", () => {
     };
     expect(isUntouchedLegacyGarden(untouched)).toBe(true);
     expect(isUntouchedLegacyGarden({ ...untouched, credits: 56 })).toBe(false);
+  });
+
+  it("does not treat a spent or built garden as a disposable leftover", () => {
+    expect(isPristineGarden(defaultGardenState())).toBe(true);
+    const spent = { ...defaultGardenState(), credits: 56 };
+    expect(isPristineGarden(spent)).toBe(false);
+    expect(isPristineGarden(hydrateGardenState({ credits: 80, structures: {} }))).toBe(true);
   });
 
   it("does not flash the roster while account state is loading or the player is returning", () => {
