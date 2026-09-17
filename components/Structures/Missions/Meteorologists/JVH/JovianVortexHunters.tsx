@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 import MissionShell from "../../BasePlate";
-import { JVHWrapper } from "@/components/Projects/Lidar/JovianVortexHunter";
+import { LidarJVHSatelliteWithId } from "@/components/Projects/Lidar/JovianVortexHunter";
 import { CloudCogIcon, CloudHail, HelpCircle, ShovelIcon } from "lucide-react";
-import { LidarJVHSatellite, StarterJovianVortexHunter } from "@/components/Projects/Lidar/JovianVortexHunter";
+import { StarterJovianVortexHunter } from "@/components/Projects/Lidar/JovianVortexHunter";
 import VoteJVH from "./JVHVote";
 import CloudClassifier from "@/components/Data/Generator/Meteorologists/JVH/cloud-classifier";
 import JVHCloudClassificationGenerator from "./GaseousPlanetCloudMaker";
 import ClassificationOptionsCounter from "@/content/Posts/ClassificationOptionsCounter";
-import { PreferredGaseousClassifications } from "../../PickPlanet";
+// import { PreferredGaseousClassifications } from "../../PickPlanet";
 
 interface Mission {
     id: number;
@@ -45,7 +45,7 @@ const JovianVortexHunters = () => {
             points: 2,
             completedCount: 0,
             // internalComponent: () => <LidarJVHSatellite anomalyid={4} />, // <JVHWrapper />
-            internalComponent: () => <JVHWrapper />,
+            internalComponent: () => <LidarJVHSatelliteWithId />,
             color: "text-blue-500",
         },
         {

@@ -1,223 +1,98 @@
-'use client'
+"use client"
 
-import { useState, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { ChevronRight, ChevronLeft, CloudSun, Rocket, Leaf, LucideIcon } from 'lucide-react'
-import { zoodexDataSources, telescopeDataSources, lidarDataSources } from "@/components/Data/ZoodexDataSources";
-import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
-import { useActivePlanet } from '@/context/ActivePlanet';
-import { Card, CardContent } from '../ui/card';
-import { Button } from '../ui/button';
+import { useState, useEffect } from "react"
+import { AnimatePresence } from "framer-motion"
+import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react"
+import { useActivePlanet } from "@/context/ActivePlanet"
 
-interface Mission {
-  name: string;
-  icon: string;
-  description: string;
-  identifier: string;
-  techId: number;
-  tutorialMission: number;
-  activeStructure: number;
-  sourceLink?: string;
-};
+import { IntroStep } from "./intro-step"
+import { SelectionStep } from "./selection-step"
+import { MissionStep } from "./mission-step"
+import { ConfirmationStep } from "./confirmation"
+import { CompleteStep } from "./completed"
+import { structures, projects } from "./structures"
+import type { Structure, Mission } from "./types"
 
-interface Category {
-  id: number;
-  title: string;
-  description: string;
-  icon: LucideIcon;
-  details: Mission[];
-};
-
-interface Structure {
-  name: string;
-  icon: React.ElementType;
-  description: string;
-  bgColor: string;
-  accentColor: string;
-  inventoryItemId: number;
-  shape: React.ReactNode;
-};
-
-interface Project {
-  name: string;
-  description: string;
-  identifier: string;
-  sourceLink: string;
-  icon: string;           
-  techId: number;         
-  tutorialMission: number;
-  activeStructure: number;
-};
-
-const structures: Structure[] = [
-  {
-    name: 'Refracting Telescope',
-    icon: Rocket,
-    description: 'Browse & classify space-based observations & classifications', 
-    bgColor: 'bg-indigo-900',
-    accentColor: 'text-purple-400',
-    shape: <div className="absolute top-0 right-0 w-32 h-32 bg-purple-800 rounded-full -mr-16 -mt-16 opacity-20"></div>,
-    inventoryItemId: 3103,
-  },
-  {
-    name: 'Biodome',
-    icon: Leaf,
-    description: 'For xenobiologists studying alien life forms',
-    bgColor: 'bg-green-700',
-    accentColor: 'text-green-300',
-    shape: <div className="absolute bottom-0 left-0 w-40 h-40 bg-green-600 rounded-tr-full -ml-20 -mb-20 opacity-20"></div>,
-    inventoryItemId: 3104,
-  },
-  {
-    name: 'Atmospheric Probe', 
-    icon: CloudSun,
-    description: 'For climatologists analyzing extraterrestrial atmospheres',
-    bgColor: 'bg-blue-600',
-    accentColor: 'text-blue-200',
-    shape: <div className="absolute top-0 left-0 w-48 h-24 bg-blue-500 rounded-br-full -ml-24 -mt-12 opacity-20"></div>,
-    inventoryItemId: 3105,
-  },
-];
-
-const projects: Record<string, Project[]> = {
-  'Refracting Telescope': [
-    {
-      name: 'Planet Hunting', description: 'Discover real planets in our galactic community', identifier: 'telescope-tess', sourceLink: 'https://www.zooniverse.org/projects/mschwamb/planet-hunters-ngts',
-      icon: '',
-      techId: 3103,
-      tutorialMission: 3000001,
-      activeStructure: 3103,
-    },
-    {
-      name: 'Asteroid Detection', description: "Discover new asteroids everyday in your telescope's data", identifier: 'telescope-minorPlanet', sourceLink: 'https://www.zooniverse.org/projects/fulsdavid/the-daily-minor-planet',
-      icon: '',
-      techId: 3103,
-      tutorialMission: 20000004,
-      activeStructure: 3103,
-    },
-    {
-      name: 'Sunspot observations', description: "Help diagnose our sun's health problems and behaviour", identifier: 'telescope-sunspots', sourceLink: 'https://www.zooniverse.org/projects/teolixx/sunspot-detectives',
-      icon: '',
-      techId: 3103,
-      tutorialMission: 3000002,
-      activeStructure: 3103,
-    }
-  ],
-  'Biodome': [
-    {
-      name: 'Wildwatch Burrowing Owls', description: 'Document and understand the developmental milestones of Otey Mesa burrowing owls through your observation satellites', identifier: 'zoodex-burrowingOwl', sourceLink: 'zooniverse.org/projects/sandiegozooglobal/wildwatch-burrowing-owl/',
-      icon: '',
-      techId: 3104,
-      tutorialMission: 3000004,
-      activeStructure: 3104,
-    },
-    {
-      name: 'Iguanas from Above', description: 'Help us count Galapagos Marine Iguanas from aerial photographs taken by your satellite network', identifier: 'zoodex-iguanasFromAbove', sourceLink: 'https://www.zooniverse.org/projects/andreavarela89/iguanas-from-above',
-      icon: '',
-      techId: 3104,
-      tutorialMission: 3000004,
-      activeStructure: 3104,
-    },
-  ],
-  'Atmospheric Probe': [
-    {
-      name: 'Martian Cloud Survey', description: 'Model cloud behaviour on Mars (and similar exoplanet candidates)', identifier: 'lidar-martianClouds', sourceLink: 'https://www.zooniverse.org/projects/marek-slipski/cloudspotting-on-mars',
-      icon: '',
-      techId: 3105,
-      tutorialMission: 3000010,
-      activeStructure: 3105,
-    },
-    {
-      name: 'Vortex Hunter', description: 'Identify and manipulate features & fluid dynamics in gaseous planets like Jupiter', identifier: 'lidar-jovianVortexHunter', sourceLink: 'zooniverse.org/projects/ramanakumars/jovian-vortex-hunter/',
-      icon: '',
-      techId: 3105,
-      tutorialMission: 20000007,
-      activeStructure: 3105,
-    },
-  ],
-};
-
-const combineCategories = (): Category[] => {
-  return [
-    {
-      id: 1,
-      title: "Biological Projects",
-      description: "Explore biological research projects related to animals and biodiversity.",
-      icon: Leaf,
-      details: zoodexDataSources.flatMap(source =>
-        source.items.map(item => ({
-          name: item.name,
-          techId: item.techId,
-          icon: '🐾', 
-          description: item.description,
-          identifier: item.identifier,
-          tutorialMission: item.tutorialMission,
-          activeStructure: item.activeStructure
-        }))
-      ),
-    },
-    {
-      id: 2,
-      title: "Space Investigations",
-      description: "Dive into astronomical research focused on planets, stars, and cosmic phenomena.",
-      icon: Rocket,
-      details: telescopeDataSources.flatMap(source =>
-        source.items.filter(item => item.techId === 1).map(item => ({
-          name: item.name,
-          icon: '🚀', // Example icon
-          description: item.description,
-          techId: item.techId,
-          identifier: item.identifier,
-          tutorialMission: item.tutorialMission,
-          activeStructure: item.activeStructure
-        }))
-      ),
-    },
-    {
-      id: 3,
-      title: "Meteorological Studies",
-      description: "Study weather patterns and cloud formations on various planets.",
-      icon: CloudSun,
-      details: lidarDataSources.flatMap(source =>
-        source.items.filter(item => item.techId === 5).map(item => ({
-          name: item.name,
-          techId: item.techId,
-          icon: '🌦️',
-          description: item.description,
-          identifier: item.identifier,
-          tutorialMission: item.tutorialMission,
-          activeStructure: item.activeStructure
-        }))
-      ), 
-    },
-  ];
-};
+type Step = "intro" | "referral" | "selection" | "mission" | "confirmation" | "complete"
 
 export default function MissionSelector() {
-  const { activePlanet, updatePlanetLocation } = useActivePlanet();
-  const supabase = useSupabaseClient();
-  const session = useSession();
+  const { activePlanet, updatePlanetLocation } = useActivePlanet()
+  const supabase = useSupabaseClient()
+  const session = useSession()
 
-  const [selectedStructure, setSelectedStructure] = useState<Structure | null>(null);
-  const [selectedMission, setSelectedMission] = useState<Mission | null>(null);
-  const [confirmationMessage, setConfirmationMessage] = useState('');
+  const [currentStep, setCurrentStep] = useState<Step>("intro")
+  const [selectedStructure, setSelectedStructure] = useState<Structure | null>(null)
+  const [selectedMission, setSelectedMission] = useState<Mission | null>(null)
+  const [confirmationMessage, setConfirmationMessage] = useState("")
+  const [isLoading, setIsLoading] = useState(false)
+
+  // New referral code state
+  const [referralCode, setReferralCode] = useState("")
+  const [referralError, setReferralError] = useState<string | null>(null)
+  const [isSubmittingReferral, setIsSubmittingReferral] = useState(false)
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setCurrentStep("referral")
+    }, 1500)
+    return () => clearTimeout(timer)
+  }, [])
+
+  // Handle referral code submit
+  const handleReferralSubmit = async () => {
+    if (!session || !referralCode.trim()) {
+      setReferralError("Please enter a valid referral code or skip.")
+      return
+    }
+
+    setIsSubmittingReferral(true)
+    setReferralError(null)
+
+    try {
+      const { error } = await supabase.from("referrals").insert({
+        referree_id: session.user.id,
+        referral_code: referralCode.trim(),
+      })
+
+      if (error) {
+        setReferralError("Failed to submit referral code. Please try again.")
+        setIsSubmittingReferral(false)
+        return
+      }
+
+      // Success, move to selection step
+      setCurrentStep("selection")
+    } catch (e) {
+      setReferralError("An unexpected error occurred.")
+      setIsSubmittingReferral(false)
+    }
+  }
+
+  // Skip referral step
+  const handleReferralSkip = () => {
+    setReferralCode("")
+    setReferralError(null)
+    setCurrentStep("selection")
+  }
 
   const handleStructureClick = (structure: Structure) => {
-    setSelectedStructure(structure);
-    setSelectedMission(null);
-    setConfirmationMessage('');
-  };
+    setSelectedStructure(structure)
+    setSelectedMission(null)
+    setConfirmationMessage("")
+    setCurrentStep("mission")
+  }
 
   const handleMissionClick = (mission: Mission) => {
-    setSelectedMission(mission);
-    setConfirmationMessage('');
-  };
+    setSelectedMission(mission)
+    setConfirmationMessage("")
+    setCurrentStep("confirmation")
+  }
 
   const insertAdditionalStarterItems = async (chosenId: number) => {
-    if (!session) return;
+    if (!session) return
 
-    const starterItemIds = [3105, 3104, 3103];
-    const otherItemIds = starterItemIds.filter((id) => id !== chosenId);
+    const starterItemIds = [3105, 3104, 3103, 3107]
+    const otherItemIds = starterItemIds.filter((id) => id !== chosenId)
 
     const additionalInserts = otherItemIds.map((itemId) => ({
       owner: session.user.id,
@@ -226,88 +101,144 @@ export default function MissionSelector() {
       quantity: 1,
       notes: "Starter item added alongside mission item",
       configuration: { Uses: 10, "missions unlocked": [] },
-    }));
+    }))
 
-    const { error } = await supabase.from("inventory").insert(additionalInserts);
+    const { error } = await supabase.from("inventory").insert(additionalInserts)
 
     if (error) {
-      console.error("Failed to insert additional items:", error.message);
-    };
-  };
-
-const handleConfirmMission = async () => {
-  if (!session || !selectedMission) return;
-
-  const chosenItemId = selectedMission.activeStructure;
-
-  const structureCreationData = {
-    owner: session.user.id,
-    item: chosenItemId,
-    anomaly: activePlanet?.id || 30,
-    quantity: 1,
-    notes: "Created for user's first classification mission",
-    configuration: {
-      Uses: 10,
-      "missions unlocked": [selectedMission.identifier],
-    },
-  };
-
-  try {
-    updatePlanetLocation(30);
-
-    await supabase.from("inventory").insert([structureCreationData]);
-
-    // 🔽 Insert the other two items
-    await insertAdditionalStarterItems(chosenItemId);
-
-    setConfirmationMessage(`Mission "${selectedMission.name}" confirmed!`);
-  } catch (error: any) {
-    setConfirmationMessage(`Error: ${error.message}`);
+      console.error("Failed to insert additional items:", error.message)
+    }
   }
-};
+
+  const handleConfirmMission = async () => {
+    if (!session || !selectedMission) return
+
+    setIsLoading(true)
+    const chosenItemId = selectedMission.activeStructure
+
+    const structureCreationData = {
+      owner: session.user.id,
+      item: chosenItemId,
+      anomaly: activePlanet?.id || 30,
+      quantity: 1,
+      notes: "Created for user's first classification mission",
+      configuration: {
+        Uses: 10,
+        "missions unlocked": [selectedMission.identifier],
+      },
+    }
+
+    try {
+      updatePlanetLocation(30)
+
+      await supabase.from("inventory").insert([structureCreationData])
+      await insertAdditionalStarterItems(chosenItemId)
+
+      setConfirmationMessage(`Mission "${selectedMission.name}" confirmed!`)
+      setCurrentStep("complete")
+
+      setTimeout(() => {
+        window.location.reload()
+      }, 3000)
+    } catch (error: any) {
+      setConfirmationMessage(`Error: ${error.message}`)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleBack = () => {
+    if (currentStep === "mission") {
+      setCurrentStep("selection")
+      setSelectedStructure(null)
+    } else if (currentStep === "confirmation") {
+      setCurrentStep("mission")
+      setSelectedMission(null)
+    }
+  }
+
+  // Referral step UI
+  const ReferralStep = () => (
+    <div className="max-w-md mx-auto p-6 bg-[#2E3440] rounded-md border border-[#5E81AC] shadow-md">
+      <h2 className="text-xl font-bold text-[#81A1C1] mb-4">Referral Code</h2>
+      <p className="text-[#D8DEE9] mb-4">
+        If you have a referral code, please enter it below. Otherwise, you can skip this step.
+      </p>
+      <input
+        type="text"
+        value={referralCode}
+        onChange={(e) => setReferralCode(e.target.value)}
+        placeholder="Enter referral code"
+        className="w-full mb-2 px-3 py-2 rounded border border-[#81A1C1] bg-[#3B4252] text-[#ECEFF4] focus:outline-none focus:ring-2 focus:ring-[#88C0D0]"
+        disabled={isSubmittingReferral}
+      />
+      {referralError && (
+        <p className="text-red-400 mb-2">{referralError}</p>
+      )}
+      <div className="flex justify-between">
+        <button
+          onClick={handleReferralSkip}
+          disabled={isSubmittingReferral}
+          className="px-4 py-2 rounded bg-transparent border border-[#81A1C1] text-[#81A1C1] hover:bg-[#81A1C1] hover:text-[#2E3440] transition"
+        >
+          Skip
+        </button>
+        <button
+          onClick={handleReferralSubmit}
+          disabled={isSubmittingReferral}
+          className="px-4 py-2 rounded bg-[#81A1C1] text-[#2E3440] hover:bg-[#88C0D0] transition"
+        >
+          {isSubmittingReferral ? "Submitting..." : "Submit"}
+        </button>
+      </div>
+    </div>
+  )
 
   return (
-    <div className="p-6 space-y-6">
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        {structures.map((structure) => (
-          <Card key={structure.name} onClick={() => handleStructureClick(structure)} className={`cursor-pointer relative ${structure.bgColor}`}>
-            <CardContent className="p-4 text-white">
-              {structure.shape}
-              <structure.icon className={`w-8 h-8 ${structure.accentColor}`} />
-              <h3 className="text-lg font-semibold mt-2">{structure.name}</h3>
-              <p className="text-sm opacity-80">{structure.description}</p>
-            </CardContent>
-          </Card>
-        ))}
+    <div className="min-h-screen relative">
+      {/* Subtle background elements */}
+      <div className="squiggly-shape sci-fi-shape-1 bg-primary/5"></div>
+      <div className="squiggly-shape sci-fi-shape-2 bg-accent/5"></div>
+      <div className="squiggly-shape sci-fi-shape-3 bg-secondary/5"></div>
+
+      <div className="container mx-auto px-4 py-8 max-w-7xl relative">
+        <AnimatePresence mode="wait">
+          {/* Intro Step */}
+          {currentStep === "intro" && <IntroStep />}
+
+          {/* Referral Step */}
+          {currentStep === "referral" && <ReferralStep />}
+
+          {/* Selection Step */}
+          {currentStep === "selection" && (
+            <SelectionStep structures={structures} onStructureClick={handleStructureClick} />
+          )}
+
+          {/* Mission Selection Step */}
+          {currentStep === "mission" && selectedStructure && (
+            <MissionStep
+              selectedStructure={selectedStructure}
+              projects={projects}
+              onMissionClick={handleMissionClick}
+              onBack={handleBack}
+            />
+          )}
+
+          {/* Confirmation Step */}
+          {currentStep === "confirmation" && selectedMission && selectedStructure && (
+            <ConfirmationStep
+              selectedMission={selectedMission}
+              selectedStructure={selectedStructure}
+              isLoading={isLoading}
+              onConfirm={handleConfirmMission}
+              onBack={handleBack}
+            />
+          )}
+
+          {/* Complete Step */}
+          {currentStep === "complete" && <CompleteStep confirmationMessage={confirmationMessage} />}
+        </AnimatePresence>
       </div>
-
-      {selectedStructure && (
-        <div className="border-t pt-4">
-          <h2 className="text-xl font-bold mb-2">Missions for {selectedStructure.name}</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-            {projects[selectedStructure.name]?.map((mission) => (
-              <Card key={mission.identifier} onClick={() => handleMissionClick(mission)} className="cursor-pointer">
-                <CardContent className="p-4">
-                  <h4 className="text-md font-medium">{mission.name}</h4>
-                  <p className="text-sm">{mission.description}</p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {selectedMission && (
-        <div className="border-t pt-4">
-          <h3 className="text-lg font-semibold mb-2">Confirm Mission</h3>
-          <p className="mb-2">{selectedMission.name}: {selectedMission.description}</p>
-          <Button onClick={handleConfirmMission}>Confirm & Begin</Button>
-        </div>
-      )}
-
-      {confirmationMessage && (
-        <div className="text-green-500 mt-4 font-medium">{confirmationMessage}</div>
-      )}
     </div>
-  );
+  )
 };

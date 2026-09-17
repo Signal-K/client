@@ -76,6 +76,14 @@ const inventoryItems: InventoryItem[] = [
     locationType: 'Atmosphere',
   },
   {
+    id: 3107,
+    name: "SeisCAM",
+    description: "Explore the surfaces of exoplanets",
+    icon_url: '/assets/Items/miningstation.png',
+    ItemCategory: "Structure",
+    locationType: "Surface",
+  },
+  {
     id: 3106, 
     name: "Research Station",
     description: "Unlock new technology and research",

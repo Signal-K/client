@@ -46,15 +46,15 @@ type FocusView = "planet" | "overview" | "Climate" | "atmosphere" | "exploration
 export type Anomaly = {
   id: number;
   content: string | null;
-  anomalytype: string | null;
-  mass: number | null;
-  radius: number | null;
-  density: number | null;
-  gravity: number | null;
-  temperature: number | null;
-  orbital_period: number | null;
-avatar_url: string | null;
-  created_at: string;
+  anomalytype?: string | null;
+  mass?: number | null;
+  radius?: number | null;
+  density?: number | null;
+  gravity?: number | null;
+  temperature?: number | null;
+  orbital_period?: number | null;
+avatar_url?: string | null;
+  created_at?: string;
 };
 
 export interface AggregatedCloud {
@@ -419,14 +419,14 @@ export default function TestPlanetWrapper() {
 
     const AtmosphereComponent = () => (
         <div className="w-full max-w-4xl bg-black/10 backdrop-blur-sm rounded-xl p-6 text-white mx-auto">
-          {classification?.id !== undefined && (
+          {/* {classification?.id !== undefined && (
             <WeatherEventStatus 
               density={density || 1}
               classificationId={classification.id} 
               biome={dominantBiome || 'RockyHighlands'}
               biomass={biomassScore}
             />
-          )}
+          )} */}
         </div>
     );
 

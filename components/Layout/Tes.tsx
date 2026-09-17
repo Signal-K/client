@@ -5,9 +5,11 @@ import Link from "next/link"
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react"
 import { Bell, ChevronDown, HammerIcon, LogOut, Settings, Star, Trophy, User, X, Zap } from "lucide-react"
 import { formatDistanceToNow, startOfDay, addDays } from "date-fns"
-import { Avatar } from "../Account/Avatar"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
+import { Avatar } from "../Account/Avatar";
+import { Moon, Sun } from "lucide-react"
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import UseDarkMode from "@/hooks/useDarkMode";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,19 +18,17 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Progress } from "@/components/ui/progress"
+} from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { Menu, Transition } from "@headlessui/react"
 import TotalPoints from "../Structures/Missions/Stardust/Total"
 import { MissionsPopover } from "./Navigation/MissionDropdown"
-import AlertsDropdown from "./Navigation/AlertsDropdown"
+// import AlertsDropdown from "./Navigation/AlertsDropdown"
 import { StardustDropdown } from "./Navigation/StardustDropdown"
 import { LocationsDropdown } from "./Navigation/LocationsDropdown"
 import TechnologyPopover, { TechnologySection } from "./Navigation/TechTreeDropdown"
-import { Alert } from "antd"
-import AlertBar from "./Navigation/AlertBar"
+import { useRouter } from "next/navigation"
+import ResponsiveAlerts from "./Navigation/AlertsDropdown"
 
 // Sample data - replace with actual data in your implementation
 const techTree = [
@@ -39,8 +39,12 @@ const techTree = [
 ];
 
 export default function GameNavbar() {
-  const supabase = useSupabaseClient()
-  const session = useSession()
+  const supabase = useSupabaseClient();
+  const session = useSession();
+
+  const router = useRouter();
+
+  const { isDark, toggleDarkMode } = UseDarkMode();
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [alertMessage, setAlertMessage] = useState<string>("");
@@ -75,7 +79,33 @@ export default function GameNavbar() {
     calculateTimeRemaining()
 
     return () => clearInterval(interval)
-  }, [])
+  }, []);
+
+  const [referralCode, setReferralCode] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!session) {
+      setReferralCode(null);
+      return;
+    }
+
+    const fetchReferralCode = async () => {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("referral_code")
+        .eq("id", session.user.id)
+        .single();
+
+      if (error) {
+        console.error("Error fetching referral code:", error);
+        setReferralCode(null);
+      } else {
+        setReferralCode(data?.referral_code ?? null);
+      }
+    };
+
+    fetchReferralCode();
+  }, [session, supabase]);
 
   // Fetch milestones
   useEffect(() => {
@@ -231,14 +261,21 @@ export default function GameNavbar() {
   // milestones={milestones[currentWeekIndex]?.data || []}
 />
 
-          <AlertsDropdown
-            
-          />
+          <ResponsiveAlerts />
 
           {/* Tech Tree Button */}
           <TechnologyPopover />
 
           <LocationsDropdown />
+
+          {/* <Button
+            variant="ghost"
+            size="icon"
+           onClick={toggleDarkMode}
+  className="text-white"
+>
+  {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+          </Button> */}
 
           {/* Profile Dropdown */}
           <DropdownMenu>
@@ -269,10 +306,20 @@ export default function GameNavbar() {
                   </Link>
                 </DropdownMenuItem>
               </DropdownMenuGroup>
+              {referralCode && (
+    <>
+      <DropdownMenuSeparator className="bg-white/10" />
+      <DropdownMenuItem className="cursor-default select-text" disabled>
+        <span className="font-mono text-sm">Referral: {referralCode}</span>
+      </DropdownMenuItem>
+    </>
+  )}
               <DropdownMenuSeparator className="bg-white/10" />
               <DropdownMenuItem className="hover:bg-white/10 focus:bg-white/10 cursor-pointer text-red-400">
-                <LogOut className="mr-2 h-4 w-4" />
-                <span>Log out</span>
+                <Button onClick={signOut}>
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>Log out</span>
+                </Button>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -313,7 +360,7 @@ export default function GameNavbar() {
         <div className="p-4 space-y-6">
           {/* Alerts Section */}
           <div className="space-y-2">
-            <AlertBar />
+            <ResponsiveAlerts />
           </div>
 
           {/* Milestones Section */}
@@ -323,7 +370,7 @@ export default function GameNavbar() {
               Weekly Milestones
             </h3>
             {milestones.length > 0 &&
-              milestones[currentWeekIndex]?.data.slice(0, 2).map((milestone: any, index: number) => (
+              milestones[currentWeekIndex]?.data.slice(0, 3).map((milestone: any, index: number) => (
                 <div key={index} className="bg-[#1e293b] rounded-lg p-3 border border-[#581c87]">
                   <div className="flex justify-between items-center">
                     <p className="text-white truncate">{milestone.name}</p>
@@ -333,9 +380,9 @@ export default function GameNavbar() {
                   </div>
                 </div>
               ))}
-            <Button variant="link" className="text-[#67e8f9] p-0 h-auto">
+            {/* <Button variant="link" className="text-[#67e8f9] p-0 h-auto" onClick={() => router.push('/scenes/milestones')}>
               View All Milestones
-            </Button>
+            </Button> */}
           </div>
 
           {/* Technology Section */}
@@ -347,6 +394,11 @@ export default function GameNavbar() {
 
       {/* Footer */}
       <div className="p-4 border-t border-white/10 space-y-2">
+      <div className="justify-start p-4">
+    {referralCode && (
+      <p className="text-sm font-mono text-white select-text">Referral: {referralCode}</p>
+    )}
+  </div>
         <Button className="w-full justify-start" variant="ghost">
           <User className="mr-2 h-5 w-5" />
           Profile

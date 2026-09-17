@@ -67,10 +67,10 @@ const stationConfig: Station[] = [
         mass: 0.25,
       },
     ],
-    location: {
-      coordinates: "23.4162° N, 75.2397° W",
-      depth: "+2m",
-    },
+    // location: {
+    //   coordinates: "23.4162° N, 75.2397° W",
+    //   depth: "+2m",
+    // },
     built: false,
   },
   {
@@ -91,10 +91,10 @@ const stationConfig: Station[] = [
         mass: 0.0000001,
       },
     ],
-    location: {
-      coordinates: "2.4162° S, 54.2397° W",
-      altitude: "-10m",
-    },
+    // location: {
+      // coordinates: "2.4162° S, 54.2397° W",
+      // altitude: "-10m",
+    // },
     built: false,
   },
 ];
