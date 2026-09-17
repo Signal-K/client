@@ -1,0 +1,21 @@
+.markerClusterSmall {
+    height: 30px;
+    width: 30px;
+  }
+  .markerClusterMedium {
+    height: 30px;
+    width: 30px;
+  }
+  .markerClusterLarge {
+    height: 30px;
+    width: 30px;
+  }
+  .markerClusterLargeXL {
+    height: 30px;
+    width: 30px;
+  }
+  .markerClusterLabel {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
