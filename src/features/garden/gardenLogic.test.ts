@@ -3,8 +3,11 @@ import type { ProjectType } from "../onboarding/hubState";
 import { assertNaming } from "./catalog";
 import {
   applyProjectRoster,
+  ARCHIVE_STRUCTURE_INVENTORY_ITEM_IDS,
+  AUTOMATON_STRUCTURE_NAMES,
   buildStructure,
   defaultGardenState,
+  GARDEN_STORAGE_KEY,
   hydrateGardenState,
   isPristineGarden,
   isUntouchedLegacyGarden,
@@ -83,7 +86,6 @@ describe("building structures", () => {
 describe("account recovery", () => {
   it("maps legacy inventory and automaton rows onto garden ids", () => {
     expect(structuresFromInventoryItems([3103, 24, 23])).toEqual([
-      "ssc.structure.telescope",
       "ssc.structure.satellite",
       "ssc.structure.rover",
     ]);
@@ -91,6 +93,9 @@ describe("account recovery", () => {
       "ssc.structure.telescope",
       "ssc.structure.solar",
     ]);
+    expect(ARCHIVE_STRUCTURE_INVENTORY_ITEM_IDS).not.toContain(3103);
+    expect(AUTOMATON_STRUCTURE_NAMES).toContain("TelescopePlanet");
+    expect(GARDEN_STORAGE_KEY).toBe("ssc.garden.v3");
     expect(projectsForStructures(["ssc.structure.telescope", "ssc.structure.solar"])).toEqual([
       "planet-hunting",
       "solar-monitoring",

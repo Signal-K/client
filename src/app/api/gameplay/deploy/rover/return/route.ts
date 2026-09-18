@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 
 import { createPocketbaseAdminClient } from "@/lib/pocketbase/adminClient";
+import { withVisibleRecords } from "@/lib/pocketbase/sscVisibility";
 import { getRouteUser } from "@/lib/server/routeAuth";
 
 export const dynamic = "force-dynamic";
@@ -14,10 +15,12 @@ export async function POST() {
 
   const pb = await createPocketbaseAdminClient();
   const linkedRows = await pb.collection("linked_anomalies").getFullList({
-    filter: pb.filter("author = {:author} && automaton = {:automaton}", {
-      author: user.id,
-      automaton: "Rover",
-    }),
+    filter: withVisibleRecords(
+      pb.filter("author = {:author} && automaton = {:automaton}", {
+        author: user.id,
+        automaton: "Rover",
+      })
+    ),
     fields: "id",
   });
   await Promise.all(linkedRows.map((row) => pb.collection("linked_anomalies").delete(row.id)));

@@ -6,10 +6,11 @@ import {
 } from "@/src/features/onboarding/hubState";
 import { hydrateGardenState, isPristineGarden, type GardenState } from "@/src/features/garden/gardenLogic";
 
-export const PREFS_STORAGE_KEY = "star-sailors-preferences";
-export const DEVICE_COMPLETE_KEY = "star-sailors-onboarding-complete";
-export const ONBOARDING_STEP_KEY = "ss_onboarding_step";
-export const ONBOARDING_PROJECT_KEY = "ss_onboarding_project";
+export const PREFS_STORAGE_KEY = "star-sailors-preferences-v2";
+export const DEVICE_COMPLETE_KEY = "star-sailors-onboarding-complete-v2";
+export const ONBOARDING_STEP_KEY = "ss_onboarding_step_v2";
+export const ONBOARDING_PROJECT_KEY = "ss_onboarding_project_v2";
+export const GARDEN_V3_KEY = "ssc.garden.v3";
 export const GARDEN_V2_KEY = "ssc.garden.v2";
 export const GARDEN_V1_KEY = "ssc.garden.v1";
 
@@ -68,9 +69,7 @@ export function readOnboardingLeftovers(userId?: string | null): HubOnboarding |
 
 export function readGardenLeftovers(userId?: string | null): GardenState | null {
   const raw =
-    (userId ? storageGet(`${GARDEN_V2_KEY}:${userId}`) : null) ??
-    storageGet(GARDEN_V2_KEY) ??
-    storageGet(GARDEN_V1_KEY);
+    (userId ? storageGet(`${GARDEN_V3_KEY}:${userId}`) : null) ?? storageGet(GARDEN_V3_KEY);
   if (!raw) return null;
   try {
     const garden = hydrateGardenState(JSON.parse(raw));
@@ -91,7 +90,11 @@ export function clearOnboardingLeftovers(userId?: string | null) {
 export function clearGardenLeftovers(userId?: string | null) {
   storageRemove(GARDEN_V1_KEY);
   storageRemove(GARDEN_V2_KEY);
-  if (userId) storageRemove(`${GARDEN_V2_KEY}:${userId}`);
+  storageRemove(GARDEN_V3_KEY);
+  if (userId) {
+    storageRemove(`${GARDEN_V2_KEY}:${userId}`);
+    storageRemove(`${GARDEN_V3_KEY}:${userId}`);
+  }
 }
 
 export async function fetchHubState(): Promise<HubState & { authenticated: boolean }> {

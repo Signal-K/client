@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { getRouteUser } from "@/lib/server/routeAuth";
 import { createPocketbaseAdminClient } from "@/lib/pocketbase/adminClient";
 import { mapLinkedAnomalyToRow } from "@/lib/pocketbase/legacyShapes";
+import { withVisibleRecords } from "@/lib/pocketbase/sscVisibility";
 import { recursiveSerialize } from "@/utils/serialization";
 
 export const dynamic = "force-dynamic";
@@ -41,7 +42,9 @@ export async function GET(request: NextRequest) {
     const row = await pb
       .collection("linked_anomalies")
       .getFirstListItem(
-        pb.filter("author = {:author} && anomalyId = {:aid}", { author: user.id, aid: anomalyId }),
+        withVisibleRecords(
+          pb.filter("author = {:author} && anomalyId = {:aid}", { author: user.id, aid: anomalyId })
+        ),
         { sort: "-legacyId" }
       )
       .catch(() => null);
@@ -61,7 +64,7 @@ export async function GET(request: NextRequest) {
   }
 
   const result = await pb.collection("linked_anomalies").getList(1, 500, {
-    filter: filters.join(" && "),
+    filter: withVisibleRecords(filters.join(" && ")),
     sort: "-legacyId",
   });
   return NextResponse.json(recursiveSerialize({ linkedAnomalies: result.items.map(mapLinkedAnomalyToRow) }));

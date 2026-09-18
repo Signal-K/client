@@ -3,6 +3,7 @@ import { revalidatePath } from "next/cache";
 
 import { getRouteUser } from "@/lib/server/routeAuth";
 import { createPocketbaseAdminClient } from "@/lib/pocketbase/adminClient";
+import { withVisibleRecords } from "@/lib/pocketbase/sscVisibility";
 import { recursiveSerialize } from "@/utils/serialization";
 
 export const dynamic = "force-dynamic";
@@ -47,11 +48,13 @@ export async function POST(request: NextRequest) {
 
   const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
   const recentDeployments = await pb.collection("linked_anomalies").getList(1, 1, {
-    filter: pb.filter("author = {:a} && automaton = {:auto} && date >= {:d}", {
-      a: user.id,
-      auto: "Rover",
-      d: sevenDaysAgo,
-    }),
+    filter: withVisibleRecords(
+      pb.filter("author = {:a} && automaton = {:auto} && date >= {:d}", {
+        a: user.id,
+        auto: "Rover",
+        d: sevenDaysAgo,
+      })
+    ),
   });
 
   if (recentDeployments.totalItems > 0) {

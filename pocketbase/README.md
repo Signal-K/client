@@ -38,6 +38,24 @@ this repo; if a PocketBase instance was affected, re-import the schema with
 backup.
 Back up `/pb_data` before importing data or upgrading the PocketBase image.
 
+## Hide legacy structures (garden overhaul)
+
+Star Sailors currently stores structures in two places:
+
+- Legacy: `inventory.item` ids and `linked_anomalies.automaton` names (`Telescope`, `WeatherSatellite`, `Rover`, …). Hub bootstrap used to treat username, inventory, automatons, or classifications as “returning,” which skipped the new garden roster.
+- New: `ss_hub_state.onboarding` + `ss_hub_state.garden` JSON.
+
+`sscHidden` on `inventory` and `linked_anomalies` is additive. Import schema, then hide (do not delete) structure inventory rows and automaton links, and reset hub garden/onboarding:
+
+```bash
+# dry-run (default)
+yarn pocketbase:archive-legacy-structures
+
+DRY_RUN=false yarn pocketbase:archive-legacy-structures
+```
+
+Mineral item `3103` stays visible. Reconcile later by reading `sscHidden = true` rows back onto garden structure ids.
+
 For a local instance, import the schema with:
 
 ```bash

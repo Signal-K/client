@@ -6,6 +6,7 @@ import { getRouteUser } from "@/lib/server/routeAuth";
 import { hasResearchedTech } from "@/lib/server/researched";
 import { createPocketbaseAdminClient } from "@/lib/pocketbase/adminClient";
 import { mapAnomalyToRow } from "@/lib/pocketbase/legacyShapes";
+import { withVisibleRecords } from "@/lib/pocketbase/sscVisibility";
 
 // Schema for deployment input
 const DeploySchema = z.object({
@@ -71,11 +72,13 @@ export async function getTelescopeStatus() {
 
     const [linkedCount, validCommentsCount, validVotesCount] = await Promise.all([
       pb.collection("linked_anomalies").getList(1, 1, {
-        filter: pb.filter("automaton = {:a} && author = {:u} && date >= {:d}", {
-          a: "Telescope",
-          u: user.id,
-          d: oneWeekAgo.toISOString(),
-        }),
+        filter: withVisibleRecords(
+          pb.filter("automaton = {:a} && author = {:u} && date >= {:d}", {
+            a: "Telescope",
+            u: user.id,
+            d: oneWeekAgo.toISOString(),
+          })
+        ),
       }).then((r) => r.totalItems),
       countOthersInteractions(
         pb,
@@ -280,7 +283,9 @@ export async function getLinkedAnomaly(anomalyId: number) {
         const pb = await createPocketbaseAdminClient();
         const linkedAnomaly = await pb
             .collection("linked_anomalies")
-            .getFirstListItem(pb.filter("author = {:a} && anomalyId = {:id}", { a: user.id, id: anomalyId }), {
+            .getFirstListItem(
+              withVisibleRecords(pb.filter("author = {:a} && anomalyId = {:id}", { a: user.id, id: anomalyId })),
+              {
                 sort: "-legacyId",
             })
             .catch(() => null);

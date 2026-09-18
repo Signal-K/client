@@ -125,11 +125,8 @@ export default function GameClient({ user }: GameClientProps) {
     const inferred = projectsForStructures(owned);
     const interests =
       preferences.projectInterests.length > 0 ? preferences.projectInterests : inferred;
-    if (
-      !preferences.hasCompletedOnboarding &&
-      (bootstrap?.returning || interests.length > 0)
-    ) {
-      hydrateFromAccount({ interests, returning: !!bootstrap?.returning });
+    if (!preferences.hasCompletedOnboarding && bootstrap?.returning) {
+      hydrateFromAccount({ interests, returning: true });
     }
     if (interests.length > 0) garden.applyProjects(interests);
   }, [accountLoading, bootstrap, garden, garden.hydrated, hydrateFromAccount, preferences.projectInterests, prefsLoading]);

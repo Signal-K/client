@@ -543,6 +543,10 @@
       {
         "name": "unlockTime",
         "type": "date"
+      },
+      {
+        "name": "sscHidden",
+        "type": "bool"
       }
     ],
     "indexes": [
@@ -598,6 +602,10 @@
       {
         "name": "terrarium",
         "type": "number"
+      },
+      {
+        "name": "sscHidden",
+        "type": "bool"
       }
     ],
     "indexes": [

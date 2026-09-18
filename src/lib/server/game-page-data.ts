@@ -1,6 +1,7 @@
 import { unstable_cache } from "next/cache";
 import { getHubLeaderboard } from "@/src/lib/server/hub-leaderboard";
 import { createPocketbaseAdminClient } from "@/lib/pocketbase/adminClient";
+import { withVisibleRecords } from "@/lib/pocketbase/sscVisibility";
 
 function parseConfig(raw: unknown): Record<string, unknown> | null {
   if (!raw) return null;
@@ -359,7 +360,7 @@ export async function getGamePageDataForUser(userId: string) {
 async function getLinkedAnomaliesForUser(userId: string): Promise<LinkedAnomalyEntry[]> {
   const pb = await createPocketbaseAdminClient();
   const rows = await pb.collection("linked_anomalies").getFullList({
-    filter: pb.filter("author = {:author}", { author: userId }),
+    filter: withVisibleRecords(pb.filter("author = {:author}", { author: userId })),
     sort: "-date",
   });
 

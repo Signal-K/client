@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { getRouteUser } from "@/lib/server/routeAuth";
 import { createPocketbaseAdminClient } from "@/lib/pocketbase/adminClient";
 import { mapAnomalyToRow, mapClassificationToRow } from "@/lib/pocketbase/legacyShapes";
+import { withVisibleRecords } from "@/lib/pocketbase/sscVisibility";
 import { recursiveSerialize } from "@/utils/serialization";
 
 export const dynamic = "force-dynamic";
@@ -29,7 +30,7 @@ export async function GET() {
         ")",
     }),
     pb.collection("linked_anomalies").getList(1, 1, {
-      filter: pb.filter("author = {:a} && automaton = {:auto}", { a: user.id, auto: "Rover" }),
+      filter: withVisibleRecords(pb.filter("author = {:a} && automaton = {:auto}", { a: user.id, auto: "Rover" })),
     }),
   ]);
 

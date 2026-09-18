@@ -30,6 +30,7 @@
     "pocketbase:map-clerk-users": "node --experimental-strip-types scripts/pocketbase/map-clerk-users-to-shared.ts",
     "pocketbase:backfill-ecosystem-profiles": "node --experimental-strip-types scripts/pocketbase/backfill-shared-ecosystem-profiles.ts",
     "pocketbase:restore-legacy-profiles": "node --experimental-strip-types scripts/pocketbase/restore-legacy-profiles.ts",
+    "pocketbase:archive-legacy-structures": "node --experimental-strip-types scripts/pocketbase/archive-legacy-structures.ts",
     "test": "yarn test:all",
     "test:unit": "vitest run",
     "test:unit:watch": "vitest",
