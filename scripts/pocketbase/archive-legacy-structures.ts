@@ -13,11 +13,11 @@
 import fs from "node:fs/promises";
 import PocketBase from "pocketbase";
 
-import { defaultOnboarding } from "../../src/features/onboarding/hubState.ts";
+import { defaultOnboarding } from "@/src/features/onboarding/hubState";
 import {
   ARCHIVE_STRUCTURE_INVENTORY_ITEM_IDS,
   AUTOMATON_STRUCTURE_NAMES,
-} from "../../src/features/garden/gardenLogic.ts";
+} from "@/src/features/garden/gardenLogic";
 
 const url = process.env.POCKETBASE_URL || process.env.NEXT_PUBLIC_POCKETBASE_URL || "http://localhost:8095";
 const email = process.env.POCKETBASE_ADMIN_EMAIL;
@@ -40,9 +40,21 @@ function automatonFilter(): string {
   return AUTOMATON_STRUCTURE_NAMES.map((name) => `automaton = "${name}"`).join(" || ");
 }
 
+async function hasSscHidden(collection: string): Promise<boolean> {
+  const meta = await pb.collections.getOne(collection);
+  const fields = (meta.fields ?? []) as Array<{ name?: string }>;
+  return fields.some((field) => field.name === "sscHidden");
+}
+
 async function hideCollection(collection: string, filter: string): Promise<number> {
+  // `sscHidden` only exists once pb_schema.json has been imported, and a dry-run
+  // deliberately skips that import. Filtering on it unconditionally makes the
+  // dry-run fail on exactly the un-migrated instances it is meant to inspect.
+  const scoped = (await hasSscHidden(collection))
+    ? `(${filter}) && sscHidden = false`
+    : `(${filter})`;
   const rows = await pb.collection(collection).getFullList({
-    filter: `(${filter}) && sscHidden = false`,
+    filter: scoped,
     fields: "id",
   });
   if (!dryRun) {
@@ -103,4 +115,7 @@ async function main() {
   );
 }
 
-await main();
+main().catch((error) => {
+  console.error(error);
+  process.exit(1);
+});

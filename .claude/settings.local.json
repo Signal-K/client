@@ -30,11 +30,17 @@
       "WebFetch(domain:alerce.science)",
       "WebFetch(domain:science.alerce.online)",
       "WebFetch(domain:alerce.readthedocs.io)",
-      "WebFetch(domain:developer.zooniverse.org)"
+      "WebFetch(domain:developer.zooniverse.org)",
+      "mcp__desk__search",
+      "mcp__desk__list_tickets",
+      "mcp__desk__list_projects",
+      "mcp__plugin_cloudflare_cloudflare-api__search",
+      "mcp__plugin_cloudflare_cloudflare-api__execute",
+      "mcp__plugin_cloudflare_cloudflare-api__docs",
+      "Skill(clerk-backend-api)"
     ]
   },
   "enabledMcpjsonServers": [
-    "stitch",
-    "knowns"
+    "stitch"
   ]
 }
