@@ -106,6 +106,11 @@ const PROJECTS: Project[] = [
   },
 ];
 
+/** One project per instrument — asteroid/ice still map onto telescope/satellite in gardenLogic. */
+const ROSTER_PROJECTS = PROJECTS.filter((project) =>
+  ["planet-hunting", "cloud-tracking", "rover-training", "solar-monitoring"].includes(project.id)
+);
+
 interface ProjectPreferencesModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -138,13 +143,13 @@ export default function ProjectPreferencesModal({
 
   const handleSave = () => {
     const interests =
-      selectedProjects.length > 0 ? selectedProjects : PROJECTS.map((p) => p.id);
+      selectedProjects.length > 0 ? selectedProjects : ROSTER_PROJECTS.map((p) => p.id);
     onSave(interests);
     onClose();
   };
 
   const selectAll = () => {
-    setSelectedProjects(PROJECTS.map((p) => p.id));
+    setSelectedProjects(ROSTER_PROJECTS.map((p) => p.id));
   };
 
   return (
@@ -226,7 +231,7 @@ export default function ProjectPreferencesModal({
             </div>
 
             <div className="grid gap-4 md:grid-cols-2">
-              {PROJECTS.map((project) => {
+              {ROSTER_PROJECTS.map((project) => {
                 const isSelected = selectedProjects.includes(project.id);
                 const isExpanded = expandedProject === project.id;
 
@@ -345,7 +350,7 @@ export default function ProjectPreferencesModal({
               <p className="text-xs text-muted-foreground">
                 {selectedProjects.length > 0
                   ? `${selectedProjects.length} project${selectedProjects.length === 1 ? "" : "s"} selected`
-                  : "Nothing picked yet — Confirm will arm every track."}
+                  : "Nothing picked yet — Confirm will arm one project per instrument."}
               </p>
               <Button type="button" variant="ghost" onClick={onClose} className="shrink-0">
                 Skip for now

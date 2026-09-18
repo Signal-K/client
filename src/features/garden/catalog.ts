@@ -22,7 +22,7 @@ export type MinigameId =
   | "ssc.minigame.supply"
   | "ssc.minigame.rover";
 
-export type HopId = "ssc.hop.landnam";
+export type HopId = "ssc.hop.landnam" | "ssc.hop.spectra" | "ssc.hop.garden";
 
 export interface GrowthStage {
   tier: number;
@@ -66,6 +66,9 @@ export interface HopDef {
 }
 
 const LANDNAM = "https://playlandnam.space";
+const GARDEN = "https://starsailors.space/game";
+/** Native Spectra Outpost. Empty until NEXT_PUBLIC_SPECTRA_URL is set (KES-417). */
+const SPECTRA = process.env.NEXT_PUBLIC_SPECTRA_URL || "";
 const READY_MS = [0, 20000, 14000, 9000];
 
 const MINIGAMES: Record<MinigameId, MinigameDef> = {
@@ -98,7 +101,7 @@ const MINIGAMES: Record<MinigameId, MinigameDef> = {
     name: "Probe flight",
     structure: "ssc.structure.probe",
     reward: 16,
-    flightMs: 14000,
+    flightMs: 32000,
     hop: null,
     classifyIn: "sky",
   },
@@ -108,18 +111,17 @@ const MINIGAMES: Record<MinigameId, MinigameDef> = {
     structure: "ssc.structure.pad",
     reward: 14,
     cost: 10,
-    flightMs: 11000,
+    flightMs: 28000,
     hop: "ssc.hop.landnam",
     classifyIn: "sky",
   },
   "ssc.minigame.rover": {
     id: "ssc.minigame.rover",
-    name: "Rover (deferred)",
+    name: "AI4Mars",
     structure: "ssc.structure.rover",
-    reward: 0,
-    deferred: true,
+    reward: 10,
     hop: null,
-    classifyIn: null,
+    classifyIn: "sky",
   },
 };
 
@@ -148,7 +150,7 @@ export const CATALOG = {
   flow: {
     panel: {
       id: "ssc.flow.panel" as const,
-      blurb: "Tap structure or sky subject → entity panel. Never skip the panel into play.",
+      blurb: "Camp verbs sit on a compact chip. Instruments open in the sky. Never a sparse sidebar.",
     },
     skyClassify: {
       id: "ssc.flow.sky_classify" as const,
@@ -165,9 +167,21 @@ export const CATALOG = {
   hops: {
     landnam: {
       id: "ssc.hop.landnam" as const,
-      label: "Open Landnam",
+      label: "Landnam",
       href: LANDNAM,
       blurb: "The long-session game. Rockets, mining, TESS — not this garden.",
+    } satisfies HopDef,
+    spectra: {
+      id: "ssc.hop.spectra" as const,
+      label: "Spectra",
+      href: SPECTRA,
+      blurb: "Weekly scrap-yard. Machine-tend stations there — watering these beds is a different verb.",
+    } satisfies HopDef,
+    garden: {
+      id: "ssc.hop.garden" as const,
+      label: "Garden",
+      href: GARDEN,
+      blurb: "This camp. Other games link back here.",
     } satisfies HopDef,
   },
   structures: [
@@ -176,7 +190,7 @@ export const CATALOG = {
       slug: "habitat",
       name: "Habitat",
       verb: "Home",
-      blurb: "The greenhouse you tend. Upgrade for a fatter garden, not a second flagship.",
+      blurb: "A small greenhouse on the dirt. Camp home — not a dome over the plain.",
       minigame: null,
       hop: null,
       startTier: 1,
@@ -190,9 +204,9 @@ export const CATALOG = {
     {
       id: "ssc.structure.hydro",
       slug: "hydro",
-      name: "Garden",
-      verb: "Tend",
-      blurb: "Beds on the dirt. Water them; they tick credits while you are away.",
+      name: "Garden beds",
+      verb: "Water",
+      blurb: "Water the beds so CR ticks here. Spectra machine-tending is a different hop.",
       minigame: null,
       hop: null,
       startTier: 1,
@@ -208,7 +222,7 @@ export const CATALOG = {
       slug: "telescope",
       name: "Telescope",
       verb: "Point",
-      blurb: "Planet Hunters from this dome. A dip on the curve is the arrival.",
+      blurb: "One project: Planet Hunters. A dip on the curve is the arrival. Hop Landnam for the long session.",
       minigame: "ssc.minigame.planet_hunters",
       hop: "ssc.hop.landnam",
       startTier: 1,
@@ -225,7 +239,7 @@ export const CATALOG = {
       slug: "satellite",
       name: "Satellite",
       verb: "Scan",
-      blurb: "Clouds from orbit. Classify the shape, then let the dish sit.",
+      blurb: "One project: Cloud Watch. Classify the shape, then let the dish sit.",
       minigame: "ssc.minigame.clouds",
       hop: null,
       startTier: 1,
@@ -242,7 +256,7 @@ export const CATALOG = {
       slug: "solar",
       name: "Solar",
       verb: "Watch",
-      blurb: "Sunspot groups on the disk. Count, then leave the panels in the light.",
+      blurb: "One project: Sunspots. Count the groups, then leave the panels in the light.",
       minigame: "ssc.minigame.solar",
       hop: null,
       startTier: 1,
@@ -259,7 +273,7 @@ export const CATALOG = {
       slug: "pad",
       name: "Pad",
       verb: "Send",
-      blurb: "A hull on dirt. Send a crate, greet a return. Hop to Landnam for the deep flights.",
+      blurb: "A hull on dirt. Send a crate when you mean it. Other players' classify work flies from here too.",
       minigame: "ssc.minigame.supply",
       hop: "ssc.hop.landnam",
       startTier: 1,
@@ -290,13 +304,18 @@ export const CATALOG = {
       id: "ssc.structure.rover",
       slug: "rover",
       name: "Rover",
-      verb: "Later",
-      blurb: "Locked. Rover minigames need their own session — not this garden pass.",
+      verb: "Label",
+      blurb: "One project: AI4Mars. Raise the rover, then label terrain in the sky.",
       minigame: "ssc.minigame.rover",
       hop: null,
-      startTier: 0,
-      locked: true,
-      growth: [],
+      startTier: 1,
+      locked: false,
+      buildCost: 20,
+      growth: stages([
+        [1, "rover-t1", { labels: 1, label: "Small rover" }],
+        [2, "rover-t2", { labels: 1, label: "Mast cam" }],
+        [3, "rover-t3", { labels: 1, label: "Science deck" }],
+      ]),
     },
   ] satisfies StructureDef[],
   minigames: MINIGAMES,
@@ -316,6 +335,8 @@ export function allIds(): string[] {
     CATALOG.flow.skyClassify.id,
     CATALOG.upgrade.id,
     CATALOG.hops.landnam.id,
+    CATALOG.hops.spectra.id,
+    CATALOG.hops.garden.id,
   ];
   for (const s of CATALOG.structures) ids.push(s.id);
   for (const key of Object.keys(CATALOG.minigames)) ids.push(key);
@@ -360,6 +381,10 @@ export function structureById(id: string | null | undefined): StructureDef | nul
 
 export function hopById(id: string | null | undefined): HopDef | null {
   return Object.values(CATALOG.hops).find((h) => h.id === id) || null;
+}
+
+export function hopRail(): HopDef[] {
+  return [CATALOG.hops.garden, CATALOG.hops.landnam, CATALOG.hops.spectra];
 }
 
 export function growthFor(structure: StructureDef | null, tier: number): GrowthStage | null {

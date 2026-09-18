@@ -34,6 +34,7 @@ export const BUILDABLE_STRUCTURE_IDS: StructureId[] = [
   "ssc.structure.telescope",
   "ssc.structure.satellite",
   "ssc.structure.solar",
+  "ssc.structure.rover",
 ];
 
 const PROJECT_TO_STRUCTURE: Record<ProjectType, StructureId> = {
@@ -169,7 +170,6 @@ export function seedOwnedStructures(state: GardenState, owned: StructureId[]): G
     const def = structureById(id);
     const rec = structures[id];
     if (!def || !rec) continue;
-    if (def.locked) continue; // rover stays a later session
     structures[id] = {
       ...rec,
       locked: false,
@@ -261,13 +261,36 @@ export function isPristineGarden(state: GardenState | null | undefined): boolean
   return true;
 }
 
+export function hasRaisedInstrument(state: GardenState | null | undefined): boolean {
+  if (!state) return false;
+  return BUILDABLE_STRUCTURE_IDS.some((id) => state.structures[id] && !state.structures[id].locked);
+}
+
+export type GardenLesson = "raise" | "classify" | "hop" | null;
+
+/** Short first-session: raise one instrument, classify once, then offer a hop. */
+export function gardenLesson(args: {
+  state: GardenState;
+  coachDone: boolean;
+  classifiedThisVisit: boolean;
+  classificationCount: number;
+}): GardenLesson {
+  if (args.coachDone) return null;
+  if (!hasRaisedInstrument(args.state)) return "raise";
+  if (!args.classifiedThisVisit && args.classificationCount < 1) return "classify";
+  return "hop";
+}
+
 export function shouldAskForProjectRoster(args: {
   prefsLoading: boolean;
   accountLoading: boolean;
   needsPreferencesPrompt: boolean;
   returning: boolean;
+  hasInterests?: boolean;
+  hasRaisedInstrument?: boolean;
 }): boolean {
   if (args.prefsLoading || args.accountLoading) return false;
+  if (args.hasRaisedInstrument) return false;
   if (args.returning) return false;
   return args.needsPreferencesPrompt;
 }

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { Input } from "@/src/components/ui/input";
 import { Button } from "@/src/components/ui/button";
-import { completeProfileAction } from "@/src/app/actions/profile-actions";
+import { completeProfileAction, getCurrentProfileAction } from "@/src/app/actions/profile-actions";
 
 function generateReferralCode(length = 8) {
   const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -21,9 +21,27 @@ export default function CompleteProfileForm({ onSuccess }: { onSuccess: () => vo
   const [referrerCodeInput, setReferrerCodeInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
+  const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
     setOwnReferralCode(generateReferralCode());
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    void getCurrentProfileAction().then((result) => {
+      if (cancelled || !result.ok || !result.data) {
+        if (!cancelled) setHydrated(true);
+        return;
+      }
+      if (result.data.username) setUsername(result.data.username);
+      if (result.data.fullName) setFullName(result.data.fullName);
+      if (result.data.referralCode) setOwnReferralCode(result.data.referralCode);
+      setHydrated(true);
+    });
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   useEffect(() => {
@@ -78,9 +96,13 @@ export default function CompleteProfileForm({ onSuccess }: { onSuccess: () => vo
 
   return (
     <section className="rounded-2xl bg-white/80 p-6 border shadow space-y-4 text-center max-w-xl mx-auto">
-      <h3 className="text-xl font-semibold text-indigo-700">Complete Your Profile</h3>
+      <h3 className="text-xl font-semibold text-indigo-700">
+        {hydrated && username ? "Your profile" : "Complete Your Profile"}
+      </h3>
       <p className="text-muted-foreground">
-        To unlock full gameplay access and referral features, please set your display name and username.
+        {hydrated && username
+          ? "Saved username is on the hub chip. Edit it here if you want."
+          : "Set a username to show on the garden hub. This is the same identity other games in the suite read."}
       </p>
 
       <div className="space-y-4 text-left">
@@ -133,7 +155,7 @@ export default function CompleteProfileForm({ onSuccess }: { onSuccess: () => vo
         disabled={loading}
         className="bg-indigo-600 hover:bg-indigo-700 text-white w-full mt-4"
       >
-        {loading ? "Saving..." : "Save Profile"}
+        {loading ? "Saving..." : username ? "Save profile" : "Save Profile"}
       </Button>
     </section>
   );
