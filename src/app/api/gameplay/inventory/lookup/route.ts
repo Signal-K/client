@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import { createPocketbaseAdminClient } from "@/lib/pocketbase/adminClient";
+import { withVisibleRecords } from "@/lib/pocketbase/sscVisibility";
 import { getRouteUser } from "@/lib/server/routeAuth";
 import { recursiveSerialize } from "@/utils/serialization";
 
@@ -22,11 +23,13 @@ export async function GET(request: NextRequest) {
   const data = await pb
     .collection("inventory")
     .getFirstListItem(
-      pb.filter("owner = {:owner} && anomaly = {:anomaly} && item = {:item}", {
-        owner: user.id,
-        anomaly,
-        item,
-      }),
+      withVisibleRecords(
+        pb.filter("owner = {:owner} && anomaly = {:anomaly} && item = {:item}", {
+          owner: user.id,
+          anomaly,
+          item,
+        })
+      ),
       { sort: "legacyId", fields: "legacyId,configuration" }
     )
     .catch(() => null);

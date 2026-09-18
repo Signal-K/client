@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 
 import { getRouteUser } from "@/lib/server/routeAuth";
 import { createPocketbaseAdminClient } from "@/lib/pocketbase/adminClient";
+import { withVisibleRecords } from "@/lib/pocketbase/sscVisibility";
 import { loadHubState } from "@/lib/server/hubState";
 import { emptyHubState, hasAccountOnboarding } from "@/src/features/onboarding/hubState";
 
@@ -37,7 +38,7 @@ export async function GET() {
     safe(
       async () => {
         const result = await pb.collection("inventory").getList(1, 200, {
-          filter: pb.filter("owner = {:owner}", { owner: user.id }),
+          filter: withVisibleRecords(pb.filter("owner = {:owner}", { owner: user.id })),
           fields: "item",
         });
         return { items: result.items as Array<{ item?: number }> };
@@ -47,7 +48,7 @@ export async function GET() {
     safe(
       async () => {
         const result = await pb.collection("linked_anomalies").getList(1, 200, {
-          filter: pb.filter("author = {:author}", { author: user.id }),
+          filter: withVisibleRecords(pb.filter("author = {:author}", { author: user.id })),
           fields: "automaton",
         });
         return { items: result.items as Array<{ automaton?: string }> };
@@ -83,13 +84,7 @@ export async function GET() {
   ];
   const username = (profile?.username as string | undefined) ?? null;
   const classificationCount = classifications.totalItems ?? 0;
-  const returning = Boolean(
-    username ||
-      inventoryItemIds.length ||
-      automatons.length ||
-      classificationCount > 0 ||
-      hasAccountOnboarding(hubState.onboarding)
-  );
+  const returning = hasAccountOnboarding(hubState.onboarding);
 
   return NextResponse.json({
     username,

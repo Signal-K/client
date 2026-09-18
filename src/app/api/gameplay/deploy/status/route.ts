@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 
 import { getRouteUser } from "@/lib/server/routeAuth";
 import { createPocketbaseAdminClient } from "@/lib/pocketbase/adminClient";
+import { withVisibleRecords } from "@/lib/pocketbase/sscVisibility";
 import { recursiveSerialize } from "@/utils/serialization";
 
 export const dynamic = "force-dynamic";
@@ -53,19 +54,25 @@ export async function GET() {
           return rows.map((r) => ({ anomaly: r.anomaly, content: contentByAnomalyId.get(r.anomaly) ?? null }));
         }),
         pb.collection("linked_anomalies").getFullList({
-          filter: pb.filter("author = {:author} && automaton = {:a} && date >= {:d}", {
-            author: user.id,
-            a: "Telescope",
-            d: oneWeekAgo.toISOString(),
-          }),
+          filter: withVisibleRecords(
+            pb.filter("author = {:author} && automaton = {:a} && date >= {:d}", {
+              author: user.id,
+              a: "Telescope",
+              d: oneWeekAgo.toISOString(),
+            })
+          ),
           fields: "anomalyId",
         }),
         pb.collection("linked_anomalies").getFullList({
-          filter: pb.filter("author = {:author} && automaton = {:a}", { author: user.id, a: "WeatherSatellite" }),
+          filter: withVisibleRecords(
+            pb.filter("author = {:author} && automaton = {:a}", { author: user.id, a: "WeatherSatellite" })
+          ),
           fields: "anomalyId",
         }),
         pb.collection("linked_anomalies").getFullList({
-          filter: pb.filter("author = {:author} && automaton = {:a}", { author: user.id, a: "Rover" }),
+          filter: withVisibleRecords(
+            pb.filter("author = {:author} && automaton = {:a}", { author: user.id, a: "Rover" })
+          ),
           fields: "anomalyId",
         }),
         pb.collection("ss_classifications").getFullList({

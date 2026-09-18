@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 
 import { createPocketbaseAdminClient } from "@/lib/pocketbase/adminClient";
 import { mapAnomalyToRow, mapClassificationToRow } from "@/lib/pocketbase/legacyShapes";
+import { withVisibleRecords } from "@/lib/pocketbase/sscVisibility";
 import { getRouteUser } from "@/lib/server/routeAuth";
 
 export const dynamic = "force-dynamic";
@@ -22,11 +23,13 @@ export async function GET() {
   try {
     const pb = await createPocketbaseAdminClient();
     const linkedRows = await pb.collection("linked_anomalies").getFullList({
-      filter: pb.filter("author = {:author} && (automaton = {:telescope} || automaton = {:planet})", {
-        author: userId,
-        telescope: "Telescope",
-        planet: "TelescopePlanet",
-      }),
+      filter: withVisibleRecords(
+        pb.filter("author = {:author} && (automaton = {:telescope} || automaton = {:planet})", {
+          author: userId,
+          telescope: "Telescope",
+          planet: "TelescopePlanet",
+        })
+      ),
       fields: "legacyId,anomalyId,classificationId",
     });
 

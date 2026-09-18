@@ -30,6 +30,7 @@
     "pocketbase:map-clerk-users": "node --experimental-strip-types scripts/pocketbase/map-clerk-users-to-shared.ts",
     "pocketbase:backfill-ecosystem-profiles": "node --experimental-strip-types scripts/pocketbase/backfill-shared-ecosystem-profiles.ts",
     "pocketbase:restore-legacy-profiles": "node --experimental-strip-types scripts/pocketbase/restore-legacy-profiles.ts",
+    "pocketbase:archive-legacy-structures": "tsx scripts/pocketbase/archive-legacy-structures.ts",
     "test": "yarn test:all",
     "test:unit": "vitest run",
     "test:unit:watch": "vitest",
@@ -131,6 +132,7 @@
     "postcss-load-config": "^6.0.1",
     "start-server-and-test": "^2.1.3",
     "tailwindcss": "^3.4.1",
+    "tsx": "^4.23.13",
     "typescript": "^5.6.3",
     "vitest": "^3.2.4",
     "wrangler": "^4.114.0"

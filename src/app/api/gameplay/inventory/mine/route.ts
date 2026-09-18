@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getRouteUser } from "@/lib/server/routeAuth";
 import { createPocketbaseAdminClient } from "@/lib/pocketbase/adminClient";
 import { mapInventoryToRow } from "@/lib/pocketbase/legacyShapes";
+import { withVisibleRecords } from "@/lib/pocketbase/sscVisibility";
 import { recursiveSerialize } from "@/utils/serialization";
 
 export const dynamic = "force-dynamic";
@@ -37,7 +38,7 @@ export async function GET(request: NextRequest) {
   }
 
   const result = await pb.collection("inventory").getList(1, Math.max(1, Math.min(limit, 2000)), {
-    filter: filters.join(" && "),
+    filter: withVisibleRecords(filters.join(" && ")),
     sort: "-legacyId",
   });
 

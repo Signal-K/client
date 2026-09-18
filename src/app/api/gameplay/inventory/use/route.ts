@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 
 import { createPocketbaseAdminClient } from "@/lib/pocketbase/adminClient";
+import { withVisibleRecords } from "@/lib/pocketbase/sscVisibility";
 import { getRouteUser } from "@/lib/server/routeAuth";
 
 export const dynamic = "force-dynamic";
@@ -28,7 +29,7 @@ export async function POST(request: NextRequest) {
   const pb = await createPocketbaseAdminClient();
   const row = await pb
     .collection("inventory")
-    .getFirstListItem(pb.filter("legacyId = {:id}", { id: inventoryId }), {
+    .getFirstListItem(withVisibleRecords(pb.filter("legacyId = {:id}", { id: inventoryId })), {
       fields: "id,legacyId,owner,configuration",
     })
     .catch(() => null);

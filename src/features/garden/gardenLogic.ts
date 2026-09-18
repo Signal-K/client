@@ -27,8 +27,7 @@ export interface GardenState {
   hydroTick: number;
 }
 
-export const GARDEN_STORAGE_KEY = "ssc.garden.v2";
-export const GARDEN_STORAGE_KEY_LEGACY = "ssc.garden.v1";
+export const GARDEN_STORAGE_KEY = "ssc.garden.v3";
 
 /** Instruments the player spends credits to raise after picking projects. */
 export const BUILDABLE_STRUCTURE_IDS: StructureId[] = [
@@ -60,11 +59,19 @@ const INVENTORY_ITEM_TO_STRUCTURE: Record<number, StructureId> = {
 
 const AUTOMATON_TO_STRUCTURE: Record<string, StructureId> = {
   Telescope: "ssc.structure.telescope",
+  TelescopePlanet: "ssc.structure.telescope",
   TelescopeSolar: "ssc.structure.solar",
   Satellite: "ssc.structure.satellite",
   WeatherSatellite: "ssc.structure.satellite",
   Rover: "ssc.structure.rover",
 };
+
+/** Inventory ids that represent raised instruments. 3103 is mineral research cargo, not a plot. */
+export const ARCHIVE_STRUCTURE_INVENTORY_ITEM_IDS = Object.keys(INVENTORY_ITEM_TO_STRUCTURE)
+  .map(Number)
+  .filter((id) => id !== 3103);
+
+export const AUTOMATON_STRUCTURE_NAMES = Object.keys(AUTOMATON_TO_STRUCTURE);
 
 export function gardenStorageKey(userId?: string | null): string {
   return userId ? `${GARDEN_STORAGE_KEY}:${userId}` : GARDEN_STORAGE_KEY;
@@ -127,6 +134,7 @@ export function projectsForStructures(ids: StructureId[]): ProjectType[] {
 export function structuresFromInventoryItems(itemIds: number[]): StructureId[] {
   const ids = new Set<StructureId>();
   for (const item of itemIds) {
+    if (!ARCHIVE_STRUCTURE_INVENTORY_ITEM_IDS.includes(item)) continue;
     const id = INVENTORY_ITEM_TO_STRUCTURE[item];
     if (id) ids.add(id);
   }

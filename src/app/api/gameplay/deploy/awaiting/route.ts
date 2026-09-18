@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { createPocketbaseAdminClient } from "@/lib/pocketbase/adminClient";
+import { withVisibleRecords } from "@/lib/pocketbase/sscVisibility";
 import { getRouteUser } from "@/lib/server/routeAuth";
 
 export const dynamic = "force-dynamic";
@@ -13,7 +14,7 @@ export async function GET() {
 
   const pb = await createPocketbaseAdminClient();
   const linkedRows = await pb.collection("linked_anomalies").getFullList({
-    filter: pb.filter("author = {:author} && unlocked = false", { author: user.id }),
+    filter: withVisibleRecords(pb.filter("author = {:author} && unlocked = false", { author: user.id })),
     sort: "-date",
     fields: "legacyId,anomalyId,date,automaton,unlocked",
   });

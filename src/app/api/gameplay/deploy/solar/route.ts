@@ -3,6 +3,7 @@ import { revalidatePath } from "next/cache";
 
 import { getRouteUser } from "@/lib/server/routeAuth";
 import { createPocketbaseAdminClient } from "@/lib/pocketbase/adminClient";
+import { withVisibleRecords } from "@/lib/pocketbase/sscVisibility";
 import { recursiveSerialize } from "@/utils/serialization";
 
 export const dynamic = "force-dynamic";
@@ -32,11 +33,13 @@ export async function POST() {
       fields: "legacyId",
     }),
     pb.collection("linked_anomalies").getList(1, 1, {
-      filter: pb.filter("author = {:author} && automaton = {:a} && date >= {:d}", {
-        author: user.id,
-        a: automatonType,
-        d: weekStart,
-      }),
+      filter: withVisibleRecords(
+        pb.filter("author = {:author} && automaton = {:a} && date >= {:d}", {
+          author: user.id,
+          a: automatonType,
+          d: weekStart,
+        })
+      ),
     }),
   ]);
 
