@@ -3,97 +3,37 @@ name: Deploy to Cloudflare Workers
 # Client is a full Next.js app (API routes, server actions, server-side
 # Pocketbase admin auth) -- not a static SPA like Atlas, so this deploys via
 # the OpenNext Cloudflare adapter (Workers + Assets), not cloudflare/pages-action.
+#
+# Frequent main commits are expected. Cancel superseded runs so only the latest
+# code publishes, and never `wrangler secret put` here (that publishes an extra
+# Worker version per secret and caused Error 1102 on 2026-09-18).
 on:
   push:
     branches: [main, master]
+    paths:
+      - "src/**"
+      - "public/**"
+      - "package.json"
+      - "yarn.lock"
+      - "next.config.*"
+      - "wrangler.jsonc"
+      - "open-next.config.*"
+      - "tsconfig.json"
+      - "postcss.config.*"
+      - "tailwind.config.*"
+      - "components.json"
+      - ".github/workflows/deploy-cloudflare.yml"
+      - ".github/workflows/open-next-worker.yml"
   workflow_dispatch: {}
 
 concurrency:
   group: cloudflare-production
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
-    environment: production
-    permissions:
-      contents: read
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "22"
-          cache: yarn
-
-      - name: Install dependencies
-        run: yarn install --frozen-lockfile
-
-      - name: Validate Cloudflare secrets
-        run: |
-          missing=()
-          for name in CLOUDFLARE_API_TOKEN CLOUDFLARE_ACCOUNT_ID POCKETBASE_URL POCKETBASE_ADMIN_EMAIL POCKETBASE_ADMIN_PASSWORD CLERK_SECRET_KEY NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY; do
-            value="${!name}"
-            if [ -z "$value" ]; then
-              missing+=("$name")
-            fi
-          done
-          if [ "${#missing[@]}" -gt 0 ]; then
-            echo "::error::Missing required secrets: ${missing[*]}. Add them to the Signal-K/client Actions secrets."
-            exit 1
-          fi
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          POCKETBASE_URL: ${{ secrets.POCKETBASE_URL }}
-          POCKETBASE_ADMIN_EMAIL: ${{ secrets.POCKETBASE_ADMIN_EMAIL }}
-          POCKETBASE_ADMIN_PASSWORD: ${{ secrets.POCKETBASE_ADMIN_PASSWORD }}
-          CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
-          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
-
-      - name: Build (OpenNext Cloudflare adapter)
-        run: npx opennextjs-cloudflare build
-        env:
-          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
-          NEXT_PUBLIC_CLERK_SIGN_IN_URL: ${{ vars.NEXT_PUBLIC_CLERK_SIGN_IN_URL }}
-          NEXT_PUBLIC_CLERK_SIGN_UP_URL: ${{ vars.NEXT_PUBLIC_CLERK_SIGN_UP_URL }}
-          NEXT_PUBLIC_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL: ${{ vars.NEXT_PUBLIC_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL }}
-          NEXT_PUBLIC_CLERK_SIGN_UP_FALLBACK_REDIRECT_URL: ${{ vars.NEXT_PUBLIC_CLERK_SIGN_UP_FALLBACK_REDIRECT_URL }}
-          NEXT_PUBLIC_POCKETBASE_URL: ${{ secrets.POCKETBASE_URL }}
-          NEXT_PUBLIC_POSTHOG_KEY: ${{ vars.NEXT_PUBLIC_POSTHOG_KEY }}
-          NEXT_PUBLIC_POSTHOG_HOST: https://us.posthog.com
-          posthog_api_key: ${{ vars.NEXT_PUBLIC_POSTHOG_KEY }}
-          posthog_project_id: ${{ vars.POSTHOG_PROJECT_ID }}
-          posthog_region: US Cloud
-
-      - uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          # NOTE: `--env ""` looks like the right way to pin this to the
-          # top-level environment now that wrangler.jsonc also defines
-          # `env.staging`, but wrangler-action's arg splitting drops the
-          # empty-string value and wrangler then errors with "Not enough
-          # arguments following: env" (broke prod deploy on 2026-09-17,
-          # see run 35190488025). Plain `deploy` still targets the
-          # top-level env correctly; it just logs a harmless warning.
-          command: deploy
-
-      - name: Sync runtime secrets
-        run: |
-          printf '%s' "$POCKETBASE_URL" | npx wrangler secret put POCKETBASE_URL
-          printf '%s' "$POCKETBASE_ADMIN_EMAIL" | npx wrangler secret put POCKETBASE_ADMIN_EMAIL
-          printf '%s' "$POCKETBASE_ADMIN_PASSWORD" | npx wrangler secret put POCKETBASE_ADMIN_PASSWORD
-          printf '%s' "$CLERK_SECRET_KEY" | npx wrangler secret put CLERK_SECRET_KEY
-          if [ -n "$CLERK_WEBHOOK_SIGNING_SECRET" ]; then
-            printf '%s' "$CLERK_WEBHOOK_SIGNING_SECRET" | npx wrangler secret put CLERK_WEBHOOK_SIGNING_SECRET
-          fi
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          POCKETBASE_URL: ${{ secrets.POCKETBASE_URL }}
-          POCKETBASE_ADMIN_EMAIL: ${{ secrets.POCKETBASE_ADMIN_EMAIL }}
-          POCKETBASE_ADMIN_PASSWORD: ${{ secrets.POCKETBASE_ADMIN_PASSWORD }}
-          CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
-          CLERK_WEBHOOK_SIGNING_SECRET: ${{ secrets.CLERK_WEBHOOK_SIGNING_SECRET }}
+    uses: ./.github/workflows/open-next-worker.yml
+    secrets: inherit
+    with:
+      wrangler_command: deploy
+      wrangler_env_args: ""

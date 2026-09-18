@@ -13,6 +13,20 @@ name: Deploy to Cloudflare Workers (Staging)
 on:
   push:
     branches: [staging]
+    paths:
+      - "src/**"
+      - "public/**"
+      - "package.json"
+      - "yarn.lock"
+      - "next.config.*"
+      - "wrangler.jsonc"
+      - "open-next.config.*"
+      - "tsconfig.json"
+      - "postcss.config.*"
+      - "tailwind.config.*"
+      - "components.json"
+      - ".github/workflows/deploy-cloudflare-staging.yml"
+      - ".github/workflows/open-next-worker.yml"
   workflow_dispatch: {}
 
 concurrency:
@@ -21,79 +35,8 @@ concurrency:
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
-    environment: production
-    permissions:
-      contents: read
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "22"
-          cache: yarn
-
-      - name: Install dependencies
-        run: yarn install --frozen-lockfile
-
-      - name: Validate Cloudflare secrets
-        run: |
-          missing=()
-          for name in CLOUDFLARE_API_TOKEN CLOUDFLARE_ACCOUNT_ID POCKETBASE_URL POCKETBASE_ADMIN_EMAIL POCKETBASE_ADMIN_PASSWORD CLERK_SECRET_KEY NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY; do
-            value="${!name}"
-            if [ -z "$value" ]; then
-              missing+=("$name")
-            fi
-          done
-          if [ "${#missing[@]}" -gt 0 ]; then
-            echo "::error::Missing required secrets: ${missing[*]}. Add them to the Signal-K/client Actions secrets."
-            exit 1
-          fi
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          POCKETBASE_URL: ${{ secrets.POCKETBASE_URL }}
-          POCKETBASE_ADMIN_EMAIL: ${{ secrets.POCKETBASE_ADMIN_EMAIL }}
-          POCKETBASE_ADMIN_PASSWORD: ${{ secrets.POCKETBASE_ADMIN_PASSWORD }}
-          CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
-          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
-
-      - name: Build (OpenNext Cloudflare adapter)
-        run: npx opennextjs-cloudflare build
-        env:
-          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
-          NEXT_PUBLIC_CLERK_SIGN_IN_URL: ${{ vars.NEXT_PUBLIC_CLERK_SIGN_IN_URL }}
-          NEXT_PUBLIC_CLERK_SIGN_UP_URL: ${{ vars.NEXT_PUBLIC_CLERK_SIGN_UP_URL }}
-          NEXT_PUBLIC_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL: ${{ vars.NEXT_PUBLIC_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL }}
-          NEXT_PUBLIC_CLERK_SIGN_UP_FALLBACK_REDIRECT_URL: ${{ vars.NEXT_PUBLIC_CLERK_SIGN_UP_FALLBACK_REDIRECT_URL }}
-          NEXT_PUBLIC_POCKETBASE_URL: ${{ secrets.POCKETBASE_URL }}
-          NEXT_PUBLIC_POSTHOG_KEY: ${{ vars.NEXT_PUBLIC_POSTHOG_KEY }}
-          NEXT_PUBLIC_POSTHOG_HOST: https://us.posthog.com
-          posthog_api_key: ${{ vars.NEXT_PUBLIC_POSTHOG_KEY }}
-          posthog_project_id: ${{ vars.POSTHOG_PROJECT_ID }}
-          posthog_region: US Cloud
-
-      - uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: deploy --env staging
-
-      - name: Sync runtime secrets
-        run: |
-          printf '%s' "$POCKETBASE_URL" | npx wrangler secret put POCKETBASE_URL --env staging
-          printf '%s' "$POCKETBASE_ADMIN_EMAIL" | npx wrangler secret put POCKETBASE_ADMIN_EMAIL --env staging
-          printf '%s' "$POCKETBASE_ADMIN_PASSWORD" | npx wrangler secret put POCKETBASE_ADMIN_PASSWORD --env staging
-          printf '%s' "$CLERK_SECRET_KEY" | npx wrangler secret put CLERK_SECRET_KEY --env staging
-          if [ -n "$CLERK_WEBHOOK_SIGNING_SECRET" ]; then
-            printf '%s' "$CLERK_WEBHOOK_SIGNING_SECRET" | npx wrangler secret put CLERK_WEBHOOK_SIGNING_SECRET --env staging
-          fi
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          POCKETBASE_URL: ${{ secrets.POCKETBASE_URL }}
-          POCKETBASE_ADMIN_EMAIL: ${{ secrets.POCKETBASE_ADMIN_EMAIL }}
-          POCKETBASE_ADMIN_PASSWORD: ${{ secrets.POCKETBASE_ADMIN_PASSWORD }}
-          CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
-          CLERK_WEBHOOK_SIGNING_SECRET: ${{ secrets.CLERK_WEBHOOK_SIGNING_SECRET }}
+    uses: ./.github/workflows/open-next-worker.yml
+    secrets: inherit
+    with:
+      wrangler_command: deploy --env staging
+      wrangler_env_args: --env staging

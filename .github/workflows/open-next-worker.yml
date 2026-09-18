@@ -1,0 +1,106 @@
+name: OpenNext Worker (reusable)
+
+# Shared by production and staging. Secrets already on the Worker persist
+# across `wrangler deploy` — do not `secret put` here. Each secret put
+# publishes a new Worker version; doing that after every commit is what
+# turned two main pushes into ten versions and Error 1102 on 2026-09-18.
+on:
+  workflow_call:
+    inputs:
+      wrangler_command:
+        description: Wrangler CLI command, e.g. `deploy` or `deploy --env staging`
+        required: true
+        type: string
+      wrangler_env_args:
+        description: Extra wrangler args for secret list (empty for production, `--env staging` for staging)
+        required: false
+        default: ""
+        type: string
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Validate GitHub secrets
+        run: |
+          missing=()
+          for name in CLOUDFLARE_API_TOKEN CLOUDFLARE_ACCOUNT_ID POCKETBASE_URL POCKETBASE_ADMIN_EMAIL POCKETBASE_ADMIN_PASSWORD CLERK_SECRET_KEY NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY; do
+            value="${!name}"
+            if [ -z "$value" ]; then
+              missing+=("$name")
+            fi
+          done
+          if [ "${#missing[@]}" -gt 0 ]; then
+            echo "::error::Missing required secrets: ${missing[*]}. Add them to the Signal-K/client Actions secrets."
+            exit 1
+          fi
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          POCKETBASE_URL: ${{ secrets.POCKETBASE_URL }}
+          POCKETBASE_ADMIN_EMAIL: ${{ secrets.POCKETBASE_ADMIN_EMAIL }}
+          POCKETBASE_ADMIN_PASSWORD: ${{ secrets.POCKETBASE_ADMIN_PASSWORD }}
+          CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
+          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
+
+      - name: Build (OpenNext Cloudflare adapter)
+        run: npx opennextjs-cloudflare build
+        env:
+          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
+          NEXT_PUBLIC_CLERK_SIGN_IN_URL: ${{ vars.NEXT_PUBLIC_CLERK_SIGN_IN_URL }}
+          NEXT_PUBLIC_CLERK_SIGN_UP_URL: ${{ vars.NEXT_PUBLIC_CLERK_SIGN_UP_URL }}
+          NEXT_PUBLIC_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL: ${{ vars.NEXT_PUBLIC_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL }}
+          NEXT_PUBLIC_CLERK_SIGN_UP_FALLBACK_REDIRECT_URL: ${{ vars.NEXT_PUBLIC_CLERK_SIGN_UP_FALLBACK_REDIRECT_URL }}
+          NEXT_PUBLIC_POCKETBASE_URL: ${{ secrets.POCKETBASE_URL }}
+          NEXT_PUBLIC_POSTHOG_KEY: ${{ vars.NEXT_PUBLIC_POSTHOG_KEY }}
+          NEXT_PUBLIC_POSTHOG_HOST: https://us.posthog.com
+          posthog_api_key: ${{ vars.NEXT_PUBLIC_POSTHOG_KEY }}
+          posthog_project_id: ${{ vars.POSTHOG_PROJECT_ID }}
+          posthog_region: US Cloud
+
+      - uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          # NOTE: `--env ""` looks like the right way to pin production now
+          # that wrangler.jsonc also defines `env.staging`, but wrangler-action's
+          # arg splitting drops the empty-string value and wrangler then errors
+          # with "Not enough arguments following: env" (broke prod deploy on
+          # 2026-09-17, see run 35190488025). Plain `deploy` still targets the
+          # top-level env correctly; it just logs a harmless warning.
+          command: ${{ inputs.wrangler_command }}
+
+      - name: Confirm Worker secrets already exist
+        run: |
+          # `wrangler deploy` keeps existing Worker secrets. We only fail if a
+          # required name is missing — then someone must run the manual
+          # "Sync Cloudflare Worker secrets" workflow, not this deploy.
+          listed="$(npx wrangler secret list ${{ inputs.wrangler_env_args }})"
+          echo "$listed"
+          missing=()
+          for name in POCKETBASE_URL POCKETBASE_ADMIN_EMAIL POCKETBASE_ADMIN_PASSWORD CLERK_SECRET_KEY; do
+            if ! printf '%s\n' "$listed" | grep -Fq "$name"; then
+              missing+=("$name")
+            fi
+          done
+          if [ "${#missing[@]}" -gt 0 ]; then
+            echo "::error::Worker is missing secrets: ${missing[*]}. Run the 'Sync Cloudflare Worker secrets' workflow once; do not put secrets on every deploy."
+            exit 1
+          fi
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
