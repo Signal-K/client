@@ -6,8 +6,6 @@
       "instance": "client/pocketbase",
       "collections": [
         "anomalies",
-        "classifications",
-        "comments",
         "defensive_probes",
         "events",
         "inventory",
@@ -30,7 +28,12 @@
         "votes",
         "zoo"
       ],
-      "new_collection_prefix": "ss_"
+      "new_collection_prefix": "ss_",
+      "ss_prefixed_collections": [
+        "ss_classifications",
+        "ss_comments",
+        "ss_hub_state"
+      ]
     },
     "platform_shared": {
       "description": "Cross-product identity and service-to-service data owned by the shared backend.",
