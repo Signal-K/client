@@ -33,26 +33,29 @@ const CHOICES: Array<{ project: ProjectType; structure: StructureId; title: stri
 export interface GardenOnboardingProps {
   isOpen: boolean;
   credits: number;
+  /** Projects already chosen during account onboarding; pre-selected so the player only confirms. */
+  initialProjects?: ProjectType[];
   onSave: (projects: ProjectType[]) => void;
   /** Set when reopened after first run, so the player can back out. */
   onClose?: () => void;
 }
 
 /** First-run flow for a fresh garden: pick what to raise → tap a plot → choose a spot → build. */
-export function GardenOnboarding({ isOpen, credits, onSave, onClose }: GardenOnboardingProps) {
-  const [picked, setPicked] = useState<ProjectType[]>([]);
+export function GardenOnboarding({ isOpen, credits, initialProjects, onSave, onClose }: GardenOnboardingProps) {
+  const [chosen, setChosen] = useState<ProjectType[] | null>(null);
   if (!isOpen) return null;
+  const picked = chosen ?? initialProjects ?? [];
 
   const toggle = (project: ProjectType) =>
-    setPicked((prev) => (prev.includes(project) ? prev.filter((p) => p !== project) : [...prev, project]));
+    setChosen(picked.includes(project) ? picked.filter((p) => p !== project) : [...picked, project]);
 
   return (
     <div className={styles.onbScrim} role="dialog" aria-modal="true" aria-labelledby="onb-title">
       <div className={styles.onbCard}>
-        <h2 id="onb-title">Your garden starts fresh</h2>
+        <h2 id="onb-title">A fresh garden</h2>
         <p className={styles.onbLead}>
-          Everything you contributed, your research, and your {credits} CR came with you. What you had before is
-          archived. Now you decide what grows here.
+          Your research and your {credits} CR came with you; your old layout is archived. Confirm what you want to
+          raise first.
         </p>
         <p className={styles.onbStep}>1 · Choose what to raise first</p>
         <div className={styles.onbChoices}>

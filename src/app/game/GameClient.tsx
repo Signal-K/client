@@ -204,6 +204,27 @@ export default function GameClient({ user }: GameClientProps) {
           Raise instruments on open ground, classify to earn credits, upgrade to grow
         </p>
         <GardenCoach message={coachMessage} />
+        {garden.syncError && (
+          <div
+            role="alert"
+            style={{
+              position: "absolute",
+              top: 56,
+              left: "50%",
+              transform: "translateX(-50%)",
+              zIndex: 60,
+              maxWidth: "min(92vw, 420px)",
+              padding: "8px 14px",
+              borderRadius: 10,
+              background: "rgba(120, 30, 30, 0.92)",
+              color: "#fff",
+              fontSize: 13,
+              textAlign: "center",
+            }}
+          >
+            {garden.syncError}
+          </div>
+        )}
         <div className={cx(styles.toast, !!garden.toast && styles.isOn)} role="status">
           {garden.toast}
         </div>
@@ -238,7 +259,11 @@ export default function GameClient({ user }: GameClientProps) {
           <GameSurveys
             userId={user?.id}
             classifications={classifications}
-            mechanicId={garden.openPanelId ? STRUCTURE_TO_MECHANIC_ID[garden.openPanelId] : undefined}
+            mechanicId={
+              garden.openPanelId && !garden.state.structures[garden.openPanelId]?.locked
+                ? STRUCTURE_TO_MECHANIC_ID[garden.openPanelId]
+                : undefined
+            }
           />
         </div>
       )}
@@ -255,6 +280,7 @@ export default function GameClient({ user }: GameClientProps) {
       <GardenOnboarding
         isOpen={showRoster || rosterReopened}
         credits={garden.state.credits}
+        initialProjects={preferences.projectInterests}
         onSave={handleSaveProjects}
         onClose={showRoster ? undefined : () => setRosterReopened(false)}
       />

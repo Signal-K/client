@@ -44,9 +44,11 @@ export function useGardenState(userId?: string | null) {
   const [openMinigame, setOpenMinigame] = useState<MinigameDef | null>(null);
   const [probeGrainOpen, setProbeGrainOpen] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
+  const [syncError, setSyncError] = useState<string | null>(null);
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const persistTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const persistEnabled = useRef(false);
+  const loadFailed = useRef(false);
   const skipNextPersist = useRef(true);
   const minigameOpenRef = useRef(false);
   const stateRef = useRef(state);
@@ -54,11 +56,13 @@ export function useGardenState(userId?: string | null) {
   minigameOpenRef.current = !!openMinigame || probeGrainOpen;
 
   const queueGardenPersist = useCallback(() => {
-    if (!persistEnabled.current) return;
+    if (!persistEnabled.current || loadFailed.current) return;
     if (persistTimer.current) clearTimeout(persistTimer.current);
     persistTimer.current = setTimeout(() => {
       persistTimer.current = null;
-      void patchHubState({ garden: stateRef.current });
+      void patchHubState({ garden: stateRef.current }).then((res) => {
+        setSyncError(res ? null : "Couldn't save your garden. Changes may be lost if you leave — retrying on your next move.");
+      });
     }, GARDEN_PATCH_MS);
   }, []);
 
@@ -67,6 +71,15 @@ export function useGardenState(userId?: string | null) {
     async function hydrate() {
       const remote = await fetchHubState();
       if (cancelled) return;
+      if (remote.failed) {
+        setSyncError("Couldn't reach the garden server. Your progress can't load or save right now.");
+        setState(defaultGardenState());
+        loadFailed.current = true;
+        persistEnabled.current = false;
+        skipNextPersist.current = true;
+        setHydrated(true);
+        return;
+      }
       const leftover = readGardenLeftovers(userId);
       if (remote.garden && !isPristineGarden(remote.garden)) {
         setState(remote.garden);
@@ -102,7 +115,7 @@ export function useGardenState(userId?: string | null) {
       clearTimeout(persistTimer.current);
       persistTimer.current = null;
     }
-    if (persistEnabled.current) {
+    if (persistEnabled.current && !loadFailed.current) {
       void patchHubState({ garden: stateRef.current });
     }
   }, []);
@@ -357,6 +370,7 @@ export function useGardenState(userId?: string | null) {
   return {
     state,
     hydrated,
+    syncError,
     openPanelId,
     openPanel,
     closePanel,

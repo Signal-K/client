@@ -116,7 +116,7 @@ export default function OnboardingPage() {
   };
 
   return (
-    <div className="relative min-h-[100dvh] w-full overflow-hidden bg-background text-foreground font-sans">
+    <div className="relative min-h-[100dvh] w-full overflow-x-hidden bg-background text-foreground font-sans">
       {showIntro && (
         <IntroSequence
           onComplete={() => {
@@ -128,7 +128,7 @@ export default function OnboardingPage() {
       <div className="pointer-events-none absolute inset-0 star-field opacity-30" />
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-transparent via-background/50 to-background" />
 
-      <main className="relative z-10 mx-auto flex h-[100dvh] max-w-lg flex-col px-6 py-8">
+      <main className="relative z-10 mx-auto flex min-h-[100dvh] max-w-lg flex-col px-6 py-8">
 
         {step === "intro" && (
           <IntroStep

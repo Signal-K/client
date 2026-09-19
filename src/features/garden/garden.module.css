@@ -703,6 +703,7 @@
 .btnPrimary { background: #4f8f5a; color: #f7f0e4; border-color: transparent; }
 .btnHop { background: #3a5a8c; color: #f4f0e8; border-color: transparent; }
 .btnGhost { background: transparent; text-align: center; font-weight: 550; color: var(--ink-soft); }
+.minigame .btnGhost { color: #f1eadb; border-color: rgba(241, 234, 219, 0.5); }
 
 /* ---- classify in the sky area (ssc.flow.sky_classify) ---- */
 .minigame {

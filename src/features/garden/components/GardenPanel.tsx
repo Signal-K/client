@@ -178,7 +178,7 @@ function PanelBody({
           </button>
         )}
 
-        {hop && (
+        {hop && !rec.locked && (
           <button className={cx(styles.btn, styles.btnHop)} onClick={() => onHopOut(hop.id)}>
             {hop.label} →
           </button>
