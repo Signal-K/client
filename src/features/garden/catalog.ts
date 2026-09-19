@@ -22,7 +22,7 @@ export type MinigameId =
   | "ssc.minigame.supply"
   | "ssc.minigame.rover";
 
-export type HopId = "ssc.hop.landnam";
+export type HopId = "ssc.hop.landnam" | "ssc.hop.spectra" | "ssc.hop.garden";
 
 export interface GrowthStage {
   tier: number;
@@ -66,6 +66,9 @@ export interface HopDef {
 }
 
 const LANDNAM = "https://playlandnam.space";
+const GARDEN = "https://starsailors.space/game";
+/** Spectra Outpost. Empty until NEXT_PUBLIC_SPECTRA_URL is set (KES-417). */
+const SPECTRA = process.env.NEXT_PUBLIC_SPECTRA_URL || "";
 const READY_MS = [0, 20000, 14000, 9000];
 
 const MINIGAMES: Record<MinigameId, MinigameDef> = {
@@ -165,9 +168,21 @@ export const CATALOG = {
   hops: {
     landnam: {
       id: "ssc.hop.landnam" as const,
-      label: "Open Landnam",
+      label: "Landnam",
       href: LANDNAM,
       blurb: "The long-session game. Rockets, mining, TESS — not this garden.",
+    } satisfies HopDef,
+    spectra: {
+      id: "ssc.hop.spectra" as const,
+      label: "Spectra",
+      href: SPECTRA,
+      blurb: "Weekly scrap-yard. Machine-tend stations there — watering these beds is a different verb.",
+    } satisfies HopDef,
+    garden: {
+      id: "ssc.hop.garden" as const,
+      label: "Garden",
+      href: GARDEN,
+      blurb: "This camp. Other games link back here.",
     } satisfies HopDef,
   },
   structures: [
@@ -192,9 +207,9 @@ export const CATALOG = {
       slug: "hydro",
       name: "Garden",
       verb: "Tend",
-      blurb: "Beds on the dirt. Water them; they tick credits while you are away.",
+      blurb: "Water the beds so CR ticks here. Spectra machine-tending is a different hop.",
       minigame: null,
-      hop: null,
+      hop: "ssc.hop.spectra",
       startTier: 1,
       locked: false,
       growth: stages([
@@ -316,6 +331,8 @@ export function allIds(): string[] {
     CATALOG.flow.skyClassify.id,
     CATALOG.upgrade.id,
     CATALOG.hops.landnam.id,
+    CATALOG.hops.spectra.id,
+    CATALOG.hops.garden.id,
   ];
   for (const s of CATALOG.structures) ids.push(s.id);
   for (const key of Object.keys(CATALOG.minigames)) ids.push(key);
@@ -360,6 +377,29 @@ export function structureById(id: string | null | undefined): StructureDef | nul
 
 export function hopById(id: string | null | undefined): HopDef | null {
   return Object.values(CATALOG.hops).find((h) => h.id === id) || null;
+}
+
+export function hopRail(): HopDef[] {
+  return [CATALOG.hops.garden, CATALOG.hops.landnam, CATALOG.hops.spectra];
+}
+
+/** Append `from=garden` so Landnam / Spectra can grant a return bonus. */
+export function outboundHopUrl(hop: HopDef): string | null {
+  if (!hop.href) return null;
+  if (hop.id === "ssc.hop.garden") return hop.href;
+  try {
+    const url = new URL(hop.href);
+    url.searchParams.set("from", "garden");
+    return url.toString();
+  } catch {
+    return hop.href;
+  }
+}
+
+export function hopSlugFromReturnParam(value: string | null | undefined): "ssc.hop.landnam" | "ssc.hop.spectra" | null {
+  if (value === "landnam") return "ssc.hop.landnam";
+  if (value === "spectra") return "ssc.hop.spectra";
+  return null;
 }
 
 export function growthFor(structure: StructureDef | null, tier: number): GrowthStage | null {

@@ -5,14 +5,17 @@ import {
   CATALOG,
   growthFor,
   hopById,
+  outboundHopUrl,
   structureById,
   type HopDef,
+  type HopId,
   type MinigameDef,
   type StructureId,
 } from "./catalog";
 import {
   applyProjectRoster,
   buildStructure,
+  claimHopBonus,
   defaultGardenState,
   isPristineGarden,
   seedOwnedStructures,
@@ -361,10 +364,31 @@ export function useGardenState(userId?: string | null) {
   const closeProbeGrain = useCallback(() => setProbeGrainOpen(false), []);
 
   const hopOut = useCallback((hop: HopDef) => {
-    pushToast(`Leaving the garden for ${hop.label.replace("Open ", "")}.`);
-    if (typeof window !== "undefined") {
-      window.open(hop.href, "_blank", "noopener");
+    const href = outboundHopUrl(hop);
+    if (!href) {
+      pushToast("That hop isn't live yet.");
+      return 0;
     }
+    const next = claimHopBonus(stateRef.current, "out", hop.id);
+    if (next.awarded) setState(next.state);
+    pushToast(
+      next.awarded
+        ? `+${next.awarded} CR garden stamp. Leaving for ${hop.label}.`
+        : `Leaving the garden for ${hop.label}.`,
+    );
+    if (typeof window !== "undefined") {
+      window.open(href, "_blank", "noopener");
+    }
+    return next.awarded;
+  }, [pushToast]);
+
+  const claimReturnBonus = useCallback((hopId: HopId) => {
+    const next = claimHopBonus(stateRef.current, "in", hopId);
+    if (!next.awarded) return 0;
+    setState(next.state);
+    const name = hopId === "ssc.hop.landnam" ? "Landnam" : "Spectra";
+    pushToast(`Welcome back from ${name}. +${next.awarded} CR for the camp.`);
+    return next.awarded;
   }, [pushToast]);
 
   return {
@@ -395,6 +419,7 @@ export function useGardenState(userId?: string | null) {
     collectFlight,
     addCredits,
     hopOut,
+    claimReturnBonus,
     hopById,
     structureById,
     growthFor,

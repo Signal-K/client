@@ -635,6 +635,39 @@
   color: var(--ink-soft);
   font-weight: 600;
 }
+.hopRail {
+  position: absolute;
+  left: 50%;
+  top: 52px;
+  transform: translateX(-50%);
+  z-index: 21;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  pointer-events: auto;
+}
+.hopBtn {
+  appearance: none;
+  border: 1px solid var(--hair);
+  background: var(--paper);
+  color: var(--ink);
+  border-radius: 999px;
+  padding: 6px 10px;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 650;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.hopBtn.isHere {
+  background: #efe6d6;
+  cursor: default;
+}
+.hopBtn:disabled:not(.isHere) {
+  opacity: 0.45;
+  cursor: default;
+}
 
 .toast {
   position: absolute;
@@ -866,6 +899,7 @@
 .stage[data-layout="landscape"] .probeShip { left: 25%; top: 76%; }
 
 .stage[data-layout="landscape"] .hud { top: 18px; left: 22px; right: 22px; }
+.stage[data-layout="landscape"] .hopRail { top: 18px; }
 .stage[data-layout="landscape"] .hint { left: 20%; right: 20%; bottom: 22px; }
 .stage[data-layout="landscape"] .toast { left: 28%; right: 28%; bottom: 22px; }
 

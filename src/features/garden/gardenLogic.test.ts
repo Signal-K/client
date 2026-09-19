@@ -1,13 +1,15 @@
 import { describe, expect, it } from "vitest";
 import type { ProjectType } from "../onboarding/hubState";
-import { assertNaming } from "./catalog";
+import { assertNaming, hopRail, hopSlugFromReturnParam, outboundHopUrl } from "./catalog";
 import {
   applyProjectRoster,
   ARCHIVE_STRUCTURE_INVENTORY_ITEM_IDS,
   AUTOMATON_STRUCTURE_NAMES,
   buildStructure,
+  claimHopBonus,
   defaultGardenState,
   GARDEN_STORAGE_KEY,
+  HOP_BONUS_CR,
   hydrateGardenState,
   isPristineGarden,
   isUntouchedLegacyGarden,
@@ -22,6 +24,17 @@ import {
 describe("garden catalog naming", () => {
   it("still passes with build costs on science structures", () => {
     expect(assertNaming()).toBeGreaterThan(0);
+  });
+
+  it("exposes garden, landnam, and spectra on the hop rail", () => {
+    expect(hopRail().map((hop) => hop.id)).toEqual([
+      "ssc.hop.garden",
+      "ssc.hop.landnam",
+      "ssc.hop.spectra",
+    ]);
+    expect(outboundHopUrl(hopRail()[1])).toContain("from=garden");
+    expect(hopSlugFromReturnParam("landnam")).toBe("ssc.hop.landnam");
+    expect(hopSlugFromReturnParam("garden")).toBeNull();
   });
 });
 
@@ -141,5 +154,19 @@ describe("account recovery", () => {
     expect(shouldAskForProjectRoster({ prefsLoading: true, accountLoading: false, gardenPristine: true })).toBe(false);
     expect(shouldAskForProjectRoster({ prefsLoading: false, accountLoading: false, gardenPristine: true })).toBe(true);
     expect(shouldAskForProjectRoster({ prefsLoading: false, accountLoading: false, gardenPristine: false })).toBe(false);
+  });
+});
+
+describe("cross-game hop bonuses", () => {
+  it("awards a one-shot credit stamp per hop direction", () => {
+    const first = claimHopBonus(defaultGardenState(), "out", "ssc.hop.landnam");
+    expect(first.awarded).toBe(HOP_BONUS_CR);
+    expect(first.state.credits).toBe(80 + HOP_BONUS_CR);
+    const again = claimHopBonus(first.state, "out", "ssc.hop.landnam");
+    expect(again.awarded).toBe(0);
+    const inbound = claimHopBonus(first.state, "in", "ssc.hop.landnam");
+    expect(inbound.awarded).toBe(HOP_BONUS_CR);
+    const garden = claimHopBonus(defaultGardenState(), "out", "ssc.hop.garden");
+    expect(garden.awarded).toBe(0);
   });
 });

@@ -159,6 +159,14 @@ export async function POST(request: NextRequest) {
     revalidatePath("/viewports/rover");
     revalidatePath(`/next/${nextLegacyId}`);
 
+    const { captureServerEvent } = await import("@/src/lib/server/posthog");
+    await captureServerEvent(user.id, "classification_submitted", {
+      source: "api",
+      classification_id: nextLegacyId,
+      classificationtype,
+      anomaly,
+    });
+
     return NextResponse.json(recursiveSerialize(mapClassificationToRow(created)));
   } catch (error: any) {
     console.error("Error creating classification:", error);

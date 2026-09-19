@@ -2,6 +2,7 @@ import type { ProjectType } from "@/src/features/onboarding/hubState";
 import {
   CATALOG,
   structureById,
+  type HopId,
   type StructureId,
 } from "./catalog";
 
@@ -29,6 +30,34 @@ export interface GardenState {
   hydroTick: number;
   /** Bumped when the garden is redesigned; older gardens restart with only their credits carried over. */
   generation?: number;
+  /** One-shot hop stamps (`out:ssc.hop.landnam`, `in:ssc.hop.spectra`). Not a second economy. */
+  hopBonuses?: Record<string, boolean>;
+}
+
+export const HOP_BONUS_CR = 8;
+
+export type BonusHopId = Exclude<HopId, "ssc.hop.garden">;
+
+export function hopBonusKey(direction: "out" | "in", hopId: BonusHopId): string {
+  return `${direction}:${hopId}`;
+}
+
+export function claimHopBonus(
+  state: GardenState,
+  direction: "out" | "in",
+  hopId: HopId,
+): { state: GardenState; awarded: number } {
+  if (hopId === "ssc.hop.garden") return { state, awarded: 0 };
+  const key = hopBonusKey(direction, hopId);
+  if (state.hopBonuses?.[key]) return { state, awarded: 0 };
+  return {
+    awarded: HOP_BONUS_CR,
+    state: {
+      ...state,
+      credits: state.credits + HOP_BONUS_CR,
+      hopBonuses: { ...state.hopBonuses, [key]: true },
+    },
+  };
 }
 
 /** 2 = build/place/design gardens. Gardens without this were the pre-redesign layout. */

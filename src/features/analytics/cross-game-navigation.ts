@@ -2,6 +2,9 @@ export interface CrossGameNavigationPayload {
   destination: string;
   source_section: string;
   user_id?: string | null;
+  hop_id?: string;
+  bonus_cr?: number;
+  direction?: "out" | "in";
 }
 
 export function captureCrossGameNavigation(

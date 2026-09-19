@@ -2,51 +2,85 @@
 
 import { Sparkles, User } from "lucide-react";
 import styles from "../garden.module.css";
-import { CATALOG } from "../catalog";
+import { CATALOG, hopRail } from "../catalog";
 import type { SkyPhase } from "../useSkyPhase";
+
+function cx(...classes: Array<string | false | undefined>) {
+  return classes.filter(Boolean).join(" ");
+}
 
 export interface GardenHudProps {
   credits: number;
   phase: SkyPhase;
+  username?: string | null;
   onProfileClick?: () => void;
   onProjectsClick?: () => void;
+  onHopOut?: (hopId: string) => void;
 }
 
-/** ssc.currency.credits + sky-phase chip. Replaces CommandHeader for the garden hub. */
-export function GardenHud({ credits, phase, onProfileClick, onProjectsClick }: GardenHudProps) {
+/** ssc.currency.credits + identity chip + suite hop rail. */
+export function GardenHud({
+  credits,
+  phase,
+  username,
+  onProfileClick,
+  onProjectsClick,
+  onHopOut,
+}: GardenHudProps) {
   return (
-    <header className={styles.hud}>
-      <div className={styles.chip} title={CATALOG.currency.id}>
-        <span className={styles.coin} aria-hidden="true" />
-        <span>{credits}</span>
-        <span style={{ fontWeight: 550, opacity: 0.7, fontSize: 11 }}>{CATALOG.currency.label}</span>
-      </div>
-      <div style={{ display: "flex", alignItems: "center", gap: 8, pointerEvents: "auto" }}>
-        <div className={styles.phaseChip}>{phase}</div>
-        {onProjectsClick && (
-          <button
-            type="button"
-            className={styles.chip}
-            style={{ padding: "6px 10px" }}
-            onClick={onProjectsClick}
-            aria-label="Project roster"
-            title="Choose science tracks"
-          >
-            <Sparkles size={16} />
-          </button>
-        )}
-        {onProfileClick && (
-          <button
-            type="button"
-            className={styles.chip}
-            style={{ padding: "6px 10px" }}
-            onClick={onProfileClick}
-            aria-label="Profile"
-          >
-            <User size={16} />
-          </button>
-        )}
-      </div>
-    </header>
+    <>
+      <header className={styles.hud}>
+        <div className={styles.chip} title={CATALOG.currency.id}>
+          <span className={styles.coin} aria-hidden="true" />
+          <span>{credits}</span>
+          <span style={{ fontWeight: 550, opacity: 0.7, fontSize: 11 }}>{CATALOG.currency.label}</span>
+        </div>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, pointerEvents: "auto" }}>
+          <div className={styles.phaseChip}>{phase}</div>
+          {onProjectsClick && (
+            <button
+              type="button"
+              className={styles.chip}
+              style={{ padding: "6px 10px" }}
+              onClick={onProjectsClick}
+              aria-label="Project roster"
+              title="Choose science tracks"
+            >
+              <Sparkles size={16} />
+            </button>
+          )}
+          {onProfileClick && (
+            <button
+              type="button"
+              className={styles.chip}
+              style={{ padding: "6px 10px" }}
+              onClick={onProfileClick}
+              aria-label={username ? `Profile, ${username}` : "Profile"}
+            >
+              <User size={16} />
+              {username ? <span style={{ fontSize: 12, fontWeight: 650 }}>{username}</span> : null}
+            </button>
+          )}
+        </div>
+      </header>
+      <nav className={styles.hopRail} aria-label="Suite hops">
+        {hopRail().map((hop) => {
+          const here = hop.id === "ssc.hop.garden";
+          const missing = !here && !hop.href;
+          return (
+            <button
+              key={hop.id}
+              type="button"
+              className={cx(styles.hopBtn, here && styles.isHere)}
+              disabled={here || missing}
+              title={missing ? "Spectra hop URL not set yet" : hop.blurb}
+              onClick={() => !here && !missing && onHopOut?.(hop.id)}
+            >
+              {hop.label}
+            </button>
+          );
+        })}
+      </nav>
+    </>
   );
 }

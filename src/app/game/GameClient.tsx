@@ -9,9 +9,10 @@ import { GardenCoach, GardenOnboarding } from "@/src/features/garden/components/
 import { GameSurveys } from "@/src/features/surveys/components/GameSurveys";
 import { useUserPreferences, type ProjectType } from "@/src/hooks/useUserPreferences";
 
+import { captureCrossGameNavigation } from "@/src/features/analytics/cross-game-navigation";
 import { useGardenState } from "@/src/features/garden/useGardenState";
 import { useSkyPhase } from "@/src/features/garden/useSkyPhase";
-import { hopById, type StructureId } from "@/src/features/garden/catalog";
+import { hopById, hopSlugFromReturnParam, type StructureId } from "@/src/features/garden/catalog";
 import {
   BUILDABLE_STRUCTURE_IDS,
   needsGardenOnboarding,
@@ -83,8 +84,27 @@ export default function GameClient({ user }: GameClientProps) {
 
   useEffect(() => {
     posthog?.capture("garden_hub_viewed", { userId: user?.id });
+    posthog?.capture("game_hub_viewed", { userId: user?.id });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    if (!garden.hydrated) return;
+    const from = hopSlugFromReturnParam(new URLSearchParams(window.location.search).get("from"));
+    if (!from) return;
+    const awarded = garden.claimReturnBonus(from);
+    if (awarded) {
+      captureCrossGameNavigation(posthog, {
+        destination: "garden",
+        source_section: "garden_return",
+        user_id: user?.id,
+        hop_id: from,
+        bonus_cr: awarded,
+        direction: "in",
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [garden.hydrated]);
 
   useEffect(() => {
     if (!user?.id) {
@@ -145,9 +165,24 @@ export default function GameClient({ user }: GameClientProps) {
   const handleHopOut = useCallback(
     (hopId: string) => {
       const hop = hopById(hopId);
-      if (hop) garden.hopOut(hop);
+      if (!hop) return;
+      const awarded = garden.hopOut(hop);
+      captureCrossGameNavigation(posthog, {
+        destination: hop.id.replace("ssc.hop.", ""),
+        source_section: "garden_hub",
+        user_id: user?.id,
+        hop_id: hop.id,
+        bonus_cr: awarded,
+        direction: "out",
+      });
+      posthog?.capture("garden_hop_clicked", {
+        hop_id: hop.id,
+        structure: garden.openPanelId,
+        bonus_cr: awarded,
+        userId: user?.id,
+      });
     },
-    [garden]
+    [garden, posthog, user?.id]
   );
 
   const handleSaveProjects = useCallback(
@@ -187,7 +222,14 @@ export default function GameClient({ user }: GameClientProps) {
     <div className={styles.gardenPage}>
       <GardenScene
         state={garden.state}
-        onOpen={garden.openPanel}
+        onOpen={(id) => {
+          posthog?.capture("garden_structure_opened", {
+            structure: id,
+            mechanic: STRUCTURE_TO_MECHANIC_ID[id],
+            userId: user?.id,
+          });
+          garden.openPanel(id);
+        }}
         layout={layout}
         phase={phase}
         placingId={garden.placingId}
@@ -197,8 +239,10 @@ export default function GameClient({ user }: GameClientProps) {
         <GardenHud
           credits={garden.state.credits}
           phase={phase}
+          username={bootstrap?.username}
           onProfileClick={() => setShowProfileModal(true)}
           onProjectsClick={() => setRosterReopened(true)}
+          onHopOut={handleHopOut}
         />
         <p className={styles.hint}>
           Raise instruments on open ground, classify to earn credits, upgrade to grow
@@ -209,7 +253,7 @@ export default function GameClient({ user }: GameClientProps) {
             role="alert"
             style={{
               position: "absolute",
-              top: 56,
+              top: 88,
               left: "50%",
               transform: "translateX(-50%)",
               zIndex: 60,
@@ -238,7 +282,15 @@ export default function GameClient({ user }: GameClientProps) {
           onUpgrade={garden.upgrade}
           onBeginPlace={garden.beginPlace}
           onCollectFlight={garden.collectFlight}
-          onStartMinigame={garden.startMinigame}
+          onStartMinigame={(mg) => {
+            posthog?.capture("garden_tool_opened", {
+              minigame: mg.id,
+              structure: mg.structure,
+              mechanic: STRUCTURE_TO_MECHANIC_ID[mg.structure],
+              userId: user?.id,
+            });
+            garden.startMinigame(mg);
+          }}
           onHopOut={handleHopOut}
           onDeferredToast={handleDeferredToast}
         />
@@ -246,7 +298,15 @@ export default function GameClient({ user }: GameClientProps) {
         <SkyClassify
           openMinigame={garden.openMinigame}
           onCloseMinigame={garden.closeMinigame}
-          onCompleteSkyClassify={garden.completeSkyClassify}
+          onCompleteSkyClassify={(structureId) => {
+            posthog?.capture("garden_classify_completed", {
+              structure: structureId,
+              mechanic: STRUCTURE_TO_MECHANIC_ID[structureId],
+              minigame: garden.openMinigame?.id,
+              userId: user?.id,
+            });
+            garden.completeSkyClassify(structureId);
+          }}
           probeGrainOpen={garden.probeGrainOpen}
           onCloseProbeGrain={garden.closeProbeGrain}
           onSendFlight={garden.sendFlight}
