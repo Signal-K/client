@@ -25,7 +25,12 @@ export interface GardenState {
   structures: Record<StructureId, StructureRecord>;
   flights: Partial<Record<StructureId, FlightRecord>>;
   hydroTick: number;
+  /** Bumped when the garden is redesigned; older gardens restart with only their credits carried over. */
+  generation?: number;
 }
+
+/** 2 = build/place/design gardens. Gardens without this were the pre-redesign layout. */
+export const GARDEN_GENERATION = 2;
 
 export const GARDEN_STORAGE_KEY = "ssc.garden.v3";
 
@@ -101,7 +106,17 @@ export function defaultGardenState(): GardenState {
     structures,
     flights: {},
     hydroTick: Date.now(),
+    generation: GARDEN_GENERATION,
   };
+}
+
+/** A fresh garden that keeps what the player earned (credits) but none of the old layout. */
+export function restartedGarden(previous: { credits?: unknown } | null | undefined): GardenState {
+  const fresh = defaultGardenState();
+  const credits = previous?.credits;
+  return typeof credits === "number" && Number.isFinite(credits) && credits >= 0
+    ? { ...fresh, credits }
+    : fresh;
 }
 
 export function structuresForProjects(interests: ProjectType[]): StructureId[] {
@@ -236,6 +251,7 @@ export function hydrateGardenState(parsed: unknown): GardenState {
   if (!parsed || typeof parsed !== "object") return base;
   const garden = parsed as Partial<GardenState>;
   if (isUntouchedLegacyGarden(garden)) return base;
+  if (garden.generation !== GARDEN_GENERATION) return restartedGarden(garden);
   return {
     ...base,
     ...garden,
@@ -265,6 +281,18 @@ export function isPristineGarden(state: GardenState | null | undefined): boolean
  * The garden owns onboarding: a pristine garden (nothing raised, no plots chosen) always
  * gets the roster, even for accounts that finished the pre-garden onboarding.
  */
+/** Nothing raised, chosen, or tended yet — credits may be carried over from a prior garden. */
+export function needsGardenOnboarding(state: GardenState | null | undefined): boolean {
+  if (!state) return true;
+  if (Object.keys(state.flights || {}).length) return false;
+  const raised = BUILDABLE_STRUCTURE_IDS.some((id) => {
+    const rec = state.structures?.[id];
+    return !!rec && (!rec.locked || !!rec.buildable);
+  });
+  if (raised) return false;
+  return !Object.values(state.structures || {}).some((rec) => rec.tendedAt);
+}
+
 export function shouldAskForProjectRoster(args: {
   prefsLoading: boolean;
   accountLoading: boolean;

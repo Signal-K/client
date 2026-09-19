@@ -73,7 +73,7 @@ export function useGardenState(userId?: string | null) {
         setState(leftover);
         if (remote.authenticated) void patchHubState({ garden: leftover });
       } else {
-        setState(defaultGardenState());
+        setState(remote.garden ?? defaultGardenState());
       }
       persistEnabled.current = false;
       skipNextPersist.current = true;

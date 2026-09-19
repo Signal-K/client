@@ -13,7 +13,7 @@ import { useGardenState } from "@/src/features/garden/useGardenState";
 import { useSkyPhase } from "@/src/features/garden/useSkyPhase";
 import { hopById, type StructureId } from "@/src/features/garden/catalog";
 import {
-  isPristineGarden,
+  needsGardenOnboarding,
   shouldAskForProjectRoster,
 } from "@/src/features/garden/gardenLogic";
 import { GardenScene } from "@/src/features/garden/components/GardenScene";
@@ -162,7 +162,7 @@ export default function GameClient({ user }: GameClientProps) {
   const showRoster = shouldAskForProjectRoster({
     prefsLoading,
     accountLoading,
-    gardenPristine: isPristineGarden(garden.state),
+    gardenPristine: needsGardenOnboarding(garden.state),
   });
 
   if (!garden.hydrated) {

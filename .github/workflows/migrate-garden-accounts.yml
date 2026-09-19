@@ -1,0 +1,40 @@
+name: Migrate garden accounts
+
+# Restarts every account at the beginning of the redesigned garden: legacy structures are hidden,
+# each account's old onboarding + garden are copied to ss_hub_state.legacyArchive, credits carry over.
+# Contributions, research and other inventory are untouched. Idempotent. Dry-run unless dry_run=false.
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Report only. Set to false to write to PocketBase."
+        type: choice
+        options: ["true", "false"]
+        default: "true"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: migrate-garden-accounts
+  cancel-in-progress: false
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: yarn
+      - run: yarn install --frozen-lockfile
+      - name: Migrate accounts
+        run: yarn pocketbase:archive-legacy-structures
+        env:
+          DRY_RUN: ${{ inputs.dry_run }}
+          POCKETBASE_URL: ${{ secrets.POCKETBASE_URL }}
+          POCKETBASE_ADMIN_EMAIL: ${{ secrets.POCKETBASE_ADMIN_EMAIL }}
+          POCKETBASE_ADMIN_PASSWORD: ${{ secrets.POCKETBASE_ADMIN_PASSWORD }}
