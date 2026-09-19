@@ -261,13 +261,15 @@ export function isPristineGarden(state: GardenState | null | undefined): boolean
   return true;
 }
 
+/**
+ * The garden owns onboarding: a pristine garden (nothing raised, no plots chosen) always
+ * gets the roster, even for accounts that finished the pre-garden onboarding.
+ */
 export function shouldAskForProjectRoster(args: {
   prefsLoading: boolean;
   accountLoading: boolean;
-  needsPreferencesPrompt: boolean;
-  returning: boolean;
+  gardenPristine: boolean;
 }): boolean {
   if (args.prefsLoading || args.accountLoading) return false;
-  if (args.returning) return false;
-  return args.needsPreferencesPrompt;
+  return args.gardenPristine;
 }

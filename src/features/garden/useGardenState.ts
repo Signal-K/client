@@ -30,7 +30,8 @@ import {
 
 export type { FlightRecord, GardenState, StructureRecord };
 
-const HYDRO_TICK_MS = 14000;
+// Idle income is a trickle: a 40 CR upgrade should take about an hour of idling, not minutes.
+const HYDRO_TICK_MS = 90000;
 const FLIGHT_TICK_MS = 500;
 const TOAST_MS = 2400;
 const GARDEN_PATCH_MS = 800;
@@ -46,8 +47,10 @@ export function useGardenState(userId?: string | null) {
   const persistTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const persistEnabled = useRef(false);
   const skipNextPersist = useRef(true);
+  const minigameOpenRef = useRef(false);
   const stateRef = useRef(state);
   stateRef.current = state;
+  minigameOpenRef.current = !!openMinigame || probeGrainOpen;
 
   const queueGardenPersist = useCallback(() => {
     if (!persistEnabled.current) return;
@@ -139,7 +142,7 @@ export function useGardenState(userId?: string | null) {
         const habitat = structures["ssc.structure.habitat"];
         let credits = prev.credits;
         let hydroTick = prev.hydroTick;
-        if (hydro?.tendedAt && now - prev.hydroTick > HYDRO_TICK_MS) {
+        if (hydro?.tendedAt && !minigameOpenRef.current && now - prev.hydroTick > HYDRO_TICK_MS) {
           hydroTick = now;
           const bonusStage = growthFor(structureById("ssc.structure.habitat"), habitat?.tier || 1);
           const idleBonus = (bonusStage?.capacity.idleBonus as number | undefined) || 0;

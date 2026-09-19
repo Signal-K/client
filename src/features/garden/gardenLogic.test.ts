@@ -120,30 +120,10 @@ describe("account recovery", () => {
     expect(isPristineGarden(hydrateGardenState({ credits: 80, structures: {} }))).toBe(true);
   });
 
-  it("does not flash the roster while account state is loading or the player is returning", () => {
-    expect(
-      shouldAskForProjectRoster({
-        prefsLoading: false,
-        accountLoading: true,
-        needsPreferencesPrompt: true,
-        returning: false,
-      })
-    ).toBe(false);
-    expect(
-      shouldAskForProjectRoster({
-        prefsLoading: false,
-        accountLoading: false,
-        needsPreferencesPrompt: true,
-        returning: true,
-      })
-    ).toBe(false);
-    expect(
-      shouldAskForProjectRoster({
-        prefsLoading: false,
-        accountLoading: false,
-        needsPreferencesPrompt: true,
-        returning: false,
-      })
-    ).toBe(true);
+  it("asks a pristine garden for a roster once account state has loaded", () => {
+    expect(shouldAskForProjectRoster({ prefsLoading: false, accountLoading: true, gardenPristine: true })).toBe(false);
+    expect(shouldAskForProjectRoster({ prefsLoading: true, accountLoading: false, gardenPristine: true })).toBe(false);
+    expect(shouldAskForProjectRoster({ prefsLoading: false, accountLoading: false, gardenPristine: true })).toBe(true);
+    expect(shouldAskForProjectRoster({ prefsLoading: false, accountLoading: false, gardenPristine: false })).toBe(false);
   });
 });

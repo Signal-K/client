@@ -372,7 +372,9 @@
 .thing:focus-visible { outline: 2px solid #4f8f5a; outline-offset: 4px; border-radius: 8px; }
 .thing svg { display: block; width: 100%; height: auto; pointer-events: none; filter: drop-shadow(1px 3px 0 rgba(80, 60, 40, 0.18)); }
 .thing.isLocked { cursor: pointer; opacity: 0.55; filter: grayscale(0.4); }
-.thing.isPlot { cursor: pointer; opacity: 0.85; filter: none; }
+.thing.isPlot { cursor: pointer; opacity: 1; filter: none; }
+/* An unbuilt plot is just dirt + a dashed ring — never the finished instrument. */
+.thing.isPlot svg { opacity: 0; }
 .thing.isPlot::after {
   content: "";
   position: absolute;
@@ -749,9 +751,17 @@
    their own internal layout/scroll — the overlay grows to fit them rather
    than clipping or shrinking their UI. */
 .mgPlay > :global(.ssc-real-mount) {
-  flex: 1;
-  min-height: 0;
-  overflow-y: auto;
+  flex: none;
+  color: #e8e4dc;
+}
+.mgPlay > :global(.ssc-real-mount) label { color: #c8c4b8; }
+.mgPlay > :global(.ssc-real-mount) select { color: #1c2430; }
+.mgPlay > :global(.ssc-real-mount) [class*="aspect-square"] { aspect-ratio: auto; min-height: 150px; }
+.mgPlay > .dipBtn {
+  position: sticky;
+  bottom: 0;
+  flex: none;
+  margin-top: auto;
 }
 .prompt { margin: 0; font-size: 14px; color: #c8c4b8; line-height: 1.4; }
 .choices { display: grid; gap: 8px; }

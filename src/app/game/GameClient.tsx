@@ -13,10 +13,8 @@ import { useGardenState } from "@/src/features/garden/useGardenState";
 import { useSkyPhase } from "@/src/features/garden/useSkyPhase";
 import { hopById, type StructureId } from "@/src/features/garden/catalog";
 import {
-  projectsForStructures,
+  isPristineGarden,
   shouldAskForProjectRoster,
-  structuresFromAutomatons,
-  structuresFromInventoryItems,
 } from "@/src/features/garden/gardenLogic";
 import { GardenScene } from "@/src/features/garden/components/GardenScene";
 import { GardenHud } from "@/src/features/garden/components/GardenHud";
@@ -82,7 +80,6 @@ export default function GameClient({ user }: GameClientProps) {
   const [classifications, setClassifications] = useState<ClassificationForMechanicSurvey[]>([]);
   const [accountLoading, setAccountLoading] = useState(true);
   const [bootstrap, setBootstrap] = useState<HubBootstrap | null>(null);
-  const seededRef = useRef(false);
 
   useEffect(() => {
     posthog?.capture("garden_hub_viewed", { userId: user?.id });
@@ -111,25 +108,6 @@ export default function GameClient({ user }: GameClientProps) {
       cancelled = true;
     };
   }, [user?.id]);
-
-  useEffect(() => {
-    if (!garden.hydrated || prefsLoading || accountLoading || seededRef.current) return;
-    seededRef.current = true;
-    const owned = bootstrap
-      ? [
-          ...structuresFromInventoryItems(bootstrap.inventoryItemIds ?? []),
-          ...structuresFromAutomatons(bootstrap.automatons ?? []),
-        ]
-      : [];
-    if (owned.length) garden.seedOwned(owned);
-    const inferred = projectsForStructures(owned);
-    const interests =
-      preferences.projectInterests.length > 0 ? preferences.projectInterests : inferred;
-    if (!preferences.hasCompletedOnboarding && bootstrap?.returning) {
-      hydrateFromAccount({ interests, returning: true });
-    }
-    if (interests.length > 0) garden.applyProjects(interests);
-  }, [accountLoading, bootstrap, garden, garden.hydrated, hydrateFromAccount, preferences.projectInterests, prefsLoading]);
 
   useEffect(() => {
     if (!user?.id) return;
@@ -184,8 +162,7 @@ export default function GameClient({ user }: GameClientProps) {
   const showRoster = shouldAskForProjectRoster({
     prefsLoading,
     accountLoading,
-    needsPreferencesPrompt,
-    returning: !!bootstrap?.returning,
+    gardenPristine: isPristineGarden(garden.state),
   });
 
   if (!garden.hydrated) {
