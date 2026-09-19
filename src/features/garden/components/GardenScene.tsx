@@ -5,9 +5,9 @@ import styles from "../garden.module.css";
 import type { StructureId } from "../catalog";
 import type { GardenState } from "../useGardenState";
 import type { SkyPhase } from "../useSkyPhase";
+import { useCommunityLaunches } from "../useCommunityLaunches";
 
-const SHOOTING_STAR_MS = 3200;
-const AMBIENT_LAUNCH_MS = 12000;
+const SHOOTING_STAR_MS = 52000;
 
 function cx(...classes: Array<string | false | undefined>) {
   return classes.filter(Boolean).join(" ");
@@ -64,10 +64,11 @@ export interface GardenSceneProps {
   onOpen: (id: StructureId) => void;
   layout: "portrait" | "landscape";
   phase: SkyPhase;
+  userId?: string | null;
   children?: React.ReactNode;
 }
 
-export function GardenScene({ state, onOpen, layout, phase, children }: GardenSceneProps) {
+export function GardenScene({ state, onOpen, layout, phase, userId, children }: GardenSceneProps) {
   const shootingStars = useShootingStars(phase);
 
   const padFlight = state.flights["ssc.structure.pad"];
@@ -75,24 +76,12 @@ export function GardenScene({ state, onOpen, layout, phase, children }: GardenSc
   const padAway = padFlight?.status === "away";
   const probeAway = probeFlight?.status === "away";
 
-  const pad = useFlightPulse(padAway, 4300, 2700);
-  const probe = useFlightPulse(probeAway, 2500, 2500);
+  const pad = useFlightPulse(padAway, 5200, 3600);
+  const probe = useFlightPulse(probeAway, 3600, 3600);
+  const community = useCommunityLaunches(padAway, userId);
 
-  // Ambient ship leaving the pad every ~12s, purely so the garden isn't still.
-  // Does not fire while the pad itself is away on a real send.
-  useEffect(() => {
-    const initial = setTimeout(() => {
-      if (!padAway) pad.pulse("flying", 4300);
-    }, 1800);
-    const id = setInterval(() => {
-      if (!padAway) pad.pulse("flying", 4300);
-    }, AMBIENT_LAUNCH_MS);
-    return () => {
-      clearTimeout(initial);
-      clearInterval(id);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const padAnim = pad.anim !== "idle" ? pad.anim : community.anim;
+  const padKey = pad.anim !== "idle" ? pad.pulseKey : community.pulseKey;
 
   return (
     <div className={styles.stage} data-phase={phase} data-layout={layout}>
@@ -120,8 +109,8 @@ export function GardenScene({ state, onOpen, layout, phase, children }: GardenSc
       </div>
 
       <div
-        key={`pad-launch-${pad.pulseKey}`}
-        className={cx(styles.ambientLaunch, pad.anim === "flying" && styles.isFlying, pad.anim === "landing" && styles.isLanding)}
+        key={`pad-launch-${padKey}`}
+        className={cx(styles.ambientLaunch, padAnim === "flying" && styles.isFlying, padAnim === "landing" && styles.isLanding)}
         aria-hidden="true"
       >
         <svg viewBox="0 0 36 44">
@@ -176,33 +165,29 @@ export function GardenScene({ state, onOpen, layout, phase, children }: GardenSc
           </GardenSubject>
 
           <GardenThing id="ssc.structure.habitat" slug="habitat" state={state} onOpen={onOpen} label="Habitat">
-            <svg viewBox="0 0 120 110">
-              <ellipse cx="60" cy="96" rx="38" ry="8" fill="rgba(80,60,40,0.18)" />
-              <path d="M24 70 L24 52 Q24 28 60 18 Q96 28 96 52 L96 70 Q96 82 60 86 Q24 82 24 70Z" fill="#efe6d6" stroke="#c9bfb0" strokeWidth="1.2" />
-              <path d="M32 54 Q60 22 88 54 Q88 62 60 66 Q32 62 32 54Z" fill="#b7e4dc" stroke="#7aa8a0" strokeWidth="1" opacity="0.9" />
+            <svg viewBox="0 0 72 64">
+              <ellipse cx="36" cy="58" rx="22" ry="5" fill="rgba(80,60,40,0.18)" />
+              <rect x="14" y="28" width="44" height="26" rx="2" fill="#efe6d6" stroke="#c9bfb0" />
+              <path d="M12 30 L36 14 L60 30 Z" fill="#b7e4dc" stroke="#7aa8a0" />
+              <rect x="32" y="38" width="8" height="16" rx="1" fill="#d9ccb8" />
+              <rect className={styles.windowGlow} x="18" y="34" width="8" height="8" rx="1" fill="#e8c96a" opacity="0.45" />
+              <rect className={styles.windowGlow} x="46" y="34" width="8" height="8" rx="1" fill="#e8c96a" opacity="0.45" />
               <g className={styles.plantSway} fill="#6f9a5e">
-                <ellipse cx="50" cy="48" rx="4" ry="6" />
-                <ellipse cx="62" cy="44" rx="5" ry="7" />
-                <ellipse cx="72" cy="50" rx="4" ry="5" />
+                <ellipse cx="24" cy="40" rx="3" ry="5" />
+                <ellipse cx="48" cy="40" rx="3" ry="5" />
               </g>
               <g className={cx(styles.growthT2, styles.plantSway)} fill="#5a8a4c">
-                <ellipse cx="42" cy="52" rx="4" ry="6" />
-                <ellipse cx="78" cy="50" rx="4" ry="6" />
+                <ellipse cx="28" cy="36" rx="3" ry="5" />
+                <ellipse cx="44" cy="36" rx="3" ry="5" />
               </g>
               <g className={styles.growthT3}>
-                <path d="M18 72 Q18 58 32 54 L32 74 Q24 78 18 72Z" fill="#efe6d6" stroke="#c9bfb0" />
-                <g className={styles.plantSway} fill="#6f9a5e">
-                  <ellipse cx="26" cy="62" rx="4" ry="6" />
-                  <ellipse cx="88" cy="58" rx="5" ry="7" />
-                </g>
+                <rect x="8" y="36" width="10" height="16" rx="1" fill="#efe6d6" stroke="#c9bfb0" />
+                <ellipse className={styles.plantSway} cx="13" cy="40" rx="3" ry="5" fill="#6f9a5e" />
               </g>
-              <rect x="52" y="68" width="16" height="14" rx="2" fill="#d9ccb8" />
-              <rect className={styles.windowGlow} x="34" y="62" width="10" height="8" rx="1" fill="#e8c96a" opacity="0.35" />
-              <rect className={styles.windowGlow} x="76" y="62" width="10" height="8" rx="1" fill="#e8c96a" opacity="0.35" />
             </svg>
           </GardenThing>
 
-          <GardenThing id="ssc.structure.hydro" slug="hydro" state={state} onOpen={onOpen} label="Garden">
+          <GardenThing id="ssc.structure.hydro" slug="hydro" state={state} onOpen={onOpen} label="Beds">
             <svg viewBox="0 0 110 70">
               <rect x="8" y="18" width="94" height="44" rx="3" fill="#c4b49a" stroke="#8d7354" strokeWidth="1.4" />
               <path d="M8 32 H102 M8 48 H102 M39 18 V62 M71 18 V62" stroke="#a58a66" strokeWidth="1.2" />
@@ -311,24 +296,21 @@ export function GardenScene({ state, onOpen, layout, phase, children }: GardenSc
             </svg>
           </GardenThing>
 
-          <button
-            className={cx(styles.thing, styles.isLocked)}
-            data-id="ssc.structure.rover"
-            data-slug="rover"
-            data-tier="0"
-            type="button"
-            aria-label="Rover, locked"
-            onClick={() => onOpen("ssc.structure.rover")}
-          >
+          <GardenThing id="ssc.structure.rover" slug="rover" state={state} onOpen={onOpen} label="Rover">
             <svg viewBox="0 0 70 50">
               <ellipse cx="35" cy="44" rx="20" ry="5" fill="rgba(80,60,40,0.18)" />
               <rect x="18" y="18" width="34" height="14" rx="3" fill="#d4ccc0" stroke="#b0a89c" />
               <circle cx="22" cy="36" r="7" fill="#8a8074" />
               <circle cx="48" cy="36" r="7" fill="#8a8074" />
               <rect x="44" y="10" width="4" height="12" fill="#b0a89c" />
+              <g className={styles.growthT2}>
+                <rect x="28" y="12" width="10" height="8" rx="1" fill="#c9bfb0" />
+              </g>
+              <g className={styles.growthT3}>
+                <rect x="16" y="14" width="8" height="6" rx="1" fill="#efe6d6" />
+              </g>
             </svg>
-            <span className={styles.label}>Rover · later</span>
-          </button>
+          </GardenThing>
 
           <div className={styles.crew} aria-hidden="true">
             <svg viewBox="0 0 28 44">
@@ -365,6 +347,13 @@ export function GardenScene({ state, onOpen, layout, phase, children }: GardenSc
   );
 }
 
+const PROJECT_LABEL: Partial<Record<string, string>> = {
+  telescope: "Planet Hunters",
+  satellite: "Cloud Watch",
+  solar: "Sunspots",
+  rover: "AI4Mars",
+};
+
 function GardenThing({
   id,
   slug,
@@ -385,11 +374,12 @@ function GardenThing({
   const away = flight?.status === "away";
   const ready = !!rec?.ready && !rec?.locked && !away;
   const plot = !!rec?.locked && !!rec?.buildable;
+  const project = PROJECT_LABEL[slug];
   const visibleLabel = rec?.locked
     ? plot
-      ? `${label} · plot`
+      ? `${project ?? label} · plot`
       : `${label} · later`
-    : label;
+    : project ?? label;
 
   return (
     <button

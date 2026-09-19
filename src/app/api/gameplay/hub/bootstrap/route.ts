@@ -1,9 +1,11 @@
+import { currentUser } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
 import { getRouteUser } from "@/lib/server/routeAuth";
 import { createPocketbaseAdminClient } from "@/lib/pocketbase/adminClient";
 import { withVisibleRecords } from "@/lib/pocketbase/sscVisibility";
 import { loadHubState } from "@/lib/server/hubState";
+import { resolveGardenIdentity } from "@/lib/server/gardenIdentity";
 import { emptyHubState, hasAccountOnboarding } from "@/src/features/onboarding/hubState";
 
 export const dynamic = "force-dynamic";
@@ -26,15 +28,24 @@ export async function GET() {
 
   const pb = await createPocketbaseAdminClient();
 
-  const [profile, inventory, linked, classifications, hubState] = await Promise.all([
-    safe(
-      () =>
-        pb
-          .collection("profiles")
-          .getFirstListItem(pb.filter("userId = {:id}", { id: user.id }))
-          .catch(() => null),
-      null
-    ),
+  let email: string | null = null;
+  try {
+    const clerkUser = await currentUser();
+    email =
+      clerkUser?.primaryEmailAddress?.emailAddress ??
+      clerkUser?.emailAddresses?.[0]?.emailAddress ??
+      null;
+  } catch {
+    email = null;
+  }
+
+  const [identity, inventory, linked, classifications, hubState] = await Promise.all([
+    safe(() => resolveGardenIdentity(pb, user.id, email), {
+      username: null,
+      fullName: null,
+      classificationPoints: 0,
+      profileId: null,
+    }),
     safe(
       async () => {
         const result = await pb.collection("inventory").getList(1, 200, {
@@ -82,13 +93,14 @@ export async function GET() {
         .filter(Boolean)
     ),
   ];
-  const username = (profile?.username as string | undefined) ?? null;
+  const username = identity.username;
   const classificationCount = classifications.totalItems ?? 0;
   const returning = hasAccountOnboarding(hubState.onboarding);
 
   return NextResponse.json({
     username,
-    classificationPoints: (profile?.classificationPoints as number | undefined) ?? 0,
+    fullName: identity.fullName,
+    classificationPoints: identity.classificationPoints,
     inventoryItemIds,
     automatons,
     classificationCount,
