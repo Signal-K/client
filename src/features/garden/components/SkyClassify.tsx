@@ -24,6 +24,10 @@ const SunspotSteps = dynamic(
   () => import("@/src/components/projects/Telescopes/Sunspots/SunspotShell"),
   { ssr: false, loading: () => <p className={styles.prompt}>Loading Sunspots…</p> }
 );
+const StarterAiForMars = dynamic(
+  () => import("@/src/components/projects/Auto/AI4Mars").then((mod) => mod.StarterAiForMars),
+  { ssr: false, loading: () => <p className={styles.prompt}>Loading AI4Mars…</p> }
+);
 
 export interface SkyClassifyProps {
   openMinigame: MinigameDef | null;
@@ -75,6 +79,10 @@ export function SkyClassify({
         ) : openMinigame!.id === "ssc.minigame.solar" ? (
           <RealClassify structureId={openMinigame!.structure} onDone={onCompleteSkyClassify}>
             <SunspotSteps />
+          </RealClassify>
+        ) : openMinigame!.id === "ssc.minigame.rover" ? (
+          <RealClassify structureId={openMinigame!.structure} onDone={onCompleteSkyClassify}>
+            <StarterAiForMars anomalyid={69592674} />
           </RealClassify>
         ) : openMinigame!.id === "ssc.minigame.supply" ? (
           <SupplyPrompt mgDef={openMinigame!} onSendFlight={onSendFlight} onHopOut={onHopOut} onStay={onCloseMinigame} />

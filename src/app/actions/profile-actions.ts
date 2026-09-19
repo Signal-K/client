@@ -1,11 +1,13 @@
 "use server";
 
+import { currentUser } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
 import { getRouteUser } from "@/lib/server/routeAuth";
 import { createPocketbaseAdminClient } from "@/lib/pocketbase/adminClient";
 import { getStorageUrl } from "@/lib/pocketbase/storageUrl";
 import { storageObjectId, storageFilename } from "@/lib/pocketbase/storageId";
 import { ReferralService } from "@/src/features/referrals/referral-service";
+import { resolveGardenIdentity } from "@/lib/server/gardenIdentity";
 
 async function findProfileByUserId(pb: Awaited<ReturnType<typeof createPocketbaseAdminClient>>, userId: string) {
   return pb
@@ -19,16 +21,29 @@ export async function getCurrentProfileAction() {
   if (!user) return { ok: false as const, error: "Unauthorized" };
 
   const pb = await createPocketbaseAdminClient();
-  const profile = await findProfileByUserId(pb, user.id);
+  let email: string | null = null;
+  try {
+    const clerkUser = await currentUser();
+    email =
+      clerkUser?.primaryEmailAddress?.emailAddress ??
+      clerkUser?.emailAddresses?.[0]?.emailAddress ??
+      null;
+  } catch {
+    email = null;
+  }
+  const identity = await resolveGardenIdentity(pb, user.id, email);
+  const profile = identity.profileId
+    ? await pb.collection("profiles").getOne(identity.profileId).catch(() => null)
+    : await findProfileByUserId(pb, user.id);
 
   return {
     ok: true as const,
-    data: profile
+    data: profile || identity.username
       ? {
-          username: profile.username ?? null,
-          fullName: profile.fullName ?? null,
-          avatarUrl: profile.avatarUrl ?? null,
-          referralCode: profile.referralCode ?? null,
+          username: identity.username ?? profile?.username ?? null,
+          fullName: identity.fullName ?? profile?.fullName ?? null,
+          avatarUrl: profile?.avatarUrl ?? null,
+          referralCode: profile?.referralCode ?? null,
         }
       : null,
   };

@@ -18,6 +18,7 @@ export type TelescopeFocusType = "stellar" | "planetary";
 export type TutorialId =
   | "welcome-tour"
   | "game-overview"
+  | "garden-first-session"
   | "telescope-intro"
   | "satellite-intro"
   | "rover-intro"

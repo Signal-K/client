@@ -1,20 +1,20 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import { usePostHog } from "posthog-js/react";
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/src/components/ui/dialog";
-import { GardenCoach, GardenOnboarding } from "@/src/features/garden/components/GardenOnboarding";
+import { GardenOnboarding } from "@/src/features/garden/components/GardenOnboarding";
 import { GameSurveys } from "@/src/features/surveys/components/GameSurveys";
 import { useUserPreferences, type ProjectType } from "@/src/hooks/useUserPreferences";
 
 import { captureCrossGameNavigation } from "@/src/features/analytics/cross-game-navigation";
 import { useGardenState } from "@/src/features/garden/useGardenState";
 import { useSkyPhase } from "@/src/features/garden/useSkyPhase";
-import { hopById, hopSlugFromReturnParam, type StructureId } from "@/src/features/garden/catalog";
+import { growthFor, hopById, hopSlugFromReturnParam, structureById, type StructureId } from "@/src/features/garden/catalog";
 import {
-  BUILDABLE_STRUCTURE_IDS,
+  gardenLesson,
   needsGardenOnboarding,
   shouldAskForProjectRoster,
 } from "@/src/features/garden/gardenLogic";
@@ -52,6 +52,7 @@ function cx(...classes: Array<string | false | undefined>) {
 
 interface HubBootstrap {
   username: string | null;
+  fullName: string | null;
   classificationPoints: number;
   inventoryItemIds: number[];
   automatons: string[];
@@ -74,9 +75,9 @@ export default function GameClient({ user }: GameClientProps) {
   const {
     preferences,
     isLoading: prefsLoading,
-    needsPreferencesPrompt,
     setProjectInterests,
-    hydrateFromAccount,
+    markTutorialComplete,
+    hasTutorialCompleted,
   } = useUserPreferences(user?.id);
   const [classifications, setClassifications] = useState<ClassificationForMechanicSurvey[]>([]);
   const [accountLoading, setAccountLoading] = useState(true);
@@ -158,7 +159,7 @@ export default function GameClient({ user }: GameClientProps) {
   }, []);
 
   const handleDeferredToast = useCallback(
-    () => garden.pushToast("Deferred on purpose (SSC-7)."),
+    () => garden.pushToast("Pick this project in your roster to unlock the plot."),
     [garden]
   );
 
@@ -201,14 +202,29 @@ export default function GameClient({ user }: GameClientProps) {
     gardenPristine: needsGardenOnboarding(garden.state),
   });
 
-  const hasPlot = Object.values(garden.state.structures).some((rec) => rec.locked && rec.buildable);
-  const raisedAny = BUILDABLE_STRUCTURE_IDS.some((id) => !garden.state.structures[id]?.locked);
-  const coachMessage =
-    showRoster || raisedAny || garden.placingId
-      ? null
-      : hasPlot
-        ? "Tap a glowing plot, then choose where to raise it."
-        : null;
+  const lesson = showRoster
+    ? null
+    : gardenLesson({
+        state: garden.state,
+        coachDone: hasTutorialCompleted("garden-first-session"),
+        classifiedThisVisit: garden.classifiedThisVisit,
+        classificationCount: bootstrap?.classificationCount ?? 0,
+      });
+  const lessonCopy =
+    garden.placingId
+      ? "Tap a glowing plot, then choose where to raise it."
+      : lesson === "raise"
+        ? "Tap a dashed plot. Spend CR to raise one instrument."
+        : lesson === "classify"
+          ? "The sky is ready — tap the instrument to classify once."
+          : lesson === "hop"
+            ? "Garden is a launchpad. Hop to Landnam or Spectra for a longer session."
+            : null;
+
+  const habitat = garden.state.structures["ssc.structure.habitat"];
+  const hydro = garden.state.structures["ssc.structure.hydro"];
+  const bonusStage = growthFor(structureById("ssc.structure.habitat"), habitat?.tier || 1);
+  const idleRate = (hydro?.tier || 1) + ((bonusStage?.capacity.idleBonus as number | undefined) || 0);
 
   if (!garden.hydrated) {
     return (
@@ -228,26 +244,38 @@ export default function GameClient({ user }: GameClientProps) {
             mechanic: STRUCTURE_TO_MECHANIC_ID[id],
             userId: user?.id,
           });
-          garden.openPanel(id);
+          garden.openStructure(id);
         }}
         layout={layout}
         phase={phase}
         placingId={garden.placingId}
         onPlace={(slot) => garden.placingId && garden.build(garden.placingId, slot)}
         onCancelPlace={garden.cancelPlace}
+        userId={user?.id}
       >
         <GardenHud
           credits={garden.state.credits}
           phase={phase}
           username={bootstrap?.username}
+          watered={garden.wateredThisVisit}
+          idleRate={idleRate}
           onProfileClick={() => setShowProfileModal(true)}
           onProjectsClick={() => setRosterReopened(true)}
           onHopOut={handleHopOut}
         />
-        <p className={styles.hint}>
+        <p className={cx(styles.hint, !!lessonCopy && styles.isOff)}>
           Raise instruments on open ground, classify to earn credits, upgrade to grow
         </p>
-        <GardenCoach message={coachMessage} />
+        {lessonCopy ? (
+          <div className={styles.coach} role="status">
+            {lessonCopy}
+            {lesson === "hop" ? (
+              <button type="button" onClick={() => markTutorialComplete("garden-first-session")}>
+                Got it
+              </button>
+            ) : null}
+          </div>
+        ) : null}
         {garden.syncError && (
           <div
             role="alert"
@@ -331,7 +359,7 @@ export default function GameClient({ user }: GameClientProps) {
       <Dialog open={showProfileModal} onOpenChange={setShowProfileModal}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle>User Profile</DialogTitle>
+            <DialogTitle>{bootstrap?.username ? "Profile" : "Finish profile"}</DialogTitle>
           </DialogHeader>
           <CompleteProfileForm onSuccess={() => setShowProfileModal(false)} />
         </DialogContent>

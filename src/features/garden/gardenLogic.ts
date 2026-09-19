@@ -85,6 +85,7 @@ export const BUILDABLE_STRUCTURE_IDS: StructureId[] = [
   "ssc.structure.telescope",
   "ssc.structure.satellite",
   "ssc.structure.solar",
+  "ssc.structure.rover",
 ];
 
 const PROJECT_TO_STRUCTURE: Record<ProjectType, StructureId> = {
@@ -230,7 +231,6 @@ export function seedOwnedStructures(state: GardenState, owned: StructureId[]): G
     const def = structureById(id);
     const rec = structures[id];
     if (!def || !rec) continue;
-    if (def.locked) continue; // rover stays a later session
     structures[id] = {
       ...rec,
       locked: false,
@@ -339,6 +339,26 @@ export function needsGardenOnboarding(state: GardenState | null | undefined): bo
   });
   if (raised) return false;
   return !Object.values(state.structures || {}).some((rec) => rec.tendedAt);
+}
+
+export function hasRaisedInstrument(state: GardenState | null | undefined): boolean {
+  if (!state) return false;
+  return BUILDABLE_STRUCTURE_IDS.some((id) => state.structures[id] && !state.structures[id].locked);
+}
+
+export type GardenLesson = "raise" | "classify" | "hop" | null;
+
+/** Short first-session: raise one instrument, classify once, then offer a hop. */
+export function gardenLesson(args: {
+  state: GardenState;
+  coachDone: boolean;
+  classifiedThisVisit: boolean;
+  classificationCount: number;
+}): GardenLesson {
+  if (args.coachDone) return null;
+  if (!hasRaisedInstrument(args.state)) return "raise";
+  if (!args.classifiedThisVisit && args.classificationCount < 1) return "classify";
+  return "hop";
 }
 
 export function shouldAskForProjectRoster(args: {

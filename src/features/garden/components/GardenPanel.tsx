@@ -146,11 +146,11 @@ function PanelBody({
           </button>
         ) : rec.locked ? (
           <button className={styles.btn} disabled onClick={onDeferredToast}>
-            {def.locked ? "Rover minigames — dedicated session later" : "Choose this project first"}
+            Choose this project first
           </button>
         ) : def.id === "ssc.structure.hydro" ? (
           <button className={cx(styles.btn, styles.btnPrimary)} onClick={onTendHydro}>
-            Tend the beds
+            Water the beds
           </button>
         ) : def.id === "ssc.structure.habitat" ? (
           <button className={cx(styles.btn, styles.btnPrimary)} onClick={onSitHabitat}>

@@ -48,6 +48,8 @@ export function useGardenState(userId?: string | null) {
   const [probeGrainOpen, setProbeGrainOpen] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   const [syncError, setSyncError] = useState<string | null>(null);
+  const [classifiedThisVisit, setClassifiedThisVisit] = useState(false);
+  const [wateredThisVisit, setWateredThisVisit] = useState(false);
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const persistTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const persistEnabled = useRef(false);
@@ -85,9 +87,9 @@ export function useGardenState(userId?: string | null) {
       }
       const leftover = readGardenLeftovers(userId);
       if (remote.garden && !isPristineGarden(remote.garden)) {
-        setState(remote.garden);
+        setState({ ...remote.garden, hydroTick: Date.now() });
       } else if (leftover) {
-        setState(leftover);
+        setState({ ...leftover, hydroTick: Date.now() });
         if (remote.authenticated) void patchHubState({ garden: leftover });
       } else {
         setState(remote.garden ?? defaultGardenState());
@@ -159,7 +161,7 @@ export function useGardenState(userId?: string | null) {
         const habitat = structures["ssc.structure.habitat"];
         let credits = prev.credits;
         let hydroTick = prev.hydroTick;
-        if (hydro?.tendedAt && !minigameOpenRef.current && now - prev.hydroTick > HYDRO_TICK_MS) {
+        if (hydro?.tendedAt && wateredThisVisit && !minigameOpenRef.current && now - prev.hydroTick > HYDRO_TICK_MS) {
           hydroTick = now;
           const bonusStage = growthFor(structureById("ssc.structure.habitat"), habitat?.tier || 1);
           const idleBonus = (bonusStage?.capacity.idleBonus as number | undefined) || 0;
@@ -182,26 +184,57 @@ export function useGardenState(userId?: string | null) {
       });
     }, FLIGHT_TICK_MS);
     return () => clearInterval(id);
-  }, [hydrated]);
+  }, [hydrated, wateredThisVisit]);
 
   const openPanel = useCallback((id: StructureId) => setOpenPanelId(id), []);
   const closePanel = useCallback(() => setOpenPanelId(null), []);
 
+  const openStructure = useCallback((id: StructureId) => {
+    const def = structureById(id);
+    const rec = stateRef.current.structures[id];
+    if (!def || !rec) return;
+    if (rec.locked) {
+      setOpenPanelId(id);
+      return;
+    }
+    const flight = stateRef.current.flights[id];
+    if (flight?.status === "home") {
+      setOpenPanelId(id);
+      return;
+    }
+    if (flight?.status === "away") {
+      pushToast(`En route · ${Math.max(0, Math.ceil((flight.eta - Date.now()) / 1000))}s`);
+      return;
+    }
+    if (def.minigame) {
+      const mg = CATALOG.minigames[def.minigame];
+      if (mg.deferred) {
+        pushToast("This instrument is a later session.");
+        return;
+      }
+      setOpenPanelId(null);
+      setOpenMinigame(mg);
+      return;
+    }
+    setOpenPanelId(id);
+  }, [pushToast]);
+
   const tendHydro = useCallback(() => {
+    setWateredThisVisit(true);
     setState((prev) => {
       const rec = prev.structures["ssc.structure.hydro"];
       const structures = {
         ...prev.structures,
         "ssc.structure.hydro": { ...rec, tendedAt: Date.now(), ready: false },
       };
-      return { ...prev, structures, credits: prev.credits + 4 + rec.tier };
+      return { ...prev, structures, credits: prev.credits + 4 + rec.tier, hydroTick: Date.now() };
     });
-    pushToast("Garden watered. Credits will tick while you are away.");
+    pushToast("Beds watered. CR ticks here while you stay — this is not Spectra machine-tending.");
     closePanel();
   }, [closePanel, pushToast]);
 
   const sitHabitat = useCallback(() => {
-    pushToast("Home. The garden is the game.");
+    pushToast("Home. Water the beds to tick CR; hop out for a longer session.");
     closePanel();
   }, [closePanel, pushToast]);
 
@@ -345,6 +378,7 @@ export function useGardenState(userId?: string | null) {
         },
       };
     });
+    setClassifiedThisVisit(true);
     pushToast("Noted. Credits on the dirt — raise the next instrument.");
   }, [pushToast]);
 
@@ -366,7 +400,7 @@ export function useGardenState(userId?: string | null) {
   const hopOut = useCallback((hop: HopDef) => {
     const href = outboundHopUrl(hop);
     if (!href) {
-      pushToast("That hop isn't live yet.");
+      pushToast(`${hop.label} hop is not wired yet — native Spectra still lives in weekly.`);
       return 0;
     }
     const next = claimHopBonus(stateRef.current, "out", hop.id);
@@ -397,6 +431,7 @@ export function useGardenState(userId?: string | null) {
     syncError,
     openPanelId,
     openPanel,
+    openStructure,
     closePanel,
     openMinigame,
     startMinigame,
@@ -406,6 +441,8 @@ export function useGardenState(userId?: string | null) {
     closeProbeGrain,
     toast,
     pushToast,
+    wateredThisVisit,
+    classifiedThisVisit,
     tendHydro,
     sitHabitat,
     upgrade,

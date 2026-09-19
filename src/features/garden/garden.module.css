@@ -424,15 +424,15 @@
   z-index: 2;
 }
 
-/* Camp clustered around the habitat — not a scatter row. */
-.thing[data-slug="habitat"] { left: 50%; top: 62%; width: 30%; z-index: 3; }
-.thing[data-slug="hydro"] { left: 50%; top: 73%; width: 26%; z-index: 6; }
-.thing[data-slug="telescope"] { left: 32%; top: 62%; width: 16%; z-index: 4; }
-.thing[data-slug="satellite"] { left: 68%; top: 61%; width: 15%; z-index: 4; }
-.thing[data-slug="solar"] { left: 80%; top: 68%; width: 16%; z-index: 5; }
-.thing[data-slug="pad"] { left: 14%; top: 72%; width: 20%; z-index: 5; }
-.thing[data-slug="probe"] { left: 26%; top: 80%; width: 12%; z-index: 7; }
-.thing[data-slug="rover"] { left: 90%; top: 76%; width: 16%; min-height: 88px; z-index: 9; }
+/* Camp in a side-on row on the dirt — small greenhouse, not a full-bleed dome. */
+.thing[data-slug="habitat"] { left: 50%; top: 70%; width: 14%; z-index: 5; }
+.thing[data-slug="hydro"] { left: 50%; top: 82%; width: 18%; z-index: 6; }
+.thing[data-slug="telescope"] { left: 34%; top: 72%; width: 12%; z-index: 4; }
+.thing[data-slug="satellite"] { left: 64%; top: 72%; width: 12%; z-index: 4; }
+.thing[data-slug="solar"] { left: 76%; top: 74%; width: 13%; z-index: 5; }
+.thing[data-slug="pad"] { left: 14%; top: 76%; width: 16%; z-index: 5; }
+.thing[data-slug="probe"] { left: 24%; top: 82%; width: 10%; z-index: 7; }
+.thing[data-slug="rover"] { left: 88%; top: 78%; width: 13%; min-height: 72px; z-index: 9; }
 .crew { left: 44%; top: 76%; width: 8%; z-index: 6; pointer-events: none; padding: 0; min-width: 0; min-height: 0; animation: stroll 18s ease-in-out infinite; }
 .crewB { left: 56%; top: 77%; animation: strollB 22s ease-in-out infinite; }
 .crew svg,
@@ -606,6 +606,7 @@
   align-items: center;
   justify-content: space-between;
   pointer-events: none;
+  gap: 8px;
 }
 .chip {
   display: inline-flex;
@@ -668,6 +669,48 @@
   opacity: 0.45;
   cursor: default;
 }
+.idleChip {
+  position: absolute;
+  left: 14px;
+  top: 86px;
+  z-index: 20;
+  pointer-events: none;
+  font-size: 11px;
+  font-weight: 650;
+  color: var(--ok);
+  background: var(--paper);
+  border: 1px solid var(--hair);
+  border-radius: 999px;
+  padding: 4px 10px;
+}
+.coach {
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  bottom: 78px;
+  z-index: 21;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 650;
+  color: var(--ink);
+  background: var(--paper);
+  border-radius: 12px;
+  padding: 10px 12px;
+  box-shadow: 0 8px 24px rgba(40, 30, 20, 0.16);
+  pointer-events: auto;
+}
+.coach button {
+  display: block;
+  width: 100%;
+  margin-top: 8px;
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: var(--ink-soft);
+  font: inherit;
+  font-size: 11px;
+  cursor: pointer;
+}
 
 .toast {
   position: absolute;
@@ -700,18 +743,18 @@
 }
 .sheet {
   position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  left: 10%;
+  right: 10%;
+  bottom: 16px;
   z-index: 31;
   background: var(--hud);
-  border-radius: 20px 20px 0 0;
-  padding: 18px 18px 28px;
-  box-shadow: 0 -12px 40px rgba(20, 16, 12, 0.2);
-  transform: translateY(110%);
+  border-radius: 16px;
+  padding: 14px 16px 16px;
+  box-shadow: 0 12px 32px rgba(20, 16, 12, 0.2);
+  transform: translateY(120%);
   transition: transform 0.28s ease;
   pointer-events: none;
-  max-height: 70%;
+  max-height: 42%;
   overflow-y: auto;
 }
 .sheet.isOpen { transform: none; pointer-events: auto; }
@@ -877,14 +920,14 @@
 .stage[data-layout="landscape"] .path { left: 12%; width: 24%; top: 14%; height: 36%; }
 
 .stage[data-layout="landscape"] .thing { min-width: 72px; }
-.stage[data-layout="landscape"] .thing[data-slug="pad"] { left: 16%; top: 72%; width: clamp(88px, 10vw, 140px); }
-.stage[data-layout="landscape"] .thing[data-slug="probe"] { left: 25%; top: 78%; width: clamp(56px, 6vw, 88px); }
-.stage[data-layout="landscape"] .thing[data-slug="telescope"] { left: 36%; top: 68%; width: clamp(80px, 8vw, 120px); }
-.stage[data-layout="landscape"] .thing[data-slug="habitat"] { left: 50%; top: 66%; width: clamp(140px, 14vw, 210px); }
-.stage[data-layout="landscape"] .thing[data-slug="hydro"] { left: 50%; top: 80%; width: clamp(120px, 12vw, 180px); }
-.stage[data-layout="landscape"] .thing[data-slug="satellite"] { left: 64%; top: 68%; width: clamp(72px, 8vw, 110px); }
-.stage[data-layout="landscape"] .thing[data-slug="solar"] { left: 75%; top: 72%; width: clamp(80px, 9vw, 130px); }
-.stage[data-layout="landscape"] .thing[data-slug="rover"] { left: 88%; top: 76%; width: clamp(80px, 8vw, 120px); }
+.stage[data-layout="landscape"] .thing[data-slug="pad"] { left: 12%; top: 74%; width: clamp(72px, 8vw, 110px); }
+.stage[data-layout="landscape"] .thing[data-slug="probe"] { left: 22%; top: 80%; width: clamp(48px, 5vw, 72px); }
+.stage[data-layout="landscape"] .thing[data-slug="telescope"] { left: 34%; top: 70%; width: clamp(64px, 7vw, 96px); }
+.stage[data-layout="landscape"] .thing[data-slug="habitat"] { left: 50%; top: 68%; width: clamp(72px, 8vw, 110px); }
+.stage[data-layout="landscape"] .thing[data-slug="hydro"] { left: 50%; top: 82%; width: clamp(96px, 10vw, 140px); }
+.stage[data-layout="landscape"] .thing[data-slug="satellite"] { left: 64%; top: 70%; width: clamp(64px, 7vw, 96px); }
+.stage[data-layout="landscape"] .thing[data-slug="solar"] { left: 76%; top: 74%; width: clamp(72px, 8vw, 110px); }
+.stage[data-layout="landscape"] .thing[data-slug="rover"] { left: 88%; top: 78%; width: clamp(68px, 7vw, 100px); }
 .stage[data-layout="landscape"] .crew { left: 46%; top: 82%; width: clamp(36px, 4vw, 52px); }
 .stage[data-layout="landscape"] .crewB { left: 54%; top: 83%; }
 
@@ -900,21 +943,22 @@
 
 .stage[data-layout="landscape"] .hud { top: 18px; left: 22px; right: 22px; }
 .stage[data-layout="landscape"] .hopRail { top: 18px; }
+.stage[data-layout="landscape"] .idleChip { left: 22px; top: 56px; }
 .stage[data-layout="landscape"] .hint { left: 20%; right: 20%; bottom: 22px; }
 .stage[data-layout="landscape"] .toast { left: 28%; right: 28%; bottom: 22px; }
 
 .stage[data-layout="landscape"] .sheet {
-  left: auto;
-  right: 0;
-  top: 0;
-  bottom: 0;
-  width: min(380px, 34vw);
-  border-radius: 20px 0 0 20px;
-  transform: translateX(110%);
-  padding: 22px 22px 28px;
-  max-height: none;
+  left: 50%;
+  right: auto;
+  top: auto;
+  bottom: 18px;
+  width: min(420px, 46vw);
+  border-radius: 16px;
+  transform: translate(-50%, 120%);
+  padding: 16px 18px 18px;
+  max-height: 46%;
 }
-.stage[data-layout="landscape"] .sheet.isOpen { transform: none; }
+.stage[data-layout="landscape"] .sheet.isOpen { transform: translate(-50%, 0); }
 
 .stage[data-layout="landscape"] .minigame {
   inset: 0 0 10% 0;

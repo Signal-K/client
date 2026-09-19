@@ -13,6 +13,8 @@ export interface GardenHudProps {
   credits: number;
   phase: SkyPhase;
   username?: string | null;
+  watered?: boolean;
+  idleRate?: number;
   onProfileClick?: () => void;
   onProjectsClick?: () => void;
   onHopOut?: (hopId: string) => void;
@@ -23,6 +25,8 @@ export function GardenHud({
   credits,
   phase,
   username,
+  watered,
+  idleRate,
   onProfileClick,
   onProjectsClick,
   onHopOut,
@@ -81,6 +85,9 @@ export function GardenHud({
           );
         })}
       </nav>
+      {watered && idleRate != null ? (
+        <p className={styles.idleChip}>Beds watered · +{idleRate} CR / 90s</p>
+      ) : null}
     </>
   );
 }
