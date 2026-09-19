@@ -5,7 +5,7 @@ import dynamic from "next/dynamic";
 import { usePostHog } from "posthog-js/react";
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/src/components/ui/dialog";
-import ProjectPreferencesModal from "@/src/components/onboarding/ProjectPreferencesModal";
+import { GardenCoach, GardenOnboarding } from "@/src/features/garden/components/GardenOnboarding";
 import { GameSurveys } from "@/src/features/surveys/components/GameSurveys";
 import { useUserPreferences, type ProjectType } from "@/src/hooks/useUserPreferences";
 
@@ -13,6 +13,7 @@ import { useGardenState } from "@/src/features/garden/useGardenState";
 import { useSkyPhase } from "@/src/features/garden/useSkyPhase";
 import { hopById, type StructureId } from "@/src/features/garden/catalog";
 import {
+  BUILDABLE_STRUCTURE_IDS,
   needsGardenOnboarding,
   shouldAskForProjectRoster,
 } from "@/src/features/garden/gardenLogic";
@@ -68,14 +69,13 @@ export default function GameClient({ user }: GameClientProps) {
   const phase = useSkyPhase();
   const [layout, setLayout] = useState<"portrait" | "landscape">("portrait");
   const [showProfileModal, setShowProfileModal] = useState(false);
+  const [rosterReopened, setRosterReopened] = useState(false);
   const {
     preferences,
     isLoading: prefsLoading,
     needsPreferencesPrompt,
     setProjectInterests,
-    dismissPreferencesPrompt,
     hydrateFromAccount,
-    showPreferencesPrompt,
   } = useUserPreferences(user?.id);
   const [classifications, setClassifications] = useState<ClassificationForMechanicSurvey[]>([]);
   const [accountLoading, setAccountLoading] = useState(true);
@@ -154,6 +154,7 @@ export default function GameClient({ user }: GameClientProps) {
     (prefs: ProjectType[]) => {
       setProjectInterests(prefs);
       garden.applyProjects(prefs);
+      setRosterReopened(false);
       posthog?.capture("onboarding_completed", { userId: user?.id, projects: prefs });
     },
     [garden, posthog, setProjectInterests, user?.id]
@@ -165,6 +166,15 @@ export default function GameClient({ user }: GameClientProps) {
     gardenPristine: needsGardenOnboarding(garden.state),
   });
 
+  const hasPlot = Object.values(garden.state.structures).some((rec) => rec.locked && rec.buildable);
+  const raisedAny = BUILDABLE_STRUCTURE_IDS.some((id) => !garden.state.structures[id]?.locked);
+  const coachMessage =
+    showRoster || raisedAny || garden.placingId
+      ? null
+      : hasPlot
+        ? "Tap a glowing plot, then choose where to raise it."
+        : null;
+
   if (!garden.hydrated) {
     return (
       <div className={styles.gardenPage}>
@@ -175,16 +185,25 @@ export default function GameClient({ user }: GameClientProps) {
 
   return (
     <div className={styles.gardenPage}>
-      <GardenScene state={garden.state} onOpen={garden.openPanel} layout={layout} phase={phase}>
+      <GardenScene
+        state={garden.state}
+        onOpen={garden.openPanel}
+        layout={layout}
+        phase={phase}
+        placingId={garden.placingId}
+        onPlace={(slot) => garden.placingId && garden.build(garden.placingId, slot)}
+        onCancelPlace={garden.cancelPlace}
+      >
         <GardenHud
           credits={garden.state.credits}
           phase={phase}
           onProfileClick={() => setShowProfileModal(true)}
-          onProjectsClick={showPreferencesPrompt}
+          onProjectsClick={() => setRosterReopened(true)}
         />
         <p className={styles.hint}>
-          Pick projects, spend CR to raise instruments, classify to earn more
+          Raise instruments on open ground, classify to earn credits, upgrade to grow
         </p>
+        <GardenCoach message={coachMessage} />
         <div className={cx(styles.toast, !!garden.toast && styles.isOn)} role="status">
           {garden.toast}
         </div>
@@ -196,7 +215,7 @@ export default function GameClient({ user }: GameClientProps) {
           onTendHydro={garden.tendHydro}
           onSitHabitat={garden.sitHabitat}
           onUpgrade={garden.upgrade}
-          onBuild={garden.build}
+          onBeginPlace={garden.beginPlace}
           onCollectFlight={garden.collectFlight}
           onStartMinigame={garden.startMinigame}
           onHopOut={handleHopOut}
@@ -233,11 +252,11 @@ export default function GameClient({ user }: GameClientProps) {
         </DialogContent>
       </Dialog>
 
-      <ProjectPreferencesModal
-        isOpen={showRoster}
-        initialInterests={preferences?.projectInterests ?? []}
-        onClose={dismissPreferencesPrompt}
+      <GardenOnboarding
+        isOpen={showRoster || rosterReopened}
+        credits={garden.state.credits}
         onSave={handleSaveProjects}
+        onClose={showRoster ? undefined : () => setRosterReopened(false)}
       />
 
       <PWAPrompt />

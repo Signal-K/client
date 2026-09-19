@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import styles from "../garden.module.css";
 import type { StructureId } from "../catalog";
 import type { GardenState } from "../useGardenState";
+import { GARDEN_SLOT_COUNT, occupiedSlots } from "../gardenLogic";
+import { structureById } from "../catalog";
 import type { SkyPhase } from "../useSkyPhase";
 
 const SHOOTING_STAR_MS = 3200;
@@ -64,10 +66,23 @@ export interface GardenSceneProps {
   onOpen: (id: StructureId) => void;
   layout: "portrait" | "landscape";
   phase: SkyPhase;
+  /** Instrument being placed; free slots light up until one is chosen. */
+  placingId?: StructureId | null;
+  onPlace?: (slot: number) => void;
+  onCancelPlace?: () => void;
   children?: React.ReactNode;
 }
 
-export function GardenScene({ state, onOpen, layout, phase, children }: GardenSceneProps) {
+export function GardenScene({
+  state,
+  onOpen,
+  layout,
+  phase,
+  placingId,
+  onPlace,
+  onCancelPlace,
+  children,
+}: GardenSceneProps) {
   const shootingStars = useShootingStars(phase);
 
   const padFlight = state.flights["ssc.structure.pad"];
@@ -360,6 +375,27 @@ export function GardenScene({ state, onOpen, layout, phase, children }: GardenSc
         </svg>
       </div>
 
+      {placingId && (
+        <>
+          {Array.from({ length: GARDEN_SLOT_COUNT }, (_, slot) =>
+            occupiedSlots(state).has(slot) ? null : (
+              <button
+                key={slot}
+                type="button"
+                className={styles.slotMark}
+                data-slot={slot}
+                aria-label={`Place ${structureById(placingId)?.name ?? "instrument"} here`}
+                onClick={() => onPlace?.(slot)}
+              />
+            )
+          )}
+          <div className={styles.placeBanner} role="status">
+            <span>Choose a spot for the {structureById(placingId)?.name ?? "instrument"}</span>
+            <button type="button" onClick={onCancelPlace}>Cancel</button>
+          </div>
+        </>
+      )}
+
       {children}
     </div>
   );
@@ -403,6 +439,7 @@ function GardenThing({
       data-id={id}
       data-slug={slug}
       data-tier={String(rec?.tier ?? 0)}
+      data-slot={typeof rec?.slot === "number" ? rec.slot : undefined}
       type="button"
       aria-label={visibleLabel}
       onClick={() => onOpen(id)}

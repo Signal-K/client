@@ -56,21 +56,37 @@ describe("building structures", () => {
 
   it("spends credits to raise a selected plot", () => {
     const armed = applyProjectRoster(defaultGardenState(), ["planet-hunting"]);
-    const result = buildStructure(armed, "ssc.structure.telescope");
+    const result = buildStructure(armed, "ssc.structure.telescope", 2);
     expect(result.ok).toBe(true);
     if (!result.ok) return;
     expect(result.state.credits).toBe(80 - 24);
     expect(result.state.structures["ssc.structure.telescope"].locked).toBe(false);
     expect(result.state.structures["ssc.structure.telescope"].tier).toBe(1);
+    expect(result.state.structures["ssc.structure.telescope"].slot).toBe(2);
+  });
+
+  it("places instruments on distinct, valid slots only", () => {
+    const armed = applyProjectRoster(defaultGardenState(), ["planet-hunting", "cloud-tracking"]);
+    const first = buildStructure(armed, "ssc.structure.telescope", 1);
+    expect(first.ok).toBe(true);
+    if (!first.ok) return;
+    const taken = buildStructure(first.state, "ssc.structure.satellite", 1);
+    expect(taken.ok).toBe(false);
+    if (!taken.ok) expect(taken.reason).toBe("slot");
+    for (const bad of [-1, 5, 1.5, Number.NaN]) {
+      const result = buildStructure(armed, "ssc.structure.satellite", bad);
+      expect(result.ok).toBe(false);
+    }
+    expect(buildStructure(first.state, "ssc.structure.satellite", 0).ok).toBe(true);
   });
 
   it("refuses to build an unlisted plot or one the player cannot afford", () => {
     const fresh = defaultGardenState();
-    const blocked = buildStructure(fresh, "ssc.structure.telescope");
+    const blocked = buildStructure(fresh, "ssc.structure.telescope", 0);
     expect(blocked.ok).toBe(false);
     if (!blocked.ok) expect(blocked.reason).toBe("locked");
     const poor = applyProjectRoster({ ...defaultGardenState(), credits: 5 }, ["planet-hunting"]);
-    const unaffordable = buildStructure(poor, "ssc.structure.telescope");
+    const unaffordable = buildStructure(poor, "ssc.structure.telescope", 0);
     expect(unaffordable.ok).toBe(false);
     if (!unaffordable.ok) expect(unaffordable.reason).toBe("credits");
   });

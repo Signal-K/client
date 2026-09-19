@@ -12,6 +12,8 @@ export interface StructureRecord {
   tendedAt: number;
   ready: boolean;
   readyAt: number;
+  /** Where the player placed this instrument (index into GARDEN_SLOTS). Unset for camp structures. */
+  slot?: number;
 }
 
 export interface FlightRecord {
@@ -31,6 +33,21 @@ export interface GardenState {
 
 /** 2 = build/place/design gardens. Gardens without this were the pre-redesign layout. */
 export const GARDEN_GENERATION = 2;
+
+/** Open ground where the player raises instruments. Coordinates live in garden.module.css ([data-slot]). */
+export const GARDEN_SLOT_COUNT = 5;
+
+export function occupiedSlots(state: GardenState): Set<number> {
+  const taken = new Set<number>();
+  for (const rec of Object.values(state.structures)) {
+    if (typeof rec.slot === "number") taken.add(rec.slot);
+  }
+  return taken;
+}
+
+export function isFreeSlot(state: GardenState, slot: number): boolean {
+  return Number.isInteger(slot) && slot >= 0 && slot < GARDEN_SLOT_COUNT && !occupiedSlots(state).has(slot);
+}
 
 export const GARDEN_STORAGE_KEY = "ssc.garden.v3";
 
@@ -198,9 +215,9 @@ export function seedOwnedStructures(state: GardenState, owned: StructureId[]): G
 
 export type BuildResult =
   | { ok: true; state: GardenState }
-  | { ok: false; reason: "locked" | "unlisted" | "built" | "credits"; cost: number };
+  | { ok: false; reason: "locked" | "unlisted" | "built" | "credits" | "slot"; cost: number };
 
-export function buildStructure(state: GardenState, id: StructureId): BuildResult {
+export function buildStructure(state: GardenState, id: StructureId, slot: number): BuildResult {
   const def = structureById(id);
   const rec = state.structures[id];
   const cost = def?.buildCost ?? 0;
@@ -209,6 +226,7 @@ export function buildStructure(state: GardenState, id: StructureId): BuildResult
   if (!rec.locked) return { ok: false, reason: "built", cost };
   if (!rec.buildable) return { ok: false, reason: "locked", cost };
   if (state.credits < cost) return { ok: false, reason: "credits", cost };
+  if (!isFreeSlot(state, slot)) return { ok: false, reason: "slot", cost };
   return {
     ok: true,
     state: {
@@ -223,6 +241,7 @@ export function buildStructure(state: GardenState, id: StructureId): BuildResult
           tier: def.startTier,
           ready: !!def.minigame,
           readyAt: 0,
+          slot,
         },
       },
     },

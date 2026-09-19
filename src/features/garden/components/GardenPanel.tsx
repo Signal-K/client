@@ -17,7 +17,7 @@ export interface GardenPanelProps {
   onTendHydro: () => void;
   onSitHabitat: () => void;
   onUpgrade: (id: StructureId) => void;
-  onBuild: (id: StructureId) => void;
+  onBeginPlace: (id: StructureId) => void;
   onCollectFlight: (id: StructureId) => void;
   onStartMinigame: (mg: MinigameDef) => void;
   onHopOut: (hopId: string) => void;
@@ -32,7 +32,7 @@ export function GardenPanel({
   onTendHydro,
   onSitHabitat,
   onUpgrade,
-  onBuild,
+  onBeginPlace,
   onCollectFlight,
   onStartMinigame,
   onHopOut,
@@ -71,7 +71,7 @@ export function GardenPanel({
             onTendHydro={onTendHydro}
             onSitHabitat={onSitHabitat}
             onUpgrade={onUpgrade}
-            onBuild={onBuild}
+            onBeginPlace={onBeginPlace}
             onCollectFlight={onCollectFlight}
             onStartMinigame={onStartMinigame}
             onHopOut={onHopOut}
@@ -92,7 +92,7 @@ function PanelBody({
   onTendHydro,
   onSitHabitat,
   onUpgrade,
-  onBuild,
+  onBeginPlace,
   onCollectFlight,
   onStartMinigame,
   onHopOut,
@@ -106,7 +106,7 @@ function PanelBody({
   onTendHydro: () => void;
   onSitHabitat: () => void;
   onUpgrade: (id: StructureId) => void;
-  onBuild: (id: StructureId) => void;
+  onBeginPlace: (id: StructureId) => void;
   onCollectFlight: (id: StructureId) => void;
   onStartMinigame: (mg: MinigameDef) => void;
   onHopOut: (hopId: string) => void;
@@ -140,9 +140,9 @@ function PanelBody({
           <button
             className={cx(styles.btn, styles.btnPrimary)}
             disabled={credits < buildCost}
-            onClick={() => onBuild(def.id)}
+            onClick={() => onBeginPlace(def.id)}
           >
-            Build {def.name} · {buildCost} CR
+            Place {def.name} · {buildCost} CR
           </button>
         ) : rec.locked ? (
           <button className={styles.btn} disabled onClick={onDeferredToast}>

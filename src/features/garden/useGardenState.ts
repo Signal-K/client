@@ -40,6 +40,7 @@ export function useGardenState(userId?: string | null) {
   const [state, setState] = useState<GardenState>(() => defaultGardenState());
   const [hydrated, setHydrated] = useState(false);
   const [openPanelId, setOpenPanelId] = useState<StructureId | null>(null);
+  const [placingId, setPlacingId] = useState<StructureId | null>(null);
   const [openMinigame, setOpenMinigame] = useState<MinigameDef | null>(null);
   const [probeGrainOpen, setProbeGrainOpen] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
@@ -210,17 +211,30 @@ export function useGardenState(userId?: string | null) {
     });
   }, [pushToast]);
 
-  const build = useCallback((id: StructureId) => {
+  const beginPlace = useCallback((id: StructureId) => {
     const def = structureById(id);
-    setState((prev) => {
-      const result = buildStructure(prev, id);
-      if (!result.ok) {
-        if (result.reason === "credits") pushToast(`Need ${result.cost} CR to build.`);
-        return prev;
-      }
-      pushToast(`${def?.name ?? "Instrument"} is up. Classify to earn the next upgrade.`);
-      return result.state;
-    });
+    const cost = def?.buildCost ?? 0;
+    if (stateRef.current.credits < cost) {
+      pushToast(`Need ${cost} CR to build.`);
+      return;
+    }
+    closePanel();
+    setPlacingId(id);
+  }, [closePanel, pushToast]);
+
+  const cancelPlace = useCallback(() => setPlacingId(null), []);
+
+  const build = useCallback((id: StructureId, slot: number) => {
+    const def = structureById(id);
+    const result = buildStructure(stateRef.current, id, slot);
+    if (!result.ok) {
+      if (result.reason === "credits") pushToast(`Need ${result.cost} CR to build.`);
+      if (result.reason === "slot") pushToast("That spot is taken.");
+      return;
+    }
+    setState(result.state);
+    setPlacingId(null);
+    pushToast(`${def?.name ?? "Instrument"} is up. Classify to earn the next upgrade.`);
   }, [pushToast]);
 
   const applyProjects = useCallback((interests: ProjectType[]) => {
@@ -358,6 +372,9 @@ export function useGardenState(userId?: string | null) {
     sitHabitat,
     upgrade,
     build,
+    placingId,
+    beginPlace,
+    cancelPlace,
     applyProjects,
     seedOwned,
     sendFlight,
