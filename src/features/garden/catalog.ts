@@ -208,7 +208,7 @@ export const CATALOG = {
       verb: "Water",
       blurb: "Water the beds so CR ticks here. Spectra machine-tending is a different hop.",
       minigame: null,
-      hop: null,
+      hop: "ssc.hop.spectra",
       startTier: 1,
       locked: false,
       growth: stages([
@@ -385,6 +385,25 @@ export function hopById(id: string | null | undefined): HopDef | null {
 
 export function hopRail(): HopDef[] {
   return [CATALOG.hops.garden, CATALOG.hops.landnam, CATALOG.hops.spectra];
+}
+
+/** Append `from=garden` so Landnam / Spectra can grant a return bonus. */
+export function outboundHopUrl(hop: HopDef): string | null {
+  if (!hop.href) return null;
+  if (hop.id === "ssc.hop.garden") return hop.href;
+  try {
+    const url = new URL(hop.href);
+    url.searchParams.set("from", "garden");
+    return url.toString();
+  } catch {
+    return hop.href;
+  }
+}
+
+export function hopSlugFromReturnParam(value: string | null | undefined): "ssc.hop.landnam" | "ssc.hop.spectra" | null {
+  if (value === "landnam") return "ssc.hop.landnam";
+  if (value === "spectra") return "ssc.hop.spectra";
+  return null;
 }
 
 export function growthFor(structure: StructureDef | null, tier: number): GrowthStage | null {

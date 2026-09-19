@@ -27,6 +27,8 @@ function getConfig() {
 async function authenticate(): Promise<{ token: string; model: RecordModel }> {
   const { url, email, password } = getConfig();
   const pb = new PocketBase(url);
+  // Server routes fan out parallel queries on one client; the SDK would otherwise cancel duplicates.
+  pb.autoCancellation(false);
   await pb.collection("_superusers").authWithPassword(email, password);
   cachedToken = pb.authStore.token;
   cachedModel = pb.authStore.record;
@@ -42,6 +44,8 @@ async function authenticate(): Promise<{ token: string; model: RecordModel }> {
 export async function createPocketbaseAdminClient(): Promise<PocketBase> {
   const { url } = getConfig();
   const pb = new PocketBase(url);
+  // Server routes fan out parallel queries on one client; the SDK would otherwise cancel duplicates.
+  pb.autoCancellation(false);
 
   if (cachedToken && cachedModel) {
     pb.authStore.save(cachedToken, cachedModel);

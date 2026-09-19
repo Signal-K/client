@@ -14,7 +14,7 @@ export const GARDEN_V3_KEY = "ssc.garden.v3";
 export const GARDEN_V2_KEY = "ssc.garden.v2";
 export const GARDEN_V1_KEY = "ssc.garden.v1";
 
-let inflight: Promise<HubState & { authenticated: boolean }> | null = null;
+let inflight: Promise<HubState & { authenticated: boolean; failed?: boolean }> | null = null;
 
 function storageGet(key: string): string | null {
   if (typeof window === "undefined") return null;
@@ -97,7 +97,7 @@ export function clearGardenLeftovers(userId?: string | null) {
   }
 }
 
-export async function fetchHubState(): Promise<HubState & { authenticated: boolean }> {
+export async function fetchHubState(): Promise<HubState & { authenticated: boolean; failed?: boolean }> {
   if (inflight) return inflight;
   inflight = (async () => {
     try {
@@ -106,7 +106,7 @@ export async function fetchHubState(): Promise<HubState & { authenticated: boole
         return { onboarding: defaultOnboarding(), garden: null, authenticated: false };
       }
       if (!res.ok) {
-        return { onboarding: defaultOnboarding(), garden: null, authenticated: true };
+        return { onboarding: defaultOnboarding(), garden: null, authenticated: true, failed: true };
       }
       const data = (await res.json()) as HubState;
       return {
@@ -115,7 +115,7 @@ export async function fetchHubState(): Promise<HubState & { authenticated: boole
         authenticated: true,
       };
     } catch {
-      return { onboarding: defaultOnboarding(), garden: null, authenticated: true };
+      return { onboarding: defaultOnboarding(), garden: null, authenticated: true, failed: true };
     }
   })().finally(() => {
     inflight = null;

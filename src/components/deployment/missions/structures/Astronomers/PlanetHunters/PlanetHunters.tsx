@@ -40,7 +40,7 @@ const PlanetHuntersSteps = () => {
       icon: TelescopeIcon,
       points: 1,
       completedCount: 0,
-      link: "/structures/telescope/planet-hunters/classify",
+      link: "/structures/telescope/planet-hunters/start/one",
       color: "text-blue-500",
       chapter: 1,
     },
@@ -98,7 +98,7 @@ const PlanetHuntersSteps = () => {
         const classRes = await fetch(
           `/api/gameplay/classifications?author=${encodeURIComponent(session.user.id)}&classificationtype=planet&limit=500`
         );
-        const classPayload = await classRes.json();
+        const classPayload = await classRes.json().catch(() => null);
         if (!classRes.ok) throw new Error(classPayload?.error || "Failed to load classifications");
         const classifications = classPayload?.classifications || [];
 
@@ -108,7 +108,7 @@ const PlanetHuntersSteps = () => {
         }
 
         const activityRes = await fetch(`/api/gameplay/social/my?category=Temperature&limit=5000`);
-        const activityPayload = await activityRes.json();
+        const activityPayload = await activityRes.json().catch(() => null);
         if (!activityRes.ok) throw new Error(activityPayload?.error || "Failed to load activity");
         const commentsData = activityPayload?.comments || [];
         const votesData = activityPayload?.votes || [];

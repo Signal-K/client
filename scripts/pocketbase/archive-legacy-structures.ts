@@ -1,9 +1,12 @@
 #!/usr/bin/env node
 /**
- * Hide (do not delete) legacy built structures so every account sees the new
- * garden roster. Import `pb_schema.json` first (adds `sscHidden`), then mark
- * structure inventory + automaton linked_anomalies hidden and reset
- * `ss_hub_state` onboarding/garden JSON.
+ * Restart every account at the beginning of the redesigned garden without losing
+ * anything. Import `pb_schema.json` first (adds `sscHidden` and `legacyArchive`), then:
+ *  - mark structure inventory + automaton linked_anomalies hidden (not deleted);
+ *  - copy each `ss_hub_state` onboarding/garden into `legacyArchive`, reset onboarding, and
+ *    start a fresh garden that carries the account's credits.
+ * Classifications, research and other inventory are never touched. Idempotent: rows that
+ * already have a `legacyArchive` (or a current-generation garden) are skipped.
  *
  * Default is dry-run. Apply with:
  *   DRY_RUN=false yarn pocketbase:archive-legacy-structures
@@ -13,7 +16,7 @@
 import fs from "node:fs/promises";
 import PocketBase from "pocketbase";
 
-import { defaultOnboarding } from "@/src/features/onboarding/hubState";
+import { migrateHubRow, type LegacyHubRow } from "@/src/features/garden/gardenMigration";
 import {
   ARCHIVE_STRUCTURE_INVENTORY_ITEM_IDS,
   AUTOMATON_STRUCTURE_NAMES,
@@ -65,19 +68,27 @@ async function hideCollection(collection: string, filter: string): Promise<numbe
   return rows.length;
 }
 
-async function resetHubState(): Promise<number> {
-  const rows = await pb.collection("ss_hub_state").getFullList({ fields: "id,userId" });
-  const onboarding = defaultOnboarding();
-  if (!dryRun) {
-    for (const row of rows) {
+async function migrateHubState(): Promise<{ migrated: number; alreadyMigrated: number }> {
+  const rows = await pb.collection("ss_hub_state").getFullList();
+  let migrated = 0;
+  let alreadyMigrated = 0;
+  for (const row of rows) {
+    const next = migrateHubRow(row as unknown as LegacyHubRow);
+    if (!next) {
+      alreadyMigrated += 1;
+      continue;
+    }
+    migrated += 1;
+    if (!dryRun) {
       await pb.collection("ss_hub_state").update(row.id, {
-        onboarding,
-        garden: null,
+        onboarding: next.onboarding,
+        garden: next.garden,
+        legacyArchive: next.legacyArchive,
         updatedAt: new Date().toISOString(),
       });
     }
   }
-  return rows.length;
+  return { migrated, alreadyMigrated };
 }
 
 async function main() {
@@ -96,7 +107,7 @@ async function main() {
 
   const inventoryHidden = await hideCollection("inventory", itemFilter());
   const linkedHidden = await hideCollection("linked_anomalies", automatonFilter());
-  const hubReset = await resetHubState();
+  const hub = await migrateHubState();
 
   console.log(
     JSON.stringify(
@@ -105,7 +116,7 @@ async function main() {
         url,
         inventoryHidden,
         linkedHidden,
-        hubReset,
+        hub,
         inventoryItems: ARCHIVE_STRUCTURE_INVENTORY_ITEM_IDS,
         automatons: AUTOMATON_STRUCTURE_NAMES,
       },

@@ -70,14 +70,15 @@ export function GardenHud({
       <nav className={styles.hopRail} aria-label="Suite hops">
         {hopRail().map((hop) => {
           const here = hop.id === "ssc.hop.garden";
+          const missing = !here && !hop.href;
           return (
             <button
               key={hop.id}
               type="button"
               className={cx(styles.hopBtn, here && styles.isHere)}
-              disabled={here}
-              title={hop.blurb}
-              onClick={() => !here && onHopOut?.(hop.id)}
+              disabled={here || missing}
+              title={missing ? "Spectra hop URL not set yet" : hop.blurb}
+              onClick={() => !here && !missing && onHopOut?.(hop.id)}
             >
               {hop.label}
             </button>
@@ -85,7 +86,7 @@ export function GardenHud({
         })}
       </nav>
       {watered && idleRate != null ? (
-        <p className={styles.idleChip}>Beds watered · +{idleRate} CR / 14s</p>
+        <p className={styles.idleChip}>Beds watered · +{idleRate} CR / 90s</p>
       ) : null}
     </>
   );

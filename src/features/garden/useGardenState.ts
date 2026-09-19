@@ -5,14 +5,17 @@ import {
   CATALOG,
   growthFor,
   hopById,
+  outboundHopUrl,
   structureById,
   type HopDef,
+  type HopId,
   type MinigameDef,
   type StructureId,
 } from "./catalog";
 import {
   applyProjectRoster,
   buildStructure,
+  claimHopBonus,
   defaultGardenState,
   isPristineGarden,
   seedOwnedStructures,
@@ -30,7 +33,8 @@ import {
 
 export type { FlightRecord, GardenState, StructureRecord };
 
-const HYDRO_TICK_MS = 14000;
+// Idle income is a trickle: a 40 CR upgrade should take about an hour of idling, not minutes.
+const HYDRO_TICK_MS = 90000;
 const FLIGHT_TICK_MS = 500;
 const TOAST_MS = 2400;
 const GARDEN_PATCH_MS = 800;
@@ -39,24 +43,31 @@ export function useGardenState(userId?: string | null) {
   const [state, setState] = useState<GardenState>(() => defaultGardenState());
   const [hydrated, setHydrated] = useState(false);
   const [openPanelId, setOpenPanelId] = useState<StructureId | null>(null);
+  const [placingId, setPlacingId] = useState<StructureId | null>(null);
   const [openMinigame, setOpenMinigame] = useState<MinigameDef | null>(null);
   const [probeGrainOpen, setProbeGrainOpen] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
+  const [syncError, setSyncError] = useState<string | null>(null);
   const [classifiedThisVisit, setClassifiedThisVisit] = useState(false);
   const [wateredThisVisit, setWateredThisVisit] = useState(false);
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const persistTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const persistEnabled = useRef(false);
+  const loadFailed = useRef(false);
   const skipNextPersist = useRef(true);
+  const minigameOpenRef = useRef(false);
   const stateRef = useRef(state);
   stateRef.current = state;
+  minigameOpenRef.current = !!openMinigame || probeGrainOpen;
 
   const queueGardenPersist = useCallback(() => {
-    if (!persistEnabled.current) return;
+    if (!persistEnabled.current || loadFailed.current) return;
     if (persistTimer.current) clearTimeout(persistTimer.current);
     persistTimer.current = setTimeout(() => {
       persistTimer.current = null;
-      void patchHubState({ garden: stateRef.current });
+      void patchHubState({ garden: stateRef.current }).then((res) => {
+        setSyncError(res ? null : "Couldn't save your garden. Changes may be lost if you leave — retrying on your next move.");
+      });
     }, GARDEN_PATCH_MS);
   }, []);
 
@@ -65,6 +76,15 @@ export function useGardenState(userId?: string | null) {
     async function hydrate() {
       const remote = await fetchHubState();
       if (cancelled) return;
+      if (remote.failed) {
+        setSyncError("Couldn't reach the garden server. Your progress can't load or save right now.");
+        setState(defaultGardenState());
+        loadFailed.current = true;
+        persistEnabled.current = false;
+        skipNextPersist.current = true;
+        setHydrated(true);
+        return;
+      }
       const leftover = readGardenLeftovers(userId);
       if (remote.garden && !isPristineGarden(remote.garden)) {
         setState({ ...remote.garden, hydroTick: Date.now() });
@@ -72,7 +92,7 @@ export function useGardenState(userId?: string | null) {
         setState({ ...leftover, hydroTick: Date.now() });
         if (remote.authenticated) void patchHubState({ garden: leftover });
       } else {
-        setState(defaultGardenState());
+        setState(remote.garden ?? defaultGardenState());
       }
       persistEnabled.current = false;
       skipNextPersist.current = true;
@@ -100,7 +120,7 @@ export function useGardenState(userId?: string | null) {
       clearTimeout(persistTimer.current);
       persistTimer.current = null;
     }
-    if (persistEnabled.current) {
+    if (persistEnabled.current && !loadFailed.current) {
       void patchHubState({ garden: stateRef.current });
     }
   }, []);
@@ -141,7 +161,7 @@ export function useGardenState(userId?: string | null) {
         const habitat = structures["ssc.structure.habitat"];
         let credits = prev.credits;
         let hydroTick = prev.hydroTick;
-        if (hydro?.tendedAt && wateredThisVisit && now - prev.hydroTick > HYDRO_TICK_MS) {
+        if (hydro?.tendedAt && wateredThisVisit && !minigameOpenRef.current && now - prev.hydroTick > HYDRO_TICK_MS) {
           hydroTick = now;
           const bonusStage = growthFor(structureById("ssc.structure.habitat"), habitat?.tier || 1);
           const idleBonus = (bonusStage?.capacity.idleBonus as number | undefined) || 0;
@@ -240,17 +260,30 @@ export function useGardenState(userId?: string | null) {
     });
   }, [pushToast]);
 
-  const build = useCallback((id: StructureId) => {
+  const beginPlace = useCallback((id: StructureId) => {
     const def = structureById(id);
-    setState((prev) => {
-      const result = buildStructure(prev, id);
-      if (!result.ok) {
-        if (result.reason === "credits") pushToast(`Need ${result.cost} CR to build.`);
-        return prev;
-      }
-      pushToast(`${def?.name ?? "Instrument"} is up. Classify to earn the next upgrade.`);
-      return result.state;
-    });
+    const cost = def?.buildCost ?? 0;
+    if (stateRef.current.credits < cost) {
+      pushToast(`Need ${cost} CR to build.`);
+      return;
+    }
+    closePanel();
+    setPlacingId(id);
+  }, [closePanel, pushToast]);
+
+  const cancelPlace = useCallback(() => setPlacingId(null), []);
+
+  const build = useCallback((id: StructureId, slot: number) => {
+    const def = structureById(id);
+    const result = buildStructure(stateRef.current, id, slot);
+    if (!result.ok) {
+      if (result.reason === "credits") pushToast(`Need ${result.cost} CR to build.`);
+      if (result.reason === "slot") pushToast("That spot is taken.");
+      return;
+    }
+    setState(result.state);
+    setPlacingId(null);
+    pushToast(`${def?.name ?? "Instrument"} is up. Classify to earn the next upgrade.`);
   }, [pushToast]);
 
   const applyProjects = useCallback((interests: ProjectType[]) => {
@@ -365,19 +398,37 @@ export function useGardenState(userId?: string | null) {
   const closeProbeGrain = useCallback(() => setProbeGrainOpen(false), []);
 
   const hopOut = useCallback((hop: HopDef) => {
-    if (!hop.href) {
+    const href = outboundHopUrl(hop);
+    if (!href) {
       pushToast(`${hop.label} hop is not wired yet — native Spectra still lives in weekly.`);
-      return;
+      return 0;
     }
-    pushToast(`Leaving the garden for ${hop.label}.`);
+    const next = claimHopBonus(stateRef.current, "out", hop.id);
+    if (next.awarded) setState(next.state);
+    pushToast(
+      next.awarded
+        ? `+${next.awarded} CR garden stamp. Leaving for ${hop.label}.`
+        : `Leaving the garden for ${hop.label}.`,
+    );
     if (typeof window !== "undefined") {
-      window.open(hop.href, "_blank", "noopener");
+      window.open(href, "_blank", "noopener");
     }
+    return next.awarded;
+  }, [pushToast]);
+
+  const claimReturnBonus = useCallback((hopId: HopId) => {
+    const next = claimHopBonus(stateRef.current, "in", hopId);
+    if (!next.awarded) return 0;
+    setState(next.state);
+    const name = hopId === "ssc.hop.landnam" ? "Landnam" : "Spectra";
+    pushToast(`Welcome back from ${name}. +${next.awarded} CR for the camp.`);
+    return next.awarded;
   }, [pushToast]);
 
   return {
     state,
     hydrated,
+    syncError,
     openPanelId,
     openPanel,
     openStructure,
@@ -396,12 +447,16 @@ export function useGardenState(userId?: string | null) {
     sitHabitat,
     upgrade,
     build,
+    placingId,
+    beginPlace,
+    cancelPlace,
     applyProjects,
     seedOwned,
     sendFlight,
     collectFlight,
     addCredits,
     hopOut,
+    claimReturnBonus,
     hopById,
     structureById,
     growthFor,

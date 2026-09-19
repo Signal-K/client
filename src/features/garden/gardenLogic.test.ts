@@ -1,14 +1,16 @@
 import { describe, expect, it } from "vitest";
 import type { ProjectType } from "../onboarding/hubState";
-import { assertNaming, hopById, hopRail } from "./catalog";
+import { assertNaming, hopById, hopRail, hopSlugFromReturnParam, outboundHopUrl } from "./catalog";
 import {
   applyProjectRoster,
   ARCHIVE_STRUCTURE_INVENTORY_ITEM_IDS,
   AUTOMATON_STRUCTURE_NAMES,
   buildStructure,
+  claimHopBonus,
   defaultGardenState,
   gardenLesson,
   GARDEN_STORAGE_KEY,
+  HOP_BONUS_CR,
   hydrateGardenState,
   isPristineGarden,
   isUntouchedLegacyGarden,
@@ -33,6 +35,9 @@ describe("garden catalog naming", () => {
       "ssc.hop.landnam",
       "ssc.hop.spectra",
     ]);
+    expect(outboundHopUrl(hopRail()[1])).toContain("from=garden");
+    expect(hopSlugFromReturnParam("landnam")).toBe("ssc.hop.landnam");
+    expect(hopSlugFromReturnParam("garden")).toBeNull();
   });
 });
 
@@ -75,21 +80,37 @@ describe("building structures", () => {
 
   it("spends credits to raise a selected plot", () => {
     const armed = applyProjectRoster(defaultGardenState(), ["planet-hunting"]);
-    const result = buildStructure(armed, "ssc.structure.telescope");
+    const result = buildStructure(armed, "ssc.structure.telescope", 2);
     expect(result.ok).toBe(true);
     if (!result.ok) return;
     expect(result.state.credits).toBe(80 - 24);
     expect(result.state.structures["ssc.structure.telescope"].locked).toBe(false);
     expect(result.state.structures["ssc.structure.telescope"].tier).toBe(1);
+    expect(result.state.structures["ssc.structure.telescope"].slot).toBe(2);
+  });
+
+  it("places instruments on distinct, valid slots only", () => {
+    const armed = applyProjectRoster(defaultGardenState(), ["planet-hunting", "cloud-tracking"]);
+    const first = buildStructure(armed, "ssc.structure.telescope", 1);
+    expect(first.ok).toBe(true);
+    if (!first.ok) return;
+    const taken = buildStructure(first.state, "ssc.structure.satellite", 1);
+    expect(taken.ok).toBe(false);
+    if (!taken.ok) expect(taken.reason).toBe("slot");
+    for (const bad of [-1, 5, 1.5, Number.NaN]) {
+      const result = buildStructure(armed, "ssc.structure.satellite", bad);
+      expect(result.ok).toBe(false);
+    }
+    expect(buildStructure(first.state, "ssc.structure.satellite", 0).ok).toBe(true);
   });
 
   it("refuses to build an unlisted plot or one the player cannot afford", () => {
     const fresh = defaultGardenState();
-    const blocked = buildStructure(fresh, "ssc.structure.telescope");
+    const blocked = buildStructure(fresh, "ssc.structure.telescope", 0);
     expect(blocked.ok).toBe(false);
     if (!blocked.ok) expect(blocked.reason).toBe("locked");
     const poor = applyProjectRoster({ ...defaultGardenState(), credits: 5 }, ["planet-hunting"]);
-    const unaffordable = buildStructure(poor, "ssc.structure.telescope");
+    const unaffordable = buildStructure(poor, "ssc.structure.telescope", 0);
     expect(unaffordable.ok).toBe(false);
     if (!unaffordable.ok) expect(unaffordable.reason).toBe("credits");
   });
@@ -105,7 +126,7 @@ describe("building structures", () => {
     const seeded = seedOwnedStructures(defaultGardenState(), ["ssc.structure.rover"]);
     expect(seeded.structures["ssc.structure.rover"].locked).toBe(false);
     const armed = applyProjectRoster(defaultGardenState(), ["rover-training"]);
-    const result = buildStructure(armed, "ssc.structure.rover");
+    const result = buildStructure(armed, "ssc.structure.rover", 0);
     expect(result.ok).toBe(true);
     if (!result.ok) return;
     expect(result.state.credits).toBe(80 - 20);
@@ -150,42 +171,25 @@ describe("account recovery", () => {
     expect(isPristineGarden(hydrateGardenState({ credits: 80, structures: {} }))).toBe(true);
   });
 
-  it("does not flash the roster while account state is loading or the player is returning", () => {
-    expect(
-      shouldAskForProjectRoster({
-        prefsLoading: false,
-        accountLoading: true,
-        needsPreferencesPrompt: true,
-        returning: false,
-      })
-    ).toBe(false);
-    expect(
-      shouldAskForProjectRoster({
-        prefsLoading: false,
-        accountLoading: false,
-        needsPreferencesPrompt: true,
-        returning: true,
-        hasInterests: true,
-      })
-    ).toBe(false);
-    expect(
-      shouldAskForProjectRoster({
-        prefsLoading: false,
-        accountLoading: false,
-        needsPreferencesPrompt: true,
-        returning: true,
-        hasInterests: false,
-        hasRaisedInstrument: false,
-      })
-    ).toBe(false);
-    expect(
-      shouldAskForProjectRoster({
-        prefsLoading: false,
-        accountLoading: false,
-        needsPreferencesPrompt: true,
-        returning: false,
-      })
-    ).toBe(true);
+  it("asks a pristine garden for a roster once account state has loaded", () => {
+    expect(shouldAskForProjectRoster({ prefsLoading: false, accountLoading: true, gardenPristine: true })).toBe(false);
+    expect(shouldAskForProjectRoster({ prefsLoading: true, accountLoading: false, gardenPristine: true })).toBe(false);
+    expect(shouldAskForProjectRoster({ prefsLoading: false, accountLoading: false, gardenPristine: true })).toBe(true);
+    expect(shouldAskForProjectRoster({ prefsLoading: false, accountLoading: false, gardenPristine: false })).toBe(false);
+  });
+});
+
+describe("cross-game hop bonuses", () => {
+  it("awards a one-shot credit stamp per hop direction", () => {
+    const first = claimHopBonus(defaultGardenState(), "out", "ssc.hop.landnam");
+    expect(first.awarded).toBe(HOP_BONUS_CR);
+    expect(first.state.credits).toBe(80 + HOP_BONUS_CR);
+    const again = claimHopBonus(first.state, "out", "ssc.hop.landnam");
+    expect(again.awarded).toBe(0);
+    const inbound = claimHopBonus(first.state, "in", "ssc.hop.landnam");
+    expect(inbound.awarded).toBe(HOP_BONUS_CR);
+    const garden = claimHopBonus(defaultGardenState(), "out", "ssc.hop.garden");
+    expect(garden.awarded).toBe(0);
   });
 
   it("teaches raise then classify then hop", () => {
@@ -194,7 +198,7 @@ describe("account recovery", () => {
       gardenLesson({ state: fresh, coachDone: false, classifiedThisVisit: false, classificationCount: 0 })
     ).toBe("raise");
     const armed = applyProjectRoster(fresh, ["planet-hunting"]);
-    const built = buildStructure(armed, "ssc.structure.telescope");
+    const built = buildStructure(armed, "ssc.structure.telescope", 0);
     expect(built.ok).toBe(true);
     if (!built.ok) return;
     expect(

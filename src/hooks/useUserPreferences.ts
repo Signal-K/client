@@ -89,6 +89,14 @@ export function useUserPreferences(userId?: string | null) {
         return;
       }
 
+      if (remote.failed) {
+        // Backend unreachable: don't mistake an empty default for a fresh account.
+        setPreferences(withDevice(defaultOnboarding()));
+        setNeedsPreferencesPrompt(false);
+        setIsLoading(false);
+        return;
+      }
+
       let onboarding = remote.onboarding;
       if (!hasAccountOnboarding(onboarding)) {
         const leftover = readOnboardingLeftovers(userId);

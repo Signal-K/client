@@ -144,7 +144,7 @@ function SupplyPrompt({
       >
         Send supply · {mgDef.cost} CR
       </button>
-      {hop && (
+      {hop && hop.href && (
         <button className={cx(styles.btn, styles.btnHop)} type="button" onClick={() => onHopOut(hop.id)}>
           {hop.label} →
         </button>

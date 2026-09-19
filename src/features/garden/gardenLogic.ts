@@ -2,6 +2,7 @@ import type { ProjectType } from "@/src/features/onboarding/hubState";
 import {
   CATALOG,
   structureById,
+  type HopId,
   type StructureId,
 } from "./catalog";
 
@@ -12,6 +13,8 @@ export interface StructureRecord {
   tendedAt: number;
   ready: boolean;
   readyAt: number;
+  /** Where the player placed this instrument (index into GARDEN_SLOTS). Unset for camp structures. */
+  slot?: number;
 }
 
 export interface FlightRecord {
@@ -25,6 +28,54 @@ export interface GardenState {
   structures: Record<StructureId, StructureRecord>;
   flights: Partial<Record<StructureId, FlightRecord>>;
   hydroTick: number;
+  /** Bumped when the garden is redesigned; older gardens restart with only their credits carried over. */
+  generation?: number;
+  /** One-shot hop stamps (`out:ssc.hop.landnam`, `in:ssc.hop.spectra`). Not a second economy. */
+  hopBonuses?: Record<string, boolean>;
+}
+
+export const HOP_BONUS_CR = 8;
+
+export type BonusHopId = Exclude<HopId, "ssc.hop.garden">;
+
+export function hopBonusKey(direction: "out" | "in", hopId: BonusHopId): string {
+  return `${direction}:${hopId}`;
+}
+
+export function claimHopBonus(
+  state: GardenState,
+  direction: "out" | "in",
+  hopId: HopId,
+): { state: GardenState; awarded: number } {
+  if (hopId === "ssc.hop.garden") return { state, awarded: 0 };
+  const key = hopBonusKey(direction, hopId);
+  if (state.hopBonuses?.[key]) return { state, awarded: 0 };
+  return {
+    awarded: HOP_BONUS_CR,
+    state: {
+      ...state,
+      credits: state.credits + HOP_BONUS_CR,
+      hopBonuses: { ...state.hopBonuses, [key]: true },
+    },
+  };
+}
+
+/** 2 = build/place/design gardens. Gardens without this were the pre-redesign layout. */
+export const GARDEN_GENERATION = 2;
+
+/** Open ground where the player raises instruments. Coordinates live in garden.module.css ([data-slot]). */
+export const GARDEN_SLOT_COUNT = 5;
+
+export function occupiedSlots(state: GardenState): Set<number> {
+  const taken = new Set<number>();
+  for (const rec of Object.values(state.structures)) {
+    if (typeof rec.slot === "number") taken.add(rec.slot);
+  }
+  return taken;
+}
+
+export function isFreeSlot(state: GardenState, slot: number): boolean {
+  return Number.isInteger(slot) && slot >= 0 && slot < GARDEN_SLOT_COUNT && !occupiedSlots(state).has(slot);
 }
 
 export const GARDEN_STORAGE_KEY = "ssc.garden.v3";
@@ -102,7 +153,17 @@ export function defaultGardenState(): GardenState {
     structures,
     flights: {},
     hydroTick: Date.now(),
+    generation: GARDEN_GENERATION,
   };
+}
+
+/** A fresh garden that keeps what the player earned (credits) but none of the old layout. */
+export function restartedGarden(previous: { credits?: unknown } | null | undefined): GardenState {
+  const fresh = defaultGardenState();
+  const credits = previous?.credits;
+  return typeof credits === "number" && Number.isFinite(credits) && credits >= 0
+    ? { ...fresh, credits }
+    : fresh;
 }
 
 export function structuresForProjects(interests: ProjectType[]): StructureId[] {
@@ -183,9 +244,9 @@ export function seedOwnedStructures(state: GardenState, owned: StructureId[]): G
 
 export type BuildResult =
   | { ok: true; state: GardenState }
-  | { ok: false; reason: "locked" | "unlisted" | "built" | "credits"; cost: number };
+  | { ok: false; reason: "locked" | "unlisted" | "built" | "credits" | "slot"; cost: number };
 
-export function buildStructure(state: GardenState, id: StructureId): BuildResult {
+export function buildStructure(state: GardenState, id: StructureId, slot: number): BuildResult {
   const def = structureById(id);
   const rec = state.structures[id];
   const cost = def?.buildCost ?? 0;
@@ -194,6 +255,7 @@ export function buildStructure(state: GardenState, id: StructureId): BuildResult
   if (!rec.locked) return { ok: false, reason: "built", cost };
   if (!rec.buildable) return { ok: false, reason: "locked", cost };
   if (state.credits < cost) return { ok: false, reason: "credits", cost };
+  if (!isFreeSlot(state, slot)) return { ok: false, reason: "slot", cost };
   return {
     ok: true,
     state: {
@@ -208,6 +270,7 @@ export function buildStructure(state: GardenState, id: StructureId): BuildResult
           tier: def.startTier,
           ready: !!def.minigame,
           readyAt: 0,
+          slot,
         },
       },
     },
@@ -236,6 +299,7 @@ export function hydrateGardenState(parsed: unknown): GardenState {
   if (!parsed || typeof parsed !== "object") return base;
   const garden = parsed as Partial<GardenState>;
   if (isUntouchedLegacyGarden(garden)) return base;
+  if (garden.generation !== GARDEN_GENERATION) return restartedGarden(garden);
   return {
     ...base,
     ...garden,
@@ -261,6 +325,22 @@ export function isPristineGarden(state: GardenState | null | undefined): boolean
   return true;
 }
 
+/**
+ * The garden owns onboarding: a pristine garden (nothing raised, no plots chosen) always
+ * gets the roster, even for accounts that finished the pre-garden onboarding.
+ */
+/** Nothing raised, chosen, or tended yet — credits may be carried over from a prior garden. */
+export function needsGardenOnboarding(state: GardenState | null | undefined): boolean {
+  if (!state) return true;
+  if (Object.keys(state.flights || {}).length) return false;
+  const raised = BUILDABLE_STRUCTURE_IDS.some((id) => {
+    const rec = state.structures?.[id];
+    return !!rec && (!rec.locked || !!rec.buildable);
+  });
+  if (raised) return false;
+  return !Object.values(state.structures || {}).some((rec) => rec.tendedAt);
+}
+
 export function hasRaisedInstrument(state: GardenState | null | undefined): boolean {
   if (!state) return false;
   return BUILDABLE_STRUCTURE_IDS.some((id) => state.structures[id] && !state.structures[id].locked);
@@ -284,13 +364,8 @@ export function gardenLesson(args: {
 export function shouldAskForProjectRoster(args: {
   prefsLoading: boolean;
   accountLoading: boolean;
-  needsPreferencesPrompt: boolean;
-  returning: boolean;
-  hasInterests?: boolean;
-  hasRaisedInstrument?: boolean;
+  gardenPristine: boolean;
 }): boolean {
   if (args.prefsLoading || args.accountLoading) return false;
-  if (args.hasRaisedInstrument) return false;
-  if (args.returning) return false;
-  return args.needsPreferencesPrompt;
+  return args.gardenPristine;
 }

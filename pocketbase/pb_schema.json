@@ -1089,6 +1089,10 @@
         "type": "json"
       },
       {
+        "name": "legacyArchive",
+        "type": "json"
+      },
+      {
         "name": "updatedAt",
         "type": "date"
       }

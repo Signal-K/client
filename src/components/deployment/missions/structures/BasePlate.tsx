@@ -1,11 +1,7 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Button } from "@/src/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
-import { useSession } from "@/src/lib/auth/session-context";
-import { EarthViewLayout } from "@/src/components/scenes/planetScene/layout";
-import Navbar from "@/src/components/layout/Navbar";
 import Link from "next/link";
-import ProfileSetupForm from "@/src/components/profile/setup/ProfileSetup";
 import { getLevelProgress, getXPForNextChapter } from "@/src/utils/gameplay/leveling";
 
 interface MissionConfig {
@@ -15,6 +11,7 @@ interface MissionConfig {
   icon: React.ElementType;
   points?: number;
   slug?: string;
+  link?: string;
   internalComponent?: React.ElementType;
   color: string;
   action?: () => void;
@@ -42,46 +39,7 @@ const MissionShell = ({
   onNextChapter,
   tutorialMission,
 }: MissionShellProps) => {
-  const session = useSession();
-
-  const [loading, setLoading] = useState(false);
-  const [firstName, setFirstName] = useState("");
-  const [username, setUsername] = useState("");
-  const [avatar, setAvatar] = useState<File | null>(null);
-  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
-  const [refresh, setRefresh] = useState(false);
-
   const [selectedMission, setSelectedMission] = useState<MissionConfig | null>(null);
-
-  useEffect(() => {
-    let ignore = false;
-
-    async function getProfile() {
-      setLoading(true);
-      const res = await fetch("/api/gameplay/profile/me");
-      const payload = await res.json().catch(() => null);
-
-      if (!ignore) {
-        if (!res.ok) {
-          console.warn(payload?.error || "Failed to fetch profile");
-        } else if (payload) {
-          setUsername(payload.username || "");
-          setFirstName(payload.full_name || "");
-          setAvatarPreview(payload.avatar_url || "");
-        }
-      }
-
-      setLoading(false);
-    }
-
-    if (session?.user?.id) {
-      getProfile();
-    }
-
-    return () => {
-      ignore = true;
-    };
-  }, [session, refresh]);
 
   const getCardSpanClass = (index: number, total: number) => {
     if (total === 1) return "col-span-2 md:col-span-2 lg:col-span-4";
@@ -96,7 +54,7 @@ const renderMission = (mission: MissionConfig, index: number, total: number) => 
   const cardContent = (
     <div
       key={mission.id}
-      className={`bg-gradient-to-br from-[#E5EEF4] to-[#D8E5EC] shadow-md rounded-xl cursor-pointer p-4 aspect-square w-full max-w-full flex flex-col justify-between ${getCardSpanClass(index, total)}`}
+      className={`bg-gradient-to-br from-[#E5EEF4] to-[#D8E5EC] shadow-md rounded-xl cursor-pointer p-4 min-h-[180px] w-full max-w-full min-w-0 break-words flex flex-col justify-between ${getCardSpanClass(index, total)}`}
     >
       <div className="flex items-start space-x-4">
         <mission.icon className={`w-10 h-10 ${mission.color}`} />
@@ -114,6 +72,14 @@ const renderMission = (mission: MissionConfig, index: number, total: number) => 
       </div>
     </div>
   );
+
+  if (mission.link) {
+    return (
+      <Link key={mission.id} href={mission.link}>
+        {cardContent}
+      </Link>
+    );
+  }
 
   // If it has a slug, make it a link
   if (mission.slug) {
@@ -153,21 +119,12 @@ const renderMission = (mission: MissionConfig, index: number, total: number) => 
   const pointsForNextChapter = getXPForNextChapter(currentChapter);
   const progressPercent = getLevelProgress(experiencePoints);
 
-  if (!firstName) {
-    return (
-      <EarthViewLayout>
-        <ProfileSetupForm onProfileUpdate={() => setRefresh((prev) => !prev)} />
-          <></>
-      </EarthViewLayout>
-    );
-  }
-
   return (
     <div className="flex flex-col items-center justify-center w-full min-h-screen px-4 text-white overflow-x-hidden">
       {!selectedMission && (
         <div className="flex flex-col w-full max-w-6xl">
           <div className="flex justify-between items-center mb-4">
-            <h1 className="text-xl font-bold text-[#2E3440]">Chapter {currentChapter}</h1>
+            <h1 className="text-xl font-bold text-white">Chapter {currentChapter}</h1>
             <div className="flex space-x-4">
               <Button onClick={onPreviousChapter} disabled={currentChapter === 1}>
                 Previous
@@ -191,7 +148,7 @@ const renderMission = (mission: MissionConfig, index: number, total: number) => 
             ></div>
           </div>
 
-          <p className="text-sm text-center text-[#4C566A] mb-6">
+          <p className="text-sm text-center text-white/80 mb-6">
             Level {level} ({experiencePoints} points)
           </p>
 
