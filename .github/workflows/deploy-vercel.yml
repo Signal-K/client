@@ -1,0 +1,74 @@
+name: Deploy Star Sailors to Vercel
+
+on:
+  push:
+    branches: [main, staging]
+    paths:
+      - "src/**"
+      - "public/**"
+      - "package.json"
+      - "yarn.lock"
+      - "next.config.*"
+      - "tsconfig.json"
+      - "postcss.config.*"
+      - "tailwind.config.*"
+      - ".github/workflows/deploy-vercel.yml"
+  workflow_dispatch: {}
+
+concurrency:
+  group: vercel-${{ github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: yarn
+
+      - name: Validate Vercel deployment credentials
+        run: |
+          for name in VERCEL_ORG_ID VERCEL_PROJECT_ID VERCEL_TOKEN; do
+            if [ -z "${!name}" ]; then
+              echo "::error::Missing required repository secret: $name"
+              exit 1
+            fi
+          done
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Pull production configuration
+        if: github.ref_name == 'main'
+        run: npx --yes vercel@latest pull --yes --environment=production
+
+      - name: Pull staging preview configuration
+        if: github.ref_name == 'staging'
+        run: npx --yes vercel@latest pull --yes --environment=preview --git-branch=staging
+
+      - name: Build Vercel output
+        run: npx --yes vercel@latest build
+
+      - name: Deploy production
+        if: github.ref_name == 'main'
+        run: |
+          deployment_url="$(npx --yes vercel@latest deploy --prebuilt --prod)"
+          echo "deployment_url=$deployment_url" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Deploy staging preview and assign its stable alias
+        if: github.ref_name == 'staging'
+        run: |
+          deployment_url="$(npx --yes vercel@latest deploy --prebuilt)"
+          npx --yes vercel@latest alias set "$deployment_url" staging.starsailors.space
+          echo "deployment_url=$deployment_url" >> "$GITHUB_STEP_SUMMARY"
+          echo "staging_url=https://staging.starsailors.space" >> "$GITHUB_STEP_SUMMARY"
