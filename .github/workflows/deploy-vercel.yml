@@ -28,6 +28,8 @@ jobs:
       VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
       VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
       VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
     steps:
       - uses: actions/checkout@v4
 
@@ -39,6 +41,16 @@ jobs:
       - name: Validate Vercel deployment credentials
         run: |
           for name in VERCEL_ORG_ID VERCEL_PROJECT_ID VERCEL_TOKEN; do
+            if [ -z "${!name}" ]; then
+              echo "::error::Missing required repository secret: $name"
+              exit 1
+            fi
+          done
+
+      - name: Validate staging cutover credentials
+        if: github.ref_name == 'staging'
+        run: |
+          for name in CLOUDFLARE_ACCOUNT_ID CLOUDFLARE_API_TOKEN; do
             if [ -z "${!name}" ]; then
               echo "::error::Missing required repository secret: $name"
               exit 1
@@ -69,6 +81,46 @@ jobs:
         if: github.ref_name == 'staging'
         run: |
           deployment_url="$(npx --yes vercel@latest deploy --prebuilt --scope "$VERCEL_ORG_ID")"
+          domain=staging.starsailors.space
+
+          # Vercel must own the domain before the DNS move. If it is already
+          # registered, inspect succeeds and this remains a no-op.
+          if ! npx --yes vercel@latest domains inspect "$domain" --scope "$VERCEL_ORG_ID" >/dev/null 2>&1; then
+            npx --yes vercel@latest domains add "$domain" "$VERCEL_PROJECT_ID" --scope "$VERCEL_ORG_ID"
+          fi
+
+          domains="$(curl --fail-with-body --silent --show-error \
+            -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
+            "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/workers/domains?hostname=$domain")"
+          domain_id="$(echo "$domains" | jq -r --arg domain "$domain" '.result[] | select(.hostname == $domain and .service == "starsailors-client-staging") | .id' | head -1)"
+          if [ -n "$domain_id" ] && [ "$domain_id" != null ]; then
+            curl --fail-with-body --silent --show-error -X DELETE \
+              -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
+              "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/workers/domains/$domain_id" | jq -e '.success == true'
+          fi
+
+          zone_id="$(curl --fail-with-body --silent --show-error \
+            -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
+            "https://api.cloudflare.com/client/v4/zones?name=starsailors.space" | jq -r '.result[0].id')"
+          test -n "$zone_id" && test "$zone_id" != null
+          record_id="$(curl --fail-with-body --silent --show-error \
+            -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
+            "https://api.cloudflare.com/client/v4/zones/$zone_id/dns_records?type=CNAME&name=$domain" | jq -r '.result[0].id // empty')"
+          payload="$(jq -nc --arg name "$domain" '{type:"CNAME",name:$name,content:"cname.vercel-dns.com",ttl:1,proxied:false}')"
+          if [ -n "$record_id" ]; then
+            curl --fail-with-body --silent --show-error -X PUT \
+              -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
+              -H "Content-Type: application/json" \
+              --data "$payload" \
+              "https://api.cloudflare.com/client/v4/zones/$zone_id/dns_records/$record_id" | jq -e '.success == true'
+          else
+            curl --fail-with-body --silent --show-error -X POST \
+              -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
+              -H "Content-Type: application/json" \
+              --data "$payload" \
+              "https://api.cloudflare.com/client/v4/zones/$zone_id/dns_records" | jq -e '.success == true'
+          fi
+
           npx --yes vercel@latest alias set "$deployment_url" staging.starsailors.space --scope "$VERCEL_ORG_ID"
           echo "deployment_url=$deployment_url" >> "$GITHUB_STEP_SUMMARY"
           echo "staging_url=https://staging.starsailors.space" >> "$GITHUB_STEP_SUMMARY"
