@@ -5,10 +5,8 @@
   "compatibility_date": "2026-07-24",
   // No nodejs_compat and no limits.cpu_ms: this Worker must fit the Workers
   // Free plan (10ms CPU, 50 subrequests). See the SSC-30 note in ../../wrangler.jsonc.
-  "vars": {
-    "CLERK_ISSUER": "https://clerk.starsailors.space",
-    "CLERK_AUTHORIZED_PARTIES": "https://starsailors.space,https://www.starsailors.space"
-  },
+  // CLERK_ISSUER and CLERK_AUTHORIZED_PARTIES come from GitHub Actions variables
+  // (deploy-api-worker.yml passes them with --var); use .dev.vars locally.
   // Secrets (wrangler secret put): POCKETBASE_URL, POCKETBASE_ADMIN_EMAIL, POCKETBASE_ADMIN_PASSWORD.
   // Same-origin route: browsers call /api/v1/* on starsailors.space, so there
   // are no CORS preflights (each would be an extra billable request).
@@ -20,10 +18,8 @@
   "env": {
     "staging": {
       "name": "starsailors-api-staging",
-      "vars": {
-        "CLERK_ISSUER": "https://clerk.starsailors.space",
-        "CLERK_AUTHORIZED_PARTIES": "https://staging.starsailors.space"
-      },
+      // Direct *.workers.dev URL so staging can be smoke-tested without DNS.
+      "workers_dev": true,
       "routes": [{ "pattern": "staging.starsailors.space/api/v1/*", "zone_name": "starsailors.space" }]
     }
   }

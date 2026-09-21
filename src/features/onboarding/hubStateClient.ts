@@ -14,7 +14,6 @@ export const GARDEN_V3_KEY = "ssc.garden.v3";
 export const GARDEN_V2_KEY = "ssc.garden.v2";
 export const GARDEN_V1_KEY = "ssc.garden.v1";
 
-let inflight: Promise<HubState & { authenticated: boolean; failed?: boolean }> | null = null;
 
 function storageGet(key: string): string | null {
   if (typeof window === "undefined") return null;
@@ -97,30 +96,56 @@ export function clearGardenLeftovers(userId?: string | null) {
   }
 }
 
-export async function fetchHubState(): Promise<HubState & { authenticated: boolean; failed?: boolean }> {
-  if (inflight) return inflight;
-  inflight = (async () => {
+export interface HubBootstrap {
+  username: string | null;
+  fullName: string | null;
+  classificationPoints: number;
+  inventoryItemIds: number[];
+  automatons: string[];
+  classificationCount: number;
+  returning: boolean;
+}
+
+export type HubBootstrapResult = {
+  authenticated: boolean;
+  failed?: boolean;
+  bootstrap: HubBootstrap | null;
+  state: HubState;
+};
+
+// One request feeds the account summary, onboarding and garden state. Callers
+// that mount together share the in-flight promise instead of each fetching.
+let bootstrapInflight: Promise<HubBootstrapResult> | null = null;
+
+export function fetchHubBootstrap(): Promise<HubBootstrapResult> {
+  if (bootstrapInflight) return bootstrapInflight;
+  bootstrapInflight = (async (): Promise<HubBootstrapResult> => {
+    const fresh = (): HubState => ({ onboarding: defaultOnboarding(), garden: null });
     try {
-      const res = await fetch("/api/gameplay/hub/state");
-      if (res.status === 401) {
-        return { onboarding: defaultOnboarding(), garden: null, authenticated: false };
-      }
-      if (!res.ok) {
-        return { onboarding: defaultOnboarding(), garden: null, authenticated: true, failed: true };
-      }
-      const data = (await res.json()) as HubState;
+      const res = await fetch("/api/gameplay/hub/bootstrap");
+      if (res.status === 401) return { authenticated: false, bootstrap: null, state: fresh() };
+      if (!res.ok) return { authenticated: true, failed: true, bootstrap: null, state: fresh() };
+      const { hubState, ...bootstrap } = (await res.json()) as HubBootstrap & { hubState?: HubState };
       return {
-        onboarding: parseOnboarding(data.onboarding),
-        garden: data.garden == null ? null : hydrateGardenState(data.garden),
         authenticated: true,
+        bootstrap,
+        state: {
+          onboarding: parseOnboarding(hubState?.onboarding),
+          garden: hubState?.garden == null ? null : hydrateGardenState(hubState.garden),
+        },
       };
     } catch {
-      return { onboarding: defaultOnboarding(), garden: null, authenticated: true, failed: true };
+      return { authenticated: true, failed: true, bootstrap: null, state: fresh() };
     }
   })().finally(() => {
-    inflight = null;
+    bootstrapInflight = null;
   });
-  return inflight;
+  return bootstrapInflight;
+}
+
+export async function fetchHubState(): Promise<HubState & { authenticated: boolean; failed?: boolean }> {
+  const { state, authenticated, failed } = await fetchHubBootstrap();
+  return { ...state, authenticated, failed };
 }
 
 export async function patchHubState(patch: {

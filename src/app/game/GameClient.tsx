@@ -7,6 +7,7 @@ import { usePostHog } from "posthog-js/react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/src/components/ui/dialog";
 import { GardenOnboarding } from "@/src/features/garden/components/GardenOnboarding";
 import { GameSurveys } from "@/src/features/surveys/components/GameSurveys";
+import { fetchHubBootstrap, type HubBootstrap } from "@/src/features/onboarding/hubStateClient";
 import { useUserPreferences, type ProjectType } from "@/src/hooks/useUserPreferences";
 
 import { captureCrossGameNavigation } from "@/src/features/analytics/cross-game-navigation";
@@ -48,16 +49,6 @@ const PushNotificationPrompt = dynamic(
 
 function cx(...classes: Array<string | false | undefined>) {
   return classes.filter(Boolean).join(" ");
-}
-
-interface HubBootstrap {
-  username: string | null;
-  fullName: string | null;
-  classificationPoints: number;
-  inventoryItemIds: number[];
-  automatons: string[];
-  classificationCount: number;
-  returning: boolean;
 }
 
 interface GameClientProps {
@@ -113,11 +104,10 @@ export default function GameClient({ user }: GameClientProps) {
       return;
     }
     let cancelled = false;
-    fetch("/api/gameplay/hub/bootstrap")
-      .then((res) => (res.ok ? res.json() : null))
-      .then((data: HubBootstrap | null) => {
+    fetchHubBootstrap()
+      .then((result) => {
         if (cancelled) return;
-        setBootstrap(data);
+        setBootstrap(result.bootstrap);
       })
       .catch(() => {
         if (!cancelled) setBootstrap(null);
@@ -130,8 +120,13 @@ export default function GameClient({ user }: GameClientProps) {
     };
   }, [user?.id]);
 
+  // Secondary data: only surveys read this, so it is not part of the initial load.
+  const [wantClassifications, setWantClassifications] = useState(false);
   useEffect(() => {
-    if (!user?.id) return;
+    if (garden.openPanelId) setWantClassifications(true);
+  }, [garden.openPanelId]);
+  useEffect(() => {
+    if (!user?.id || !wantClassifications) return;
     let cancelled = false;
     fetch(`/api/gameplay/classifications?author=${encodeURIComponent(user.id)}&limit=500`)
       .then((res) => (res.ok ? res.json() : { classifications: [] }))
@@ -144,7 +139,7 @@ export default function GameClient({ user }: GameClientProps) {
     return () => {
       cancelled = true;
     };
-  }, [user?.id]);
+  }, [user?.id, wantClassifications]);
 
   useEffect(() => {
     const mq = window.matchMedia("(orientation: landscape)");

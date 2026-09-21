@@ -1,19 +1,12 @@
 name: Deploy API Worker (SSC-35)
 
-# Deploys production on every merge that touches workers/api (secrets persist
-# across deploys, so no manual step) and can also be dispatched by hand for
-# staging or a secret rotation. The API Worker (workers/api) serves /api/v1/* same-origin and
+# Manual only. The API Worker (workers/api) serves /api/v1/* same-origin and
 # must stay inside the Workers Free plan. Configuration comes from GitHub:
 #   vars:    CLERK_ISSUER, CLERK_AUTHORIZED_PARTIES(_STAGING)
 #   secrets: POCKETBASE_URL, POCKETBASE_ADMIN_EMAIL, POCKETBASE_ADMIN_PASSWORD
 # Existing Worker secrets survive `wrangler deploy`; each secret write publishes
 # a new Worker version, so only tick sync_secrets when a secret actually changed.
 on:
-  push:
-    branches: [main]
-    paths:
-      - "workers/api/**"
-      - ".github/workflows/deploy-api-worker.yml"
   workflow_dispatch:
     inputs:
       target:
@@ -29,7 +22,7 @@ on:
         default: false
 
 concurrency:
-  group: deploy-api-worker-${{ inputs.target || 'production' }}
+  group: deploy-api-worker-${{ inputs.target }}
   cancel-in-progress: false
 
 jobs:

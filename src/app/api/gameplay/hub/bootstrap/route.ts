@@ -28,24 +28,29 @@ export async function GET() {
 
   const pb = await createPocketbaseAdminClient();
 
-  let email: string | null = null;
-  try {
-    const clerkUser = await currentUser();
-    email =
-      clerkUser?.primaryEmailAddress?.emailAddress ??
-      clerkUser?.emailAddresses?.[0]?.emailAddress ??
-      null;
-  } catch {
-    email = null;
-  }
+  // Clerk's Backend API is a subrequest, so the email is only fetched for the
+  // legacy ecosystem-profile fallback when the account has no username yet.
+  const lookupEmail = async (): Promise<string | null> => {
+    try {
+      const clerkUser = await currentUser();
+      return (
+        clerkUser?.primaryEmailAddress?.emailAddress ??
+        clerkUser?.emailAddresses?.[0]?.emailAddress ??
+        null
+      );
+    } catch {
+      return null;
+    }
+  };
+  const emptyIdentity = { username: null, fullName: null, classificationPoints: 0, profileId: null };
 
   const [identity, inventory, linked, classifications, hubState] = await Promise.all([
-    safe(() => resolveGardenIdentity(pb, user.id, email), {
-      username: null,
-      fullName: null,
-      classificationPoints: 0,
-      profileId: null,
-    }),
+    safe(async () => {
+      const identity = await resolveGardenIdentity(pb, user.id, null);
+      if (identity.username) return identity;
+      const email = await lookupEmail();
+      return email ? resolveGardenIdentity(pb, user.id, email) : identity;
+    }, emptyIdentity),
     safe(
       async () => {
         const result = await pb.collection("inventory").getList(1, 200, {
@@ -76,7 +81,7 @@ export async function GET() {
       },
       { totalItems: 0 }
     ),
-    safe(() => loadHubState(user.id), emptyHubState()),
+    safe(() => loadHubState(user.id, pb), emptyHubState()),
   ]);
 
   const inventoryItemIds = [
