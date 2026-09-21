@@ -1,10 +1,8 @@
 import { Suspense } from "react";
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import type { Metadata } from "next";
 import { ArrowRight, ExternalLink } from "lucide-react";
 
-import { auth } from "@clerk/nextjs/server";
 import { cn } from "@/src/lib/utils";
 import { LandingAnalytics } from "./(landing)/_components/LandingAnalytics";
 import { LandingMobileMenu } from "./(landing)/_components/LandingMobileMenu";
@@ -66,13 +64,9 @@ const projects = [
   },
 ] as const;
 
-export default async function HomePage() {
-  const { userId } = await auth();
-
-  if (userId) {
-    redirect("/game?from=landing");
-  }
-
+// Signed-in visitors are redirected to /game by middleware, so the page itself
+// needs no Clerk read and can render as static HTML.
+export default function HomePage() {
   return (
     <div className="min-h-screen bg-background text-foreground font-sans selection:bg-primary/30">
       <LandingAnalytics />
