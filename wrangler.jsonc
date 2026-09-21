@@ -22,13 +22,14 @@
   "observability": {
     "enabled": true
   },
-  // OpenNext SSR cannot finish within the Workers Free 10ms CPU cap
-  // (Cloudflare Error 1102 / exceededCpu on starsailors.space, 2026-09-18).
-  // Requires Workers Paid. 60s covers cold start + Clerk + a few PocketBase
-  // round-trips without taking the 5-minute maximum.
-  "limits": {
-    "cpu_ms": 60000
-  },
+  // Do not set limits.cpu_ms here. The CI Cloudflare account is on Workers
+  // Free; Wrangler then fails the whole deploy with 100328
+  // ("CPU limits are not supported for the Free plan"). That blocked
+  // production after SSC-24 (GitHub Actions runs 35413508850 / 35430528448).
+  // OpenNext SSR still cannot finish in the Free 10ms CPU cap (Error 1102).
+  // After this account is on Workers Paid, restore:
+  // "limits": { "cpu_ms": 60000 }
+
   // `wrangler deploy --env staging` — a constant preview target. Runtime
   // secrets (POCKETBASE_URL, CLERK_SECRET_KEY, ...) are synced from the same
   // repo secrets as production on purpose — this shares the one ecosystem
@@ -66,9 +67,6 @@
       },
       "observability": {
         "enabled": true
-      },
-      "limits": {
-        "cpu_ms": 60000
       }
     }
   }
