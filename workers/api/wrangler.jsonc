@@ -18,6 +18,8 @@
   "env": {
     "staging": {
       "name": "starsailors-api-staging",
+      // Direct *.workers.dev URL so staging can be smoke-tested without DNS.
+      "workers_dev": true,
       "routes": [{ "pattern": "staging.starsailors.space/api/v1/*", "zone_name": "starsailors.space" }]
     }
   }
