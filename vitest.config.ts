@@ -8,8 +8,9 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, './src'),
+      // Longest prefix first so "@/src/x" is not rewritten to "src/src/x".
       '@/src': path.resolve(__dirname, './src'),
+      '@': path.resolve(__dirname, './src'),
     },
   },
 })

@@ -1,3 +1,4 @@
+import type PocketBase from "pocketbase";
 import { type RecordModel } from "pocketbase";
 
 import { createPocketbaseAdminClient } from "@/lib/pocketbase/adminClient";
@@ -29,9 +30,9 @@ function asHubRecord(record: RecordModel | null): HubRecord | null {
   return { id: row.id, onboarding: row.onboarding, garden: row.garden };
 }
 
-async function findHubRecord(userId: string): Promise<HubRecord | null> {
+async function findHubRecord(userId: string, shared?: PocketBase): Promise<HubRecord | null> {
   try {
-    const pb = await createPocketbaseAdminClient();
+    const pb = shared ?? (await createPocketbaseAdminClient());
     const record = await pb
       .collection(COLLECTION)
       .getFirstListItem(pb.filter("userId = {:id}", { id: userId }))
@@ -54,8 +55,8 @@ function recordToHubState(record: HubRecord | null): HubState {
   };
 }
 
-export async function loadHubState(userId: string): Promise<HubState> {
-  const record = await findHubRecord(userId);
+export async function loadHubState(userId: string, pb?: PocketBase): Promise<HubState> {
+  const record = await findHubRecord(userId, pb);
   return recordToHubState(record);
 }
 
