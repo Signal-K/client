@@ -46,8 +46,8 @@ jobs:
           # Register before changing DNS. The deploy workflow has already
           # assigned the staging alias (or --prod assigned production), but
           # this makes a missing project-domain configuration fail early.
-          if ! npx --yes vercel@latest domains inspect "$domain" >/dev/null 2>&1; then
-            npx --yes vercel@latest domains add "$domain" "$VERCEL_PROJECT_ID"
+          if ! npx --yes vercel@latest domains inspect "$domain" --scope "$VERCEL_ORG_ID" >/dev/null 2>&1; then
+            npx --yes vercel@latest domains add "$domain" "$VERCEL_PROJECT_ID" --scope "$VERCEL_ORG_ID"
           fi
 
           domains="$(curl --fail-with-body --silent --show-error \
