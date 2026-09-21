@@ -86,7 +86,14 @@ jobs:
           # Vercel must own the domain before the DNS move. If it is already
           # registered, inspect succeeds and this remains a no-op.
           if ! npx --yes vercel@latest domains inspect "$domain" --scope "$VERCEL_ORG_ID" >/dev/null 2>&1; then
-            npx --yes vercel@latest domains add "$domain" "$VERCEL_PROJECT_ID" --scope "$VERCEL_ORG_ID"
+            domain_add_exit=0
+            npx --yes vercel@latest domains add "$domain" "$VERCEL_PROJECT_ID" --scope "$VERCEL_ORG_ID" || domain_add_exit=$?
+            # Vercel returns 4 after successfully registering a domain whose
+            # DNS has not yet moved. The following Cloudflare step is what
+            # resolves that expected pending-verification state.
+            if [ "$domain_add_exit" -ne 0 ] && [ "$domain_add_exit" -ne 4 ]; then
+              exit "$domain_add_exit"
+            fi
           fi
 
           domains="$(curl --fail-with-body --silent --show-error \
