@@ -1,12 +1,28 @@
 {
   "$schema": "./node_modules/wrangler/config-schema.json",
   "name": "starsailors-client",
-  "main": ".open-next/worker.js",
+  // SSC-31: no OpenNext. Pages are a static Next.js export (`out/`, built by
+  // `yarn cf:build`) served by Workers Static Assets without invoking the
+  // Worker. workers/app/src/index.ts only runs for /api/*, /ingest/* and
+  // paths with no asset (dynamic pages, 404) and never renders React.
+  "main": "workers/app/src/index.ts",
   "compatibility_date": "2026-07-24",
+  // nodejs_compat: route handlers read process.env (populated from vars and
+  // secrets) and a few use node:crypto / AsyncLocalStorage.
   "compatibility_flags": ["nodejs_compat"],
   "assets": {
-    "directory": ".open-next/assets",
-    "binding": "ASSETS"
+    "directory": "out",
+    "binding": "ASSETS",
+    "html_handling": "auto-trailing-slash",
+    "not_found_handling": "none"
+  },
+  // Route handlers under src/app/api are bundled as-is; these replace the
+  // Next.js/Clerk server modules they import (see workers/app/src/shims).
+  "alias": {
+    "next/server": "./workers/app/src/shims/next-server.ts",
+    "next/cache": "./workers/app/src/shims/next-cache.ts",
+    "@clerk/nextjs/server": "./workers/app/src/shims/clerk-nextjs-server.ts",
+    "@clerk/nextjs/webhooks": "@clerk/backend/webhooks"
   },
   "routes": [
     { "pattern": "starsailors.space", "custom_domain": true },
@@ -26,9 +42,8 @@
   // Free; Wrangler then fails the whole deploy with 100328
   // ("CPU limits are not supported for the Free plan"). That blocked
   // production after SSC-24 (GitHub Actions runs 35413508850 / 35430528448).
-  // OpenNext SSR still cannot finish in the Free 10ms CPU cap (Error 1102).
-  // After this account is on Workers Paid, restore:
-  // "limits": { "cpu_ms": 60000 }
+  // The SSC-31 architecture is built to fit the Free 10ms cap instead; see
+  // docs/runbooks/cloudflare-cutover.md for the per-route budget.
 
   // `wrangler deploy --env staging` — a constant preview target. Runtime
   // secrets (POCKETBASE_URL, CLERK_SECRET_KEY, ...) are synced from the same
@@ -46,7 +61,7 @@
   "env": {
     "staging": {
       "name": "starsailors-client-staging",
-      "main": ".open-next/worker.js",
+      "main": "workers/app/src/index.ts",
       "compatibility_date": "2026-07-24",
       "compatibility_flags": ["nodejs_compat"],
       "workers_dev": true,
@@ -55,8 +70,16 @@
       // (starsailors.space, www.starsailors.space) to this Worker on deploy.
       "routes": [{ "pattern": "staging.starsailors.space", "custom_domain": true }],
       "assets": {
-        "directory": ".open-next/assets",
-        "binding": "ASSETS"
+        "directory": "out",
+        "binding": "ASSETS",
+        "html_handling": "auto-trailing-slash",
+        "not_found_handling": "none"
+      },
+      "alias": {
+        "next/server": "./workers/app/src/shims/next-server.ts",
+        "next/cache": "./workers/app/src/shims/next-cache.ts",
+        "@clerk/nextjs/server": "./workers/app/src/shims/clerk-nextjs-server.ts",
+        "@clerk/nextjs/webhooks": "@clerk/backend/webhooks"
       },
       "vars": {
         "NEXT_PUBLIC_POSTHOG_KEY": "phc_65umDftbbTkrm1V6azue6OeU4u5c8iJcaHm4JtJ95di",

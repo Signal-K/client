@@ -1,12 +1,11 @@
-import CloudDetailsClient from '@/src/components/discovery/planets/client';
+import { placeholderParams } from "@/src/lib/routing/staticParams";
 
-type MyCloudPageProps = {
-    params: Promise<{
-        id: string;
-    }>;
+import CloudPageClient from "./CloudPageClient";
+
+export function generateStaticParams() {
+  return placeholderParams("id");
 }
 
-export default async function Page(props: MyCloudPageProps) {
-    const params = await props.params;
-    return <CloudDetailsClient id={parseInt(params.id)} />;
+export default function Page() {
+  return <CloudPageClient />;
 }

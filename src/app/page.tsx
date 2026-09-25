@@ -6,6 +6,7 @@ import { ArrowRight, ExternalLink } from "lucide-react";
 import { cn } from "@/src/lib/utils";
 import { LandingAnalytics } from "./(landing)/_components/LandingAnalytics";
 import { LandingMobileMenu } from "./(landing)/_components/LandingMobileMenu";
+import { LandingSignedInRedirect } from "./(landing)/_components/LandingSignedInRedirect";
 import { LandingStats, LandingStatsFallback } from "./(landing)/_components/LandingStats";
 
 export const metadata: Metadata = {
@@ -64,12 +65,14 @@ const projects = [
   },
 ] as const;
 
-// Signed-in visitors are redirected to /game by middleware, so the page itself
-// needs no Clerk read and can render as static HTML.
+// Signed-in visitors are redirected to /game (by middleware under `next dev`,
+// by LandingSignedInRedirect in the static export), so the page itself needs
+// no Clerk read and can render as static HTML.
 export default function HomePage() {
   return (
     <div className="min-h-screen bg-background text-foreground font-sans selection:bg-primary/30">
       <LandingAnalytics />
+      <LandingSignedInRedirect />
 
       <header className="sticky top-0 z-50 flex items-center justify-between border-b border-border bg-background/80 px-6 py-4 backdrop-blur-md sm:px-12">
         <span className="text-sm font-black uppercase tracking-[0.2em] text-foreground">

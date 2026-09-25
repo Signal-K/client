@@ -1,3 +1,6 @@
+// SSC-35 JSON API (/api/v1/*). Since SSC-31 it runs inside the app Worker
+// (workers/app/src/index.ts) on the site's own origin, which supplies
+// CLERK_ISSUER and CLERK_AUTHORIZED_PARTIES; it is no longer deployed alone.
 import { AuthError, verifyClerkJwt, type ClerkClaims } from "./jwt";
 import { getProfileByUserId, type PocketbaseEnv, type Profile } from "./pocketbase";
 

@@ -1,6 +1,11 @@
-import { redirect } from "next/navigation";
+import { placeholderParams } from "@/src/lib/routing/staticParams";
 
-export default async function PlanetRedirect({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
-  redirect(`/planets/edit/${id}`);
+import PlanetRedirect from "./PlanetRedirect";
+
+export function generateStaticParams() {
+  return placeholderParams("id");
+}
+
+export default function Page() {
+  return <PlanetRedirect />;
 }

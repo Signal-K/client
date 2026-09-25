@@ -1,6 +1,6 @@
+import { useRouteParams } from "@/src/lib/routing/useRouteParams";
 import React, { useEffect, useState } from "react";
 import { useSession } from "@/src/lib/auth/session-context";
-import { useParams } from "next/navigation";
 import { BarChartBigIcon, GlassWater, Guitar, HelpCircle, PenBoxIcon, RadioIcon, SpeechIcon, TelescopeIcon, VoteIcon } from "lucide-react";
 import MissionShell from "../../BasePlate";
 import { DailyMinorPlanetWithId, StarterDailyMinorPlanet } from "@/src/components/projects/Telescopes/DailyMinorPlanet";
@@ -22,7 +22,7 @@ interface Mission {
 
 const DailyMinorPlanetMissions = () => {
   const session = useSession();
-  const params = useParams();
+  const params = useRouteParams<"id">("/structures/telescope/[project]/[id]/[mission]");
 
   // Extract anomaly ID from URL params if available
   const getAnomalyId = () => {

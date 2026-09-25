@@ -29,6 +29,33 @@ jobs:
       - name: Unit tests
         run: yarn test:unit
 
+  cloudflare:
+    # SSC-31: production is a static export plus a thin Worker. A server
+    # action, force-dynamic page, or new dynamic route without
+    # generateStaticParams breaks the export; catch it here, not at deploy.
+    name: Cloudflare static build
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Build static shell
+        run: yarn cf:build
+        env:
+          # Any well-formed key; the build only embeds it.
+          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: pk_test_Y2xlcmsuZXhhbXBsZS5jb20k
+
+      - name: Bundle the app Worker
+        run: npx wrangler deploy --dry-run --outdir .wrangler/dry-run
+
   e2e:
     name: E2E Tests
     runs-on: ubuntu-latest

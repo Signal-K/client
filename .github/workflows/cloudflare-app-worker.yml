@@ -1,5 +1,9 @@
-name: OpenNext Worker (reusable)
+name: Cloudflare app Worker (reusable)
 
+# SSC-31: builds the static Next.js export (`yarn cf:build` -> out/) and
+# deploys it with the app Worker (workers/app) that serves /api/*, /ingest/*
+# and dynamic pages. No OpenNext, no Next.js server, no SSR.
+#
 # Shared by production and staging. Secrets already on the Worker persist
 # across `wrangler deploy` — do not `secret put` here. Each secret put
 # publishes a new Worker version; doing that after every commit is what
@@ -57,8 +61,10 @@ jobs:
           CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
           NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
 
-      - name: Build (OpenNext Cloudflare adapter)
-        run: npx opennextjs-cloudflare build
+      - name: Build static shell and check the Worker
+        run: |
+          yarn cf:build
+          npx vitest run workers
         env:
           NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
           NEXT_PUBLIC_CLERK_SIGN_IN_URL: ${{ vars.NEXT_PUBLIC_CLERK_SIGN_IN_URL }}
@@ -82,7 +88,9 @@ jobs:
           # with "Not enough arguments following: env" (broke prod deploy on
           # 2026-09-17, see run 35190488025). Plain `deploy` still targets the
           # top-level env correctly; it just logs a harmless warning.
-          command: ${{ inputs.wrangler_command }}
+          # The publishable key is public; the Worker derives the Clerk issuer
+          # (JWKS) from it to verify session JWTs locally.
+          command: ${{ inputs.wrangler_command }} --var NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY:${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
 
       - name: Confirm Worker secrets already exist
         run: |

@@ -1,7 +1,7 @@
-name: Deploy to Cloudflare Workers (Legacy Staging)
+name: Deploy staging to Cloudflare Workers
 
-# Constant preview target for signal-k/client: same OpenNext Cloudflare
-# adapter as production, deployed to the wrangler.jsonc `env.staging`
+# Constant staging target for signal-k/client: same static shell + app
+# Worker build as production, deployed to the wrangler.jsonc `env.staging`
 # Worker at the constant https://staging.starsailors.space custom domain.
 # That's a real subdomain of the apex (not *.workers.dev) on purpose:
 # production's Clerk instance uses a custom Frontend API proxy domain
@@ -11,9 +11,23 @@ name: Deploy to Cloudflare Workers (Legacy Staging)
 # Clerk instance as production (not a separate staging backend) so
 # accounts/data stay one ecosystem; only the frontend Worker differs.
 on:
-  # SSC-31 moves the staging host to Vercel Node hosting. Keep this workflow
-  # dispatch-only until the Cloudflare Worker domain is detached, so a staging
-  # push cannot accidentally reclaim staging.starsailors.space.
+  push:
+    branches: [staging]
+    paths:
+      - "src/**"
+      - "public/**"
+      - "package.json"
+      - "yarn.lock"
+      - "next.config.*"
+      - "wrangler.jsonc"
+      - "workers/**"
+      - "scripts/cloudflare/**"
+      - "tsconfig.json"
+      - "postcss.config.*"
+      - "tailwind.config.*"
+      - "components.json"
+      - ".github/workflows/deploy-cloudflare-staging.yml"
+      - ".github/workflows/cloudflare-app-worker.yml"
   workflow_dispatch: {}
 
 concurrency:
@@ -22,7 +36,7 @@ concurrency:
 
 jobs:
   deploy:
-    uses: ./.github/workflows/open-next-worker.yml
+    uses: ./.github/workflows/cloudflare-app-worker.yml
     secrets: inherit
     with:
       wrangler_command: deploy --env staging

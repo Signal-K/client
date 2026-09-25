@@ -1,7 +1,8 @@
 'use client'
 
+import { useRouteParams } from "@/src/lib/routing/useRouteParams";
 import { useEffect, useState } from "react"
-import { useParams, useRouter } from "next/navigation"
+import { useRouter } from "next/navigation"
 import { useSessionContext } from "@/src/lib/auth/session-context"
 
 // Mission imports
@@ -19,7 +20,7 @@ import { ActiveAsteroidWithId, ActiveAsteroidClassifyWithId } from "@/src/compon
 import UseDarkMode from "@/src/hooks/useDarkMode"
 
 export default function TelescopeClassifyPage() {
-  const params = useParams()
+  const params = useRouteParams<"project" | "id" | "mission">("/structures/telescope/[project]/[id]/[mission]")
   const router = useRouter()
 
   const { session, isLoading } = useSessionContext()
@@ -34,7 +35,7 @@ export default function TelescopeClassifyPage() {
   }, [session, isLoading, router])
 
     useEffect(() => {
-      if (isLoading || !session) return;
+      if (isLoading || !session || !params) return;
 
       const project = params ? String(params.project) : "";
       const mission = params ? String(params.mission) : "";
