@@ -1,4 +1,5 @@
 import { execFileSync } from "node:child_process";
+import { readFileSync } from "node:fs";
 import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 
 // Stand-in for the platform fetch, installed before the Worker module wraps it.
@@ -11,10 +12,19 @@ const upstream = vi.hoisted(() => {
 // The Worker bundle swaps these modules via wrangler.jsonc `alias`; mirror that here.
 vi.mock("@clerk/nextjs/server", () => import("./shims/clerk-nextjs-server"));
 vi.mock("next/cache", () => import("./shims/next-cache"));
+// Cron producers read PocketBase; hand them an in-memory stand-in.
+const pocketbase = vi.hoisted(() => ({ data: {} as Record<string, Array<Record<string, unknown>>> }));
+vi.mock("@/lib/pocketbase/adminClient", async () => {
+  const { fakePocketBase } = await import("@/src/server/testing/fakePocketBase");
+  return { createPocketbaseAdminClient: async () => fakePocketBase(pocketbase.data).pb };
+});
 
 import { resetJwksCache } from "../../api/src/jwt";
 import { requestContext } from "./context";
-import { handle, issuerFromPublishableKey, resolveAuth, type Env } from "./index";
+import { createMemoryKV, type KVLike } from "@/src/server/platform";
+import { resetSnapshotMemo, SNAPSHOT_BUNDLE_KEY } from "@/src/server/snapshots/store";
+import { DISCOVERY_REMINDER_CRON, SNAPSHOT_CRON } from "./background";
+import worker, { handle, issuerFromPublishableKey, resolveAuth, type Env } from "./index";
 import { auth } from "./shims/clerk-nextjs-server";
 
 const ISS = "https://clerk.example.test";
@@ -40,6 +50,8 @@ const claims = (sub: string) => ({ sub, sid: `sess_${sub}`, iss: ISS, exp: NOW +
 
 let assetRequests: string[];
 let fetchMock: ReturnType<typeof vi.fn>;
+let kv: KVLike;
+let queued: Array<{ body: any; delaySeconds?: number }>;
 
 const env: Env = {
   ASSETS: {
@@ -54,6 +66,14 @@ const env: Env = {
   POCKETBASE_URL: "https://pb.example.test",
   POCKETBASE_ADMIN_EMAIL: "a@b.c",
   POCKETBASE_ADMIN_PASSWORD: "secret",
+  get PUBLIC_DATA() {
+    return kv;
+  },
+  JOBS: {
+    sendBatch: async (messages) => {
+      queued.push(...messages);
+    },
+  },
 };
 
 const call = (path: string, init: RequestInit = {}) =>
@@ -71,6 +91,11 @@ beforeAll(async () => {
 
 beforeEach(() => {
   resetJwksCache();
+  resetSnapshotMemo();
+  kv = createMemoryKV();
+  queued = [];
+  pocketbase.data = {};
+  vi.unstubAllEnvs();
   assetRequests = [];
   fetchMock = vi.fn(async () => new Response(JSON.stringify({ keys: [jwk] })));
 });
@@ -218,6 +243,134 @@ describe("budget instrumentation", () => {
 
     const page = await call("/posts/1");
     expect(page.headers.get("x-ssc-subrequests")).toBe("0");
+  });
+});
+
+describe("public snapshots (SSC-37)", () => {
+  const publish = (generatedAt: string) =>
+    kv.put(
+      SNAPSHOT_BUNDLE_KEY,
+      JSON.stringify({
+        version: 1,
+        sections: {
+          "landing-stats": { schema: 1, generatedAt, data: { totalClassifications: 42 }, lastAttemptAt: generatedAt, lastError: null },
+          "community-activity": {
+            schema: 1,
+            generatedAt,
+            data: [
+              { id: 1, author: "user_aaa", authorId: "user_aaaaaaaa", type: "sunspot", at: generatedAt },
+              { id: 2, author: "user_bbb", authorId: "user_bbbbbbbb", type: "cloud", at: generatedAt },
+            ],
+            lastAttemptAt: generatedAt,
+            lastError: "PocketBase 502",
+          },
+        },
+      }),
+    );
+
+  it("serves a published snapshot from KV without touching PocketBase", async () => {
+    await publish(new Date().toISOString());
+    upstream.mockClear();
+    const res = await handle(new Request(`${ORIGIN}/api/public/snapshots/landing-stats`), env);
+    expect(res.status).toBe(200);
+    expect(res.headers.get("x-snapshot-status")).toBe("fresh");
+    expect(res.headers.get("cache-control")).toBe("public, max-age=60");
+    expect(res.headers.get("x-ssc-subrequests")).toBe("0");
+    expect(upstream).not.toHaveBeenCalled();
+    expect(await res.json()).toMatchObject({ status: "fresh", data: { totalClassifications: 42 } });
+  });
+
+  it("flags stale data and reports missing snapshots as 503", async () => {
+    await publish(new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString());
+    const stale = await call("/api/public/snapshots/landing-stats");
+    expect(stale.status).toBe(200);
+    expect(stale.headers.get("x-snapshot-status")).toBe("stale");
+
+    const missing = await call("/api/public/snapshots/sunspot-leaderboard");
+    expect(missing.status).toBe(503);
+    expect(missing.headers.get("x-snapshot-status")).toBe("missing");
+    expect(missing.headers.get("cache-control")).toBe("no-store");
+
+    expect((await call("/api/public/snapshots/hub-top-profiles")).status).toBe(404);
+  });
+
+  it("strips user ids from community activity and honours ?exclude", async () => {
+    await publish(new Date().toISOString());
+    const rows = await (await call("/api/community-activity?exclude=user_aaaaaaaa")).json();
+    expect(rows).toEqual([{ id: 2, author: "user_bbb", type: "cloud", at: expect.any(String) }]);
+  });
+
+  it("exposes freshness and the last refresh error on /api/public/status", async () => {
+    await publish(new Date().toISOString());
+    const body = await (await call("/api/public/status")).json();
+    expect(body.healthy).toBe(false);
+    expect(body.snapshots).toContainEqual(expect.objectContaining({ name: "community-activity", status: "fresh", lastError: "PocketBase 502" }));
+    expect(body.snapshots).toContainEqual(expect.objectContaining({ name: "sunspot-leaderboard", status: "missing" }));
+  });
+
+  it("publishes the snapshots from the cron trigger", async () => {
+    pocketbase.data = {
+      ss_classifications: [{ legacyId: 1, author: "user_a", classificationtype: "sunspot", createdAt: new Date().toISOString() }],
+      profiles: [{ userId: "user_a", username: "ada", classificationPoints: 3 }],
+    };
+    const log = vi.spyOn(console, "log").mockImplementation(() => {});
+    await worker.scheduled({ cron: SNAPSHOT_CRON, scheduledTime: Date.now() }, env, { waitUntil: () => {} });
+    const bundle = (await kv.get(SNAPSHOT_BUNDLE_KEY, "json")) as any;
+    expect(Object.keys(bundle.sections).sort()).toEqual(["community-activity", "hub-top-profiles", "landing-stats", "sunspot-leaderboard"]);
+    expect(bundle.sections["sunspot-leaderboard"].data.classificationLeaders[0]).toMatchObject({ username: "ada", count: 1 });
+    expect(JSON.parse(log.mock.calls[0][0])).toMatchObject({ invocation: `cron ${SNAPSHOT_CRON}`, task: "snapshots" });
+  });
+});
+
+describe("background jobs (SSC-39)", () => {
+  it("starts the daily reminder fan-out from its cron", async () => {
+    vi.spyOn(console, "log").mockImplementation(() => {});
+    await worker.scheduled({ cron: DISCOVERY_REMINDER_CRON, scheduledTime: Date.parse("2026-09-25T17:00:00Z") }, env, { waitUntil: () => {} });
+    expect(queued.map((m) => m.body.id)).toEqual(["reminders:2026-09-25:p1"]);
+  });
+
+  it("queues the signed-in user's notification and answers 202 at once", async () => {
+    const res = await call("/api/notify-my-discoveries", {
+      method: "POST",
+      headers: { authorization: `Bearer ${await sign(claims("user_1"))}`, "content-type": "application/json" },
+      // A body userId is ignored: the push goes to the session user only.
+      body: JSON.stringify({ userId: "someone_else", customMessage: { title: "Deployed", body: "3 targets", url: "/structures/telescope" } }),
+    });
+    expect(res.status).toBe(202);
+    expect(queued).toHaveLength(1);
+    expect(queued[0].body).toMatchObject({ type: "push.user", userId: "user_1", notification: { title: "Deployed" } });
+    expect((await call("/api/notify-my-discoveries", { method: "POST", body: "{}" })).status).toBe(401);
+  });
+
+  it("guards operator endpoints with INTERNAL_JOBS_TOKEN", async () => {
+    expect((await call("/api/send-test-notification", { method: "POST" })).status).toBe(503);
+    vi.stubEnv("INTERNAL_JOBS_TOKEN", "s3cret");
+    expect((await call("/api/send-test-notification", { method: "POST", headers: { authorization: "Bearer nope" } })).status).toBe(401);
+    const res = await call("/api/internal/jobs", { headers: { authorization: "Bearer s3cret" } });
+    expect(res.status).toBe(200);
+    expect(await res.json()).toEqual({ count: 0, parked: [] });
+    expect((await call("/api/auto-notify-discoveries", { method: "POST", headers: { authorization: "Bearer s3cret" } })).status).toBe(202);
+    expect(queued[0].body.type).toBe("reminders.discoveries");
+  });
+
+  it("consumes a queue batch and parks what it cannot process", async () => {
+    vi.spyOn(console, "log").mockImplementation(() => {});
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    const acked: string[] = [];
+    await worker.queue(
+      { queue: "starsailors-jobs", messages: [{ id: "m1", body: { junk: true }, attempts: 1, ack: () => acked.push("m1"), retry: () => {} }] },
+      env,
+      { waitUntil: () => {} },
+    );
+    expect(acked).toEqual(["m1"]);
+    expect((await kv.list({ prefix: "jobs:dead:" })).keys.map((k) => k.name)).toEqual(["jobs:dead:invalid:m1"]);
+  });
+
+  it("keeps wrangler.jsonc crons and queues in step with the code", () => {
+    const config = readFileSync("wrangler.jsonc", "utf8");
+    expect(config).toContain(`"crons": ["${SNAPSHOT_CRON}", "${DISCOVERY_REMINDER_CRON}"]`);
+    expect(config).toContain(`"crons": ["${SNAPSHOT_CRON}"]`);
+    expect(config).toMatch(/"max_retries": 5, "dead_letter_queue": "starsailors-jobs-dlq"/);
   });
 });
 

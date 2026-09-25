@@ -1,5 +1,6 @@
 import { createPocketbaseAdminClient } from "@/lib/pocketbase/adminClient";
-import { unstable_cache } from "next/cache";
+import { computeHubTopProfiles } from "@/src/server/snapshots/compute";
+import { readSnapshot } from "@/src/server/snapshots/store";
 
 export interface HubLeaderboardEntry {
   rank: number;
@@ -13,21 +14,18 @@ export interface HubLeaderboardData {
   currentUser: HubLeaderboardEntry | null;
 }
 
-const getCachedTopProfiles = unstable_cache(
-  async () => {
-    const pb = await createPocketbaseAdminClient();
-    const result = await pb.collection("profiles").getList(1, 5, {
-      sort: "-classificationPoints,+updatedAt",
-      fields: "userId,username,classificationPoints",
-    });
-    return result.items;
-  },
-  ["hub-top-profiles"],
-  { revalidate: 300, tags: ["leaderboard"] }
-);
+// SSC-37: the top five come from the precomputed `hub-top-profiles` snapshot
+// (cron-refreshed). Only the caller's own rank is read per request.
+async function getTopProfiles() {
+  const snapshot = await readSnapshot("hub-top-profiles");
+  if (snapshot.data) return snapshot.data;
+  // Not published yet (first minutes after the first deploy): one bounded read.
+  const pb = await createPocketbaseAdminClient();
+  return computeHubTopProfiles(pb);
+}
 
 export async function getHubLeaderboard(userId: string): Promise<HubLeaderboardData> {
-  const topProfiles = await getCachedTopProfiles();
+  const topProfiles = await getTopProfiles();
   const pb = await createPocketbaseAdminClient();
 
   const me = await pb
@@ -46,7 +44,7 @@ export async function getHubLeaderboard(userId: string): Promise<HubLeaderboardD
   const entries = topProfiles.map((profile, index) => ({
     rank: index + 1,
     username: profile.username || `User ${profile.userId.slice(0, 6)}`,
-    score: Number(profile.classificationPoints ?? 0),
+    score: profile.score,
     isCurrentUser: profile.userId === userId,
   }));
 

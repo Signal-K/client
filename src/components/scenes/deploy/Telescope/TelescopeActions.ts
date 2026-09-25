@@ -171,17 +171,14 @@ export async function handleDeployAction(params: HandleDeployParams) {
     const anomalyNames = selectedAnomalies.map(a => a.content || `${dt === "stellar" ? "DSK" : "TESS"}-${String(a.id).padStart(3, "0")}`)
     const sectorName = generateSectorName(selectedSector!.x, selectedSector!.y)
     setDeploymentResult({ anomalies: anomalyNames, sectorName })
-    try {
-      const notificationTitle = "Telescope Deployed Successfully"
+    // SSC-39: the push is queued server-side; never hold the confirmation for it.
+    if (userId) {
       const targetType = dt === "stellar" ? "stellar objects" : "exoplanet candidates"
-      const notificationBody = `${selectedAnomalies.length} ${targetType} discovered in ${sectorName}`
-      if (userId) {
-        await fetch('/api/notify-my-discoveries', {
-          method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ userId, customMessage: { title: notificationTitle, body: notificationBody, url: '/structures/telescope' } })
-        })
-      }
-    } catch (e) { console.error('Failed to send deployment notification:', e) }
+      void fetch('/api/notify-my-discoveries', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ customMessage: { title: "Telescope Deployed Successfully", body: `${selectedAnomalies.length} ${targetType} discovered in ${sectorName}`, url: '/structures/telescope' } })
+      }).catch((e) => console.error('Failed to queue deployment notification:', e))
+    }
     setShowConfirmation(true)
   }
 

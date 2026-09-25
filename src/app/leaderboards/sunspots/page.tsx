@@ -22,6 +22,8 @@ export default function SunspotLeaderboardPage() {
   const [probeLeaders, setProbeLeaders] = useState<LeaderboardEntry[]>([]);
   const [classificationLeaders, setClassificationLeaders] = useState<LeaderboardEntry[]>([]);
   const [loading, setLoading] = useState(true);
+  // SSC-37: rankings are precomputed every few minutes; say how old they are.
+  const [freshness, setFreshness] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchLeaderboards() {
@@ -33,7 +35,13 @@ export default function SunspotLeaderboardPage() {
         });
         const result = await response.json().catch(() => ({}));
         if (!response.ok) {
+          if (response.status === 503) setFreshness("Rankings are being prepared. Check back in a few minutes.");
           throw new Error(result?.error || "Failed to fetch leaderboard data");
+        }
+        if (typeof result?.generatedAt === "string") {
+          const minutes = Math.max(0, Math.round((Date.now() - Date.parse(result.generatedAt)) / 60_000));
+          const ago = minutes < 1 ? "just now" : `${minutes} min ago`;
+          setFreshness(result.status === "stale" ? `Rankings may be out of date (updated ${ago}).` : `Updated ${ago}.`);
         }
 
         setProbeLeaders(Array.isArray(result?.probeLeaders) ? result.probeLeaders : []);
@@ -82,6 +90,7 @@ export default function SunspotLeaderboardPage() {
               <Trophy className="w-6 h-6 text-yellow-400" />
               Sunspot Mission Leaderboards
             </CardTitle>
+            {freshness ? <p className="text-xs text-muted-foreground" data-testid="leaderboard-freshness">{freshness}</p> : null}
           </CardHeader>
           <CardContent>
             <Tabs defaultValue="probes" className="w-full">

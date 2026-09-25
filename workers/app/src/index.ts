@@ -9,10 +9,16 @@
 //   anything else with no matching asset: a dynamic page (served from its
 //               exported placeholder HTML) or the 404 page
 // None of these render React, so every request fits the Workers Free CPU budget.
+//
+// It also runs the cron trigger (public snapshots, SSC-37) and the jobs queue
+// consumer (SSC-39); see background.ts.
 import { AsyncLocalStorage } from "node:async_hooks";
+
+import { configurePlatform, createMemoryKV, type KVLike, type PlatformJobSender } from "@/src/server/platform";
 
 import { handle as handleApiV1 } from "../../api/src/index";
 import { AuthError, verifyClerkJwt, type ClerkClaims } from "../../api/src/jwt";
+import { runQueueBatch, runScheduled, type QueueBatchLike } from "./background";
 import { requestContext, type RequestContext } from "./context";
 import { apiRoutes } from "./generated/api-routes";
 import { dynamicPages } from "./generated/page-routes";
@@ -30,9 +36,39 @@ export type Env = {
   POCKETBASE_ADMIN_EMAIL: string;
   POCKETBASE_ADMIN_PASSWORD: string;
   posthog_region?: string;
+  /** Workers KV: published public snapshots, job receipts and parked jobs. */
+  PUBLIC_DATA?: KVLike;
+  /** Cloudflare Queues producer for background jobs. */
+  JOBS?: { sendBatch: PlatformJobSender };
 };
 
-export type Deps = { fetchImpl?: typeof fetch; now?: number };
+type ExecutionContextLike = { waitUntil(promise: Promise<unknown>): void };
+
+export type Deps = { fetchImpl?: typeof fetch; now?: number; ctx?: ExecutionContextLike };
+
+// Shared code (src/server) reaches the bindings through platform(); waitUntil
+// follows the current invocation.
+const invocation = new AsyncLocalStorage<{ waitUntil: ((promise: Promise<unknown>) => void) | null }>();
+let isolateKV: KVLike | null = null;
+
+function installPlatform(env: Env) {
+  if (!env.PUBLIC_DATA && !isolateKV) {
+    console.warn("[app-worker] PUBLIC_DATA KV is not bound; snapshots and job records live in isolate memory only");
+  }
+  const kv = env.PUBLIC_DATA ?? (isolateKV ??= createMemoryKV());
+  const sendJobs = env.JOBS ? (messages: Parameters<PlatformJobSender>[0]) => env.JOBS!.sendBatch(messages) : null;
+  configurePlatform(() => ({
+    kv,
+    sendJobs,
+    waitUntil: invocation.getStore()?.waitUntil ?? null,
+    localFallback: !env.PUBLIC_DATA,
+  }));
+}
+
+function inInvocation<T>(env: Env, ctx: ExecutionContextLike | undefined, fn: () => Promise<T>): Promise<T> {
+  installPlatform(env);
+  return invocation.run({ waitUntil: ctx ? (promise) => ctx.waitUntil(promise) : null }, fn);
+}
 
 // SSC-38 budget evidence: every Worker response carries `x-ssc-subrequests`,
 // the number of outbound fetches it made (Free plan cap: 50). CPU time comes
@@ -201,7 +237,7 @@ async function servePage(request: Request, env: Env, url: URL): Promise<Response
 
 export async function handle(request: Request, env: Env, deps: Deps = {}): Promise<Response> {
   const counter = { subrequests: 0 };
-  const response = await metrics.run(counter, () => route(request, env, deps));
+  const response = await metrics.run(counter, () => inInvocation(env, deps.ctx, () => route(request, env, deps)));
   const measured = new Response(response.body, response);
   measured.headers.set("x-ssc-subrequests", String(counter.subrequests));
   return measured;
@@ -230,6 +266,23 @@ async function route(request: Request, env: Env, deps: Deps): Promise<Response> 
   }
 }
 
+/** Runs a cron or queue invocation and logs its outcome and subrequest count. */
+async function background(env: Env, ctx: ExecutionContextLike, label: string, fn: () => Promise<Record<string, unknown>>) {
+  const counter = { subrequests: 0 };
+  const started = Date.now();
+  try {
+    const summary = await metrics.run(counter, () => inInvocation(env, ctx, fn));
+    console.log(JSON.stringify({ invocation: label, ...summary, subrequests: counter.subrequests, wallMs: Date.now() - started }));
+  } catch (error) {
+    console.error(`[app-worker] ${label} failed after ${counter.subrequests} subrequests`, error);
+    throw error;
+  }
+}
+
 export default {
-  fetch: (request: Request, env: Env) => handle(request, env),
+  fetch: (request: Request, env: Env, ctx?: ExecutionContextLike) => handle(request, env, { ctx }),
+  scheduled: (controller: { cron: string; scheduledTime: number }, env: Env, ctx: ExecutionContextLike) =>
+    background(env, ctx, `cron ${controller.cron}`, () => runScheduled(controller.cron, controller.scheduledTime)),
+  queue: (batch: QueueBatchLike, env: Env, ctx: ExecutionContextLike) =>
+    background(env, ctx, `queue ${batch.queue}`, () => runQueueBatch(batch)),
 };

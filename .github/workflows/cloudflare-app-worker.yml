@@ -77,6 +77,16 @@ jobs:
           posthog_api_key: ${{ vars.NEXT_PUBLIC_POSTHOG_KEY }}
           posthog_project_id: ${{ vars.POSTHOG_PROJECT_ID }}
           posthog_region: US Cloud
+          NEXT_PUBLIC_VAPID_PUBLIC_KEY: ${{ secrets.VAPID_PUBLIC_KEY }}
+
+      # SSC-37/SSC-39: creates the KV namespace and job queues on first run and
+      # writes the namespace id into wrangler.jsonc. The API token needs
+      # Workers KV Storage: Edit and Queues: Edit.
+      - name: Ensure KV namespace and queues
+        run: node scripts/cloudflare/ensure-resources.mjs ${{ inputs.wrangler_env_args }}
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
 
       - uses: cloudflare/wrangler-action@v3
         with:
@@ -90,7 +100,8 @@ jobs:
           # top-level env correctly; it just logs a harmless warning.
           # The publishable key is public; the Worker derives the Clerk issuer
           # (JWKS) from it to verify session JWTs locally.
-          command: ${{ inputs.wrangler_command }} --var NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY:${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
+          # The VAPID public key is public too; queued push jobs need it to sign.
+          command: ${{ inputs.wrangler_command }} --var NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY:${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }} ${{ secrets.VAPID_PUBLIC_KEY && format('--var NEXT_PUBLIC_VAPID_PUBLIC_KEY:{0}', secrets.VAPID_PUBLIC_KEY) || '' }}
 
       - name: Confirm Worker secrets already exist
         run: |

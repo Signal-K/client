@@ -48,12 +48,19 @@ const routes = [
   { flow: "anonymous", name: "Dynamic page (placeholder)", method: "GET", path: "/posts/1", expect: 200 },
   { flow: "anonymous", name: "Signed-out API read", method: "GET", path: "/api/auth/session", expect: 401 },
   { flow: "anonymous", name: "Unknown path (404 page)", method: "GET", path: "/budget-missing-page", expect: 404 },
+  // SSC-37: precomputed public data, read from KV only.
+  { flow: "anonymous", name: "Landing stats snapshot", method: "GET", path: "/api/public/snapshots/landing-stats", expect: 200 },
+  { flow: "anonymous", name: "Sunspot leaderboard snapshot", method: "GET", path: "/api/gameplay/leaderboards/sunspots", expect: 200 },
+  { flow: "anonymous", name: "Community activity snapshot", method: "GET", path: "/api/community-activity", expect: 200 },
+  { flow: "anonymous", name: "Snapshot health", method: "GET", path: "/api/public/status", expect: 200 },
   { flow: "authenticated read", name: "Session check", method: "GET", path: "/api/auth/session", expect: 200, auth: true },
   { flow: "authenticated read", name: "SSC-35 /api/v1/me", method: "GET", path: "/api/v1/me", expect: 200, auth: true },
   { flow: "authenticated read", name: "Hub bootstrap", method: "GET", path: "/api/gameplay/hub/bootstrap", expect: 200, auth: true },
   { flow: "authenticated read", name: "Profile", method: "GET", path: "/api/gameplay/profile/me", expect: 200, auth: true },
   { flow: "mutation", name: "Ensure profile (idempotent)", method: "POST", path: "/api/gameplay/profile/ensure", expect: 200, auth: true },
   { flow: "mutation", name: "Former server action", method: "POST", path: "/api/actions/getCurrentProfileAction", body: { args: [] }, expect: 200, auth: true },
+  // SSC-39: answers 202 once the push is queued; the consumer shows up under "Background invocations".
+  { flow: "mutation", name: "Queue a push to self", method: "POST", path: "/api/notify-my-discoveries", body: { customMessage: { title: "Budget check", body: "Star Sailors budget measurement", url: "/game" } }, expect: 202, auth: true },
   { flow: "refresh", name: "Hub reload: shell", method: "GET", path: "/game", expect: 200, auth: true },
   { flow: "refresh", name: "Hub reload: bootstrap", method: "GET", path: "/api/gameplay/hub/bootstrap", expect: 200, auth: true },
 ];
@@ -183,6 +190,30 @@ if (tail) {
   }
 }
 
+// Cron and queue invocations seen by the tail during the run (SSC-37/39).
+// A cron fires every 10 minutes, so a short run may not see one.
+const backgroundRows = [];
+if (tail) {
+  const groups = new Map();
+  for (const e of tail.events) {
+    const label = e?.event?.cron ? `cron ${e.event.cron}` : e?.event?.queue ? `queue ${e.event.queue}` : null;
+    if (!label) continue;
+    groups.set(label, [...(groups.get(label) ?? []), e]);
+  }
+  for (const [label, events] of groups) {
+    const cpu = events.map((e) => e.cpuTime ?? null);
+    const exceeded = events.some((e) => e.outcome === "exceededCpu" || e.outcome === "exceededResources");
+    backgroundRows.push({
+      invocation: label,
+      count: events.length,
+      outcomes: [...new Set(events.map((e) => e.outcome))].join("/"),
+      cpuMsMax: max(cpu),
+      cpuMsMedian: median(cpu),
+      withinBudget: !exceeded && (max(cpu) == null || max(cpu) <= CPU_BUDGET_MS),
+    });
+  }
+}
+
 const rows = results.map((r) => {
   const runs = r.runs;
   const failures = runs.filter((x) => !x.ok).length;
@@ -226,12 +257,22 @@ const lines = [
       : `| ${r.flow} | ${r.name} (\`${r.request}\`) | ${r.served} | ${r.statuses} | ${Math.round(r.errorRate * 100)}% | ${r.error1102 ? "YES" : "no"} | ${fmt(r.bytes, " B")} | ${fmt(r.coldMs, " ms")} | ${fmt(r.warmMs, " ms")} | ${fmt(r.cpuMsMax, " ms")} / ${fmt(r.cpuMsMedian, " ms")} | ${fmt(r.subrequestsMax)} | ${r.withinBudget ? "yes" : "NO"} |`,
   ),
   "",
+  "### Background invocations (cron, queue)",
+  "",
+  ...(backgroundRows.length
+    ? [
+        "| Invocation | Count | Outcome | CPU max / median | Within budget |",
+        "| --- | --- | --- | --- | --- |",
+        ...backgroundRows.map((b) => `| ${b.invocation} | ${b.count} | ${b.outcomes} | ${fmt(b.cpuMsMax, " ms")} / ${fmt(b.cpuMsMedian, " ms")} | ${b.withinBudget ? "yes" : "NO"} |`),
+      ]
+    : [useTail ? "None observed during this run (the snapshot cron fires every 10 minutes; see Workers Logs)." : "Not collected (run with --tail)."]),
+  "",
   `Budget: CPU ≤ ${CPU_BUDGET_MS} ms and ≤ ${SUBREQUEST_BUDGET} subrequests per Worker invocation (Workers Free). "Cold" is the first request of the run; run straight after a deploy for a true cold start.`,
 ];
 const report = lines.join("\n");
 console.log(report);
-if (outFile) writeFileSync(String(outFile), JSON.stringify({ base, samples, tail: useTail, at: new Date().toISOString(), rows, results }, null, 2));
+if (outFile) writeFileSync(String(outFile), JSON.stringify({ base, samples, tail: useTail, at: new Date().toISOString(), rows, backgroundRows, results }, null, 2));
 if (process.env.GITHUB_STEP_SUMMARY) writeFileSync(process.env.GITHUB_STEP_SUMMARY, report + "\n", { flag: "a" });
 
-const failed = rows.some((r) => !r.skipped && (!r.withinBudget || r.errorRate > 0));
+const failed = rows.some((r) => !r.skipped && (!r.withinBudget || r.errorRate > 0)) || backgroundRows.some((b) => !b.withinBudget);
 process.exit(failed ? 1 : 0);
