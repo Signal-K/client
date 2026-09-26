@@ -15,6 +15,7 @@
       "Bash(yarn add cypress@^15.10.0 --dev)",
       "Bash(CYPRESS_INSTALL_BINARY=/Users/scroobz/Library/Caches/Cypress/15.10.0/Cypress.app npx cypress verify)",
       "Bash(CYPRESS_INSTALL_BINARY=/Users/scroobz/Library/Caches/Cypress/15.10.0/Cypress.app yarn add cypress@15.10.0 --dev)",
+      "Bash(curl * https://signal-k-starsailors.fly.dev/*)",
       "WebSearch",
       "WebFetch(domain:store.steampowered.com)",
       "WebFetch(domain:localhost)",
@@ -37,10 +38,21 @@
       "mcp__plugin_cloudflare_cloudflare-api__search",
       "mcp__plugin_cloudflare_cloudflare-api__execute",
       "mcp__plugin_cloudflare_cloudflare-api__docs",
-      "Skill(clerk-backend-api)"
+      "Skill(clerk-backend-api)",
+      "Bash(git branch *)",
+      "Bash(curl -s -m 3 http://127.0.0.1:8090/api/health)",
+      "Bash(npx vitest *)",
+      "Bash(curl -s -m 3 http://127.0.0.1:8799/)",
+      "Bash(pkill -f \"jwks-server.mjs\")",
+      "Bash(pkill -f \"wrangler dev --port 8788\")",
+      "Bash(pkill -f \"workerd\")",
+      "Bash(lsof -iTCP:8788 -iTCP:8799 -sTCP:LISTEN)",
+      "Bash(python3 *)"
     ]
   },
+  "enableAllProjectMcpServers": true,
   "enabledMcpjsonServers": [
-    "stitch"
+    "stitch",
+    "knowns"
   ]
 }
