@@ -7,6 +7,7 @@ import ClassificationForm from "../(classifications)/PostForm";
 import ImageAnnotator from "../(classifications)/Annotating/AnnotatorView";
 import TutorialContentBlock, { createTutorialSlides } from "../TutorialContentBlock";
 import { getStorageUrl } from "@/lib/pocketbase/storageUrl";
+import { ANOMALIES_API } from "@/lib/gameplay/edgeApi";
 
 interface SelectedAnomalyProps {
     anomalyid: number;
@@ -122,7 +123,7 @@ export function StarterSunspot({ anomalyId }: { anomalyId?: string }) {
             try {
                 // If anomalyId is provided, fetch that anomaly directly
                 if (anomalyId) {
-                    const anomalyRes = await fetch(`/api/gameplay/anomalies?id=${encodeURIComponent(anomalyId)}&limit=1`);
+                    const anomalyRes = await fetch(`${ANOMALIES_API}?id=${encodeURIComponent(anomalyId)}&limit=1`);
                     const anomalyPayload = await anomalyRes.json();
                     if (!anomalyRes.ok || !anomalyPayload?.anomalies?.[0]) {
                       throw new Error(anomalyPayload?.error || "Anomaly not found");
@@ -135,7 +136,7 @@ export function StarterSunspot({ anomalyId }: { anomalyId?: string }) {
                     }
                 } else {
                     const anomalyRes = await fetch(
-                      `/api/gameplay/anomalies?anomalySet=telescope-sunspots&limit=1`
+                      `${ANOMALIES_API}?anomalySet=telescope-sunspots&limit=1`
                     );
                     const anomalyPayload = await anomalyRes.json();
                     if (!anomalyRes.ok || !anomalyPayload?.anomalies?.[0]) {

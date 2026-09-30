@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useSession } from "@/src/lib/auth/session-context";
 import ImageAnnotator from "../(classifications)/Annotating/AnnotatorView";
 import { getStorageUrl } from "@/lib/pocketbase/storageUrl";
+import { ANOMALIES_API } from "@/lib/gameplay/edgeApi";
 
 type Anomaly = {
   id: string;
@@ -31,11 +32,11 @@ export function StarterLidar({ anomalyid }: { anomalyid: string }) {
       try {
         let row: any = null;
         if (anomalyid) {
-          const res = await fetch(`/api/gameplay/anomalies?id=${encodeURIComponent(anomalyid)}&limit=1`);
+          const res = await fetch(`${ANOMALIES_API}?id=${encodeURIComponent(anomalyid)}&limit=1`);
           const payload = await res.json().catch(() => ({}));
           row = res.ok ? payload?.anomalies?.[0] : null;
         } else {
-          const res = await fetch("/api/gameplay/anomalies?anomalySet=cloudspottingOnMars&limit=1");
+          const res = await fetch(`${ANOMALIES_API}?anomalySet=cloudspottingOnMars&limit=1`);
           const payload = await res.json().catch(() => ({}));
           row = res.ok ? payload?.anomalies?.[0] : null;
         }
@@ -104,7 +105,7 @@ export function CloudspottingOnMarsWithId() {
           return;
         }
 
-        const anomalyRes = await fetch(`/api/gameplay/anomalies?id=${selected.anomaly_id}&limit=1`);
+        const anomalyRes = await fetch(`${ANOMALIES_API}?id=${selected.anomaly_id}&limit=1`);
         const anomalyPayload = await anomalyRes.json().catch(() => ({}));
         const row = anomalyRes.ok ? anomalyPayload?.anomalies?.[0] : null;
         if (!row?.id) {

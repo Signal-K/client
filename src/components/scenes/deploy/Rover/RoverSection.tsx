@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/src/components/ui/button";
 import { SciFiAnomalyComponent } from "@/src/components/classification/viewport/sci-fi-anomaly-component";
 import { fetchResearchSummary } from "@/lib/gameplay/researchSummary";
+import { ANOMALIES_API } from "@/lib/gameplay/edgeApi";
 
 export default function RoverViewportSection() {
     const router = useRouter();
@@ -87,7 +88,7 @@ export default function RoverViewportSection() {
             let anomaliesById = new Map<number, any>();
             const linkedAnomalyIds = [...new Set((linked || []).map((l: any) => Number(l.anomaly_id)).filter(Number.isFinite))];
             if (linkedAnomalyIds.length > 0) {
-              const anomalyRes = await fetch(`/api/gameplay/anomalies?ids=${linkedAnomalyIds.join(",")}&limit=500`);
+              const anomalyRes = await fetch(`${ANOMALIES_API}?ids=${linkedAnomalyIds.join(",")}&limit=500`);
               const anomalyPayload = await anomalyRes.json();
               const anomalies = anomalyRes.ok ? anomalyPayload?.anomalies || [] : [];
               anomaliesById = new Map(anomalies.map((a: any) => [Number(a.id), a]));

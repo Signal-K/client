@@ -7,6 +7,7 @@ import { Button } from "@/src/components/ui/button";
 import ImageAnnotator from "../(classifications)/Annotating/AnnotatorView";
 import TutorialContentBlock, { createTutorialSlides } from "../TutorialContentBlock";
 import { getStorageUrl } from "@/lib/pocketbase/storageUrl";
+import { ANOMALIES_API } from "@/lib/gameplay/edgeApi";
 
 interface Props {
     anomalyid: number | bigint;
@@ -41,7 +42,7 @@ export function ActiveAsteroidWithId() {
 
             try {
                 const res = await fetch(
-                  `/api/gameplay/anomalies?author=${encodeURIComponent(session.user.id)}&anomalySet=telescope-active-asteroids&limit=1`
+                  `${ANOMALIES_API}?author=${encodeURIComponent(session.user.id)}&anomalySet=telescope-active-asteroids&limit=1`
                 );
                 const payload = await res.json();
                 if (!res.ok) throw new Error(payload?.error || "Failed to load anomaly");
@@ -131,7 +132,7 @@ export function ActiveAsteroidClassifyWithId({ anomalyId }: { anomalyId: string 
 
             try {
                 const res = await fetch(
-                  `/api/gameplay/anomalies?id=${encodeURIComponent(anomalyId)}&anomalySet=active-asteroids&limit=1`
+                  `${ANOMALIES_API}?id=${encodeURIComponent(anomalyId)}&anomalySet=active-asteroids&limit=1`
                 );
                 const payload = await res.json();
                 if (!res.ok) throw new Error(payload?.error || "Failed to load anomaly");

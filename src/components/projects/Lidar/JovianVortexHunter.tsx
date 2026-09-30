@@ -6,6 +6,7 @@ import ImageAnnotator from "../(classifications)/Annotating/AnnotatorView";
 import { Button } from "@/src/components/ui/button";
 import TutorialContentBlock, { createTutorialSlides } from "../TutorialContentBlock";
 import { getStorageUrl } from "@/lib/pocketbase/storageUrl";
+import { ANOMALIES_API } from "@/lib/gameplay/edgeApi";
 
 type Anomaly = {
   id: number;
@@ -201,7 +202,7 @@ export function LidarJVHSatelliteWithId() {
 
         try {
             const anomalyRes = await fetch(
-              `/api/gameplay/anomalies?author=${encodeURIComponent(session.user.id)}&anomalySet=lidar-jovianVortexHunter&limit=1`
+              `${ANOMALIES_API}?author=${encodeURIComponent(session.user.id)}&anomalySet=lidar-jovianVortexHunter&limit=1`
             );
             const anomalyPayload = await anomalyRes.json().catch(() => ({}));
             if (!anomalyRes.ok) throw new Error(anomalyPayload?.error || "Failed to load anomaly");

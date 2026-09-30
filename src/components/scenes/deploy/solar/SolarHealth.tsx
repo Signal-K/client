@@ -9,6 +9,7 @@ import { OrbitControls, Stars } from "@react-three/drei";
 import Section from "@/src/components/sections/Section";
 import { Sun } from "@/src/components/discovery/data-sources/Solar/Sun";
 import { useRouter } from "next/navigation";
+import { ANOMALIES_API } from "@/lib/gameplay/edgeApi";
 
 function Sun3D({ sunspots }: { sunspots: number }) {
   return (
@@ -47,7 +48,7 @@ export default function SolarHealth() {
       }
       setLoading(true);
       // Fetch sunspot anomalies
-      const anomaliesResponse = await fetch("/api/gameplay/anomalies?anomalySet=sunspot", {
+      const anomaliesResponse = await fetch(`${ANOMALIES_API}?anomalySet=sunspot`, {
         cache: "no-store",
       });
       const anomaliesPayload = await anomaliesResponse.json().catch(() => null);

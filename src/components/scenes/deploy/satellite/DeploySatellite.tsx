@@ -5,6 +5,7 @@ import { useSession } from "@/src/lib/auth/session-context";
 import { usePostHog } from "posthog-js/react";
 import PlanetFocusView from "./PlanetFocusView";
 import DeploySidebar from "./DeploySidebar";
+import { ANOMALIES_API } from "@/lib/gameplay/edgeApi";
 
 type InvestigationMode = "weather" | "p-4" | "planets";
 
@@ -46,7 +47,7 @@ export default function DeploySatelliteViewport() {
 
       const [activeRes, planetRes, cloudRes, vortexRes, radarRes, totalRes] = await Promise.all([
         fetch(`/api/gameplay/active-planet?userId=${encodeURIComponent(session.user.id)}`),
-        fetch("/api/gameplay/anomalies?anomalySet=telescope-tess&limit=500"),
+        fetch(`${ANOMALIES_API}?anomalySet=telescope-tess&limit=500`),
         fetch("/api/gameplay/classifications/count?classificationtype=cloud"),
         fetch("/api/gameplay/classifications/count?classificationtype=vortex"),
         fetch("/api/gameplay/classifications/count?classificationtype=radar"),

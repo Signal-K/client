@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import SatelliteProgressBar from "./SatelliteProgressBar";
 import SatelliteSpiderScan from "./satelliteSpiderScan";
+import { ANOMALIES_API } from "@/lib/gameplay/edgeApi";
 
 interface Satellite {
   id: string;
@@ -37,7 +38,7 @@ export default function SatellitePosition({ satellites, flashingIndicator }: Sat
       }
 
       const ids = [...new Set(linked.map((x: any) => Number(x.anomaly_id)).filter((x: number) => Number.isFinite(x)))];
-      const anomalyRes = await fetch(`/api/gameplay/anomalies?ids=${ids.join(",")}&limit=500`);
+      const anomalyRes = await fetch(`${ANOMALIES_API}?ids=${ids.join(",")}&limit=500`);
       const anomalyPayload = await anomalyRes.json().catch(() => ({}));
       const anomalyMap = new Map(
         (anomalyRes.ok ? anomalyPayload?.anomalies || [] : []).map((a: any) => [Number(a.id), a])

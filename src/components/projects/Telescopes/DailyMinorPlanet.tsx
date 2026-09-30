@@ -9,6 +9,7 @@ import TutorialContentBlock from "../TutorialContentBlock";
 
 import { Button } from "@/src/components/ui/button";
 import { getStorageUrl } from "@/lib/pocketbase/storageUrl";
+import { ANOMALIES_API } from "@/lib/gameplay/edgeApi";
 interface Props {
     anomalyid: number | bigint;
 };
@@ -132,7 +133,7 @@ export function DailyMinorPlanetWithId({ anomalyId }: { anomalyId: string }) {
 
       try {
         if (anomalyId === "random" || !anomalyId) {
-          const anomaliesRes = await fetch("/api/gameplay/anomalies?anomalySet=telescope-minorPlanet&limit=50");
+          const anomaliesRes = await fetch(`${ANOMALIES_API}?anomalySet=telescope-minorPlanet&limit=50`);
           const anomaliesPayload = await anomaliesRes.json();
           const linkedAnomalies = anomaliesRes.ok ? anomaliesPayload?.anomalies || [] : [];
           if (!linkedAnomalies || linkedAnomalies.length === 0) {
@@ -158,7 +159,7 @@ export function DailyMinorPlanetWithId({ anomalyId }: { anomalyId: string }) {
           setCurrentImageUrl(urls[0]);
         } else {
           const anomalyRes = await fetch(
-            `/api/gameplay/anomalies?id=${encodeURIComponent(anomalyId)}&anomalySet=telescope-minorPlanet&limit=1`
+            `${ANOMALIES_API}?id=${encodeURIComponent(anomalyId)}&anomalySet=telescope-minorPlanet&limit=1`
           );
           const anomalyPayload = await anomalyRes.json();
           const anomalies = anomalyRes.ok ? anomalyPayload?.anomalies || [] : [];

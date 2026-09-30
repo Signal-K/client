@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import ClassificationForm from "../(classifications)/PostForm";
 import { Button } from "@/src/components/ui/button";
 import TutorialContentBlock, { createTutorialSlides } from "../TutorialContentBlock";
+import { ANOMALIES_API } from "@/lib/gameplay/edgeApi";
 
 type Anomaly = {
   id: string;
@@ -297,7 +298,7 @@ export default function TelescopeGalaxyZoo() {
 
       try {
         const res = await fetch(
-          `/api/gameplay/anomalies?anomalySet=telescope-galaxyZoo&limit=1`
+          `${ANOMALIES_API}?anomalySet=telescope-galaxyZoo&limit=1`
         );
         const data = await res.json();
         if (data.anomalies && data.anomalies.length > 0) {
