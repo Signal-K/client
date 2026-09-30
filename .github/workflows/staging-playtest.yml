@@ -1,6 +1,6 @@
 name: Staging playtest lifecycle (SSC-33)
 
-# Runs on pushes to ssc-33-playtest-ci or manually. Deploys this ref's API Worker (workers/api) to staging, enables the guarded
+# Runs on pushes to ssc-33-playtest-ci or manually. Enables the guarded
 # playtest endpoint for the duration of the run, plays the browser flow with a
 # throwaway Clerk account, and always removes the endpoint secrets afterwards.
 # Staging shares the production Clerk/PocketBase instance, so the endpoint must
@@ -44,10 +44,10 @@ jobs:
       - name: Test the Worker
         run: npx vitest run workers/api
 
-      - name: Deploy the staging API Worker with the playtest endpoint enabled
-        working-directory: workers/api
+      # The API is part of the staging app Worker (root wrangler.jsonc). The
+      # staging deploy job already shipped this ref; only the secrets change here.
+      - name: Enable the playtest endpoint on the staging Worker
         run: |
-          npx wrangler deploy --env staging --var CLERK_ISSUER:${{ vars.CLERK_ISSUER }} --var CLERK_AUTHORIZED_PARTIES:${{ vars.CLERK_AUTHORIZED_PARTIES_STAGING }}
           for name in POCKETBASE_URL POCKETBASE_ADMIN_EMAIL POCKETBASE_ADMIN_PASSWORD CLERK_SECRET_KEY STAGING_PLAYTEST_AUTH_SECRET; do
             printf '%s' "${!name}" | npx wrangler secret put "$name" --env staging
           done
@@ -62,7 +62,6 @@ jobs:
       - name: Disable the playtest endpoint
         if: always()
         run: |
-          cd workers/api
           for name in STAGING_PLAYTEST_AUTH_ENABLED STAGING_PLAYTEST_AUTH_SECRET CLERK_SECRET_KEY; do
             npx wrangler secret delete "$name" --env staging < <(yes)
           done

@@ -48,3 +48,15 @@ jobs:
     if: github.ref == 'refs/heads/ssc-edge-api-staging' || github.ref == 'refs/heads/staging'
     uses: ./.github/workflows/staging-playtest.yml
     secrets: inherit
+
+  # SSC-38: record CPU, subrequests, size and errors per route on the deployed
+  # staging Worker. Independent of the playtest so one failure can't hide the other.
+  # Runs after the playtest (pass or fail) so its secret changes don't land
+  # mid-measurement.
+  budget:
+    needs: [deploy, playtest]
+    if: always() && needs.deploy.result == 'success'
+    uses: ./.github/workflows/measure-cloudflare-budget.yml
+    secrets: inherit
+    with:
+      target: staging

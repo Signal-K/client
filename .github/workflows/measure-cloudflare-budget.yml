@@ -10,6 +10,19 @@ name: Measure Cloudflare Free-plan budget (SSC-38)
 # account (in the browser console on the target host: `Clerk.session.id`).
 # The job mints a fresh session JWT per request with CLERK_SECRET_KEY.
 on:
+  # workflow_call lets the staging deploy run the measurement after each
+  # deploy, since workflow_dispatch only works for files on the default branch.
+  workflow_call:
+    inputs:
+      target:
+        type: string
+        default: staging
+      session_id:
+        type: string
+        required: false
+      samples:
+        type: string
+        default: "5"
   workflow_dispatch:
     inputs:
       target:
