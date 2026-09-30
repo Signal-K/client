@@ -112,7 +112,9 @@ export async function verifyClerkJwt(token: string | null | undefined, opts: Ver
   if (claims.exp + skew < nowSec) throw new AuthError("expired");
   if (claims.nbf !== undefined && claims.nbf - skew > nowSec) throw new AuthError("not_yet_valid");
   if (claims.iss !== opts.issuer) throw new AuthError("bad_issuer");
-  if (opts.authorizedParties?.length && (!claims.azp || !opts.authorizedParties.includes(claims.azp))) {
+  // Like Clerk's own verifier: `azp` is checked when present. Sessions minted from a
+  // sign-in ticket carry none; a token naming a foreign origin is still rejected.
+  if (opts.authorizedParties?.length && claims.azp && !opts.authorizedParties.includes(claims.azp)) {
     throw new AuthError("bad_party");
   }
   return claims;

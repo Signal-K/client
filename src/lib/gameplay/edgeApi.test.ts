@@ -42,6 +42,16 @@ describe("classificationsFetch", () => {
     expect(urls(fetchMock)).toEqual(["/api/gameplay/classifications"]);
   });
 
+  it("waits for Clerk to finish loading before choosing a route", async () => {
+    const clerk = { loaded: false, session: { getToken: async () => "jwt" } };
+    const { fetchMock, classificationsFetch } = await load({ edge: true, clerk });
+    setTimeout(() => {
+      clerk.loaded = true;
+    }, 120);
+    await classificationsFetch("/api/gameplay/classifications?limit=1");
+    expect(urls(fetchMock)).toEqual(["/api/v1/classifications?limit=1"]);
+  });
+
   it("falls back to Next for a failed read but never re-sends a write", async () => {
     const read = await load({ edge: true, clerk: ready });
     read.fetchMock.mockImplementationOnce(async () => new Response("x", { status: 502 }));

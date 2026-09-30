@@ -12,10 +12,26 @@ type ClerkGlobal = { loaded?: boolean; session?: { getToken: () => Promise<strin
 
 // The Worker only accepts a Clerk bearer token. Without a ready, signed-in Clerk
 // session callers use the Next route, which handles signed-out requests itself.
+const CLERK_WAIT_MS = 2500;
+const CLERK_POLL_MS = 50;
+
+// The game reads its data as soon as it mounts, usually before Clerk has finished
+// loading. Wait briefly (an in-memory poll, no network) so that first read is not
+// silently sent to the Next route.
+async function readyClerk(): Promise<ClerkGlobal | null> {
+  const deadline = Date.now() + CLERK_WAIT_MS;
+  for (;;) {
+    const clerk = (window as unknown as { Clerk?: ClerkGlobal }).Clerk;
+    if (clerk?.loaded) return clerk;
+    if (Date.now() >= deadline) return null;
+    await new Promise((resolve) => setTimeout(resolve, CLERK_POLL_MS));
+  }
+}
+
 export async function edgeToken(): Promise<string | null> {
   if (!EDGE_API_ENABLED || typeof window === "undefined") return null;
-  const clerk = (window as unknown as { Clerk?: ClerkGlobal }).Clerk;
-  if (!clerk?.loaded || !clerk.session) return null;
+  const clerk = await readyClerk();
+  if (!clerk?.session) return null;
   try {
     return await clerk.session.getToken();
   } catch {

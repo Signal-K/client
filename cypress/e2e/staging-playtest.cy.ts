@@ -17,12 +17,38 @@ if (enabled) {
     })
 
     it('plays garden onboarding and builds an instrument with a fresh account', () => {
-      cy.request({ method: 'POST', url: endpoint, headers }).then(({ body }) => {
+      // A freshly written Worker secret can take a few seconds to reach every edge, and the
+      // endpoint answers 404 until then. A 404 provisions nothing, so retrying is safe.
+      const provision = (attempt = 1): Cypress.Chainable<Cypress.Response<any>> =>
+        cy.request({ method: 'POST', url: endpoint, headers, failOnStatusCode: false }).then((res) => {
+          if (res.status === 404 && attempt < 8) return cy.wait(5000).then(() => provision(attempt + 1))
+          expect(res.status).to.eq(200)
+          return cy.wrap(res)
+        })
+      provision().then(({ body }) => {
         userId = body.userId
         expect(body.ticket).to.be.a('string')
         cy.visit(`/auth?__clerk_ticket=${encodeURIComponent(body.ticket)}`)
       })
       cy.location('pathname', { timeout: 30000 }).should('eq', '/game')
+
+      // Edge API rollout: the game reads most data lazily, so prove the Worker directly with the
+      // signed-in Clerk session's own token (issuer, authorized party and identity all checked).
+      cy.window({ timeout: 30000 })
+        .should((win) => expect((win as any).Clerk?.session, 'Clerk session').to.exist)
+        .then((win) => cy.wrap((win as any).Clerk.session.getToken(), { timeout: 15000 }))
+        .then((token) => {
+          const auth = { authorization: `Bearer ${token}` }
+          const claims = JSON.parse(atob(String(token).split('.')[1].replace(/-/g, '+').replace(/_/g, '/')))
+          const seen = `azp=${claims.azp} iss=${claims.iss}`
+          cy.request({ url: '/api/v1/research/summary', headers: auth, failOnStatusCode: false }).then(({ status, body }) => {
+            expect(status, `research summary (${seen}) ${JSON.stringify(body)}`).to.eq(200)
+            expect(body.authenticated).to.eq(true)
+          })
+          cy.request({ url: `/api/v1/classifications?author=${encodeURIComponent(userId as string)}&limit=5`, headers: auth })
+            .its('status')
+            .should('eq', 200)
+        })
 
       cy.get('[role="dialog"]', { timeout: 30000 }).contains('A fresh garden')
       cy.contains('button', 'Hunt planets').click()
