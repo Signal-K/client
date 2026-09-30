@@ -15,6 +15,8 @@ export default defineConfig({
       // provider or a direct database client inside Cypress.
       config.env.SKIP_USER_CREATION_TESTS = process.env.SKIP_USER_CREATION_TESTS === "true";
       config.env.E2E_TEST_AUTH_ENABLED = process.env.E2E_TEST_AUTH_ENABLED === "true";
+      config.env.STAGING_PLAYTEST_ENABLED = process.env.STAGING_PLAYTEST_AUTH_ENABLED === "true";
+      config.env.STAGING_PLAYTEST_AUTH_SECRET = process.env.STAGING_PLAYTEST_AUTH_SECRET || "";
       config.env.E2E_TEST_USER_EMAIL = process.env.E2E_TEST_USER_EMAIL || "";
       config.env.POCKETBASE_URL =
         process.env.POCKETBASE_URL ||

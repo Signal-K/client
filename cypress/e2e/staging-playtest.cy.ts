@@ -1,0 +1,48 @@
+const secret = Cypress.env('STAGING_PLAYTEST_AUTH_SECRET')
+const enabled = Cypress.env('STAGING_PLAYTEST_ENABLED') === true && typeof secret === 'string' && secret.length > 0
+const endpoint = '/api/test/staging/playtest'
+const headers = { 'x-staging-playtest-secret': secret }
+
+// Opt-in, staging-only (SSC-33). Provisions a namespaced Clerk user, plays
+// garden onboarding plus one instrument build, then proves cleanup removed it.
+if (enabled) {
+  describe('Staging playtest account lifecycle', () => {
+    let userId: string | undefined
+
+    it('rejects requests without the operator secret', () => {
+      cy.request({ method: 'POST', url: endpoint, failOnStatusCode: false }).its('status').should('eq', 404)
+      cy.request({ method: 'POST', url: endpoint, headers: { 'x-staging-playtest-secret': 'wrong' }, failOnStatusCode: false })
+        .its('status')
+        .should('eq', 404)
+    })
+
+    it('plays garden onboarding and builds an instrument with a fresh account', () => {
+      cy.request({ method: 'POST', url: endpoint, headers }).then(({ body }) => {
+        userId = body.userId
+        expect(body.ticket).to.be.a('string')
+        cy.visit(`/auth?__clerk_ticket=${encodeURIComponent(body.ticket)}`)
+      })
+      cy.location('pathname', { timeout: 30000 }).should('eq', '/game')
+
+      cy.get('[role="dialog"]', { timeout: 30000 }).contains('A fresh garden')
+      cy.contains('button', 'Hunt planets').click()
+      cy.contains('button', 'Mark my plots').click()
+
+      cy.get('button[aria-label$="· plot"]', { timeout: 15000 }).first().click()
+      cy.contains('button', /^Place .* · \d+ CR$/).click()
+      cy.get('button[data-slot][aria-label^="Place"]').first().click()
+      cy.get('[data-id="ssc.structure.telescope"]').should('not.have.class', 'isPlot')
+    })
+
+    after(() => {
+      if (!userId) return
+      cy.request({ method: 'DELETE', url: endpoint, headers, body: { userId } }).then(({ body }) => {
+        expect(body.deleted).to.eq(true)
+      })
+      // A second delete must 404: the account no longer exists.
+      cy.request({ method: 'DELETE', url: endpoint, headers, body: { userId }, failOnStatusCode: false })
+        .its('status')
+        .should('eq', 404)
+    })
+  })
+}

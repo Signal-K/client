@@ -40,31 +40,39 @@ const ACCOUNT_RECORDS: ReadonlyArray<readonly [collection: string, field: string
   ["referrals", "referreeId"],
   ["ss_hub_state", "userId"],
   ["profiles", "userId"],
+  ["push_subscriptions", "profileId"],
+  ["notification_rejections", "profileId"],
 ];
 
-function notFound() {
-  // Do not reveal whether the guard, a user id, or a secret was wrong.
+function notFound(reason: string) {
+  // The response never reveals whether the guard, a user id, or a secret was
+  // wrong; the reason is audit-only and carries no caller-supplied values.
+  console.warn("[staging-playtest] rejected", { reason });
   return NextResponse.json({ error: "Not found" }, { status: 404 });
 }
 
-async function deletePocketBaseRecords(userId: string): Promise<number> {
+async function deletePocketBaseRecords(userId: string): Promise<{ deleted: number; remaining: number }> {
   const pb = await createPocketbaseAdminClient();
   let deleted = 0;
-
-  for (const [collection, field] of ACCOUNT_RECORDS) {
-    const records = await pb.collection(collection).getFullList({
+  let remaining = 0;
+  const list = (collection: string, field: string) =>
+    pb.collection(collection).getFullList({
       filter: pb.filter(`${field} = {:userId}`, { userId }),
       fields: "id",
     });
+
+  for (const [collection, field] of ACCOUNT_RECORDS) {
+    const records = await list(collection, field);
     await Promise.all(records.map((record) => pb.collection(collection).delete(record.id)));
     deleted += records.length;
+    remaining += (await list(collection, field)).length;
   }
 
-  return deleted;
+  return { deleted, remaining };
 }
 
 export async function POST(request: Request) {
-  if (!authorizesStagingPlaytest(request)) return notFound();
+  if (!authorizesStagingPlaytest(request)) return notFound("guard");
 
   const id = randomUUID();
   const client = await clerkClient();
@@ -93,16 +101,20 @@ export async function POST(request: Request) {
 }
 
 export async function DELETE(request: Request) {
-  if (!authorizesStagingPlaytest(request)) return notFound();
+  if (!authorizesStagingPlaytest(request)) return notFound("guard");
 
   const body = (await request.json().catch(() => null)) as { userId?: unknown } | null;
-  if (!body || typeof body.userId !== "string" || !body.userId) return notFound();
+  if (!body || typeof body.userId !== "string" || !body.userId) return notFound("bad-body");
 
   const client = await clerkClient();
   const user = (await client.users.getUser(body.userId).catch(() => null)) as PlaytestUser | null;
-  if (!user || !isStagingPlaytestMetadata(user.privateMetadata)) return notFound();
+  if (!user || !isStagingPlaytestMetadata(user.privateMetadata)) return notFound("not-owned");
 
-  const deletedRecords = await deletePocketBaseRecords(user.id);
+  const { deleted: deletedRecords, remaining } = await deletePocketBaseRecords(user.id);
+  if (remaining > 0) {
+    console.error("[staging-playtest] cleanup incomplete", { userId: user.id, remaining });
+    return NextResponse.json({ error: "Could not verify test-data deletion" }, { status: 502 });
+  }
   await client.users.deleteUser(user.id);
   const stillExists = await client.users.getUser(user.id).then(() => true).catch(() => false);
   if (stillExists) {
