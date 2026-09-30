@@ -7,6 +7,10 @@ import { toAnomalyRow } from "./anomalies";
 // read, no page revalidation, no analytics round trip.
 
 const MAX_LIMIT = 1000; // the largest page any screen asks for
+// Reads that are not scoped to the caller's own author id are community reads
+// (a shared discovery, the vote list). Keep them small.
+const COMMUNITY_MAX_LIMIT = 100;
+const COMMUNITY_MAX_IDS = 50;
 const MAX_BODY_BYTES = 64 * 1024;
 const quote = (value: string) => `"${value.replace(/["\\]/g, "")}"`;
 const num = (value: string) => {
@@ -40,9 +44,10 @@ export function buildClassificationQuery(params: URLSearchParams) {
     if (value === null) return { error: "Invalid id" };
     filters.push(`legacyId=${value}`);
   }
-  const ids = params.get("ids");
-  if (ids && nums(ids).length) filters.push(`(${nums(ids).map((v) => `legacyId=${v}`).join("||")})`);
   const author = params.get("author");
+  const ids = params.get("ids");
+  const idList = ids ? nums(ids).slice(0, author ? undefined : COMMUNITY_MAX_IDS) : [];
+  if (idList.length) filters.push(`(${idList.map((v) => `legacyId=${v}`).join("||")})`);
   if (author) filters.push(`author=${quote(author)}`);
   const type = params.get("classificationtype");
   if (type) filters.push(`classificationtype=${quote(type)}`);
@@ -60,7 +65,7 @@ export function buildClassificationQuery(params: URLSearchParams) {
   return {
     filter: filters.join("&&"),
     sort: `${params.get("ascending") === "true" ? "+" : "-"}${sortField}`,
-    perPage: Math.max(1, Math.min(Number.isFinite(limit) ? limit : 200, MAX_LIMIT)),
+    perPage: Math.max(1, Math.min(Number.isFinite(limit) ? limit : 200, author ? MAX_LIMIT : COMMUNITY_MAX_LIMIT)),
     includeAnomaly: params.get("includeAnomaly") === "true",
   };
 }

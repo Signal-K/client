@@ -51,6 +51,16 @@ describe("classifications reads", () => {
     expect(calls).toHaveLength(2);
   });
 
+  it("keeps community reads (no author) small", () => {
+    const many = Array.from({ length: 80 }, (_, i) => i + 1).join(",");
+    const community = buildClassificationQuery(new URLSearchParams(`classificationtype=planet&limit=900&ids=${many}`)) as { perPage: number; filter: string };
+    expect(community.perPage).toBe(100);
+    expect(community.filter.match(/legacyId=/g)).toHaveLength(50);
+    const own = buildClassificationQuery(new URLSearchParams(`author=user_1&limit=900&ids=${many}`)) as { perPage: number; filter: string };
+    expect(own.perPage).toBe(900);
+    expect(own.filter.match(/legacyId=/g)).toHaveLength(80);
+  });
+
   it("validates numbers and strips quote-injection", () => {
     expect(buildClassificationQuery(new URLSearchParams("id=x"))).toEqual({ error: "Invalid id" });
     expect(buildClassificationQuery(new URLSearchParams('author=a" || id!="'))).toMatchObject({ filter: 'author="a || id!="' });
