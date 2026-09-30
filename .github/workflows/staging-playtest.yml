@@ -6,6 +6,8 @@ name: Staging playtest lifecycle (SSC-33)
 # Staging shares the production Clerk/PocketBase instance, so the endpoint must
 # never stay enabled between runs.
 on:
+  push:
+    branches: [ssc-33-playtest-ci]
   workflow_dispatch: {}
 
 concurrency:
