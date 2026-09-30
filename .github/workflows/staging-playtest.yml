@@ -5,14 +5,11 @@ name: Staging playtest lifecycle (SSC-33)
 # throwaway Clerk account, and always removes the endpoint secrets afterwards.
 # Staging shares the production Clerk/PocketBase instance, so the endpoint must
 # never stay enabled between runs.
+# On the edge branch it is called by the staging deploy workflow once the deploy
+# finishes (so a deploy can never cancel it); dispatch it by hand otherwise.
 on:
-  push:
-    branches: [ssc-33-playtest-ci, ssc-edge-api-staging]
+  workflow_call: {}
   workflow_dispatch: {}
-
-concurrency:
-  group: cloudflare-staging
-  cancel-in-progress: false
 
 jobs:
 

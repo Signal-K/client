@@ -30,3 +30,10 @@ jobs:
     with:
       wrangler_command: deploy --env staging
       wrangler_env_args: --env staging
+
+  # Edge API rollout: after the edge-branch deploy, play the signed-in game on it.
+  playtest:
+    needs: deploy
+    if: github.ref == 'refs/heads/ssc-edge-api-staging'
+    uses: ./.github/workflows/staging-playtest.yml
+    secrets: inherit
