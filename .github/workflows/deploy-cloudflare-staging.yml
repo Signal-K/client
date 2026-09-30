@@ -15,6 +15,9 @@ on:
   # dispatch-only until the Cloudflare Worker domain is detached, so a staging
   # push cannot accidentally reclaim staging.starsailors.space.
   workflow_dispatch: {}
+  # Edge API rollout check: deploys only from this one branch, never `staging`.
+  push:
+    branches: [ssc-edge-api-staging]
 
 concurrency:
   group: cloudflare-staging
