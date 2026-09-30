@@ -20,7 +20,7 @@ returned Error 1102. Production no longer runs a Next.js server at all:
 | `/api/public/*`, `/api/gameplay/leaderboards/sunspots`, `/api/community-activity` | Precomputed snapshots read from Workers KV (SSC-37) | Yes, no PocketBase reads |
 | Anything else | `404.html`, status 404 | Yes |
 | Cron `*/5 * * * *` | Recomputes one public snapshot per tick (rotating) into KV | Yes (cron) |
-| Same cron, 17:00 UTC tick (production only) | Starts the daily discovery-reminder fan-out instead of a snapshot (Free allows 5 crons per account) | Yes (cron) |
+| Same cron, 17:00 UTC tick (production only; staging sets `WORKER_ENV=staging` and skips it, since it shares production users) | Starts the daily discovery-reminder fan-out instead of a snapshot (Free allows 5 crons per account) | Yes (cron) |
 | Queue `starsailors-jobs` (+ `-dlq`) | Push notifications, server-side PostHog events, fan-out (SSC-39) | Yes (queue consumer) |
 
 Identity comes from Clerk's session JWT, either the `__session` cookie or an
@@ -133,7 +133,7 @@ message (for example `POST /api/notify-my-discoveries` → 202).
   - A batch holds at most 4 jobs, and each user gets at most 5 devices per
     job, which keeps a batch under 50 subrequests.
   - Queues Free allows 10,000 operations/day, about 3 per message.
-  - Cron triggers: 2 in production and 1 in staging, out of 5 per account.
+  - Cron triggers: 1 in production and 1 in staging (snapshots only), out of 5 per account.
 - **Security.** `/api/notify-my-discoveries` used to push to any `userId` in
   the body without authentication. `/api/send-test-notification` and
   `/api/auto-notify-discoveries` were open to anyone. They now require a

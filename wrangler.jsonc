@@ -57,7 +57,7 @@
   },
   // Must match workers/app/src/background.ts: snapshots every 5 minutes, one per tick; the
   // 17:00 UTC tick starts the unclassified-discovery reminder instead. One cron because Workers
-  // Free allows 5 per account. Staging has none (its snapshots refresh only when run by hand).
+  // Free allows 5 per account. Staging has its own `*/5` (2 of 5 used), snapshots only.
   "triggers": { "crons": ["*/5 * * * *"] },
   // Do not set limits.cpu_ms here. The CI Cloudflare account is on Workers
   // Free; Wrangler then fails the whole deploy with 100328
@@ -103,6 +103,7 @@
         "@clerk/nextjs/webhooks": "@clerk/backend/webhooks"
       },
       "vars": {
+        "WORKER_ENV": "staging",
         "NEXT_PUBLIC_POSTHOG_KEY": "phc_65umDftbbTkrm1V6azue6OeU4u5c8iJcaHm4JtJ95di",
         "NEXT_PUBLIC_POSTHOG_HOST": "https://us.posthog.com",
         "posthog_api_key": "phc_65umDftbbTkrm1V6azue6OeU4u5c8iJcaHm4JtJ95di",
@@ -112,8 +113,8 @@
       "observability": {
         "enabled": true
       },
-      // Separate KV and queues from production. Snapshots only: no reminder
-      // cron, since staging shares production's PocketBase and users.
+      // Separate KV and queues from production. Snapshots only: WORKER_ENV
+      // stops the 17:00 UTC reminder, since staging shares production's PocketBase and users.
       "kv_namespaces": [{ "binding": "PUBLIC_DATA", "id": "PUBLIC_DATA_KV_ID_STAGING" }],
       "queues": {
         "producers": [{ "binding": "JOBS", "queue": "starsailors-jobs-staging" }],
@@ -122,7 +123,7 @@
           { "queue": "starsailors-jobs-staging-dlq", "max_batch_size": 10, "max_batch_timeout": 30, "max_retries": 2 }
         ]
       },
-      "triggers": { "crons": [] }
+      "triggers": { "crons": ["*/5 * * * *"] }
     }
   }
 }

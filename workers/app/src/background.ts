@@ -19,9 +19,10 @@ export const SNAPSHOT_TICK_MS = 5 * 60 * 1000;
 // Workers Free allows 5 cron triggers per account, so the reminder shares the snapshot cron.
 export const DISCOVERY_REMINDER_HOUR_UTC = 17;
 
-export async function runScheduled(_cron: string, scheduledTime: number): Promise<Record<string, unknown>> {
+// `remind` is false on staging: it shares production's PocketBase and users, so only snapshots run there.
+export async function runScheduled(_cron: string, scheduledTime: number, remind = true): Promise<Record<string, unknown>> {
   const at = new Date(scheduledTime);
-  if (at.getUTCHours() === DISCOVERY_REMINDER_HOUR_UTC && at.getUTCMinutes() < SNAPSHOT_TICK_MS / 60000) {
+  if (remind && at.getUTCHours() === DISCOVERY_REMINDER_HOUR_UTC && at.getUTCMinutes() < SNAPSHOT_TICK_MS / 60000) {
     const day = new Date(scheduledTime).toISOString().slice(0, 10);
     const queued = await enqueueJobs({ type: "reminders.discoveries", id: `reminders:${day}:p1`, day, page: 1 });
     return { task: "discovery-reminders", day, ...queued };
