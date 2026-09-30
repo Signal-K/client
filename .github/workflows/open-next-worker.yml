@@ -66,6 +66,8 @@ jobs:
           NEXT_PUBLIC_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL: ${{ vars.NEXT_PUBLIC_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL }}
           NEXT_PUBLIC_CLERK_SIGN_UP_FALLBACK_REDIRECT_URL: ${{ vars.NEXT_PUBLIC_CLERK_SIGN_UP_FALLBACK_REDIRECT_URL }}
           NEXT_PUBLIC_POCKETBASE_URL: ${{ secrets.POCKETBASE_URL }}
+          # Edge API rollout: on for the staging build only until verified there.
+          NEXT_PUBLIC_EDGE_API: ${{ inputs.wrangler_env_args != '' && 'true' || '' }}
           NEXT_PUBLIC_POSTHOG_KEY: ${{ vars.NEXT_PUBLIC_POSTHOG_KEY }}
           NEXT_PUBLIC_POSTHOG_HOST: https://us.posthog.com
           posthog_api_key: ${{ vars.NEXT_PUBLIC_POSTHOG_KEY }}
