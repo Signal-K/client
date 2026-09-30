@@ -29,10 +29,10 @@ if (enabled) {
       cy.contains('button', 'Mark my plots').click()
 
       // The onboarding coach banner floats over the first plot at Cypress's default
-      // viewport, so click the plot directly rather than through the banner.
+      // viewport, so click the plot and slot directly rather than through the banner.
       cy.get('button[aria-label$="· plot"]', { timeout: 15000 }).first().click({ force: true })
       cy.contains('button', /^Place .* · \d+ CR$/).click()
-      cy.get('button[data-slot][aria-label^="Place"]').first().click()
+      cy.get('button[data-slot][aria-label^="Place"]').first().click({ force: true })
       cy.get('[data-id="ssc.structure.telescope"]').should('not.have.class', 'isPlot')
     })
 
