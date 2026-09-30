@@ -12,6 +12,7 @@ import PlanetSelectorModal from "@/src/components/modals/PlanetSelectorModal";
 import useDeploymentStatus from "@/src/hooks/useDeploymentStatus";
 import { AvatarGenerator } from "@/src/components/profile/setup/Avatar";
 import { cn } from "@/src/lib/utils";
+import { fetchResearchSummary } from "@/lib/gameplay/researchSummary";
 
 // ─── HUD corner bracket ────────────────────────────────────────────────────────
 function HudCorner({ pos }: { pos: "tl" | "tr" | "bl" | "br" }) {
@@ -262,7 +263,7 @@ export default function ActivityHeader({
     const fetchData = async () => {
       const [pageRes, researchRes] = await Promise.all([
         fetch("/api/gameplay/page-data", { cache: "no-store" }),
-        fetch("/api/gameplay/research/summary", { cache: "no-store" }),
+        fetchResearchSummary(),
       ]);
       const pagePayload = await pageRes.json().catch(() => null);
       const researchPayload = await researchRes.json().catch(() => null);

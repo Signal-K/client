@@ -9,6 +9,7 @@ import {
   deployTelescopeAction,
   type DeploymentType 
 } from "@/src/app/actions/deploy-actions"
+import { fetchResearchSummary } from "@/lib/gameplay/researchSummary";
 
 export async function fetchAnomalies(deploymentType: string | null, setTessAnomalies: (a: DatabaseAnomaly[]) => void) {
   try {
@@ -79,7 +80,7 @@ export async function handleDeployAction(params: HandleDeployParams) {
 
   let anomalyCount = 4
   try {
-    const progressRes = await fetch("/api/gameplay/research/summary", { cache: "no-store" });
+    const progressRes = await fetchResearchSummary();
     const progressPayload = await progressRes.json().catch(() => null);
     if (progressRes.ok && (progressPayload?.researched || []).some((r: any) => r.tech_type === "probereceptors")) {
       anomalyCount = 6;

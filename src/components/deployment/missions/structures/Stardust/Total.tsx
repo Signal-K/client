@@ -1,4 +1,5 @@
 import { useEffect, useState, forwardRef, useImperativeHandle } from "react";
+import { fetchResearchSummary } from "@/lib/gameplay/researchSummary";
 
 interface TotalPointsProps {
   onPointsUpdate?: (totalPoints: number) => void;
@@ -83,7 +84,7 @@ const TotalPoints = forwardRef<TotalPointsHandle, TotalPointsProps>((props, ref)
     setLoading(true);
 
     try {
-      const summaryRes = await fetch("/api/gameplay/research/summary");
+      const summaryRes = await fetchResearchSummary();
       const summaryPayload = await summaryRes.json();
       if (!summaryRes.ok) {
         throw new Error(summaryPayload?.error || "Failed to load research summary");

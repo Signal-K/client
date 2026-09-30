@@ -11,6 +11,7 @@ import { RoverIcon, SatelliteIcon, TelescopeComplexIcon } from "@/src/components
 import { MineralExtraction } from "@/src/components/deployment/extraction/mineral-extraction";
 import { Package, Wrench, Sparkles } from "lucide-react";
 import Link from "next/link";
+import { fetchResearchSummary } from "@/lib/gameplay/researchSummary";
 
 type TabType = "minerals" | "tools";
 
@@ -77,7 +78,7 @@ export default function InventoryViewport() {
       if (!session?.user?.id) return;
 
       const [summaryRes, depositsRes] = await Promise.all([
-        fetch("/api/gameplay/research/summary", { cache: "no-store" }),
+        fetchResearchSummary(),
         fetch("/api/gameplay/mineral-deposits", { cache: "no-store" }),
       ]);
       const summary = await summaryRes.json().catch(() => ({}));

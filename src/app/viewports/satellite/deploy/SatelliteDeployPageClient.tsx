@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import { useAuthUser } from "@/src/hooks/useAuthUser";
 import ViewportShell from "@/src/components/layout/ViewportShell";
+import { fetchResearchSummary } from "@/lib/gameplay/researchSummary";
 
 const DeploySatelliteViewport = dynamic(
   () => import("@/src/components/scenes/deploy/satellite/DeploySatellite"),
@@ -16,7 +17,7 @@ export default function SatelliteDeployPageClient() {
 
   useEffect(() => {
     if (!user?.id) return;
-    fetch("/api/gameplay/research/summary", { cache: "no-store" })
+    fetchResearchSummary()
       .then((r) => r.json())
       .then((payload) => {
         const researched = Array.isArray(payload?.researched) ? payload.researched : [];

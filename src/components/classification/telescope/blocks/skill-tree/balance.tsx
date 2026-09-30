@@ -3,6 +3,7 @@
 import { Badge } from "@/src/components/ui/badge"
 import { Sparkles } from "lucide-react"
 import { useEffect, useState } from "react"
+import { fetchResearchSummary } from "@/lib/gameplay/researchSummary";
 
 interface StardustBalanceProps {
   userId: string
@@ -19,7 +20,7 @@ export function StardustBalance({ userId: _userId, onBalanceUpdate }: StardustBa
     async function fetchBalance() {
       setLoading(true)
       try {
-        const res = await fetch("/api/gameplay/research/summary")
+        const res = await fetchResearchSummary()
         const payload = await res.json()
         if (!res.ok) throw new Error(payload?.error || "Failed to load stardust balance")
 
