@@ -69,8 +69,13 @@ type Ctx = { env: PocketbaseEnv; userId: string; fetchImpl?: typeof fetch };
 const reply = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), { status, headers: { "content-type": "application/json", "cache-control": "private, no-store" } });
 
-export async function listClassifications(request: Request, { env, fetchImpl }: Ctx): Promise<Response> {
-  const query = buildClassificationQuery(new URL(request.url).searchParams);
+export async function listClassifications(request: Request, { env, userId, fetchImpl }: Ctx): Promise<Response> {
+  const params = new URL(request.url).searchParams;
+  // A player's own list is theirs alone; reading another author's list is refused.
+  // Lookups by id or type (no author) stay open because those rows are shown publicly.
+  const author = params.get("author");
+  if (author && author !== userId) return reply({ error: "forbidden" }, 403);
+  const query = buildClassificationQuery(params);
   if ("error" in query) return reply({ error: query.error }, 400);
   try {
     const items = await listRecords<Record<string, any>>(env, "ss_classifications", query, fetchImpl);

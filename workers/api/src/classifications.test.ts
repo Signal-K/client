@@ -37,6 +37,13 @@ describe("classifications reads", () => {
     expect(res.headers.get("cache-control")).toBe("private, no-store");
   });
 
+  it("refuses to list another author's classifications before any upstream call", async () => {
+    const { fetchImpl, calls } = pocketbase();
+    const res = await listClassifications(new Request("https://x.test/api/v1/classifications?author=user_2"), ctx(fetchImpl));
+    expect(res.status).toBe(403);
+    expect(calls).toHaveLength(0);
+  });
+
   it("adds exactly one more read for includeAnomaly", async () => {
     const { fetchImpl, calls } = pocketbase();
     const res = await listClassifications(new Request("https://x.test/api/v1/classifications?id=9&includeAnomaly=true&limit=1"), ctx(fetchImpl));

@@ -1,6 +1,8 @@
 // Routes ported to the Free-plan API Worker (workers/api), reached at /api/v1/*
 // on deployed hosts. `next dev` has no such route, so everything stays on the Next
 // handlers until the build sets NEXT_PUBLIC_EDGE_API=true.
+import posthog from "posthog-js";
+
 export const EDGE_API_ENABLED = process.env.NEXT_PUBLIC_EDGE_API === "true";
 
 export const ANOMALIES_API = EDGE_API_ENABLED ? "/api/v1/anomalies" : "/api/gameplay/anomalies";
@@ -38,9 +40,27 @@ export async function classificationsFetch(url: string, init: RequestInit = {}):
   try {
     const response = await fetch(EDGE_CLASSIFICATIONS + url.slice(NEXT_CLASSIFICATIONS.length), { ...init, headers });
     if (isRead && response.status >= 500) return fetch(url, init);
+    if (!isRead && response.ok) void captureClassificationSubmitted(init.body, response.clone());
     return response;
   } catch (error) {
     if (isRead) return fetch(url, init);
     throw error;
+  }
+}
+
+// The Next route sent this event from the server; the Worker does no analytics
+// round trip, so the browser sends the same event (and never blocks the write).
+async function captureClassificationSubmitted(body: BodyInit | null | undefined, response: Response) {
+  try {
+    const sent = typeof body === "string" ? JSON.parse(body) : {};
+    const created = (await response.json()) as { id?: number };
+    posthog.capture("classification_submitted", {
+      source: "api",
+      classification_id: created.id,
+      classificationtype: sent.classificationtype,
+      anomaly: sent.anomaly,
+    });
+  } catch {
+    // Analytics must never affect gameplay.
   }
 }
