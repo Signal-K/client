@@ -1,6 +1,6 @@
 name: Staging playtest lifecycle (SSC-33)
 
-# Manual only. Deploys this ref to the staging Worker, enables the guarded
+# Runs on pushes to ssc-33-playtest-ci or manually. Deploys this ref's API Worker (workers/api) to staging, enables the guarded
 # playtest endpoint for the duration of the run, plays the browser flow with a
 # throwaway Clerk account, and always removes the endpoint secrets afterwards.
 # Staging shares the production Clerk/PocketBase instance, so the endpoint must
@@ -15,15 +15,8 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  deploy:
-    uses: ./.github/workflows/open-next-worker.yml
-    secrets: inherit
-    with:
-      wrangler_command: deploy --env staging
-      wrangler_env_args: --env staging
 
   playtest:
-    needs: deploy
     runs-on: ubuntu-latest
     environment: production
     timeout-minutes: 20
@@ -33,6 +26,10 @@ jobs:
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
       STAGING_PLAYTEST_AUTH_SECRET: ${{ secrets.STAGING_PLAYTEST_AUTH_SECRET }}
+      CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
+      POCKETBASE_URL: ${{ secrets.POCKETBASE_URL }}
+      POCKETBASE_ADMIN_EMAIL: ${{ secrets.POCKETBASE_ADMIN_EMAIL }}
+      POCKETBASE_ADMIN_PASSWORD: ${{ secrets.POCKETBASE_ADMIN_PASSWORD }}
     steps:
       - uses: actions/checkout@v4
 
@@ -47,10 +44,17 @@ jobs:
       - name: Require the operator secret
         run: test -n "$STAGING_PLAYTEST_AUTH_SECRET" || { echo "::error::Set the STAGING_PLAYTEST_AUTH_SECRET Actions secret first."; exit 1; }
 
-      - name: Enable the playtest endpoint on staging only
+      - name: Test the Worker
+        run: npx vitest run workers/api
+
+      - name: Deploy the staging API Worker with the playtest endpoint enabled
+        working-directory: workers/api
         run: |
+          npx wrangler deploy --env staging --var CLERK_ISSUER:${{ vars.CLERK_ISSUER }} --var CLERK_AUTHORIZED_PARTIES:${{ vars.CLERK_AUTHORIZED_PARTIES_STAGING }}
+          for name in POCKETBASE_URL POCKETBASE_ADMIN_EMAIL POCKETBASE_ADMIN_PASSWORD CLERK_SECRET_KEY STAGING_PLAYTEST_AUTH_SECRET; do
+            printf '%s' "${!name}" | npx wrangler secret put "$name" --env staging
+          done
           printf '%s' "true" | npx wrangler secret put STAGING_PLAYTEST_AUTH_ENABLED --env staging
-          printf '%s' "$STAGING_PLAYTEST_AUTH_SECRET" | npx wrangler secret put STAGING_PLAYTEST_AUTH_SECRET --env staging
 
       - name: Run the playtest lifecycle
         run: yarn cypress run --spec cypress/e2e/staging-playtest.cy.ts
@@ -61,8 +65,10 @@ jobs:
       - name: Disable the playtest endpoint
         if: always()
         run: |
-          npx wrangler secret delete STAGING_PLAYTEST_AUTH_ENABLED --env staging --force
-          npx wrangler secret delete STAGING_PLAYTEST_AUTH_SECRET --env staging --force
+          cd workers/api
+          for name in STAGING_PLAYTEST_AUTH_ENABLED STAGING_PLAYTEST_AUTH_SECRET CLERK_SECRET_KEY; do
+            npx wrangler secret delete "$name" --env staging --force
+          done
 
       - name: Upload Cypress artifacts
         if: failure()

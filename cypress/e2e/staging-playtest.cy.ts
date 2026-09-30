@@ -1,6 +1,6 @@
 const secret = Cypress.env('STAGING_PLAYTEST_AUTH_SECRET')
 const enabled = Cypress.env('STAGING_PLAYTEST_ENABLED') === true && typeof secret === 'string' && secret.length > 0
-const endpoint = '/api/test/staging/playtest'
+const endpoint = '/api/v1/test/playtest'
 const headers = { 'x-staging-playtest-secret': secret }
 
 // Opt-in, staging-only (SSC-33). Provisions a namespaced Clerk user, plays
@@ -34,11 +34,18 @@ if (enabled) {
       cy.get('[data-id="ssc.structure.telescope"]').should('not.have.class', 'isPlot')
     })
 
+    // The Worker stops short of Cloudflare's 50-subrequest cap and answers 503
+    // with the user kept intact, so cleanup is safe to repeat until it finishes.
+    const cleanup = (attempt = 1): Cypress.Chainable =>
+      cy.request({ method: 'DELETE', url: endpoint, headers, body: { userId }, failOnStatusCode: false }).then((res) => {
+        if (res.status === 503 && attempt < 5) return cleanup(attempt + 1)
+        expect(res.status).to.eq(200)
+        expect(res.body.deleted).to.eq(true)
+      })
+
     after(() => {
       if (!userId) return
-      cy.request({ method: 'DELETE', url: endpoint, headers, body: { userId } }).then(({ body }) => {
-        expect(body.deleted).to.eq(true)
-      })
+      cleanup()
       // A second delete must 404: the account no longer exists.
       cy.request({ method: 'DELETE', url: endpoint, headers, body: { userId }, failOnStatusCode: false })
         .its('status')

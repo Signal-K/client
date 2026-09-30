@@ -28,6 +28,7 @@ async function adminToken(env: PocketbaseEnv, fetchImpl: typeof fetch, forceRefr
   return token;
 }
 
+<<<<<<< HEAD
 // One authenticated list read. Totals are opt-in (`withTotal`) because PocketBase
 // pays a COUNT(*) for them; most callers only need items.
 export async function readPage<T = Record<string, unknown>>(
@@ -76,6 +77,22 @@ export async function listRecords<T = Record<string, unknown>>(
   fetchImpl: typeof fetch = fetch,
 ): Promise<T[]> {
   return (await readPage<T>(env, collection, params, fetchImpl)).items;
+=======
+/** Authenticated PocketBase call with one token refresh on 401/403. */
+export async function adminFetch(
+  env: PocketbaseEnv,
+  path: string,
+  init: RequestInit = {},
+  fetchImpl: typeof fetch = fetch,
+): Promise<Response> {
+  const call = async (force: boolean) =>
+    fetchImpl(`${env.POCKETBASE_URL}${path}`, {
+      ...init,
+      headers: { ...init.headers, authorization: await adminToken(env, fetchImpl, force) },
+    });
+  const res = await call(false);
+  return res.status === 401 || res.status === 403 ? call(true) : res;
+>>>>>>> 46f809fe (🪶🔐 ↝ [SSC-33]: Move the staging playtest lifecycle into the Free-plan API Worker)
 }
 
 export type Profile = { userId: string; fullName: string | null; avatarUrl: string | null };

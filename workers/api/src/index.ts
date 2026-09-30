@@ -1,10 +1,11 @@
 import { AuthError, verifyClerkJwt, type ClerkClaims } from "./jwt";
 import { handleAnomalies } from "./anomalies";
 import { createClassification, listClassifications } from "./classifications";
+import { handlePlaytest, type PlaytestEnv } from "./playtest";
 import { buildResearchSummary, emptySummary } from "./research";
 import { getProfileByUserId, type PocketbaseEnv, type Profile } from "./pocketbase";
 
-export type Env = PocketbaseEnv & {
+export type Env = PocketbaseEnv & PlaytestEnv & {
   CLERK_ISSUER: string;
   CLERK_JWKS_URL?: string;
   CLERK_AUTHORIZED_PARTIES?: string; // comma-separated origins
@@ -40,6 +41,7 @@ function bearer(request: Request): string | null {
 
 export async function handle(request: Request, env: Env, deps: Deps = {}): Promise<Response> {
   const url = new URL(request.url);
+  if (url.pathname === "/api/v1/test/playtest") return handlePlaytest(request, env, deps.fetchImpl);
   const classificationsRoute = url.pathname === "/api/v1/classifications";
   if (request.method !== "GET" && !(classificationsRoute && request.method === "POST")) {
     return json({ error: "method_not_allowed" }, 405, { allow: classificationsRoute ? "GET, POST" : "GET" });
