@@ -91,6 +91,8 @@ describe("worker API auth boundary", () => {
   it("rejects wrong issuer and unauthorized party", async () => {
     expect((await call("/api/v1/me", await sign(key, { ...good, iss: "https://evil.test" }))).status).toBe(401);
     expect((await call("/api/v1/me", await sign(key, { ...good, azp: "https://evil.test" }))).status).toBe(403);
+    const { azp: _azp, ...noParty } = good;
+    expect((await call("/api/v1/me", await sign(key, noParty))).status).toBe(200);
   });
 
   it("rejects cross-user access", async () => {
