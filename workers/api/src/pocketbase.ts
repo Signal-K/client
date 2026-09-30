@@ -78,6 +78,22 @@ export async function listRecords<T = Record<string, unknown>>(
   return (await readPage<T>(env, collection, params, fetchImpl)).items;
 }
 
+/** Authenticated PocketBase call with one token refresh on 401/403. */
+export async function adminFetch(
+  env: PocketbaseEnv,
+  path: string,
+  init: RequestInit = {},
+  fetchImpl: typeof fetch = fetch,
+): Promise<Response> {
+  const call = async (force: boolean) =>
+    fetchImpl(`${env.POCKETBASE_URL}${path}`, {
+      ...init,
+      headers: { ...init.headers, authorization: await adminToken(env, fetchImpl, force) },
+    });
+  const res = await call(false);
+  return res.status === 401 || res.status === 403 ? call(true) : res;
+}
+
 export type Profile = { userId: string; fullName: string | null; avatarUrl: string | null };
 
 export async function getProfileByUserId(
