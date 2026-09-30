@@ -35,3 +35,45 @@ describe("fetchResearchSummary", () => {
     expect(fetchMock).toHaveBeenCalledTimes(2);
   });
 });
+
+describe("fetchResearchSummary on the edge API", () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    vi.unstubAllEnvs();
+    vi.resetModules();
+  });
+
+  async function load(clerk: unknown) {
+    vi.resetModules();
+    vi.stubEnv("NEXT_PUBLIC_EDGE_API", "true");
+    const fetchMock = vi.fn(async () => new Response("{}"));
+    vi.stubGlobal("fetch", fetchMock);
+    vi.stubGlobal("window", { Clerk: clerk });
+    const mod = await import("./researchSummary");
+    return { fetchMock, ...mod };
+  }
+
+  it("sends the Clerk token to the Worker when a session is ready", async () => {
+    const { fetchMock, fetchResearchSummary } = await load({ loaded: true, session: { getToken: async () => "jwt" } });
+    await fetchResearchSummary();
+    const [url, init] = fetchMock.mock.calls[0] as unknown as [string, RequestInit];
+    expect(url).toBe("/api/v1/research/summary");
+    expect(init.headers).toMatchObject({ authorization: "Bearer jwt" });
+  });
+
+  it("uses the Next route when Clerk is not ready or signed out", async () => {
+    const { fetchMock, fetchResearchSummary } = await load({ loaded: false });
+    await fetchResearchSummary();
+    expect((fetchMock.mock.calls[0] as unknown as [string])[0]).toBe("/api/gameplay/research/summary");
+  });
+
+  it("falls back to the Next route if the Worker fails", async () => {
+    const { fetchMock, fetchResearchSummary } = await load({ loaded: true, session: { getToken: async () => "jwt" } });
+    fetchMock.mockImplementationOnce(async () => new Response("x", { status: 502 }));
+    await fetchResearchSummary();
+    expect(fetchMock.mock.calls.map((c) => (c as unknown as [string])[0])).toEqual([
+      "/api/v1/research/summary",
+      "/api/gameplay/research/summary",
+    ]);
+  });
+});

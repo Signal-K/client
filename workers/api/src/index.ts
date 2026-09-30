@@ -1,5 +1,6 @@
 import { AuthError, verifyClerkJwt, type ClerkClaims } from "./jwt";
 import { handleAnomalies } from "./anomalies";
+import { buildResearchSummary, emptySummary } from "./research";
 import { getProfileByUserId, type PocketbaseEnv, type Profile } from "./pocketbase";
 
 export type Env = PocketbaseEnv & {
@@ -42,8 +43,11 @@ export async function handle(request: Request, env: Env, deps: Deps = {}): Promi
 
   if (url.pathname === "/api/v1/anomalies") return handleAnomalies(request, env, { fetchImpl: deps.fetchImpl });
 
-  const route = url.pathname.match(/^\/api\/v1\/(me|users\/([^/]+)\/profile)$/);
-  if (!route) return json({ error: "not_found" }, 404);
+  const summaryRoute = url.pathname === "/api/v1/research/summary";
+  const route = summaryRoute ? null : url.pathname.match(/^\/api\/v1\/(me|users\/([^/]+)\/profile)$/);
+  if (!route && !summaryRoute) return json({ error: "not_found" }, 404);
+  // Signed-out callers get the same empty summary the Next route returns.
+  if (summaryRoute && !bearer(request)) return json(emptySummary());
 
   let claims: ClerkClaims;
   try {
@@ -61,8 +65,16 @@ export async function handle(request: Request, env: Env, deps: Deps = {}): Promi
     throw err;
   }
 
+  if (summaryRoute) {
+    try {
+      return json(await buildResearchSummary(env, claims.sub, deps.fetchImpl));
+    } catch {
+      return json({ error: "upstream_unavailable" }, 502);
+    }
+  }
+
   // Paths naming another user are rejected outright; identity only ever comes from the verified `sub`.
-  const requestedUser = route[2] ? decodeURIComponent(route[2]) : claims.sub;
+  const requestedUser = route![2] ? decodeURIComponent(route![2]) : claims.sub;
   if (requestedUser !== claims.sub) return json({ error: "forbidden" }, 403);
 
   try {

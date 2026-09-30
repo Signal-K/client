@@ -127,3 +127,17 @@ describe("Workers Free subrequest budget", () => {
     expect((await call("/api/v1/me", await sign(key, good))).status).toBe(503);
   });
 });
+
+describe("research summary route", () => {
+  it("returns the empty summary for signed-out callers without touching upstream", async () => {
+    const res = await call("/api/v1/research/summary");
+    expect(res.status).toBe(200);
+    expect(await res.json()).toMatchObject({ authenticated: false });
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it("rejects an invalid token", async () => {
+    const res = await call("/api/v1/research/summary", "garbage");
+    expect(res.status).toBe(401);
+  });
+});

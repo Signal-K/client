@@ -14,3 +14,14 @@ This repository follows the mandatory commit policy for every repository under `
   - Put all ticket keys worked on in one bracket pair, separated by single spaces. Include the active ticket key; related external keys may follow.
   - Describe the achieved outcome concisely after `: `.
 - Never bypass the commit-message hook with `--no-verify`.
+
+## Keep the server light (permanent rule)
+
+Star Sailors must stay as light as possible on servers and PocketBase. This applies to every change, not just performance tickets.
+
+- Budget reads per request. Prefer the fewest PocketBase reads that answer the question, and never download rows just to count them (use `totalItems` with `perPage=1`, or skip totals when they are unused: `skipTotal`).
+- Request only the fields you need (`fields=`), page results, and cap list sizes.
+- Share one client request between components (dedupe in-flight, short TTL, invalidate on writes) instead of each component fetching on its own. Do not add polling; if a poll is unavoidable, make it visibility-gated, at least 2 minutes apart, and cacheable.
+- Cache public, read-mostly data at the edge (`Cache-Control` with `s-maxage`). Keep per-player data `private, no-store` and invalidate client caches on writes.
+- New read endpoints go in the Free-plan API Worker (`workers/api`: 10ms CPU, 50 subrequests, no `nodejs_compat`) when they fit; a route that cannot stay within a handful of reads should be redesigned rather than ported as-is.
+- Do not add a new request, query, timer or dependency without saying what it costs and why it is worth it.
