@@ -335,6 +335,12 @@ describe("background jobs (SSC-39)", () => {
     expect(queued.map((m) => m.body.id)).toEqual(["reminders:2026-09-25:p1"]);
   });
 
+  it("does not start the reminder fan-out on staging", async () => {
+    vi.spyOn(console, "log").mockImplementation(() => {});
+    await worker.scheduled({ cron: SNAPSHOT_CRON, scheduledTime: Date.parse("2026-09-25T17:00:00Z") }, { ...env, WORKER_ENV: "staging" }, { waitUntil: () => {} });
+    expect(queued).toEqual([]);
+  });
+
   it("queues the signed-in user's notification and answers 202 at once", async () => {
     const res = await call("/api/notify-my-discoveries", {
       method: "POST",
@@ -375,7 +381,8 @@ describe("background jobs (SSC-39)", () => {
   it("keeps wrangler.jsonc crons and queues in step with the code", () => {
     const config = readFileSync("wrangler.jsonc", "utf8");
     expect(config).toContain(`"triggers": { "crons": ["${SNAPSHOT_CRON}"] },`);
-    expect(config).toContain(`"triggers": { "crons": [] }`);
+    expect(config.match(new RegExp(`"triggers": \\{ "crons": \\["${SNAPSHOT_CRON.replace(/\*/g, "\\*")}"\\] \\}`, "g"))).toHaveLength(2);
+    expect(config).toContain(`"WORKER_ENV": "staging"`);
     expect(config).toMatch(/"max_retries": 5, "dead_letter_queue": "starsailors-jobs-dlq"/);
   });
 });

@@ -36,6 +36,8 @@ export type Env = {
   POCKETBASE_ADMIN_EMAIL: string;
   POCKETBASE_ADMIN_PASSWORD: string;
   posthog_region?: string;
+  /** Set to "staging" on the staging Worker (no reminder fan-out from its cron). */
+  WORKER_ENV?: string;
   /** Workers KV: published public snapshots, job receipts and parked jobs. */
   PUBLIC_DATA?: KVLike;
   /** Cloudflare Queues producer for background jobs. */
@@ -282,7 +284,7 @@ async function background(env: Env, ctx: ExecutionContextLike, label: string, fn
 export default {
   fetch: (request: Request, env: Env, ctx?: ExecutionContextLike) => handle(request, env, { ctx }),
   scheduled: (controller: { cron: string; scheduledTime: number }, env: Env, ctx: ExecutionContextLike) =>
-    background(env, ctx, `cron ${controller.cron}`, () => runScheduled(controller.cron, controller.scheduledTime)),
+    background(env, ctx, `cron ${controller.cron}`, () => runScheduled(controller.cron, controller.scheduledTime, env.WORKER_ENV !== "staging")),
   queue: (batch: QueueBatchLike, env: Env, ctx: ExecutionContextLike) =>
     background(env, ctx, `queue ${batch.queue}`, () => runQueueBatch(batch)),
 };
