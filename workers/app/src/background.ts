@@ -1,7 +1,7 @@
 // Cron and queue entry points of the app Worker (SSC-37, SSC-39).
 //
-//   SNAPSHOT_CRON          recompute the public snapshots into Workers KV
-//   DISCOVERY_REMINDER_CRON start the daily reminder fan-out (production only)
+//   SNAPSHOT_CRON          recompute one public snapshot into Workers KV per tick, and on the
+//                          17:00 UTC tick start the daily reminder fan-out instead
 //   queue JOBS / JOBS_DLQ  run background jobs / park dead-lettered ones
 //
 // Both run with the same 10 ms CPU cap as requests on Workers Free, so each
@@ -16,15 +16,16 @@ import { refreshSnapshots, snapshotForTick } from "@/src/server/snapshots/store"
 // refreshed every 20 min, inside the 30 min freshness window.
 export const SNAPSHOT_CRON = "*/5 * * * *";
 export const SNAPSHOT_TICK_MS = 5 * 60 * 1000;
-export const DISCOVERY_REMINDER_CRON = "0 17 * * *";
+// Workers Free allows 5 cron triggers per account, so the reminder shares the snapshot cron.
+export const DISCOVERY_REMINDER_HOUR_UTC = 17;
 
-export async function runScheduled(cron: string, scheduledTime: number): Promise<Record<string, unknown>> {
-  if (cron === DISCOVERY_REMINDER_CRON) {
+export async function runScheduled(_cron: string, scheduledTime: number): Promise<Record<string, unknown>> {
+  const at = new Date(scheduledTime);
+  if (at.getUTCHours() === DISCOVERY_REMINDER_HOUR_UTC && at.getUTCMinutes() < SNAPSHOT_TICK_MS / 60000) {
     const day = new Date(scheduledTime).toISOString().slice(0, 10);
     const queued = await enqueueJobs({ type: "reminders.discoveries", id: `reminders:${day}:p1`, day, page: 1 });
     return { task: "discovery-reminders", day, ...queued };
   }
-  // SNAPSHOT_CRON, and any cron added later without a handler of its own.
   const only = [snapshotForTick(scheduledTime, SNAPSHOT_TICK_MS)];
   const report = await refreshSnapshots({ now: scheduledTime, only });
   return { task: "snapshots", ...report };

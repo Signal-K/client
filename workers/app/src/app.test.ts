@@ -23,7 +23,7 @@ import { resetJwksCache } from "../../api/src/jwt";
 import { requestContext } from "./context";
 import { createMemoryKV, type KVLike } from "@/src/server/platform";
 import { resetSnapshotMemo, SNAPSHOT_BUNDLE_KEY } from "@/src/server/snapshots/store";
-import { DISCOVERY_REMINDER_CRON, SNAPSHOT_CRON, SNAPSHOT_TICK_MS } from "./background";
+import { SNAPSHOT_CRON, SNAPSHOT_TICK_MS } from "./background";
 import worker, { handle, issuerFromPublishableKey, resolveAuth, type Env } from "./index";
 import { auth } from "./shims/clerk-nextjs-server";
 
@@ -331,7 +331,7 @@ describe("public snapshots (SSC-37)", () => {
 describe("background jobs (SSC-39)", () => {
   it("starts the daily reminder fan-out from its cron", async () => {
     vi.spyOn(console, "log").mockImplementation(() => {});
-    await worker.scheduled({ cron: DISCOVERY_REMINDER_CRON, scheduledTime: Date.parse("2026-09-25T17:00:00Z") }, env, { waitUntil: () => {} });
+    await worker.scheduled({ cron: SNAPSHOT_CRON, scheduledTime: Date.parse("2026-09-25T17:00:00Z") }, env, { waitUntil: () => {} });
     expect(queued.map((m) => m.body.id)).toEqual(["reminders:2026-09-25:p1"]);
   });
 
@@ -374,8 +374,8 @@ describe("background jobs (SSC-39)", () => {
 
   it("keeps wrangler.jsonc crons and queues in step with the code", () => {
     const config = readFileSync("wrangler.jsonc", "utf8");
-    expect(config).toContain(`"crons": ["${SNAPSHOT_CRON}", "${DISCOVERY_REMINDER_CRON}"]`);
-    expect(config).toContain(`"crons": ["${SNAPSHOT_CRON}"]`);
+    expect(config).toContain(`"triggers": { "crons": ["${SNAPSHOT_CRON}"] },`);
+    expect(config).toContain(`"triggers": { "crons": [] }`);
     expect(config).toMatch(/"max_retries": 5, "dead_letter_queue": "starsailors-jobs-dlq"/);
   });
 });
