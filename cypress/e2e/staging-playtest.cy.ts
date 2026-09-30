@@ -39,8 +39,10 @@ if (enabled) {
         .then((win) => cy.wrap((win as any).Clerk.session.getToken(), { timeout: 15000 }))
         .then((token) => {
           const auth = { authorization: `Bearer ${token}` }
-          cy.request({ url: '/api/v1/research/summary', headers: auth }).then(({ status, body }) => {
-            expect(status).to.eq(200)
+          const claims = JSON.parse(atob(String(token).split('.')[1].replace(/-/g, '+').replace(/_/g, '/')))
+          const seen = `azp=${claims.azp} iss=${claims.iss}`
+          cy.request({ url: '/api/v1/research/summary', headers: auth, failOnStatusCode: false }).then(({ status, body }) => {
+            expect(status, `research summary (${seen}) ${JSON.stringify(body)}`).to.eq(200)
             expect(body.authenticated).to.eq(true)
           })
           cy.request({ url: `/api/v1/classifications?author=${encodeURIComponent(userId as string)}&limit=5`, headers: auth })
