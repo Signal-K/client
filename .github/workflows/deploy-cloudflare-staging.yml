@@ -12,7 +12,7 @@ name: Deploy staging to Cloudflare Workers
 # accounts/data stay one ecosystem; only the frontend Worker differs.
 on:
   push:
-    branches: [staging]
+    branches: [staging, ssc-edge-api-staging]
     paths:
       - "src/**"
       - "public/**"
@@ -29,9 +29,6 @@ on:
       - ".github/workflows/deploy-cloudflare-staging.yml"
       - ".github/workflows/cloudflare-app-worker.yml"
   workflow_dispatch: {}
-  # Edge API rollout check: deploys only from this one branch, never `staging`.
-  push:
-    branches: [ssc-edge-api-staging]
 
 concurrency:
   group: cloudflare-staging
@@ -48,6 +45,6 @@ jobs:
   # Edge API rollout: after the edge-branch deploy, play the signed-in game on it.
   playtest:
     needs: deploy
-    if: github.ref == 'refs/heads/ssc-edge-api-staging'
+    if: github.ref == 'refs/heads/ssc-edge-api-staging' || github.ref == 'refs/heads/staging'
     uses: ./.github/workflows/staging-playtest.yml
     secrets: inherit
