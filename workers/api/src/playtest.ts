@@ -109,7 +109,12 @@ export async function handlePlaytest(request: Request, env: PlaytestEnv, fetchIm
         skip_password_requirement: true,
       }),
     });
-    if (!created.ok) return json({ error: "clerk_create_failed" }, 502);
+    if (!created.ok) {
+      // Only reached with the correct secret; surface Clerk's error codes (no PII) so a 502 is diagnosable.
+      const body = (await created.json().catch(() => null)) as { errors?: { code?: string; message?: string }[] } | null;
+      const errors = (body?.errors ?? []).slice(0, 3).map((e) => ({ code: e.code, message: e.message }));
+      return json({ error: "clerk_create_failed", clerkStatus: created.status, clerkErrors: errors }, 502);
+    }
     const user = (await created.json()) as ClerkUser;
     const ticket = await clerk("/sign_in_tokens", {
       method: "POST",
