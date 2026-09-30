@@ -1,3 +1,4 @@
+import { invalidateResearchSummary } from "@/lib/gameplay/researchSummary";
 import { generateAnomalyProperties } from "./constants";
 
 export function useDatabaseOperations() {
@@ -66,6 +67,7 @@ export function useDatabaseOperations() {
         throw new Error(payload?.error || "Failed to create classification");
       }
 
+      invalidateResearchSummary();
       const data = await response.json();
       if (data) return data;
     } catch (error) {

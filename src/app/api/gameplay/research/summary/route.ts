@@ -42,6 +42,29 @@ function createEmptySummary() {
   };
 }
 
+type AdminClient = Awaited<ReturnType<typeof createPocketbaseAdminClient>>;
+
+// Count with totalItems (one row per query) instead of downloading every
+// classification the player has ever made just to tally three types.
+async function countClassifications(pb: AdminClient, userId: string) {
+  const countWhere = (extra?: string) =>
+    pb
+      .collection("ss_classifications")
+      .getList(1, 1, {
+        filter: pb.filter(`author = {:a}${extra ? ` && ${extra}` : ""}`, { a: userId }),
+        fields: "id",
+        skipTotal: false,
+      })
+      .then((result) => result.totalItems);
+  const [all, asteroid, cloud, planet] = await Promise.all([
+    countWhere(),
+    countWhere('classificationtype = "telescope-minorPlanet"'),
+    countWhere('classificationtype = "cloud"'),
+    countWhere('classificationtype = "planet"'),
+  ]);
+  return { all, asteroid, cloud, planet };
+}
+
 export async function GET() {
   try {
     const { user, authError } = await getRouteUser();
@@ -55,10 +78,7 @@ export async function GET() {
 
     const [researchProgress, classifications, surveyBonus, profile] = await Promise.all([
       getResearchedProgressForUser(userId),
-      pb.collection("ss_classifications").getFullList({
-        filter: pb.filter("author = {:a}", { a: userId }),
-        fields: "classificationtype",
-      }),
+      countClassifications(pb, userId),
       getSurveyBonusForUser(userId),
       pb
         .collection("profiles")
@@ -76,21 +96,7 @@ export async function GET() {
     }
     const referralBonus = referralCount * 5;
 
-    const classificationRows = classifications;
-
-    const counts = {
-      all: classificationRows.length,
-      asteroid: 0,
-      cloud: 0,
-      planet: 0,
-    };
-
-    for (const row of classificationRows) {
-      const type = row.classificationtype;
-      if (type === "telescope-minorPlanet") counts.asteroid += 1;
-      if (type === "cloud") counts.cloud += 1;
-      if (type === "planet") counts.planet += 1;
-    }
+    const counts = classifications;
 
     const techTypes = researchProgress.techTypes;
     const techSet = new Set(techTypes);

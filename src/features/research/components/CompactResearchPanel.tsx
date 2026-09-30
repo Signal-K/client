@@ -5,6 +5,7 @@ import { CompactUpgradeCard } from "./CompactUpgradeCard";
 import { Badge } from "@/src/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/src/components/ui/tabs";
 import { UPGRADES_CONFIG, ResearchUpgrade } from "../config/upgrades-config";
+import { fetchResearchSummary, invalidateResearchSummary } from "@/lib/gameplay/researchSummary";
 
 interface ResearchSummary {
   availableStardust: number;
@@ -34,7 +35,7 @@ export default function CompactResearchPanel() {
   const fetchUpgradeData = async () => {
     setLoading(true);
     try {
-      const response = await fetch("/api/gameplay/research/summary");
+      const response = await fetchResearchSummary();
       const payload = await response.json();
       if (!response.ok) {
         throw new Error(payload?.error || "Failed to fetch research summary");
@@ -60,6 +61,7 @@ export default function CompactResearchPanel() {
         const payload = await response.json().catch(() => ({}));
         throw new Error(payload?.error || "Failed to unlock upgrade");
       }
+      invalidateResearchSummary();
       await fetchUpgradeData();
     } catch (error) {
       console.error("Error upgrading:", error);

@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/src/components/ui/button";
 import { SciFiAnomalyComponent } from "@/src/components/classification/viewport/sci-fi-anomaly-component";
+import { fetchResearchSummary } from "@/lib/gameplay/researchSummary";
 
 export default function RoverViewportSection() {
     const router = useRouter();
@@ -57,7 +58,7 @@ export default function RoverViewportSection() {
         
         async function checkRoverUpgrade() {
             if (!session) return;
-            const summaryRes = await fetch("/api/gameplay/research/summary");
+            const summaryRes = await fetchResearchSummary();
             const summaryPayload = await summaryRes.json();
             const researchedTypes = Array.isArray(summaryPayload?.researchedTechTypes)
               ? summaryPayload.researchedTechTypes

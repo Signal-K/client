@@ -11,6 +11,7 @@ import MainHeader from "@/src/components/layout/Header/MainHeader";
 import { TelescopeBackground } from "@/src/components/classification/telescope/telescope-background";
 
 import { submitReferralCodeAction } from "@/src/app/actions/profile-actions";
+import { fetchResearchSummary } from "@/lib/gameplay/researchSummary";
 
 // Small helper component to show how stardust was spent
 function StardustSummary({ textColor }: { textColor: string }) {
@@ -20,7 +21,7 @@ function StardustSummary({ textColor }: { textColor: string }) {
   useEffect(() => {
     async function fetchResearched() {
       try {
-        const response = await fetch("/api/gameplay/research/summary");
+        const response = await fetchResearchSummary();
         const payload = await response.json();
         if (!response.ok) {
           throw new Error(payload?.error || "Failed to load stardust spending");

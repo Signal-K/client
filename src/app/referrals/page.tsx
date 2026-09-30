@@ -8,6 +8,7 @@ import { TelescopeBackground } from "@/src/components/classification/telescope/t
 import { useSessionContext } from "@/src/lib/auth/session-context";
 import ReferralBoostCard from "@/src/features/game/components/ReferralBoostCard";
 import ReferralCodePanel from "@/src/components/profile/setup/Referrals";
+import { fetchResearchSummary } from "@/lib/gameplay/researchSummary";
 
 type ReferralSummary = {
   referralCode: string | null;
@@ -35,7 +36,7 @@ export default function ReferralsPage() {
 
     const fetchSummary = async () => {
       try {
-        const response = await fetch("/api/gameplay/research/summary", { cache: "no-store" });
+        const response = await fetchResearchSummary();
         const payload = await response.json().catch(() => null);
         if (!response.ok || !payload) return;
         setSummary({

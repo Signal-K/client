@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useSession } from "@/src/lib/auth/session-context";
 import { Sparkles } from "lucide-react";
+import { fetchResearchSummary } from "@/lib/gameplay/researchSummary";
 
 interface StardustBalanceProps {
   onPointsUpdate?: (points: number) => void;
@@ -18,9 +19,7 @@ export default function StardustBalance({ onPointsUpdate }: StardustBalanceProps
 
     const fetchStardustBalance = async () => {
       try {
-        const response = await fetch("/api/gameplay/research/summary", {
-          cache: "no-store",
-        });
+        const response = await fetchResearchSummary();
         const payload = await response.json().catch(() => null);
         if (!response.ok || !payload) {
           throw new Error(payload?.error ?? "Failed to load stardust balance");

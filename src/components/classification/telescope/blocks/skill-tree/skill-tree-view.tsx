@@ -8,6 +8,7 @@ import { SkillDetails } from "./skill-details"
 import { SkillLegend } from "./skill-legend"
 import { StardustBalance } from "./balance"
 import type { Skill, SkillStatus, UserProgress } from "@/types/Structures/telescope-skills"
+import { fetchResearchSummary, invalidateResearchSummary } from "@/lib/gameplay/researchSummary";
 
 interface SkillTreeViewProps {
   onBack: () => void
@@ -137,7 +138,7 @@ export function SkillTreeView({ onBack }: SkillTreeViewProps) {
   const fetchUserProgress = async () => {
     setLoading(true)
     try {
-      const response = await fetch("/api/gameplay/research/summary")
+      const response = await fetchResearchSummary()
       const payload = await response.json()
       if (!response.ok) {
         throw new Error(payload?.error || "Failed to fetch user progress")
@@ -225,6 +226,7 @@ export function SkillTreeView({ onBack }: SkillTreeViewProps) {
         const payload = await response.json().catch(() => ({}))
         throw new Error(payload?.error || "Failed to unlock skill")
       }
+      invalidateResearchSummary()
 
       // Deduct stardust cost (you might want to implement this in your points system)
       // For now, we'll just update the local state

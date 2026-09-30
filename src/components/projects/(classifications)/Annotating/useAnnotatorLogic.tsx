@@ -35,6 +35,7 @@ import {
   type Tool,
   type CategoryConfig,
 } from "@/src/types/Annotation";
+import { fetchResearchSummary } from "@/lib/gameplay/researchSummary";
 
 export interface ImageAnnotatorProps {
   initialImageUrl: string;
@@ -133,7 +134,7 @@ export function useAnnotatorLogic({
       : ({} as Record<string, CategoryConfig>);
 
   const checkFirstClassificationEver = async () => {
-    const summaryRes = await fetch("/api/gameplay/research/summary", { cache: "no-store" }).catch(() => null);
+    const summaryRes = await fetchResearchSummary().catch(() => null);
     if (!summaryRes?.ok) return false;
     const summaryPayload = await summaryRes.json().catch(() => null);
     return Number(summaryPayload?.counts?.all ?? 0) === 0;

@@ -13,6 +13,7 @@ import ToolCard from "@/src/components/deployment/missions/structures/tool-card"
 import { RoverIcon, SatelliteIcon, TelescopeComplexIcon } from "@/src/components/deployment/missions/structures/tool-icons";
 import { Card } from "@/src/components/ui/card";
 import { MineralExtraction } from "@/src/components/deployment/extraction/mineral-extraction";
+import { fetchResearchSummary } from "@/lib/gameplay/researchSummary";
 
 type MineralConfiguration = {
   type: string;
@@ -81,7 +82,7 @@ export default function UserInventoryPage() {
       if (!session?.user?.id) return;
 
       const [summaryRes, depositsRes] = await Promise.all([
-        fetch("/api/gameplay/research/summary", { cache: "no-store" }),
+        fetchResearchSummary(),
         fetch("/api/gameplay/mineral-deposits", { cache: "no-store" }),
       ]);
       const summary = await summaryRes.json().catch(() => ({}));
