@@ -100,9 +100,10 @@ export async function handlePlaytest(request: Request, env: PlaytestEnv, fetchIm
     const created = await clerk("/users", {
       method: "POST",
       body: JSON.stringify({
-        // RFC 2606 .test addresses can never be delivered; the server mints the
-        // sign-in ticket itself so no email verification is involved.
-        email_address: [`ssc-playtest-${id}@example.test`],
+        // example.com is reserved (RFC 2606) so it can never be delivered, and Clerk
+        // rejects the .test TLD as an invalid format. The server mints the sign-in
+        // ticket itself so no email verification is involved.
+        email_address: [`ssc-playtest-${id}@example.com`],
         external_id: `ssc-playtest-${id}`,
         private_metadata: { starSailorsPlaytest: { marker: PLAYTEST_MARKER, createdAt: new Date().toISOString() } },
         skip_password_checks: true,
@@ -111,8 +112,8 @@ export async function handlePlaytest(request: Request, env: PlaytestEnv, fetchIm
     });
     if (!created.ok) {
       // Only reached with the correct secret; surface Clerk's error codes (no PII) so a 502 is diagnosable.
-      const body = (await created.json().catch(() => null)) as { errors?: { code?: string; message?: string }[] } | null;
-      const errors = (body?.errors ?? []).slice(0, 3).map((e) => ({ code: e.code, message: e.message }));
+      const body = (await created.json().catch(() => null)) as { errors?: { code?: string; message?: string; meta?: { param_name?: string } }[] } | null;
+      const errors = (body?.errors ?? []).slice(0, 3).map((e) => ({ code: e.code, message: e.message, param: e.meta?.param_name }));
       return json({ error: "clerk_create_failed", clerkStatus: created.status, clerkErrors: errors }, 502);
     }
     const user = (await created.json()) as ClerkUser;
