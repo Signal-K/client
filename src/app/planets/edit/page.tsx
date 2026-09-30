@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { classificationsFetch } from "@/lib/gameplay/edgeApi";
 
 interface PlanetEntry {
   id: number;
@@ -17,7 +18,7 @@ export default function PlanetsEditIndexPage() {
   useEffect(() => {
     async function fetchPlanets() {
       try {
-        const res = await fetch("/api/gameplay/classifications?classificationtype=planet&limit=50");
+        const res = await classificationsFetch("/api/gameplay/classifications?classificationtype=planet&limit=50");
         const data = await res.json();
         setPlanets(data?.classifications ?? []);
       } catch {

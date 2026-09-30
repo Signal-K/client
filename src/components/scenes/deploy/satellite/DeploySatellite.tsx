@@ -6,6 +6,7 @@ import { usePostHog } from "posthog-js/react";
 import PlanetFocusView from "./PlanetFocusView";
 import DeploySidebar from "./DeploySidebar";
 import { ANOMALIES_API } from "@/lib/gameplay/edgeApi";
+import { classificationsFetch } from "@/lib/gameplay/edgeApi";
 
 type InvestigationMode = "weather" | "p-4" | "planets";
 
@@ -92,7 +93,7 @@ export default function DeploySatelliteViewport() {
         return;
       }
 
-      const res = await fetch(
+      const res = await classificationsFetch(
         `/api/gameplay/classifications?author=${encodeURIComponent(session.user.id)}&anomaly=${focusedPlanet.id}&classificationtype=planet&orderBy=created_at&ascending=false&limit=1`
       );
       const payload = await res.json().catch(() => ({}));

@@ -1,3 +1,4 @@
+import { classificationsFetch } from "@/lib/gameplay/edgeApi";
 /**
  * Mineral deposit types and their configurations
  */
@@ -57,7 +58,7 @@ async function isPlanetCompatible(
 
     // If a classification ID is provided, check if it references a parent planet
     if (classificationId) {
-      const classRes = await fetch(`/api/gameplay/classifications?id=${classificationId}&limit=1`);
+      const classRes = await classificationsFetch(`/api/gameplay/classifications?id=${classificationId}&limit=1`);
       const classPayload = await classRes.json().catch(() => ({}));
       const classification = classRes.ok ? classPayload?.classifications?.[0] : null;
 
@@ -73,7 +74,7 @@ async function isPlanetCompatible(
             
             
             // Get the parent planet classification to find its anomaly
-            const parentRes = await fetch(`/api/gameplay/classifications?id=${config.parentPlanet}&limit=1`);
+            const parentRes = await classificationsFetch(`/api/gameplay/classifications?id=${config.parentPlanet}&limit=1`);
             const parentPayload = await parentRes.json().catch(() => ({}));
             const parentClassification = parentRes.ok ? parentPayload?.classifications?.[0] : null;
             
@@ -88,7 +89,7 @@ async function isPlanetCompatible(
     }
 
     // Check if planet has a classification with stats (from satellite survey)
-    const classificationsRes = await fetch(
+    const classificationsRes = await classificationsFetch(
       `/api/gameplay/classifications?author=${encodeURIComponent(userId)}&anomaly=${planetAnomalyId}&limit=500`
     );
     const classificationsPayload = await classificationsRes.json().catch(() => ({}));

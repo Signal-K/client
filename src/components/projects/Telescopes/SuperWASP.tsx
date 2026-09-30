@@ -8,6 +8,7 @@ import { Button } from "../../ui/button";
 import TutorialContentBlock, { createTutorialSlides } from "../TutorialContentBlock";
 import { useActivePlanet } from "@/src/lib/context/ActivePlanet";
 import { getStorageUrl } from "@/lib/pocketbase/storageUrl";
+import { classificationsFetch } from "@/lib/gameplay/edgeApi";
 
 type Anomaly = {
   id: string;
@@ -195,7 +196,7 @@ export const SuperWASPTutorial: React.FC<TelescopeProps> = ({ anomalyId }) => {
         timestamp: new Date().toISOString()
       };
 
-      const response = await fetch("/api/gameplay/classifications", {
+      const response = await classificationsFetch("/api/gameplay/classifications", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

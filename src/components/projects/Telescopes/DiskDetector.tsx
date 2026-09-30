@@ -10,6 +10,7 @@ import { Button } from "@/src/components/ui/button";
 import TutorialContentBlock, { createTutorialSlides } from "../TutorialContentBlock";
 import { getStorageUrl } from "@/lib/pocketbase/storageUrl";
 import { ANOMALIES_API } from "@/lib/gameplay/edgeApi";
+import { classificationsFetch } from "@/lib/gameplay/edgeApi";
 
 type Anomaly = {
   id: string;
@@ -243,7 +244,7 @@ export const DiskDetectorTutorial: React.FC<TelescopeProps> = ({
         timestamp: new Date().toISOString()
       };
 
-      const response = await fetch("/api/gameplay/classifications", {
+      const response = await classificationsFetch("/api/gameplay/classifications", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

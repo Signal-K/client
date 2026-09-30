@@ -141,3 +141,14 @@ describe("research summary route", () => {
     expect(res.status).toBe(401);
   });
 });
+
+describe("classifications routes", () => {
+  it("requires a token for reads and writes and only allows GET/POST", async () => {
+    expect((await call("/api/v1/classifications")).status).toBe(401);
+    const post = await handle(new Request("https://starsailors.space/api/v1/classifications", { method: "POST", body: "{}" }), env, { fetchImpl: fetchMock as unknown as typeof fetch, now: NOW });
+    expect(post.status).toBe(401);
+    const del = await handle(new Request("https://starsailors.space/api/v1/classifications", { method: "DELETE" }), env, { now: NOW });
+    expect(del.status).toBe(405);
+    expect(del.headers.get("allow")).toBe("GET, POST");
+  });
+});

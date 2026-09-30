@@ -1,5 +1,6 @@
 import { invalidateResearchSummary } from "@/lib/gameplay/researchSummary";
 import { generateAnomalyProperties } from "./constants";
+import { classificationsFetch } from "@/lib/gameplay/edgeApi";
 
 export function useDatabaseOperations() {
   const fetchViewportBundle = async () => {
@@ -50,7 +51,7 @@ export function useDatabaseOperations() {
   const createClassification = async (anomalyId: string, classificationType: string) => {
     try {
       const dbId = Number.parseInt(anomalyId.replace("db-", ""))
-      const response = await fetch("/api/gameplay/classifications", {
+      const response = await classificationsFetch("/api/gameplay/classifications", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -9,6 +9,7 @@ import {
   DiscAlbum,
   Paintbrush2Icon,
 } from "lucide-react";
+import { classificationsFetch } from "@/lib/gameplay/edgeApi";
 
 interface Mission {
   id: number;
@@ -95,7 +96,7 @@ const PlanetHuntersSteps = () => {
 
     const fetchData = async () => {
       try {
-        const classRes = await fetch(
+        const classRes = await classificationsFetch(
           `/api/gameplay/classifications?author=${encodeURIComponent(session.user.id)}&classificationtype=planet&limit=500`
         );
         const classPayload = await classRes.json().catch(() => null);

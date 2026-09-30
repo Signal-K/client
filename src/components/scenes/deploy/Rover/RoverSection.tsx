@@ -10,6 +10,7 @@ import { Button } from "@/src/components/ui/button";
 import { SciFiAnomalyComponent } from "@/src/components/classification/viewport/sci-fi-anomaly-component";
 import { fetchResearchSummary } from "@/lib/gameplay/researchSummary";
 import { ANOMALIES_API } from "@/lib/gameplay/edgeApi";
+import { classificationsFetch } from "@/lib/gameplay/edgeApi";
 
 export default function RoverViewportSection() {
     const router = useRouter();
@@ -149,7 +150,7 @@ export default function RoverViewportSection() {
                     let classData: any[] = [];
                     if (routeAnomalies.size > 0) {
                         const anomalyIdsToFetch = [...routeAnomalies];
-                        const classRes = await fetch(
+                        const classRes = await classificationsFetch(
                           `/api/gameplay/classifications?author=${encodeURIComponent(session.user.id)}&anomalies=${anomalyIdsToFetch.join(",")}&orderBy=created_at&ascending=false&limit=500`
                         );
                         const classPayload = await classRes.json();

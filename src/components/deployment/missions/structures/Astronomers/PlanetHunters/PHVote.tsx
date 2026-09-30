@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import PostCard from "@/src/components/social/posts/TestPostCard";
 import { incrementClassificationVote } from "@/src/lib/gameplay/classification-vote";
 import { SuccessPopup } from "@/src/components/ui/SuccessPopup";
+import { classificationsFetch } from "@/lib/gameplay/edgeApi";
 
 interface VotePlanetClassificationsProps { 
   classificationId: string | number;
@@ -31,7 +32,7 @@ export default function VotePlanetClassifications({ classificationId }: VotePlan
     setError(null);
 
     try {
-      const res = await fetch(`/api/gameplay/classifications?id=${encodeURIComponent(String(classificationId))}&limit=1`);
+      const res = await classificationsFetch(`/api/gameplay/classifications?id=${encodeURIComponent(String(classificationId))}&limit=1`);
       const payload = await res.json();
       if (!res.ok) throw new Error(payload?.error || "Failed to load classification");
       const data = payload?.classifications?.[0];
