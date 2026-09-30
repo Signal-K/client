@@ -67,7 +67,7 @@ jobs:
         run: |
           cd workers/api
           for name in STAGING_PLAYTEST_AUTH_ENABLED STAGING_PLAYTEST_AUTH_SECRET CLERK_SECRET_KEY; do
-            npx wrangler secret delete "$name" --env staging --force
+            npx wrangler secret delete "$name" --env staging < <(yes)
           done
 
       - name: Upload Cypress artifacts
