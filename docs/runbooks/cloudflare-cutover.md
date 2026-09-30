@@ -19,7 +19,7 @@ returned Error 1102. Production no longer runs a Next.js server at all:
 | `/ingest/*` | PostHog reverse proxy (formerly a `next.config` rewrite) | Yes, 1 subrequest |
 | `/api/public/*`, `/api/gameplay/leaderboards/sunspots`, `/api/community-activity` | Precomputed snapshots read from Workers KV (SSC-37) | Yes, no PocketBase reads |
 | Anything else | `404.html`, status 404 | Yes |
-| Cron `*/10 * * * *` | Recomputes the public snapshots into KV | Yes (cron) |
+| Cron `*/5 * * * *` | Recomputes one public snapshot per tick (rotating) into KV | Yes (cron) |
 | Cron `0 17 * * *` (production only) | Starts the daily discovery-reminder fan-out | Yes (cron) |
 | Queue `starsailors-jobs` (+ `-dlq`) | Push notifications, server-side PostHog events, fan-out (SSC-39) | Yes (queue consumer) |
 
@@ -280,7 +280,7 @@ decrypts each payload and verifies its VAPID signature):
 
 | Invocation | Result | Subrequests |
 | --- | --- | --- |
-| Cron `*/10 * * * *` | 4 snapshots published in one KV write | 9 |
+| Cron `*/5 * * * *` | 1 of 4 snapshots per tick, one KV write | see staging measurements |
 | `GET /api/public/snapshots/landing-stats` (after the cron) | 200 `fresh` (503 `missing` before it) | 0 |
 | `POST /api/notify-my-discoveries` | 202 in 12 ms | 0 warm (1 when it had to fetch the JWKS) |
 | Queue: `push.user`, 3 devices (201 / 410 / 503) | 1 sent, 1 subscription deleted, 1 retried after 60 s | 6 |

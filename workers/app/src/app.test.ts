@@ -23,7 +23,7 @@ import { resetJwksCache } from "../../api/src/jwt";
 import { requestContext } from "./context";
 import { createMemoryKV, type KVLike } from "@/src/server/platform";
 import { resetSnapshotMemo, SNAPSHOT_BUNDLE_KEY } from "@/src/server/snapshots/store";
-import { DISCOVERY_REMINDER_CRON, SNAPSHOT_CRON } from "./background";
+import { DISCOVERY_REMINDER_CRON, SNAPSHOT_CRON, SNAPSHOT_TICK_MS } from "./background";
 import worker, { handle, issuerFromPublishableKey, resolveAuth, type Env } from "./index";
 import { auth } from "./shims/clerk-nextjs-server";
 
@@ -308,17 +308,23 @@ describe("public snapshots (SSC-37)", () => {
     expect(body.snapshots).toContainEqual(expect.objectContaining({ name: "sunspot-leaderboard", status: "missing" }));
   });
 
-  it("publishes the snapshots from the cron trigger", async () => {
+  it("publishes one snapshot per cron tick, rotating through all of them", async () => {
     pocketbase.data = {
       ss_classifications: [{ legacyId: 1, author: "user_a", classificationtype: "sunspot", createdAt: new Date().toISOString() }],
       profiles: [{ userId: "user_a", username: "ada", classificationPoints: 3 }],
     };
     const log = vi.spyOn(console, "log").mockImplementation(() => {});
-    await worker.scheduled({ cron: SNAPSHOT_CRON, scheduledTime: Date.now() }, env, { waitUntil: () => {} });
-    const bundle = (await kv.get(SNAPSHOT_BUNDLE_KEY, "json")) as any;
+    const first = Math.ceil(Date.now() / SNAPSHOT_TICK_MS) * SNAPSHOT_TICK_MS;
+    await worker.scheduled({ cron: SNAPSHOT_CRON, scheduledTime: first }, env, { waitUntil: () => {} });
+    let bundle = (await kv.get(SNAPSHOT_BUNDLE_KEY, "json")) as any;
+    expect(Object.keys(bundle.sections)).toHaveLength(1);
+    expect(JSON.parse(log.mock.calls[0][0])).toMatchObject({ invocation: `cron ${SNAPSHOT_CRON}`, task: "snapshots" });
+    for (let tick = 1; tick < 4; tick++) {
+      await worker.scheduled({ cron: SNAPSHOT_CRON, scheduledTime: first + tick * SNAPSHOT_TICK_MS }, env, { waitUntil: () => {} });
+    }
+    bundle = (await kv.get(SNAPSHOT_BUNDLE_KEY, "json")) as any;
     expect(Object.keys(bundle.sections).sort()).toEqual(["community-activity", "hub-top-profiles", "landing-stats", "sunspot-leaderboard"]);
     expect(bundle.sections["sunspot-leaderboard"].data.classificationLeaders[0]).toMatchObject({ username: "ada", count: 1 });
-    expect(JSON.parse(log.mock.calls[0][0])).toMatchObject({ invocation: `cron ${SNAPSHOT_CRON}`, task: "snapshots" });
   });
 });
 

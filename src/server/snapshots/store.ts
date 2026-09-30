@@ -47,6 +47,12 @@ export const snapshotDefinitions = {
 export type SnapshotName = keyof typeof snapshotDefinitions;
 export type SnapshotData<N extends SnapshotName> = Awaited<ReturnType<(typeof snapshotDefinitions)[N]["compute"]>>;
 
+/** The snapshot a cron tick refreshes: one per tick, in rotation (see SNAPSHOT_CRON). */
+export function snapshotForTick(scheduledTime: number, tickMs: number): SnapshotName {
+  const names = Object.keys(snapshotDefinitions) as SnapshotName[];
+  return names[Math.floor(scheduledTime / tickMs) % names.length];
+}
+
 export const isSnapshotName = (name: string): name is SnapshotName => Object.hasOwn(snapshotDefinitions, name);
 
 export type StoredSection = {
@@ -124,12 +130,14 @@ export type RefreshReport = {
 };
 
 /**
- * Recompute every snapshot and publish the bundle with one KV write. A failed
+ * Recompute the snapshots (all, or just `only`) and publish the bundle with one KV write. A failed
  * section keeps its previous data and generatedAt (it turns stale after
  * maxAgeSeconds) and records the error, so a PocketBase outage degrades to
  * old numbers instead of empty ones.
  */
-export async function refreshSnapshots(options: { now?: number; pb?: () => Promise<PocketBase> } = {}): Promise<RefreshReport> {
+export async function refreshSnapshots(
+  options: { now?: number; pb?: () => Promise<PocketBase>; only?: readonly SnapshotName[] } = {},
+): Promise<RefreshReport> {
   const now = options.now ?? Date.now();
   const at = new Date(now).toISOString();
   const kv = platform().kv;
@@ -139,7 +147,7 @@ export async function refreshSnapshots(options: { now?: number; pb?: () => Promi
   let client: Promise<PocketBase> | null = null;
   const pb = () => (client ??= (options.pb ?? createPocketbaseAdminClient)());
 
-  const names = Object.keys(snapshotDefinitions) as SnapshotName[];
+  const names = options.only?.length ? [...options.only] : (Object.keys(snapshotDefinitions) as SnapshotName[]);
   const results = await Promise.all(
     names.map(async (name) => {
       const definition = snapshotDefinitions[name] as Definition<unknown>;

@@ -62,7 +62,8 @@ jobs:
       - name: Disable the playtest endpoint
         if: always()
         run: |
-          for name in STAGING_PLAYTEST_AUTH_ENABLED STAGING_PLAYTEST_AUTH_SECRET CLERK_SECRET_KEY; do
+          # CLERK_SECRET_KEY stays: it is a real runtime secret of the app Worker.
+          for name in STAGING_PLAYTEST_AUTH_ENABLED STAGING_PLAYTEST_AUTH_SECRET; do
             npx wrangler secret delete "$name" --env staging < <(yes)
           done
 

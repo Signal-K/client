@@ -55,9 +55,9 @@
       { "queue": "starsailors-jobs-dlq", "max_batch_size": 10, "max_batch_timeout": 30, "max_retries": 2 }
     ]
   },
-  // Must match workers/app/src/background.ts: snapshots every 10 minutes, the
+  // Must match workers/app/src/background.ts: snapshots every 5 minutes, one per tick, the
   // unclassified-discovery reminder daily at 17:00 UTC.
-  "triggers": { "crons": ["*/10 * * * *", "0 17 * * *"] },
+  "triggers": { "crons": ["*/5 * * * *", "0 17 * * *"] },
   // Do not set limits.cpu_ms here. The CI Cloudflare account is on Workers
   // Free; Wrangler then fails the whole deploy with 100328
   // ("CPU limits are not supported for the Free plan"). That blocked
@@ -121,7 +121,7 @@
           { "queue": "starsailors-jobs-staging-dlq", "max_batch_size": 10, "max_batch_timeout": 30, "max_retries": 2 }
         ]
       },
-      "triggers": { "crons": ["*/10 * * * *"] }
+      "triggers": { "crons": ["*/5 * * * *"] }
     }
   }
 }
