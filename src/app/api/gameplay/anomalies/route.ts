@@ -66,9 +66,15 @@ export async function GET(request: NextRequest) {
     const result = await pb.collection("anomalies").getList(1, clampedLimit, {
       filter: filters.join(" && "),
       sort: "-legacyId",
+      skipTotal: true,
     });
 
-    return NextResponse.json({ anomalies: recursiveSerialize(result.items.map(mapAnomalyToRow)) });
+    // The anomaly catalogue is public and changes rarely, so let the browser and
+    // the edge reuse a response for a minute instead of hitting PocketBase each time.
+    return NextResponse.json(
+      { anomalies: recursiveSerialize(result.items.map(mapAnomalyToRow)) },
+      { headers: { "Cache-Control": "public, max-age=30, s-maxage=60, stale-while-revalidate=300" } }
+    );
   } catch (err: unknown) {
     console.error("Error fetching anomalies:", err);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });

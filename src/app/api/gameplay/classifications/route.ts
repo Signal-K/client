@@ -87,6 +87,8 @@ export async function GET(request: NextRequest) {
   const result = await pb.collection("ss_classifications").getList(1, validatedLimit, {
     filter: filters.join(" && "),
     sort,
+    // Callers only read items; skipping totalItems saves a COUNT(*) per request.
+    skipTotal: true,
   });
 
   const rows = result.items.map(mapClassificationToRow);
