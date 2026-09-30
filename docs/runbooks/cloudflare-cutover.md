@@ -205,7 +205,7 @@ Steps:
    2026-09-30 for production and staging (`starsailors-api`,
    `starsailors-api-staging`); check for stale routes on any future cutover.
 7. Workers Free allows 5 cron triggers per account, shared with every Worker on
-   it. Production uses one (`*/5 * * * *`); staging has none. If a deploy fails
+   it. Production and staging use one `*/5 * * * *` each. If a deploy fails
    at `/schedules`, count them with `GET /workers/scripts/{name}/schedules`.
 
 ## Smoke test
