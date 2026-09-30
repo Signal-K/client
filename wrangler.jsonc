@@ -1,12 +1,28 @@
 {
   "$schema": "./node_modules/wrangler/config-schema.json",
   "name": "starsailors-client",
-  "main": ".open-next/worker.js",
+  // SSC-31: no OpenNext. Pages are a static Next.js export (`out/`, built by
+  // `yarn cf:build`) served by Workers Static Assets without invoking the
+  // Worker. workers/app/src/index.ts only runs for /api/*, /ingest/* and
+  // paths with no asset (dynamic pages, 404) and never renders React.
+  "main": "workers/app/src/index.ts",
   "compatibility_date": "2026-07-24",
+  // nodejs_compat: route handlers read process.env (populated from vars and
+  // secrets) and a few use node:crypto / AsyncLocalStorage.
   "compatibility_flags": ["nodejs_compat"],
   "assets": {
-    "directory": ".open-next/assets",
-    "binding": "ASSETS"
+    "directory": "out",
+    "binding": "ASSETS",
+    "html_handling": "auto-trailing-slash",
+    "not_found_handling": "none"
+  },
+  // Route handlers under src/app/api are bundled as-is; these replace the
+  // Next.js/Clerk server modules they import (see workers/app/src/shims).
+  "alias": {
+    "next/server": "./workers/app/src/shims/next-server.ts",
+    "next/cache": "./workers/app/src/shims/next-cache.ts",
+    "@clerk/nextjs/server": "./workers/app/src/shims/clerk-nextjs-server.ts",
+    "@clerk/nextjs/webhooks": "@clerk/backend/webhooks"
   },
   "routes": [
     { "pattern": "starsailors.space", "custom_domain": true },
@@ -22,13 +38,32 @@
   "observability": {
     "enabled": true
   },
+  // SSC-37: published public snapshots (one versioned bundle), plus SSC-39 job
+  // receipts and parked dead letters. The id is filled in at deploy time by
+  // scripts/cloudflare/ensure-resources.mjs, which creates the namespace if
+  // needed; `wrangler dev` uses a local simulator with the placeholder.
+  "kv_namespaces": [{ "binding": "PUBLIC_DATA", "id": "PUBLIC_DATA_KV_ID" }],
+  // SSC-39: non-critical work (push notifications, server-side analytics,
+  // reminder fan-out) runs from this queue instead of inside requests.
+  // max_batch_size 4 keeps a batch under the Free plan's 50 subrequests;
+  // max_retries 5 leaves room for the consumer to park a job itself (with its
+  // error) on attempt 5 before the platform moves it to the DLQ.
+  "queues": {
+    "producers": [{ "binding": "JOBS", "queue": "starsailors-jobs" }],
+    "consumers": [
+      { "queue": "starsailors-jobs", "max_batch_size": 4, "max_batch_timeout": 5, "max_retries": 5, "dead_letter_queue": "starsailors-jobs-dlq" },
+      { "queue": "starsailors-jobs-dlq", "max_batch_size": 10, "max_batch_timeout": 30, "max_retries": 2 }
+    ]
+  },
+  // Must match workers/app/src/background.ts: snapshots every 5 minutes, one per tick, the
+  // unclassified-discovery reminder daily at 17:00 UTC.
+  "triggers": { "crons": ["*/5 * * * *", "0 17 * * *"] },
   // Do not set limits.cpu_ms here. The CI Cloudflare account is on Workers
   // Free; Wrangler then fails the whole deploy with 100328
   // ("CPU limits are not supported for the Free plan"). That blocked
   // production after SSC-24 (GitHub Actions runs 35413508850 / 35430528448).
-  // OpenNext SSR still cannot finish in the Free 10ms CPU cap (Error 1102).
-  // After this account is on Workers Paid, restore:
-  // "limits": { "cpu_ms": 60000 }
+  // The SSC-31 architecture is built to fit the Free 10ms cap instead; see
+  // docs/runbooks/cloudflare-cutover.md for the per-route budget.
 
   // `wrangler deploy --env staging` — a constant preview target. Runtime
   // secrets (POCKETBASE_URL, CLERK_SECRET_KEY, ...) are synced from the same
@@ -46,7 +81,7 @@
   "env": {
     "staging": {
       "name": "starsailors-client-staging",
-      "main": ".open-next/worker.js",
+      "main": "workers/app/src/index.ts",
       "compatibility_date": "2026-07-24",
       "compatibility_flags": ["nodejs_compat"],
       "workers_dev": true,
@@ -55,8 +90,16 @@
       // (starsailors.space, www.starsailors.space) to this Worker on deploy.
       "routes": [{ "pattern": "staging.starsailors.space", "custom_domain": true }],
       "assets": {
-        "directory": ".open-next/assets",
-        "binding": "ASSETS"
+        "directory": "out",
+        "binding": "ASSETS",
+        "html_handling": "auto-trailing-slash",
+        "not_found_handling": "none"
+      },
+      "alias": {
+        "next/server": "./workers/app/src/shims/next-server.ts",
+        "next/cache": "./workers/app/src/shims/next-cache.ts",
+        "@clerk/nextjs/server": "./workers/app/src/shims/clerk-nextjs-server.ts",
+        "@clerk/nextjs/webhooks": "@clerk/backend/webhooks"
       },
       "vars": {
         "NEXT_PUBLIC_POSTHOG_KEY": "phc_65umDftbbTkrm1V6azue6OeU4u5c8iJcaHm4JtJ95di",
@@ -67,7 +110,18 @@
       },
       "observability": {
         "enabled": true
-      }
+      },
+      // Separate KV and queues from production. Snapshots only: no reminder
+      // cron, since staging shares production's PocketBase and users.
+      "kv_namespaces": [{ "binding": "PUBLIC_DATA", "id": "PUBLIC_DATA_KV_ID_STAGING" }],
+      "queues": {
+        "producers": [{ "binding": "JOBS", "queue": "starsailors-jobs-staging" }],
+        "consumers": [
+          { "queue": "starsailors-jobs-staging", "max_batch_size": 4, "max_batch_timeout": 5, "max_retries": 5, "dead_letter_queue": "starsailors-jobs-staging-dlq" },
+          { "queue": "starsailors-jobs-staging-dlq", "max_batch_size": 10, "max_batch_timeout": 30, "max_retries": 2 }
+        ]
+      },
+      "triggers": { "crons": ["*/5 * * * *"] }
     }
   }
 }

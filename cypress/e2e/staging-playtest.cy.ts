@@ -48,6 +48,14 @@ if (enabled) {
           cy.request({ url: `/api/v1/classifications?author=${encodeURIComponent(userId as string)}&limit=5`, headers: auth })
             .its('status')
             .should('eq', 200)
+
+          // SSC-38: repeat the signed-in reads so the per-route CPU measurement has warm-isolate
+          // samples, not just the one cold call. Statuses are not asserted here.
+          for (let i = 0; i < 5; i++) {
+            for (const path of ['/api/v1/research/summary', '/api/gameplay/hub/bootstrap', '/api/gameplay/active-planet']) {
+              cy.request({ url: path, headers: auth, failOnStatusCode: false })
+            }
+          }
         })
 
       cy.get('[role="dialog"]', { timeout: 30000 }).contains('A fresh garden')

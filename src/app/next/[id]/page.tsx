@@ -1,6 +1,11 @@
-import { redirect } from "next/navigation";
+import { placeholderParams } from "@/src/lib/routing/staticParams";
 
-export default async function LegacyClassifyPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
-  redirect(`/classify/${id}`);
+import LegacyClassifyRedirect from "./LegacyClassifyRedirect";
+
+export function generateStaticParams() {
+  return placeholderParams("id");
+}
+
+export default function LegacyClassifyPage() {
+  return <LegacyClassifyRedirect />;
 }

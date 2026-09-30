@@ -66,8 +66,9 @@ yarn-error.log*
 # vercel
 .vercel
 
-# cloudflare / opennextjs
+# cloudflare static export (scripts/cloudflare/build-static.mjs)
 .open-next/
+.cf-export-stash/
 .wrangler/
 cloudflare-env.d.ts
 .dev.vars

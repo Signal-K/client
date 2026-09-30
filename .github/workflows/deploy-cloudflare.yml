@@ -1,8 +1,7 @@
 name: Deploy to Cloudflare Workers
 
-# Client is a full Next.js app (API routes, server actions, server-side
-# Pocketbase admin auth) -- not a static SPA like Atlas, so this deploys via
-# the OpenNext Cloudflare adapter (Workers + Assets), not cloudflare/pages-action.
+# SSC-31: static Next.js export on Workers Static Assets plus the thin app
+# Worker (workers/app) for /api/*. See docs/runbooks/cloudflare-cutover.md.
 #
 # Frequent main commits are expected. Cancel superseded runs so only the latest
 # code publishes, and never `wrangler secret put` here (that publishes an extra
@@ -17,13 +16,14 @@ on:
       - "yarn.lock"
       - "next.config.*"
       - "wrangler.jsonc"
-      - "open-next.config.*"
+      - "workers/**"
+      - "scripts/cloudflare/**"
       - "tsconfig.json"
       - "postcss.config.*"
       - "tailwind.config.*"
       - "components.json"
       - ".github/workflows/deploy-cloudflare.yml"
-      - ".github/workflows/open-next-worker.yml"
+      - ".github/workflows/cloudflare-app-worker.yml"
   workflow_dispatch: {}
 
 concurrency:
@@ -32,7 +32,7 @@ concurrency:
 
 jobs:
   deploy:
-    uses: ./.github/workflows/open-next-worker.yml
+    uses: ./.github/workflows/cloudflare-app-worker.yml
     secrets: inherit
     with:
       wrangler_command: deploy

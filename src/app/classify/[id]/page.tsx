@@ -1,14 +1,11 @@
-import ClientClassificationPage from "@/src/components/projects/(classifications)/NextScene";
+import { placeholderParams } from "@/src/lib/routing/staticParams";
 
-type Props = {
-  params: Promise<{ id: string }>;
-};
+import ClassifyPageClient from "./ClassifyPageClient";
 
-export default async function Page(props: Props) {
-  const params = await props.params;
-  const { id } = params;
+export function generateStaticParams() {
+  return placeholderParams("id");
+}
 
-  if (!id) return null; // or trigger notFound();
-
-  return <ClientClassificationPage id={id} />;
-};
+export default function Page() {
+  return <ClassifyPageClient />;
+}

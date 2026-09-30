@@ -114,4 +114,4 @@ sync-surveys:
 	@export $$(cat .env.posthog | xargs) && node --experimental-strip-types scripts/sync-posthog-surveys.ts
 
 deploy-test:
-	docker-compose -f ops/compose/compose.yml build && yarn build && vercel
+	yarn cf:preview

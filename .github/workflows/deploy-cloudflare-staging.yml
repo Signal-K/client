@@ -1,7 +1,7 @@
-name: Deploy to Cloudflare Workers (Legacy Staging)
+name: Deploy staging to Cloudflare Workers
 
-# Constant preview target for signal-k/client: same OpenNext Cloudflare
-# adapter as production, deployed to the wrangler.jsonc `env.staging`
+# Constant staging target for signal-k/client: same static shell + app
+# Worker build as production, deployed to the wrangler.jsonc `env.staging`
 # Worker at the constant https://staging.starsailors.space custom domain.
 # That's a real subdomain of the apex (not *.workers.dev) on purpose:
 # production's Clerk instance uses a custom Frontend API proxy domain
@@ -11,13 +11,24 @@ name: Deploy to Cloudflare Workers (Legacy Staging)
 # Clerk instance as production (not a separate staging backend) so
 # accounts/data stay one ecosystem; only the frontend Worker differs.
 on:
-  # SSC-31 moves the staging host to Vercel Node hosting. Keep this workflow
-  # dispatch-only until the Cloudflare Worker domain is detached, so a staging
-  # push cannot accidentally reclaim staging.starsailors.space.
-  workflow_dispatch: {}
-  # Edge API rollout check: deploys only from this one branch, never `staging`.
   push:
-    branches: [ssc-edge-api-staging]
+    branches: [staging, ssc-edge-api-staging]
+    paths:
+      - "src/**"
+      - "public/**"
+      - "package.json"
+      - "yarn.lock"
+      - "next.config.*"
+      - "wrangler.jsonc"
+      - "workers/**"
+      - "scripts/cloudflare/**"
+      - "tsconfig.json"
+      - "postcss.config.*"
+      - "tailwind.config.*"
+      - "components.json"
+      - ".github/workflows/deploy-cloudflare-staging.yml"
+      - ".github/workflows/cloudflare-app-worker.yml"
+  workflow_dispatch: {}
 
 concurrency:
   group: cloudflare-staging
@@ -25,7 +36,7 @@ concurrency:
 
 jobs:
   deploy:
-    uses: ./.github/workflows/open-next-worker.yml
+    uses: ./.github/workflows/cloudflare-app-worker.yml
     secrets: inherit
     with:
       wrangler_command: deploy --env staging
@@ -34,6 +45,18 @@ jobs:
   # Edge API rollout: after the edge-branch deploy, play the signed-in game on it.
   playtest:
     needs: deploy
-    if: github.ref == 'refs/heads/ssc-edge-api-staging'
+    if: github.ref == 'refs/heads/ssc-edge-api-staging' || github.ref == 'refs/heads/staging'
     uses: ./.github/workflows/staging-playtest.yml
     secrets: inherit
+
+  # SSC-38: record CPU, subrequests, size and errors per route on the deployed
+  # staging Worker. Independent of the playtest so one failure can't hide the other.
+  # Runs after the playtest (pass or fail) so its secret changes don't land
+  # mid-measurement.
+  budget:
+    needs: [deploy, playtest]
+    if: always() && needs.deploy.result == 'success'
+    uses: ./.github/workflows/measure-cloudflare-budget.yml
+    secrets: inherit
+    with:
+      target: staging
