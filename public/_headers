@@ -1,0 +1,9 @@
+# Workers Static Assets response headers (SSC-31). Replaces next.config headers(),
+# which a static export cannot use.
+/service-worker.js
+  Cache-Control: public, max-age=0, must-revalidate
+  Service-Worker-Allowed: /
+  Content-Type: application/javascript; charset=utf-8
+
+/_next/static/*
+  Cache-Control: public, max-age=31536000, immutable

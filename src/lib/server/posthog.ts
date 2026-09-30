@@ -1,32 +1,20 @@
-import { PostHog } from "posthog-node";
+import { enqueueJobs } from "@/src/server/jobs/queue";
 
-let client: PostHog | null | undefined;
-
-function posthogKey(): string | undefined {
-  return process.env.posthog_api_key ?? process.env.POSTHOG_API_KEY ?? process.env.NEXT_PUBLIC_POSTHOG_KEY;
-}
-
-export function getPostHogServer(): PostHog | null {
-  if (process.env.NODE_ENV === "development") return null;
-  if (client !== undefined) return client;
-  const apiKey = posthogKey();
-  if (!apiKey) {
-    client = null;
-    return null;
-  }
-  client = new PostHog(apiKey, {
-    host: process.env.NEXT_PUBLIC_POSTHOG_HOST || "https://us.i.posthog.com",
-  });
-  return client;
-}
-
+/**
+ * Server-side PostHog event (SSC-39). Queued rather than sent inline, so the
+ * caller's response never waits on PostHog; the consumer delivers it with the
+ * job id as PostHog's dedupe uuid.
+ */
 export async function captureServerEvent(
   distinctId: string,
   event: string,
-  properties?: Record<string, unknown>,
+  properties: Record<string, unknown> = {},
 ): Promise<void> {
-  const posthog = getPostHogServer();
-  if (!posthog) return;
-  posthog.capture({ distinctId, event, properties });
-  await posthog.flush();
+  if (process.env.NODE_ENV === "development") return;
+  try {
+    await enqueueJobs({ type: "analytics.capture", distinctId, event, properties, timestamp: new Date().toISOString() });
+  } catch (error) {
+    // Analytics must never fail the user's action.
+    console.warn(`[analytics] could not queue ${event}: ${String(error)}`);
+  }
 }
