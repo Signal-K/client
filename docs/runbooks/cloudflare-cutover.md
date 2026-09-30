@@ -199,10 +199,14 @@ Steps:
 4. Merge to `main`, or run "Deploy to Cloudflare Workers" manually. Note the
    previous version id first: `npx wrangler deployments list`.
 5. Smoke-test production and run the budget workflow with `target: production`.
-6. Delete the standalone SSC-35 Worker, now served by the app Worker, if it
-   was ever deployed: `npx wrangler delete --name starsailors-api` and
-   `--name starsailors-api-staging`. Its `/api/v1/*` routes would otherwise
-   keep shadowing the app Worker.
+6. Retire the standalone SSC-35 API. Its zone routes win over the app Worker, so
+   delete them first (`GET /zones/{id}/workers/routes` must show none for
+   `/api/v1/*`), then `npx wrangler delete --name starsailors-api`. Done on
+   2026-09-30 for production and staging (`starsailors-api`,
+   `starsailors-api-staging`); check for stale routes on any future cutover.
+7. Workers Free allows 5 cron triggers per account, shared with every Worker on
+   it. Production uses one (`*/5 * * * *`); staging has none. If a deploy fails
+   at `/schedules`, count them with `GET /workers/scripts/{name}/schedules`.
 
 ## Smoke test
 
