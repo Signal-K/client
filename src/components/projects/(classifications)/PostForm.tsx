@@ -29,6 +29,7 @@ import Link from "next/link";
 import { ClassificationFormProps } from "./FormConfigurations";
 import { SciFiButton } from "@/src/components/ui/styles/sci-fi/button";
 import MediaUpload from "./FormFileUpload";
+import { classificationsFetch } from "@/lib/gameplay/edgeApi";
 
 const ClassificationForm: React.FC<ClassificationFormProps> = ({
   anomalyType,
@@ -340,7 +341,7 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({
         }
       }
 
-      const classificationResponse = await fetch("/api/gameplay/classifications", {
+      const classificationResponse = await classificationsFetch("/api/gameplay/classifications", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -26,6 +26,7 @@ import { SkyClassify } from "@/src/features/garden/components/SkyClassify";
 import styles from "@/src/features/garden/garden.module.css";
 import type { MechanicId } from "@/src/features/surveys/types";
 import type { ClassificationForMechanicSurvey } from "@/src/features/surveys/hooks/useGameSurveys";
+import { classificationsFetch } from "@/lib/gameplay/edgeApi";
 
 // The garden panel opens on `ssc.*` catalog ids; MECHANIC_SURVEYS still
 // speaks the pre-garden bare-word vocabulary. Structures with no citizen-
@@ -128,7 +129,7 @@ export default function GameClient({ user }: GameClientProps) {
   useEffect(() => {
     if (!user?.id || !wantClassifications) return;
     let cancelled = false;
-    fetch(`/api/gameplay/classifications?author=${encodeURIComponent(user.id)}&limit=500`)
+    classificationsFetch(`/api/gameplay/classifications?author=${encodeURIComponent(user.id)}&limit=500`)
       .then((res) => (res.ok ? res.json() : { classifications: [] }))
       .then((data) => {
         if (!cancelled) setClassifications(data.classifications ?? []);

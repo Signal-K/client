@@ -8,6 +8,7 @@ import VotePanel from "@/src/components/social/posts/VotePanel";
 // import CloudClassifier from "@/src/components/discovery/data-sources/Meteorologists/JVH/cloud-classifier";
 import ClassificationList from "@/src/components/social/posts/ClassificationList";
 import ClassificationOptionsCounter from "@/src/components/social/posts/ClassificationOptionsCounter";
+import { classificationsFetch } from "@/lib/gameplay/edgeApi";
 // import { PreferredGaseousClassifications } from "../../PickPlanet";
 
 interface Mission {
@@ -109,7 +110,7 @@ const JovianVortexHunters = () => {
         if (!session) return;
 
         const fetchMissionPoints = async (): Promise<MissionPoints> => {
-            const classRes = await fetch(
+            const classRes = await classificationsFetch(
               `/api/gameplay/classifications?author=${encodeURIComponent(session.user.id)}&classificationtype=lidar-jovianVortexHunter&limit=500`
             );
             const classPayload = await classRes.json();

@@ -1,5 +1,6 @@
 import { AuthError, verifyClerkJwt, type ClerkClaims } from "./jwt";
 import { handleAnomalies } from "./anomalies";
+import { createClassification, listClassifications } from "./classifications";
 import { buildResearchSummary, emptySummary } from "./research";
 import { getProfileByUserId, type PocketbaseEnv, type Profile } from "./pocketbase";
 
@@ -39,13 +40,16 @@ function bearer(request: Request): string | null {
 
 export async function handle(request: Request, env: Env, deps: Deps = {}): Promise<Response> {
   const url = new URL(request.url);
-  if (request.method !== "GET") return json({ error: "method_not_allowed" }, 405, { allow: "GET" });
+  const classificationsRoute = url.pathname === "/api/v1/classifications";
+  if (request.method !== "GET" && !(classificationsRoute && request.method === "POST")) {
+    return json({ error: "method_not_allowed" }, 405, { allow: classificationsRoute ? "GET, POST" : "GET" });
+  }
 
   if (url.pathname === "/api/v1/anomalies") return handleAnomalies(request, env, { fetchImpl: deps.fetchImpl });
 
   const summaryRoute = url.pathname === "/api/v1/research/summary";
-  const route = summaryRoute ? null : url.pathname.match(/^\/api\/v1\/(me|users\/([^/]+)\/profile)$/);
-  if (!route && !summaryRoute) return json({ error: "not_found" }, 404);
+  const route = summaryRoute || classificationsRoute ? null : url.pathname.match(/^\/api\/v1\/(me|users\/([^/]+)\/profile)$/);
+  if (!route && !summaryRoute && !classificationsRoute) return json({ error: "not_found" }, 404);
   // Signed-out callers get the same empty summary the Next route returns.
   if (summaryRoute && !bearer(request)) return json(emptySummary());
 
@@ -63,6 +67,11 @@ export async function handle(request: Request, env: Env, deps: Deps = {}): Promi
       return json({ error: err.code }, AUTH_STATUS[err.code], err.code === "jwks_unavailable" ? {} : { "www-authenticate": "Bearer" });
     }
     throw err;
+  }
+
+  if (classificationsRoute) {
+    const ctx = { env, userId: claims.sub, fetchImpl: deps.fetchImpl };
+    return request.method === "POST" ? createClassification(request, ctx) : listClassifications(request, ctx);
   }
 
   if (summaryRoute) {

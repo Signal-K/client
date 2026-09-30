@@ -5,6 +5,7 @@ import { useSession } from "@/src/lib/auth/session-context";
 import ImageAnnotator from "../(classifications)/Annotating/AnnotatorView";
 import { getStorageUrl } from "@/lib/pocketbase/storageUrl";
 import { ANOMALIES_API } from "@/lib/gameplay/edgeApi";
+import { classificationsFetch } from "@/lib/gameplay/edgeApi";
 
 type Anomaly = {
   id: string;
@@ -96,7 +97,7 @@ export function StarterCoMShapes({ anomalyid }: ShapesProps) {
     try {
       const { attemptMineralDepositCreation, selectCloudMineral } = await import("@/src/utils/mineralDepositCreation");
 
-      const recentRes = await fetch(
+      const recentRes = await classificationsFetch(
         `/api/gameplay/classifications?author=${encodeURIComponent(session.user.id)}&anomaly=${parseInt(anomaly.id)}&classificationtype=balloon-marsCloudShapes&orderBy=created_at&ascending=false&limit=1`
       );
       const recentPayload = await recentRes.json().catch(() => ({}));

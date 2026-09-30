@@ -10,6 +10,7 @@ import ImageAnnotator from "../(classifications)/Annotating/AnnotatorView";
 import TutorialContentBlock, { createTutorialSlides } from "../TutorialContentBlock";
 import { getStorageUrl } from "@/lib/pocketbase/storageUrl";
 import { ANOMALIES_API } from "@/lib/gameplay/edgeApi";
+import { classificationsFetch } from "@/lib/gameplay/edgeApi";
 
 interface Props {
     anomalyid: number | bigint;
@@ -163,7 +164,7 @@ export function StarterPlanetFour({
                                             selectPlanetFourMineral 
                                         } = await import("@/src/utils/mineralDepositCreation");
 
-                                        const recentRes = await fetch(
+                                        const recentRes = await classificationsFetch(
                                           `/api/gameplay/classifications?author=${encodeURIComponent(session.user.id)}&anomaly=${parseInt(anomalyid.toString())}&classificationtype=satellite-planetFour&orderBy=created_at&ascending=false&limit=1`
                                         );
                                         const recentPayload = await recentRes.json();
@@ -318,7 +319,7 @@ export function PlanetFourProject() {
                                         selectPlanetFourMineral 
                                     } = await import("@/src/utils/mineralDepositCreation");
 
-                                    const recentRes = await fetch(
+                                    const recentRes = await classificationsFetch(
                                       `/api/gameplay/classifications?author=${encodeURIComponent(session.user.id)}&anomaly=${parseInt(anomaly.id.toString())}&classificationtype=satellite-planetFour&orderBy=created_at&ascending=false&limit=1`
                                     );
                                     const recentPayload = await recentRes.json();

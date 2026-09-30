@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { PostCardSingleWithGenerator } from "@/src/components/social/posts/PostWithGen";
 import { useSession } from "@/src/lib/auth/session-context";
+import { classificationsFetch } from "@/lib/gameplay/edgeApi";
 
 interface ClassificationListProps {
   classificationType: string;
@@ -25,7 +26,7 @@ export default function ClassificationList({ classificationType }: Classificatio
     setLoading(true);
     setError(null);
 
-    fetch(
+    classificationsFetch(
       `/api/gameplay/classifications?author=${encodeURIComponent(session.user.id)}&classificationtype=${encodeURIComponent(classificationType)}&orderBy=created_at&ascending=false&limit=200`
     )
       .then((res) => res.json().then((payload) => ({ res, payload })))

@@ -6,6 +6,7 @@ import { useSession } from '@/src/lib/auth/session-context';
 import { useRouter } from 'next/navigation';
 import { DatabaseAnomaly } from '../Telescope/TelescopeUtils';
 import { getStorageUrl } from '@/lib/pocketbase/storageUrl';
+import { classificationsFetch } from "@/lib/gameplay/edgeApi";
 
 interface SatelliteSpiderScanProps {
   anomalies: (DatabaseAnomaly & { linked_anomaly_id: number; classification_id: number | string | null; date: string; })[];
@@ -213,7 +214,7 @@ const SatelliteSpiderScan: React.FC<SatelliteSpiderScanProps> = ({ anomalies }) 
       if (!session?.user?.id || anomalies.length === 0) return;
 
       const anomalyIds = anomalies.map(a => a.id);
-      const res = await fetch(
+      const res = await classificationsFetch(
         `/api/gameplay/classifications?author=${encodeURIComponent(session.user.id)}&anomalies=${anomalyIds.join(",")}&limit=500`
       );
       const payload = await res.json().catch(() => ({}));

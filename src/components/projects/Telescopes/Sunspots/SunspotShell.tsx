@@ -5,6 +5,7 @@ import { CloudCogIcon, FolderCog, HelpCircle, PaintBucket, Sun, Vote } from "luc
 
 import { Mission } from "@/src/components/deployment/missions/structures/Astronomers/SatellitePhotos/AI4M/AIForMars";
 import { StarterSunspot } from "../Sunspots";
+import { classificationsFetch } from "@/lib/gameplay/edgeApi";
 
 interface MissionStep {
   id: number;
@@ -61,7 +62,7 @@ const SunspotSteps = () => {
             try {
                 setLoading(true);
 
-                const classRes = await fetch(
+                const classRes = await classificationsFetch(
                   `/api/gameplay/classifications?author=${encodeURIComponent(session.user.id)}&classificationtype=sunspot&limit=1000`
                 );
                 const classPayload = await classRes.json();

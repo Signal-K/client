@@ -7,6 +7,7 @@ import { DailyMinorPlanetWithId, StarterDailyMinorPlanet } from "@/src/component
 import VotePanel from "@/src/components/social/posts/VotePanel";
 import ClassificationList from "@/src/components/social/posts/ClassificationList";
 import { ActiveAsteroidWithId } from "@/src/components/projects/Telescopes/ActiveAsteroids";
+import { classificationsFetch } from "@/lib/gameplay/edgeApi";
 
 interface Mission {
   id: number;
@@ -132,7 +133,7 @@ const DailyMinorPlanetMissions = () => {
 
     const fetchMissionData = async () => {
       try {
-        const classRes = await fetch(
+        const classRes = await classificationsFetch(
           `/api/gameplay/classifications?author=${encodeURIComponent(session.user.id)}&classificationtype=telescope-minorPlanet&limit=1000`
         );
         const classPayload = await classRes.json();

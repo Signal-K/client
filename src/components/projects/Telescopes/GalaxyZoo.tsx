@@ -8,6 +8,7 @@ import ClassificationForm from "../(classifications)/PostForm";
 import { Button } from "@/src/components/ui/button";
 import TutorialContentBlock, { createTutorialSlides } from "../TutorialContentBlock";
 import { ANOMALIES_API } from "@/lib/gameplay/edgeApi";
+import { classificationsFetch } from "@/lib/gameplay/edgeApi";
 
 type Anomaly = {
   id: string;
@@ -90,7 +91,7 @@ export const GalaxyZooTutorial: React.FC<GalaxyZooProps> = ({
         timestamp: new Date().toISOString()
       };
 
-      const response = await fetch("/api/gameplay/classifications", {
+      const response = await classificationsFetch("/api/gameplay/classifications", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -215,7 +216,7 @@ function GalaxyZooClassify({ anomalyId, avatarUrl }: GalaxyZooProps) {
         discovery: "Contributed to galaxy morphology mapping.",
         scientificValue: "Helps refine evolution models of the universe.",
       };
-      const response = await fetch("/api/gameplay/classifications", {
+      const response = await classificationsFetch("/api/gameplay/classifications", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

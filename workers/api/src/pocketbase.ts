@@ -51,6 +51,24 @@ export async function readPage<T = Record<string, unknown>>(
   return { items: body.items, totalItems: body.totalItems ?? body.items.length };
 }
 
+// One authenticated create. Returns the status so callers can retry a unique-index clash.
+export async function createRecord<T = Record<string, unknown>>(
+  env: PocketbaseEnv,
+  collection: string,
+  data: Record<string, unknown>,
+  fetchImpl: typeof fetch = fetch,
+): Promise<{ ok: true; record: T } | { ok: false; status: number }> {
+  const call = async (force: boolean) =>
+    fetchImpl(`${env.POCKETBASE_URL}/api/collections/${collection}/records`, {
+      method: "POST",
+      headers: { authorization: await adminToken(env, fetchImpl, force), "content-type": "application/json" },
+      body: JSON.stringify(data),
+    });
+  let res = await call(false);
+  if (res.status === 401 || res.status === 403) res = await call(true);
+  return res.ok ? { ok: true, record: (await res.json()) as T } : { ok: false, status: res.status };
+}
+
 export async function listRecords<T = Record<string, unknown>>(
   env: PocketbaseEnv,
   collection: string,

@@ -4,6 +4,7 @@ import MissionShell from "../../../BasePlate";
 import { CloudCogIcon, FolderCog, HelpCircle, PaintBucket, Vote } from "lucide-react";
 import VotePanel from "@/src/components/social/posts/VotePanel";
 import { PlanetFourProject, StarterPlanetFour } from "@/src/components/projects/Satellite/PlanetFour";
+import { classificationsFetch } from "@/lib/gameplay/edgeApi";
 
 interface Mission {
     id: number;
@@ -138,7 +139,7 @@ const PlanetFour = () => {
         const fetchMissionPoints = async (
             session: any
         ): Promise<MissionPoints> => {
-            const classRes = await fetch(
+            const classRes = await classificationsFetch(
               `/api/gameplay/classifications?author=${encodeURIComponent(session.user.id)}&classificationtype=satellite-planetFour&limit=500`
             );
             const classPayload = await classRes.json();

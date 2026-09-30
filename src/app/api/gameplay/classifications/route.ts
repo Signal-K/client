@@ -135,13 +135,9 @@ export async function POST(request: NextRequest) {
   try {
     const pb = await createPocketbaseAdminClient();
 
-    // legacyId assignment mirrors the old autoincrement PK: one past the
-    // current max. Not safe under high concurrency, but matches this app's
-    // existing single-writer-per-request pattern.
-    const latest = await pb
-      .collection("ss_classifications")
-      .getList(1, 1, { sort: "-legacyId", fields: "legacyId" });
-    const nextLegacyId = (latest.items[0]?.legacyId ?? 0) + 1;
+    // Time-ordered, unique legacyId (same scheme as the API Worker): no "max + 1"
+    // read, and no collisions between concurrent writers.
+    const nextLegacyId = Date.now() * 1000 + Math.floor(Math.random() * 1000);
 
     const created = await pb.collection("ss_classifications").create({
       legacyId: nextLegacyId,

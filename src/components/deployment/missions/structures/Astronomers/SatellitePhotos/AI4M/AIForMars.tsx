@@ -4,6 +4,7 @@ import MissionShell from "../../../BasePlate";
 import { CloudCogIcon, FolderCog, HelpCircle, PaintBucket, Vote } from "lucide-react";
 import { AiForMarsProjectWithID, StarterAiForMars } from "@/src/components/projects/Auto/AI4Mars";
 import VotePanel from "@/src/components/social/posts/VotePanel";
+import { classificationsFetch } from "@/lib/gameplay/edgeApi";
 
 export interface Mission {
     id: number;
@@ -137,7 +138,7 @@ const AI4M = () => {
         const fetchMissionPoints = async (
             session: any
         ): Promise<MissionPoints> => {    
-            const classRes = await fetch(
+            const classRes = await classificationsFetch(
               `/api/gameplay/classifications?author=${encodeURIComponent(session.user.id)}&classificationtype=automaton-aiForMars&limit=500`
             );
             const classPayload = await classRes.json();

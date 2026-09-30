@@ -7,6 +7,7 @@ import VotePanel from "@/src/components/social/posts/VotePanel";
 import ClassificationList from "@/src/components/social/posts/ClassificationList";
 import { CloudspottingOnMarsTutorial } from "@/src/components/projects/Lidar/cloudspottingOnMars";
 import { StarterCoMShapes } from "@/src/components/projects/Lidar/CloudspottingOnMarsShapes";
+import { classificationsFetch } from "@/lib/gameplay/edgeApi";
 // import { CloudspottingShapesWrapper } from "@/src/components/research/projects/Lidar/CloudspottingOnMarsShapes";
 
 interface Mission {
@@ -107,7 +108,7 @@ const CloudspottingOnMars = () => {
         const fetchMissionPoints = async (
             session: any
         ): Promise<MissionPoints> => {    
-            const classRes = await fetch(
+            const classRes = await classificationsFetch(
               `/api/gameplay/classifications?author=${encodeURIComponent(session.user.id)}&classificationtype=cloud&limit=500`
             );
             const classPayload = await classRes.json();
@@ -130,7 +131,7 @@ const CloudspottingOnMars = () => {
                 classificationIds.includes(comment.classification_id)
             ).length || 0;
 
-            const shapesRes = await fetch(
+            const shapesRes = await classificationsFetch(
               `/api/gameplay/classifications?author=${encodeURIComponent(session.user.id)}&classificationtype=balloon-marsCloudShapes&limit=500`
             );
             const shapesPayload = await shapesRes.json();

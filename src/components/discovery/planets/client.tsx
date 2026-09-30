@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useSession } from "@/src/lib/auth/session-context";
 import Navbar from "@/src/components/layout/Navbar";
 import { PostCardSingleWithGenerator } from "@/src/components/social/posts/PostWithGen";
+import { classificationsFetch } from "@/lib/gameplay/edgeApi";
 
 interface Classification {
   id: number;
@@ -51,7 +52,7 @@ export default function CloudDetailsClient({ id }: { id: number }) {
     }
 
     const fetchClassification = async () => {
-      const res = await fetch(
+      const res = await classificationsFetch(
         `/api/gameplay/classifications?id=${encodeURIComponent(String(id))}&includeAnomaly=true&limit=1`
       );
       const payload = await res.json();
