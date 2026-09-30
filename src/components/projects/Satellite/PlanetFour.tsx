@@ -9,6 +9,7 @@ import { Button } from "@/src/components/ui/button";
 import ImageAnnotator from "../(classifications)/Annotating/AnnotatorView";
 import TutorialContentBlock, { createTutorialSlides } from "../TutorialContentBlock";
 import { getStorageUrl } from "@/lib/pocketbase/storageUrl";
+import { ANOMALIES_API } from "@/lib/gameplay/edgeApi";
 
 interface Props {
     anomalyid: number | bigint;
@@ -227,7 +228,7 @@ export function PlanetFourProject() {
 
             try {
                 const anomalyRes = await fetch(
-                  `/api/gameplay/anomalies?author=${encodeURIComponent(session.user.id)}&anomalySet=satellite-planetFour&limit=1`
+                  `${ANOMALIES_API}?author=${encodeURIComponent(session.user.id)}&anomalySet=satellite-planetFour&limit=1`
                 );
                 const anomalyPayload = await anomalyRes.json();
                 if (!anomalyRes.ok) {

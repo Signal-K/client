@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useSession } from "@/src/lib/auth/session-context";
 import ImageAnnotator from "../(classifications)/Annotating/AnnotatorView";
 import { getStorageUrl } from "@/lib/pocketbase/storageUrl";
+import { ANOMALIES_API } from "@/lib/gameplay/edgeApi";
 
 type Anomaly = {
   id: string;
@@ -37,14 +38,14 @@ export function StarterCoMShapes({ anomalyid }: ShapesProps) {
 
         let anomalyRecord: any = null;
         if (linkedAnomaly?.anomaly_id) {
-          const anomalyRes = await fetch(`/api/gameplay/anomalies?id=${linkedAnomaly.anomaly_id}&limit=1`);
+          const anomalyRes = await fetch(`${ANOMALIES_API}?id=${linkedAnomaly.anomaly_id}&limit=1`);
           const anomalyPayload = await anomalyRes.json().catch(() => ({}));
           anomalyRecord = anomalyRes.ok ? anomalyPayload?.anomalies?.[0] : null;
         }
 
         if (!anomalyRecord) {
           const fallbackRes = await fetch(
-            `/api/gameplay/anomalies?anomalySet=balloon-marsCloudShapes&content=${encodeURIComponent(String(anomalyid))}&limit=1`
+            `${ANOMALIES_API}?anomalySet=balloon-marsCloudShapes&content=${encodeURIComponent(String(anomalyid))}&limit=1`
           );
           const fallbackPayload = await fallbackRes.json().catch(() => ({}));
           anomalyRecord = fallbackRes.ok ? fallbackPayload?.anomalies?.[0] : null;

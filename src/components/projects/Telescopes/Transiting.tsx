@@ -7,6 +7,7 @@ import { Button } from "@/src/components/ui/button";
 import TutorialContentBlock from "../TutorialContentBlock";
 import NGTSTutorial from "./NGTSTutorial";
 import { getStorageUrl } from "@/lib/pocketbase/storageUrl";
+import { ANOMALIES_API } from "@/lib/gameplay/edgeApi";
 
 type Anomaly = {
   id: number;
@@ -45,11 +46,11 @@ export function TelescopeTessWithId({ anomalyId }: { anomalyId: string }) {
       try {
         let anomaly: Anomaly | null = null;
         if (anomalyId && anomalyId !== "random") {
-          const res = await fetch(`/api/gameplay/anomalies?id=${encodeURIComponent(anomalyId)}&limit=1`);
+          const res = await fetch(`${ANOMALIES_API}?id=${encodeURIComponent(anomalyId)}&limit=1`);
           const payload = await res.json().catch(() => ({}));
           anomaly = res.ok ? payload?.anomalies?.[0] || null : null;
         } else {
-          const res = await fetch("/api/gameplay/anomalies?anomalySet=telescope-tess&limit=1");
+          const res = await fetch(`${ANOMALIES_API}?anomalySet=telescope-tess&limit=1`);
           const payload = await res.json().catch(() => ({}));
           anomaly = res.ok ? payload?.anomalies?.[0] || null : null;
         }

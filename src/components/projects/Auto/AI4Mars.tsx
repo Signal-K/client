@@ -9,6 +9,7 @@ import { Button } from "@/src/components/ui/button";
 import Link from "next/link";
 import TutorialContentBlock, { createTutorialSlides } from "../TutorialContentBlock";
 import { getStorageUrl } from "@/lib/pocketbase/storageUrl";
+import { ANOMALIES_API } from "@/lib/gameplay/edgeApi";
 
 interface Props {
     anomalyid: number | bigint;
@@ -46,7 +47,7 @@ export function AiForMarsProjectWithID({ anomalyid }: { anomalyid?: number }) {
                 return;
             }
             try {
-                const res = await fetch(`/api/gameplay/anomalies?id=${encodeURIComponent(String(anomalyid))}&limit=1`);
+                const res = await fetch(`${ANOMALIES_API}?id=${encodeURIComponent(String(anomalyid))}&limit=1`);
                 const payload = await res.json();
                 if (!res.ok || !payload?.anomalies?.[0]) throw new Error(payload?.error || "Anomaly not found");
                 const data = payload.anomalies[0];

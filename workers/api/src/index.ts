@@ -1,4 +1,5 @@
 import { AuthError, verifyClerkJwt, type ClerkClaims } from "./jwt";
+import { handleAnomalies } from "./anomalies";
 import { getProfileByUserId, type PocketbaseEnv, type Profile } from "./pocketbase";
 
 export type Env = PocketbaseEnv & {
@@ -38,6 +39,8 @@ function bearer(request: Request): string | null {
 export async function handle(request: Request, env: Env, deps: Deps = {}): Promise<Response> {
   const url = new URL(request.url);
   if (request.method !== "GET") return json({ error: "method_not_allowed" }, 405, { allow: "GET" });
+
+  if (url.pathname === "/api/v1/anomalies") return handleAnomalies(request, env, { fetchImpl: deps.fetchImpl });
 
   const route = url.pathname.match(/^\/api\/v1\/(me|users\/([^/]+)\/profile)$/);
   if (!route) return json({ error: "not_found" }, 404);

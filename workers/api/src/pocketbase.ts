@@ -28,6 +28,27 @@ async function adminToken(env: PocketbaseEnv, fetchImpl: typeof fetch, forceRefr
   return token;
 }
 
+// One authenticated list read (skipTotal is always on: callers only need items).
+export async function listRecords<T = Record<string, unknown>>(
+  env: PocketbaseEnv,
+  collection: string,
+  params: { filter?: string; sort?: string; perPage?: number; fields?: string },
+  fetchImpl: typeof fetch = fetch,
+): Promise<T[]> {
+  const query = new URLSearchParams({ perPage: String(params.perPage ?? 30), skipTotal: "1" });
+  if (params.filter) query.set("filter", params.filter);
+  if (params.sort) query.set("sort", params.sort);
+  if (params.fields) query.set("fields", params.fields);
+  const call = async (force: boolean) =>
+    fetchImpl(`${env.POCKETBASE_URL}/api/collections/${collection}/records?${query}`, {
+      headers: { authorization: await adminToken(env, fetchImpl, force) },
+    });
+  let res = await call(false);
+  if (res.status === 401 || res.status === 403) res = await call(true);
+  if (!res.ok) throw new Error(`pocketbase_read_${res.status}`);
+  return ((await res.json()) as { items: T[] }).items;
+}
+
 export type Profile = { userId: string; fullName: string | null; avatarUrl: string | null };
 
 export async function getProfileByUserId(
@@ -35,20 +56,12 @@ export async function getProfileByUserId(
   userId: string,
   fetchImpl: typeof fetch = fetch,
 ): Promise<Profile | null> {
-  const query = new URLSearchParams({
-    filter: `userId="${userId.replace(/["\\]/g, "")}"`,
-    perPage: "1",
-    fields: "userId,fullName,avatarUrl",
-    skipTotal: "1",
-  });
-  const call = async (force: boolean) =>
-    fetchImpl(`${env.POCKETBASE_URL}/api/collections/profiles/records?${query}`, {
-      headers: { authorization: await adminToken(env, fetchImpl, force) },
-    });
-  let res = await call(false);
-  if (res.status === 401 || res.status === 403) res = await call(true);
-  if (!res.ok) throw new Error(`pocketbase_read_${res.status}`);
-  const { items } = (await res.json()) as { items: Array<Record<string, string | null>> };
+  const items = await listRecords<Record<string, string | null>>(
+    env,
+    "profiles",
+    { filter: `userId="${userId.replace(/["\\]/g, "")}"`, perPage: 1, fields: "userId,fullName,avatarUrl" },
+    fetchImpl,
+  );
   const row = items[0];
   return row ? { userId: row.userId as string, fullName: row.fullName ?? null, avatarUrl: row.avatarUrl ?? null } : null;
 }
