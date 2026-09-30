@@ -17,12 +17,19 @@ if (enabled) {
     })
 
     it('plays garden onboarding and builds an instrument with a fresh account', () => {
+      cy.intercept('GET', '/api/v1/research/summary*').as('edgeSummary')
       cy.request({ method: 'POST', url: endpoint, headers }).then(({ body }) => {
         userId = body.userId
         expect(body.ticket).to.be.a('string')
         cy.visit(`/auth?__clerk_ticket=${encodeURIComponent(body.ticket)}`)
       })
       cy.location('pathname', { timeout: 30000 }).should('eq', '/game')
+
+      // Edge API rollout: the signed-in game must read its research summary from the Worker.
+      cy.wait('@edgeSummary', { timeout: 30000 }).then(({ response }) => {
+        expect(response?.statusCode).to.eq(200)
+        expect(response?.body.authenticated).to.eq(true)
+      })
 
       cy.get('[role="dialog"]', { timeout: 30000 }).contains('A fresh garden')
       cy.contains('button', 'Hunt planets').click()

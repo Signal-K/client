@@ -7,7 +7,7 @@ name: Staging playtest lifecycle (SSC-33)
 # never stay enabled between runs.
 on:
   push:
-    branches: [ssc-33-playtest-ci]
+    branches: [ssc-33-playtest-ci, ssc-edge-api-staging]
   workflow_dispatch: {}
 
 concurrency:
