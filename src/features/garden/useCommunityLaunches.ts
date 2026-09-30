@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 
+import { fetchCommunityActivity } from "@/lib/gameplay/communityActivity";
+
 interface ActivityRow {
   id: number | string;
   author: string;
@@ -33,10 +35,8 @@ export function useCommunityLaunches(padBusy: boolean, userId?: string | null) {
 
     async function load() {
       try {
-        const qs = userId ? `?exclude=${encodeURIComponent(userId)}` : "";
-        const res = await fetch(`/api/community-activity${qs}`, { cache: "no-store" });
-        if (!res.ok) return;
-        const rows = (await res.json()) as ActivityRow[];
+        const all = (await fetchCommunityActivity()) as ActivityRow[];
+        const rows = userId ? all.filter((row) => !String(row.author).startsWith(userId.slice(0, 8))) : all;
         if (cancelled) return;
         const ids = rows.map((row) => String(row.id));
         if (!seen.current) {
@@ -56,7 +56,7 @@ export function useCommunityLaunches(padBusy: boolean, userId?: string | null) {
     void load();
     const id = setInterval(() => {
       if (document.visibilityState === "visible") void load();
-    }, 60_000);
+    }, 120_000);
     const onVis = () => {
       if (document.visibilityState === "visible") void load();
     };

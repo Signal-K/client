@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 
+import { fetchCommunityActivity } from "@/lib/gameplay/communityActivity";
+
 interface Vehicle {
   id: number;
   author: string;
@@ -28,8 +30,7 @@ export function CommunityVehicles() {
 
   async function load() {
     try {
-      const res = await fetch("/api/community-activity", { cache: "no-store" });
-      if (res.ok) setVehicles(await res.json());
+      setVehicles((await fetchCommunityActivity()) as unknown as Vehicle[]);
     } catch {}
   }
 
@@ -39,7 +40,7 @@ export function CommunityVehicles() {
     function startPolling() {
       timerRef.current = setInterval(() => {
         if (document.visibilityState === "visible") load();
-      }, 60_000);
+      }, 120_000);
     }
 
     startPolling();
