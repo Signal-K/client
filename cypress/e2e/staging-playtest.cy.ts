@@ -18,7 +18,15 @@ if (enabled) {
 
     it('plays garden onboarding and builds an instrument with a fresh account', () => {
       cy.intercept('GET', '/api/v1/classifications*').as('edgeClassifications')
-      cy.request({ method: 'POST', url: endpoint, headers }).then(({ body }) => {
+      // A freshly written Worker secret can take a few seconds to reach every edge, and the
+      // endpoint answers 404 until then. A 404 provisions nothing, so retrying is safe.
+      const provision = (attempt = 1): Cypress.Chainable<Cypress.Response<any>> =>
+        cy.request({ method: 'POST', url: endpoint, headers, failOnStatusCode: false }).then((res) => {
+          if (res.status === 404 && attempt < 8) return cy.wait(5000).then(() => provision(attempt + 1))
+          expect(res.status).to.eq(200)
+          return cy.wrap(res)
+        })
+      provision().then(({ body }) => {
         userId = body.userId
         expect(body.ticket).to.be.a('string')
         cy.visit(`/auth?__clerk_ticket=${encodeURIComponent(body.ticket)}`)
