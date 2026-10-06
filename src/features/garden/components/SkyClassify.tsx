@@ -1,6 +1,8 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import { useState } from "react";
+import { SaturnStormClassify } from "./SaturnStormClassify";
 import styles from "../garden.module.css";
 import { hopById, type MinigameDef, type StructureId } from "../catalog";
 
@@ -70,7 +72,7 @@ export function SkyClassify({
           <ProbeGrainPick onDone={onCloseProbeGrain} />
         ) : openMinigame!.id === "ssc.minigame.planet_hunters" ? (
           <RealClassify structureId={openMinigame!.structure} onDone={onCompleteSkyClassify}>
-            <PlanetHuntersSteps />
+            <TelescopeProjects />
           </RealClassify>
         ) : openMinigame!.id === "ssc.minigame.clouds" ? (
           <RealClassify structureId={openMinigame!.structure} onDone={onCompleteSkyClassify}>
@@ -91,6 +93,25 @@ export function SkyClassify({
         ) : null}
       </div>
     </div>
+  );
+}
+
+// Telescope overlay: Planet Hunters stays the default; Saturn storm frames come
+// from the shared pool (SSC-43).
+function TelescopeProjects() {
+  const [project, setProject] = useState<"planet" | "saturn">("planet");
+  return (
+    <>
+      <div className={styles.choices}>
+        <button className={styles.choice} type="button" aria-pressed={project === "planet"} onClick={() => setProject("planet")}>
+          Planet Hunters
+        </button>
+        <button className={styles.choice} type="button" aria-pressed={project === "saturn"} onClick={() => setProject("saturn")}>
+          Saturn storms
+        </button>
+      </div>
+      {project === "planet" ? <PlanetHuntersSteps /> : <SaturnStormClassify />}
+    </>
   );
 }
 
