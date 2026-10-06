@@ -11,6 +11,9 @@ export const SATURN_VERDICTS: ReadonlyArray<{ verdict: SaturnVerdict; label: str
   { verdict: "maybe", label: "Maybe" },
 ];
 
+/** Frames per Saturn Storm Watch session (SSC-42). */
+export const SATURN_SESSION_SIZE = 10;
+
 export const SATURN_FRAMES_COLLECTION = "ss_saturn_storm_frames";
 export const SATURN_CLASSIFICATIONS_COLLECTION = "ss_saturn_storm_classifications";
 

@@ -1,3 +1,4 @@
+import type { SkyBadge } from "./skyEvents";
 import type { ProjectType } from "@/src/features/onboarding/hubState";
 import {
   CATALOG,
@@ -32,6 +33,8 @@ export interface GardenState {
   generation?: number;
   /** One-shot hop stamps (`out:ssc.hop.landnam`, `in:ssc.hop.spectra`). Not a second economy. */
   hopBonuses?: Record<string, boolean>;
+  /** Sky event badges (SSC-42), keyed by event id. Gold in the event period, silver after. */
+  badges?: Record<string, SkyBadge>;
 }
 
 export const HOP_BONUS_CR = 8;

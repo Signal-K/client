@@ -1094,3 +1094,27 @@
   text-align: center;
   box-shadow: 0 8px 24px rgba(40, 30, 20, 0.2);
 }
+
+/* Space Week sky event cards (SSC-41) */
+.skyCards {
+  position: absolute;
+  left: 12px;
+  top: 96px;
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: min(78vw, 260px);
+  pointer-events: auto;
+}
+.skyCard {
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: rgba(14, 20, 38, 0.82);
+  color: #fff;
+  font-size: 12px;
+  line-height: 1.35;
+}
+.skyCard h3 { margin: 0 0 2px; font-size: 13px; font-weight: 650; }
+.skyCard p { margin: 0 0 4px; opacity: 0.85; }
+.skyCard a { display: block; color: #9cc8ff; font-weight: 600; }
