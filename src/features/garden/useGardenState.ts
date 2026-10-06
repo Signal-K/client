@@ -23,6 +23,7 @@ import {
   type GardenState,
   type StructureRecord,
 } from "./gardenLogic";
+import { SATURN_EVENT_ID, grantSkyBadge } from "./skyEvents";
 import type { ProjectType } from "@/src/features/onboarding/hubState";
 import {
   clearGardenLeftovers,
@@ -425,6 +426,15 @@ export function useGardenState(userId?: string | null) {
     return next.awarded;
   }, [pushToast]);
 
+  /** A finished Saturn session earns the badge tier for today's date (SSC-42). */
+  const completeSaturnSession = useCallback(() => {
+    const now = Date.now();
+    const badges = grantSkyBadge(stateRef.current.badges, SATURN_EVENT_ID, now);
+    if (badges !== stateRef.current.badges) setState((prev) => ({ ...prev, badges }));
+    const tier = badges?.[SATURN_EVENT_ID]?.tier;
+    pushToast(tier ? `Saturn Storm Watch saved · ${tier} badge.` : "Saturn Storm Watch saved.");
+  }, [pushToast]);
+
   return {
     state,
     hydrated,
@@ -437,6 +447,7 @@ export function useGardenState(userId?: string | null) {
     startMinigame,
     closeMinigame,
     completeSkyClassify,
+    completeSaturnSession,
     probeGrainOpen,
     closeProbeGrain,
     toast,

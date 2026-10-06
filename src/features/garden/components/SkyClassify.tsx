@@ -35,6 +35,7 @@ export interface SkyClassifyProps {
   openMinigame: MinigameDef | null;
   onCloseMinigame: () => void;
   onCompleteSkyClassify: (structureId: StructureId) => void;
+  onCompleteSaturnSession: () => void;
   probeGrainOpen: boolean;
   onCloseProbeGrain: () => void;
   onSendFlight: (id: StructureId, minigame: MinigameDef) => boolean;
@@ -46,6 +47,7 @@ export function SkyClassify({
   openMinigame,
   onCloseMinigame,
   onCompleteSkyClassify,
+  onCompleteSaturnSession,
   probeGrainOpen,
   onCloseProbeGrain,
   onSendFlight,
@@ -72,7 +74,7 @@ export function SkyClassify({
           <ProbeGrainPick onDone={onCloseProbeGrain} />
         ) : openMinigame!.id === "ssc.minigame.planet_hunters" ? (
           <RealClassify structureId={openMinigame!.structure} onDone={onCompleteSkyClassify}>
-            <TelescopeProjects />
+            <TelescopeProjects onSaturnSession={onCompleteSaturnSession} />
           </RealClassify>
         ) : openMinigame!.id === "ssc.minigame.clouds" ? (
           <RealClassify structureId={openMinigame!.structure} onDone={onCompleteSkyClassify}>
@@ -98,7 +100,7 @@ export function SkyClassify({
 
 // Telescope overlay: Planet Hunters stays the default; Saturn storm frames come
 // from the shared pool (SSC-43).
-function TelescopeProjects() {
+function TelescopeProjects({ onSaturnSession }: { onSaturnSession: () => void }) {
   const [project, setProject] = useState<"planet" | "saturn">("planet");
   return (
     <>
@@ -110,7 +112,7 @@ function TelescopeProjects() {
           Saturn storms
         </button>
       </div>
-      {project === "planet" ? <PlanetHuntersSteps /> : <SaturnStormClassify />}
+      {project === "planet" ? <PlanetHuntersSteps /> : <SaturnStormClassify onSessionComplete={onSaturnSession} />}
     </>
   );
 }
