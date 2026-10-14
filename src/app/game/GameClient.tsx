@@ -23,6 +23,7 @@ import { GardenScene } from "@/src/features/garden/components/GardenScene";
 import { GardenHud } from "@/src/features/garden/components/GardenHud";
 import { GardenPanel } from "@/src/features/garden/components/GardenPanel";
 import { SkyClassify } from "@/src/features/garden/components/SkyClassify";
+import { SkyEventCards } from "@/src/features/garden/components/SkyEventCards";
 import styles from "@/src/features/garden/garden.module.css";
 import type { MechanicId } from "@/src/features/surveys/types";
 import type { ClassificationForMechanicSurvey } from "@/src/features/surveys/hooks/useGameSurveys";
@@ -259,6 +260,7 @@ export default function GameClient({ user }: GameClientProps) {
           onProjectsClick={() => setRosterReopened(true)}
           onHopOut={handleHopOut}
         />
+        <SkyEventCards />
         <p className={cx(styles.hint, !!lessonCopy && styles.isOff)}>
           Raise instruments on open ground, classify to earn credits, upgrade to grow
         </p>

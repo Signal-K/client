@@ -647,6 +647,50 @@
   gap: 4px;
   pointer-events: auto;
 }
+
+.skyCards {
+  position: absolute;
+  z-index: 24;
+  top: 92px;
+  right: 12px;
+  width: min(292px, calc(100% - 24px));
+  display: grid;
+  gap: 8px;
+  padding: 10px;
+  border: 1px solid var(--hair);
+  border-radius: 14px;
+  background: var(--paper);
+  box-shadow: 0 8px 24px rgba(58, 50, 40, 0.18);
+  pointer-events: auto;
+}
+.skyCardsKicker {
+  color: var(--ink-soft);
+  font-size: 11px;
+  font-weight: 750;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.skyCard {
+  padding-top: 8px;
+  border-top: 1px solid var(--hair);
+}
+.skyCard h3 { margin: 0; font-size: 14px; line-height: 1.25; }
+.skyCard p { margin: 4px 0 8px; color: var(--ink-soft); font-size: 13px; line-height: 1.35; }
+.skyCardLinks { display: flex; flex-wrap: wrap; gap: 6px; }
+.skyCardLinks a {
+  min-height: 36px;
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 8px;
+  border-radius: 8px;
+  background: var(--cream);
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.2;
+  text-decoration: none;
+}
+.skyCardLinks a:focus-visible { outline: 3px solid var(--solar); outline-offset: 2px; }
 .hopBtn {
   appearance: none;
   border: 1px solid var(--hair);
@@ -943,6 +987,7 @@
 
 .stage[data-layout="landscape"] .hud { top: 18px; left: 22px; right: 22px; }
 .stage[data-layout="landscape"] .hopRail { top: 18px; }
+.stage[data-layout="landscape"] .skyCards { top: 66px; right: 22px; max-height: calc(100dvh - 84px); overflow: auto; }
 .stage[data-layout="landscape"] .idleChip { left: 22px; top: 56px; }
 .stage[data-layout="landscape"] .hint { left: 20%; right: 20%; bottom: 22px; }
 .stage[data-layout="landscape"] .toast { left: 28%; right: 28%; bottom: 22px; }
