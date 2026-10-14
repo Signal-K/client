@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   SATURN_EVENT_ID,
+  SKY_EVENT_CARDS,
   activeSkyCards,
   badgeTierFor,
   grantSkyBadge,
@@ -43,5 +44,14 @@ describe("activeSkyCards", () => {
       "dark-sky",
     ]);
     expect(activeSkyCards(at("2026-10-12T00:00:00Z"))).toEqual([]);
+  });
+});
+
+describe("SKY_EVENT_CARDS links", () => {
+  it("only link out over https and connect Garden to Atlas and Landnám", () => {
+    const hrefs = SKY_EVENT_CARDS.flatMap((c) => c.links.map((l) => l.href));
+    expect(hrefs.every((h) => h.startsWith("https://"))).toBe(true);
+    expect(hrefs).toContain("https://youratlas.cc/");
+    expect(hrefs).toContain("https://playlandnam.space/");
   });
 });

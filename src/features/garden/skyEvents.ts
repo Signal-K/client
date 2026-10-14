@@ -57,6 +57,7 @@ export interface SkyEventCard {
 export const SKY_CARDS_END_UTC = "2026-10-12T00:00:00Z";
 
 const ATLAS = "https://youratlas.cc/";
+const LANDNAM = "https://playlandnam.space/";
 
 export const SKY_EVENT_CARDS: ReadonlyArray<SkyEventCard> = [
   {
@@ -64,7 +65,10 @@ export const SKY_EVENT_CARDS: ReadonlyArray<SkyEventCard> = [
     startUtc: "2026-10-07T00:00:00Z",
     title: "Saturn at opposition",
     body: "Saturn is closest and brightest tonight. Log it in Atlas to earn the Saturn badge.",
-    links: [{ label: "Earn the Saturn badge in Atlas", href: ATLAS }],
+    links: [
+      { label: "Earn the Saturn badge in Atlas", href: ATLAS },
+      { label: "Classify Saturn in Landnám", href: LANDNAM },
+    ],
   },
   {
     id: "evening-shower",
