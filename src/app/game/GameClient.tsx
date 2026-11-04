@@ -20,6 +20,7 @@ import {
   shouldAskForProjectRoster,
 } from "@/src/features/garden/gardenLogic";
 import { GardenScene } from "@/src/features/garden/components/GardenScene";
+import { SkyEventCards } from "@/src/features/garden/components/SkyEventCards";
 import { GardenHud } from "@/src/features/garden/components/GardenHud";
 import { GardenPanel } from "@/src/features/garden/components/GardenPanel";
 import { SkyClassify } from "@/src/features/garden/components/SkyClassify";
@@ -259,6 +260,7 @@ export default function GameClient({ user }: GameClientProps) {
           onProjectsClick={() => setRosterReopened(true)}
           onHopOut={handleHopOut}
         />
+        <SkyEventCards />
         <p className={cx(styles.hint, !!lessonCopy && styles.isOff)}>
           Raise instruments on open ground, classify to earn credits, upgrade to grow
         </p>
@@ -331,6 +333,7 @@ export default function GameClient({ user }: GameClientProps) {
             });
             garden.completeSkyClassify(structureId);
           }}
+          onCompleteSaturnSession={garden.completeSaturnSession}
           probeGrainOpen={garden.probeGrainOpen}
           onCloseProbeGrain={garden.closeProbeGrain}
           onSendFlight={garden.sendFlight}
