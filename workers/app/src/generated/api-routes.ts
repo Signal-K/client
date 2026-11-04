@@ -51,26 +51,27 @@ import * as r47 from "../../../../src/app/api/gameplay/active-planet/route";
 import * as r48 from "../../../../src/app/api/gameplay/anomalies/route";
 import * as r49 from "../../../../src/app/api/gameplay/classifications/[id]/route";
 import * as r50 from "../../../../src/app/api/gameplay/classifications/route";
-import * as r51 from "../../../../src/app/api/gameplay/extraction/[id]/route";
-import * as r52 from "../../../../src/app/api/gameplay/inventory/route";
-import * as r53 from "../../../../src/app/api/gameplay/linked-anomalies/route";
-import * as r54 from "../../../../src/app/api/gameplay/locations/route";
-import * as r55 from "../../../../src/app/api/gameplay/milestones/route";
-import * as r56 from "../../../../src/app/api/gameplay/mineral-deposits/route";
-import * as r57 from "../../../../src/app/api/gameplay/nps/route";
-import * as r58 from "../../../../src/app/api/gameplay/page-data/route";
-import * as r59 from "../../../../src/app/api/gameplay/planet-type/route";
-import * as r60 from "../../../../src/app/api/gameplay/solar/route";
-import * as r61 from "../../../../src/app/api/internal/jobs/route";
-import * as r62 from "../../../../src/app/api/public/snapshots/[name]/route";
-import * as r63 from "../../../../src/app/api/public/status/route";
-import * as r64 from "../../../../src/app/api/webhooks/clerk/route";
-import * as r65 from "../../../../src/app/api/actions/[name]/route";
-import * as r66 from "../../../../src/app/api/auto-notify-discoveries/route";
-import * as r67 from "../../../../src/app/api/community-activity/route";
-import * as r68 from "../../../../src/app/api/notify-my-discoveries/route";
-import * as r69 from "../../../../src/app/api/send-test-notification/route";
-import * as r70 from "../../../../src/app/api/storage/[bucket]/[...path]/route";
+import * as r51 from "../../../../src/app/api/gameplay/contributions/route";
+import * as r52 from "../../../../src/app/api/gameplay/extraction/[id]/route";
+import * as r53 from "../../../../src/app/api/gameplay/inventory/route";
+import * as r54 from "../../../../src/app/api/gameplay/linked-anomalies/route";
+import * as r55 from "../../../../src/app/api/gameplay/locations/route";
+import * as r56 from "../../../../src/app/api/gameplay/milestones/route";
+import * as r57 from "../../../../src/app/api/gameplay/mineral-deposits/route";
+import * as r58 from "../../../../src/app/api/gameplay/nps/route";
+import * as r59 from "../../../../src/app/api/gameplay/page-data/route";
+import * as r60 from "../../../../src/app/api/gameplay/planet-type/route";
+import * as r61 from "../../../../src/app/api/gameplay/solar/route";
+import * as r62 from "../../../../src/app/api/internal/jobs/route";
+import * as r63 from "../../../../src/app/api/public/snapshots/[name]/route";
+import * as r64 from "../../../../src/app/api/public/status/route";
+import * as r65 from "../../../../src/app/api/webhooks/clerk/route";
+import * as r66 from "../../../../src/app/api/actions/[name]/route";
+import * as r67 from "../../../../src/app/api/auto-notify-discoveries/route";
+import * as r68 from "../../../../src/app/api/community-activity/route";
+import * as r69 from "../../../../src/app/api/notify-my-discoveries/route";
+import * as r70 from "../../../../src/app/api/send-test-notification/route";
+import * as r71 from "../../../../src/app/api/storage/[bucket]/[...path]/route";
 
 export const apiRoutes: Array<{ pattern: string; segments: RouteSegment[]; module: RouteModule }> = [
   { pattern: "/api/gameplay/deploy/rover/return", segments: [{"kind":"literal","value":"api"},{"kind":"literal","value":"gameplay"},{"kind":"literal","value":"deploy"},{"kind":"literal","value":"rover"},{"kind":"literal","value":"return"}], module: r0 as unknown as RouteModule },
@@ -124,26 +125,27 @@ export const apiRoutes: Array<{ pattern: string; segments: RouteSegment[]; modul
   { pattern: "/api/gameplay/anomalies", segments: [{"kind":"literal","value":"api"},{"kind":"literal","value":"gameplay"},{"kind":"literal","value":"anomalies"}], module: r48 as unknown as RouteModule },
   { pattern: "/api/gameplay/classifications/[id]", segments: [{"kind":"literal","value":"api"},{"kind":"literal","value":"gameplay"},{"kind":"literal","value":"classifications"},{"kind":"param","name":"id"}], module: r49 as unknown as RouteModule },
   { pattern: "/api/gameplay/classifications", segments: [{"kind":"literal","value":"api"},{"kind":"literal","value":"gameplay"},{"kind":"literal","value":"classifications"}], module: r50 as unknown as RouteModule },
-  { pattern: "/api/gameplay/extraction/[id]", segments: [{"kind":"literal","value":"api"},{"kind":"literal","value":"gameplay"},{"kind":"literal","value":"extraction"},{"kind":"param","name":"id"}], module: r51 as unknown as RouteModule },
-  { pattern: "/api/gameplay/inventory", segments: [{"kind":"literal","value":"api"},{"kind":"literal","value":"gameplay"},{"kind":"literal","value":"inventory"}], module: r52 as unknown as RouteModule },
-  { pattern: "/api/gameplay/linked-anomalies", segments: [{"kind":"literal","value":"api"},{"kind":"literal","value":"gameplay"},{"kind":"literal","value":"linked-anomalies"}], module: r53 as unknown as RouteModule },
-  { pattern: "/api/gameplay/locations", segments: [{"kind":"literal","value":"api"},{"kind":"literal","value":"gameplay"},{"kind":"literal","value":"locations"}], module: r54 as unknown as RouteModule },
-  { pattern: "/api/gameplay/milestones", segments: [{"kind":"literal","value":"api"},{"kind":"literal","value":"gameplay"},{"kind":"literal","value":"milestones"}], module: r55 as unknown as RouteModule },
-  { pattern: "/api/gameplay/mineral-deposits", segments: [{"kind":"literal","value":"api"},{"kind":"literal","value":"gameplay"},{"kind":"literal","value":"mineral-deposits"}], module: r56 as unknown as RouteModule },
-  { pattern: "/api/gameplay/nps", segments: [{"kind":"literal","value":"api"},{"kind":"literal","value":"gameplay"},{"kind":"literal","value":"nps"}], module: r57 as unknown as RouteModule },
-  { pattern: "/api/gameplay/page-data", segments: [{"kind":"literal","value":"api"},{"kind":"literal","value":"gameplay"},{"kind":"literal","value":"page-data"}], module: r58 as unknown as RouteModule },
-  { pattern: "/api/gameplay/planet-type", segments: [{"kind":"literal","value":"api"},{"kind":"literal","value":"gameplay"},{"kind":"literal","value":"planet-type"}], module: r59 as unknown as RouteModule },
-  { pattern: "/api/gameplay/solar", segments: [{"kind":"literal","value":"api"},{"kind":"literal","value":"gameplay"},{"kind":"literal","value":"solar"}], module: r60 as unknown as RouteModule },
-  { pattern: "/api/internal/jobs", segments: [{"kind":"literal","value":"api"},{"kind":"literal","value":"internal"},{"kind":"literal","value":"jobs"}], module: r61 as unknown as RouteModule },
-  { pattern: "/api/public/snapshots/[name]", segments: [{"kind":"literal","value":"api"},{"kind":"literal","value":"public"},{"kind":"literal","value":"snapshots"},{"kind":"param","name":"name"}], module: r62 as unknown as RouteModule },
-  { pattern: "/api/public/status", segments: [{"kind":"literal","value":"api"},{"kind":"literal","value":"public"},{"kind":"literal","value":"status"}], module: r63 as unknown as RouteModule },
-  { pattern: "/api/webhooks/clerk", segments: [{"kind":"literal","value":"api"},{"kind":"literal","value":"webhooks"},{"kind":"literal","value":"clerk"}], module: r64 as unknown as RouteModule },
-  { pattern: "/api/actions/[name]", segments: [{"kind":"literal","value":"api"},{"kind":"literal","value":"actions"},{"kind":"param","name":"name"}], module: r65 as unknown as RouteModule },
-  { pattern: "/api/auto-notify-discoveries", segments: [{"kind":"literal","value":"api"},{"kind":"literal","value":"auto-notify-discoveries"}], module: r66 as unknown as RouteModule },
-  { pattern: "/api/community-activity", segments: [{"kind":"literal","value":"api"},{"kind":"literal","value":"community-activity"}], module: r67 as unknown as RouteModule },
-  { pattern: "/api/notify-my-discoveries", segments: [{"kind":"literal","value":"api"},{"kind":"literal","value":"notify-my-discoveries"}], module: r68 as unknown as RouteModule },
-  { pattern: "/api/send-test-notification", segments: [{"kind":"literal","value":"api"},{"kind":"literal","value":"send-test-notification"}], module: r69 as unknown as RouteModule },
-  { pattern: "/api/storage/[bucket]/[...path]", segments: [{"kind":"literal","value":"api"},{"kind":"literal","value":"storage"},{"kind":"param","name":"bucket"},{"kind":"rest","name":"path"}], module: r70 as unknown as RouteModule },
+  { pattern: "/api/gameplay/contributions", segments: [{"kind":"literal","value":"api"},{"kind":"literal","value":"gameplay"},{"kind":"literal","value":"contributions"}], module: r51 as unknown as RouteModule },
+  { pattern: "/api/gameplay/extraction/[id]", segments: [{"kind":"literal","value":"api"},{"kind":"literal","value":"gameplay"},{"kind":"literal","value":"extraction"},{"kind":"param","name":"id"}], module: r52 as unknown as RouteModule },
+  { pattern: "/api/gameplay/inventory", segments: [{"kind":"literal","value":"api"},{"kind":"literal","value":"gameplay"},{"kind":"literal","value":"inventory"}], module: r53 as unknown as RouteModule },
+  { pattern: "/api/gameplay/linked-anomalies", segments: [{"kind":"literal","value":"api"},{"kind":"literal","value":"gameplay"},{"kind":"literal","value":"linked-anomalies"}], module: r54 as unknown as RouteModule },
+  { pattern: "/api/gameplay/locations", segments: [{"kind":"literal","value":"api"},{"kind":"literal","value":"gameplay"},{"kind":"literal","value":"locations"}], module: r55 as unknown as RouteModule },
+  { pattern: "/api/gameplay/milestones", segments: [{"kind":"literal","value":"api"},{"kind":"literal","value":"gameplay"},{"kind":"literal","value":"milestones"}], module: r56 as unknown as RouteModule },
+  { pattern: "/api/gameplay/mineral-deposits", segments: [{"kind":"literal","value":"api"},{"kind":"literal","value":"gameplay"},{"kind":"literal","value":"mineral-deposits"}], module: r57 as unknown as RouteModule },
+  { pattern: "/api/gameplay/nps", segments: [{"kind":"literal","value":"api"},{"kind":"literal","value":"gameplay"},{"kind":"literal","value":"nps"}], module: r58 as unknown as RouteModule },
+  { pattern: "/api/gameplay/page-data", segments: [{"kind":"literal","value":"api"},{"kind":"literal","value":"gameplay"},{"kind":"literal","value":"page-data"}], module: r59 as unknown as RouteModule },
+  { pattern: "/api/gameplay/planet-type", segments: [{"kind":"literal","value":"api"},{"kind":"literal","value":"gameplay"},{"kind":"literal","value":"planet-type"}], module: r60 as unknown as RouteModule },
+  { pattern: "/api/gameplay/solar", segments: [{"kind":"literal","value":"api"},{"kind":"literal","value":"gameplay"},{"kind":"literal","value":"solar"}], module: r61 as unknown as RouteModule },
+  { pattern: "/api/internal/jobs", segments: [{"kind":"literal","value":"api"},{"kind":"literal","value":"internal"},{"kind":"literal","value":"jobs"}], module: r62 as unknown as RouteModule },
+  { pattern: "/api/public/snapshots/[name]", segments: [{"kind":"literal","value":"api"},{"kind":"literal","value":"public"},{"kind":"literal","value":"snapshots"},{"kind":"param","name":"name"}], module: r63 as unknown as RouteModule },
+  { pattern: "/api/public/status", segments: [{"kind":"literal","value":"api"},{"kind":"literal","value":"public"},{"kind":"literal","value":"status"}], module: r64 as unknown as RouteModule },
+  { pattern: "/api/webhooks/clerk", segments: [{"kind":"literal","value":"api"},{"kind":"literal","value":"webhooks"},{"kind":"literal","value":"clerk"}], module: r65 as unknown as RouteModule },
+  { pattern: "/api/actions/[name]", segments: [{"kind":"literal","value":"api"},{"kind":"literal","value":"actions"},{"kind":"param","name":"name"}], module: r66 as unknown as RouteModule },
+  { pattern: "/api/auto-notify-discoveries", segments: [{"kind":"literal","value":"api"},{"kind":"literal","value":"auto-notify-discoveries"}], module: r67 as unknown as RouteModule },
+  { pattern: "/api/community-activity", segments: [{"kind":"literal","value":"api"},{"kind":"literal","value":"community-activity"}], module: r68 as unknown as RouteModule },
+  { pattern: "/api/notify-my-discoveries", segments: [{"kind":"literal","value":"api"},{"kind":"literal","value":"notify-my-discoveries"}], module: r69 as unknown as RouteModule },
+  { pattern: "/api/send-test-notification", segments: [{"kind":"literal","value":"api"},{"kind":"literal","value":"send-test-notification"}], module: r70 as unknown as RouteModule },
+  { pattern: "/api/storage/[bucket]/[...path]", segments: [{"kind":"literal","value":"api"},{"kind":"literal","value":"storage"},{"kind":"param","name":"bucket"},{"kind":"rest","name":"path"}], module: r71 as unknown as RouteModule },
 ];
 
 export type RouteSegment =
