@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import { createPocketbaseAdminClient } from "@/lib/pocketbase/adminClient";
+import { recordContribution } from "@/lib/server/contributions";
 import { getRouteUser } from "@/lib/server/routeAuth";
 import {
   SATURN_CLASSIFICATIONS_COLLECTION,
@@ -36,6 +37,8 @@ export async function POST(request: NextRequest) {
     await pb
       .collection(SATURN_CLASSIFICATIONS_COLLECTION)
       .create(buildSaturnClassificationRecord(sharedUserId, frame, body.answer));
+    // SSC-48: count today's research in the ecosystem ledger (best effort, one write at most).
+    await recordContribution(pb, user.id, "classification");
     return NextResponse.json({ ok: true });
   } catch (error) {
     // Unique user+frame: a repeat answer is already recorded.

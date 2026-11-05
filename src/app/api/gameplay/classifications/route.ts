@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 
+import { recordContribution } from "@/lib/server/contributions";
 import { getRouteUser } from "@/lib/server/routeAuth";
 import { createPocketbaseAdminClient } from "@/lib/pocketbase/adminClient";
 import { mapAnomalyToRow, mapClassificationToRow } from "@/lib/pocketbase/legacyShapes";
@@ -149,6 +150,9 @@ export async function POST(request: NextRequest) {
       media: body?.media ?? null,
       classificationConfiguration: body?.classificationConfiguration ?? null,
     });
+
+    // SSC-48: count today's research in the ecosystem ledger (best effort, one write at most).
+    await recordContribution(pb, user.id, "classification");
 
     revalidatePath("/game");
     revalidatePath("/research");
