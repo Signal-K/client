@@ -16,10 +16,12 @@ function fakePb(create: (record: unknown) => Promise<unknown>) {
 beforeEach(() => resetContributionMemo());
 
 describe("contribution kinds and days", () => {
-  it("accepts only Garden's kinds", () => {
+  it("accepts any well-formed kind", () => {
     expect(isContributionKind("classification")).toBe(true);
     expect(isContributionKind("event")).toBe(true);
-    expect(isContributionKind("exchange-sale")).toBe(false);
+    expect(isContributionKind("exchange-sale")).toBe(true);
+    expect(isContributionKind("Exchange Sale")).toBe(false);
+    expect(isContributionKind("")).toBe(false);
     expect(isContributionKind(undefined)).toBe(false);
   });
 

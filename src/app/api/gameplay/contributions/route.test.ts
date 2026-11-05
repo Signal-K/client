@@ -38,9 +38,24 @@ describe("POST /api/gameplay/contributions", () => {
   });
 
   it("rejects an unknown kind without touching the ledger", async () => {
-    expect((await post({ kind: "exchange-sale" })).status).toBe(400);
+    expect((await post({ kind: "Exchange Sale" })).status).toBe(400);
+    expect((await post({ kind: "x".repeat(65) })).status).toBe(400);
     expect((await post({})).status).toBe(400);
     expect(create).not.toHaveBeenCalled();
+  });
+
+  it("accepts any well-formed kind and stores a score", async () => {
+    expect(await (await post({ kind: "exchange-sale", score: 42.4 })).json()).toEqual({ ok: true, counted: true });
+    expect((create.mock.calls[0] as unknown[])[0]).toMatchObject({ kind: "exchange-sale", score: 42 });
+  });
+
+  it("drops a bad score and keeps the contribution", async () => {
+    for (const score of [-1, "9", Number.NaN, null]) {
+      create.mockClear();
+      resetContributionMemo();
+      expect((await post({ kind: "survey", score })).status).toBe(200);
+      expect((create.mock.calls[0] as unknown[])[0]).not.toHaveProperty("score");
+    }
   });
 
   it("ignores a client-supplied day or player", async () => {

@@ -26,18 +26,20 @@ export function resetContributionMemo() {
 
 /**
  * Report one contribution. Best effort: this never throws and never blocks the
- * action that triggered it. At most one PocketBase write, and no reads.
+ * action that triggered it. At most one PocketBase write, and no reads. The
+ * first report of a kind for a day sets its score; repeats are not re-written.
  */
 export async function recordContribution(
   pb: PocketBase,
   userId: string,
   kind: ContributionKind,
-  at: number = Date.now()
+  at: number = Date.now(),
+  score?: number
 ): Promise<ContributionResult> {
   if (!userId) return "unavailable";
   if (at < unavailableUntil) return "unavailable";
 
-  const record = buildContributionRecord(userId, kind, at);
+  const record = buildContributionRecord(userId, kind, at, score);
   const key = `${record.userId}|${record.game}|${record.kind}|${record.day}`;
   if (seen.has(key)) return "duplicate";
 
