@@ -20,20 +20,20 @@ import PocketBase from "pocketbase";
 
 import { buildLegacyPointsRows, chunk, type LegacyProfile } from "./classification-points-ledger.ts";
 
-const sourceUrl = process.env.LEGACY_POCKETBASE_URL || "http://127.0.0.1:8095";
-const sharedUrl = (process.env.SHARED_POCKETBASE_URL || "http://127.0.0.1:8090").replace(/\/$/, "");
-const email = process.env.LEGACY_POCKETBASE_ADMIN_EMAIL;
-const password = process.env.LEGACY_POCKETBASE_ADMIN_PASSWORD;
+// The profiles live in the client's own PocketBase (POCKETBASE_URL, the same one the
+// app and the garden ledger writer use). If that PocketBase has the ledger collection,
+// rows are written to it directly as superuser. SHARED_POCKETBASE_URL +
+// SHARED_INTERNAL_API_KEY switch to the shared backend's ingest route instead.
+const sourceUrl = process.env.POCKETBASE_URL || process.env.LEGACY_POCKETBASE_URL || "http://127.0.0.1:8095";
+const sharedUrl = (process.env.SHARED_POCKETBASE_URL || "").replace(/\/$/, "");
+const email = process.env.POCKETBASE_ADMIN_EMAIL || process.env.LEGACY_POCKETBASE_ADMIN_EMAIL;
+const password = process.env.POCKETBASE_ADMIN_PASSWORD || process.env.LEGACY_POCKETBASE_ADMIN_PASSWORD;
 const internalKey = process.env.SHARED_INTERNAL_API_KEY;
 const dryRun = String(process.env.DRY_RUN ?? "true").toLowerCase() !== "false";
 const PAGE = 200;
 
 if (!email || !password) {
   console.error("Missing LEGACY_POCKETBASE_ADMIN_EMAIL/PASSWORD");
-  process.exit(1);
-}
-if (!dryRun && !internalKey) {
-  console.error("A real run needs SHARED_INTERNAL_API_KEY (the garden internal app key)");
   process.exit(1);
 }
 
@@ -63,8 +63,42 @@ async function main() {
     `${dryRun ? "[DRY RUN] " : ""}${profiles.length} profiles with points: ${rows.length} rows, ${total} points total, ` +
       `${skipped.noUser} skipped (no usable user id or duplicate), ${skipped.noPoints} skipped (no whole points).`,
   );
+  // Where would rows go? Report it so a dry run answers the question.
+  let ledgerHere = false;
+  let hasPoints = false;
+  try {
+    const collection = await source.collections.getOne("platform_contributions");
+    ledgerHere = true;
+    hasPoints = (collection.fields ?? []).some((f: { name: string }) => f.name === "points");
+  } catch {
+    ledgerHere = false;
+  }
+  const useShared = Boolean(sharedUrl && internalKey);
+  console.log(
+    `platform_contributions on the profiles PocketBase: ${ledgerHere ? "yes" : "no"}; ` +
+      `points field: ${hasPoints ? "yes" : "no"}; shared ingest configured: ${useShared ? "yes" : "no"}.`,
+  );
   if (dryRun) {
     console.log("Nothing was written. Set DRY_RUN=false for a real run.");
+    return;
+  }
+  if (!useShared) {
+    if (!ledgerHere || !hasPoints) {
+      throw new Error("No ledger with a points field here, and no shared ingest configured. Nothing written.");
+    }
+    let addedDirect = 0;
+    let existing = 0;
+    for (const row of rows) {
+      try {
+        await source.collection("platform_contributions").create(row);
+        addedDirect += 1;
+      } catch (error) {
+        // The unique key (userId, game, kind, day) makes a repeat a no-op.
+        if ((error as { status?: number }).status === 400) existing += 1;
+        else throw error;
+      }
+    }
+    console.log(`Ledger (direct): ${rows.length} received, ${addedDirect} added, ${existing} already there.`);
     return;
   }
 

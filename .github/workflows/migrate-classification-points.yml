@@ -1,0 +1,41 @@
+name: Migrate classification points to the ledger
+
+# SSL-783: copies every player's profiles.classificationPoints into the
+# platform_contributions ledger as one row each (kind legacy-classification-points,
+# day 2000-01-01). Idempotent. Dry run unless dry_run=false; a dry run also reports
+# whether the ledger and its points field exist on this PocketBase.
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Report only. Set to false to write to the ledger."
+        type: choice
+        options: ["true", "false"]
+        default: "true"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: migrate-classification-points
+  cancel-in-progress: false
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: yarn
+      - run: yarn install --frozen-lockfile
+      - name: Migrate points
+        run: yarn pocketbase:migrate-points-to-ledger
+        env:
+          DRY_RUN: ${{ inputs.dry_run }}
+          POCKETBASE_URL: ${{ secrets.POCKETBASE_URL }}
+          POCKETBASE_ADMIN_EMAIL: ${{ secrets.POCKETBASE_ADMIN_EMAIL }}
+          POCKETBASE_ADMIN_PASSWORD: ${{ secrets.POCKETBASE_ADMIN_PASSWORD }}
