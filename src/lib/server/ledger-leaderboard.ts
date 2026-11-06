@@ -13,7 +13,9 @@ export interface LedgerLeaderboardResponse {
 
 export interface LedgerLeaderboardConfig {
   url: string;
-  key: string;
+  /** An internal_apps key, or a superuser token; one of the two is set. */
+  key?: string;
+  token?: string;
 }
 
 /** The shared backend settings, or null when this deployment has none (the old score is used). */
@@ -26,14 +28,24 @@ export function ledgerLeaderboardConfig(env: Record<string, string | undefined> 
 /** Null on any failure or an empty ledger, so the caller can fall back. Never throws. */
 export async function fetchLedgerLeaderboard(
   userId: string,
-  config: LedgerLeaderboardConfig | null = ledgerLeaderboardConfig(),
+  config?: LedgerLeaderboardConfig | null,
   fetcher: typeof fetch = fetch,
 ): Promise<LedgerLeaderboardResponse | null> {
-  if (!config) return null;
   try {
+    // The client's PocketBase is the shared backend, so the app's own admin client
+    // reads the ledger; SHARED_* settings override that for another deployment.
+    if (config === undefined) {
+      config = ledgerLeaderboardConfig();
+      if (!config) {
+        const { createPocketbaseAdminClient } = await import("@/lib/pocketbase/adminClient");
+        const pb = await createPocketbaseAdminClient();
+        config = { url: pb.baseURL.replace(/\/$/, ""), token: pb.authStore.token };
+      }
+    }
+    if (!config) return null;
     const response = await fetcher(
       `${config.url}/api/platform/leaderboard?limit=5&userId=${encodeURIComponent(userId)}`,
-      { headers: { "X-Internal-Api-Key": config.key } },
+      { headers: config.token ? { Authorization: config.token } : { "X-Internal-Api-Key": config.key ?? "" } },
     );
     if (!response.ok) return null;
     const body = (await response.json()) as LedgerLeaderboardResponse;
