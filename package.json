@@ -29,6 +29,7 @@
     "pocketbase:check-domains": "node --experimental-strip-types scripts/pocketbase/check-collection-domains.ts",
     "pocketbase:map-clerk-users": "node --experimental-strip-types scripts/pocketbase/map-clerk-users-to-shared.ts",
     "pocketbase:backfill-ecosystem-profiles": "node --experimental-strip-types scripts/pocketbase/backfill-shared-ecosystem-profiles.ts",
+    "pocketbase:migrate-points-to-ledger": "node --experimental-strip-types scripts/pocketbase/migrate-classification-points-to-ledger.ts",
     "pocketbase:restore-legacy-profiles": "node --experimental-strip-types scripts/pocketbase/restore-legacy-profiles.ts",
     "pocketbase:archive-legacy-structures": "tsx scripts/pocketbase/archive-legacy-structures.ts",
     "test": "yarn test:all",
