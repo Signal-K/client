@@ -9,6 +9,7 @@
     "strict": true,
     "types": ["cypress", "node", "@react-three/fiber", "vitest/globals"],
     "noEmit": true,
+    "allowImportingTsExtensions": true,
     "module": "esnext",
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
