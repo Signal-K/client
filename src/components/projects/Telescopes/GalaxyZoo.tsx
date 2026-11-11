@@ -9,6 +9,7 @@ import { Button } from "@/src/components/ui/button";
 import TutorialContentBlock, { createTutorialSlides } from "../TutorialContentBlock";
 import { ANOMALIES_API } from "@/lib/gameplay/edgeApi";
 import { classificationsFetch } from "@/lib/gameplay/edgeApi";
+import { captureClassification } from "@/lib/gameplay/classificationCapture";
 
 type Anomaly = {
   id: string;
@@ -91,6 +92,13 @@ export const GalaxyZooTutorial: React.FC<GalaxyZooProps> = ({
         timestamp: new Date().toISOString()
       };
 
+      const capture = await captureClassification({
+        userId: session.user.id,
+        imageUrls: [avatarUrl],
+        title: `Galaxy Zoo · anomaly ${anomalyId}`,
+        lines: [`Answer: ${options[selectedOption]}`, comments.trim() ? `Notes: ${comments.trim()}` : ""],
+      });
+
       const response = await classificationsFetch("/api/gameplay/classifications", {
         method: "POST",
         headers: {
@@ -99,8 +107,9 @@ export const GalaxyZooTutorial: React.FC<GalaxyZooProps> = ({
         body: JSON.stringify({
           anomaly: parseInt(anomalyId),
           classificationtype: "galaxyZoo",
-          classificationConfiguration,
+          classificationConfiguration: { ...classificationConfiguration, capture: capture.config },
           content: comments.trim() || null,
+          ...(capture.media.length ? { media: capture.media } : {}),
         }),
       });
       
@@ -216,6 +225,12 @@ function GalaxyZooClassify({ anomalyId, avatarUrl }: GalaxyZooProps) {
         discovery: "Contributed to galaxy morphology mapping.",
         scientificValue: "Helps refine evolution models of the universe.",
       };
+      const capture = await captureClassification({
+        userId: session.user.id,
+        imageUrls: [avatarUrl],
+        title: `Galaxy Zoo · anomaly ${anomalyId}`,
+        lines: [`Answer: ${options[selectedOption]}`, comments.trim() ? `Notes: ${comments.trim()}` : ""],
+      });
       const response = await classificationsFetch("/api/gameplay/classifications", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -227,8 +242,10 @@ function GalaxyZooClassify({ anomalyId, avatarUrl }: GalaxyZooProps) {
             interpretation,
             comments: comments.trim() || null,
             timestamp: new Date().toISOString(),
+            capture: capture.config,
           },
           content: comments.trim() || null,
+          ...(capture.media.length ? { media: capture.media } : {}),
         }),
       });
       if (!response.ok) throw new Error("Failed to submit classification");

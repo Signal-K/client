@@ -30,6 +30,7 @@ import { ClassificationFormProps } from "./FormConfigurations";
 import { SciFiButton } from "@/src/components/ui/styles/sci-fi/button";
 import MediaUpload from "./FormFileUpload";
 import { classificationsFetch } from "@/lib/gameplay/edgeApi";
+import { captureClassification } from "@/lib/gameplay/classificationCapture";
 
 const ClassificationForm: React.FC<ClassificationFormProps> = ({
   anomalyType,
@@ -341,6 +342,26 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({
         }
       }
 
+      // The image the player classified with their answers on it, kept in storage.
+      const capture = await captureClassification({
+        userId: session?.user?.id,
+        imageUrls: Array.isArray(assetMentioned) ? assetMentioned : [assetMentioned],
+        title: `${anomalyType ?? "Classification"}${anomalyId ? ` · anomaly ${anomalyId}` : ""}`,
+        lines: [
+          ...Object.entries(selectedOptions).flatMap(([group, chosen]) =>
+            Object.entries(chosen ?? {})
+              .filter(([, on]) => on)
+              .map(([id]) => {
+                const groupOptions = classificationOptions[Number(group)];
+                const option = (Array.isArray(groupOptions) ? groupOptions : flattenedOptions).find((o) => o.id === Number(id));
+                return `✓ ${option?.text ?? `option ${id}`}`;
+              }),
+          ),
+          ...(Array.isArray(annotationOptions) ? annotationOptions.map((option) => `Marked: ${option}`) : []),
+          content ? `Notes: ${content}` : "",
+        ],
+      });
+
       const classificationResponse = await classificationsFetch("/api/gameplay/classifications", {
         method: "POST",
         headers: {
@@ -348,10 +369,10 @@ const ClassificationForm: React.FC<ClassificationFormProps> = ({
         },
         body: JSON.stringify({
           content,
-          media: [uploads, assetMentioned],
+          media: [uploads, assetMentioned, ...capture.media],
           anomaly: anomalyId,
           classificationtype: anomalyType,
-          classificationConfiguration,
+          classificationConfiguration: { ...classificationConfiguration, capture: capture.config },
         }),
       });
 
