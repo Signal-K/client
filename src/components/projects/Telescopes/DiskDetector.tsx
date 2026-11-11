@@ -11,6 +11,7 @@ import TutorialContentBlock, { createTutorialSlides } from "../TutorialContentBl
 import { getStorageUrl } from "@/lib/pocketbase/storageUrl";
 import { ANOMALIES_API } from "@/lib/gameplay/edgeApi";
 import { classificationsFetch } from "@/lib/gameplay/edgeApi";
+import { captureClassification } from "@/lib/gameplay/classificationCapture";
 
 type Anomaly = {
   id: string;
@@ -244,6 +245,16 @@ export const DiskDetectorTutorial: React.FC<TelescopeProps> = ({
         timestamp: new Date().toISOString()
       };
 
+      const capture = await captureClassification({
+        userId: session?.user?.id,
+        imageUrls,
+        title: `Disk Detective · anomaly ${anomalyId}`,
+        lines: [
+          ...classificationConfiguration.selectedOptions.map((option) => `✓ ${option.label}`),
+          comments.trim() ? `Notes: ${comments.trim()}` : "",
+        ],
+      });
+
       const response = await classificationsFetch("/api/gameplay/classifications", {
         method: "POST",
         headers: {
@@ -252,8 +263,9 @@ export const DiskDetectorTutorial: React.FC<TelescopeProps> = ({
         body: JSON.stringify({
           anomaly: parseInt(anomalyId),
           classificationtype: "diskDetective",
-          classificationConfiguration,
+          classificationConfiguration: { ...classificationConfiguration, capture: capture.config },
           content: comments.trim() || null,
+          ...(capture.media.length ? { media: capture.media } : {}),
         }),
       });
       const data = await response.json().catch(() => ({}));

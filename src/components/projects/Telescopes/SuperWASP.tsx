@@ -9,6 +9,7 @@ import TutorialContentBlock, { createTutorialSlides } from "../TutorialContentBl
 import { useActivePlanet } from "@/src/lib/context/ActivePlanet";
 import { getStorageUrl } from "@/lib/pocketbase/storageUrl";
 import { classificationsFetch } from "@/lib/gameplay/edgeApi";
+import { captureClassification } from "@/lib/gameplay/classificationCapture";
 
 type Anomaly = {
   id: string;
@@ -196,6 +197,17 @@ export const SuperWASPTutorial: React.FC<TelescopeProps> = ({ anomalyId }) => {
         timestamp: new Date().toISOString()
       };
 
+      const capture = await captureClassification({
+        userId: session?.user?.id,
+        imageUrls: [imageUrl],
+        title: `SuperWASP variable · anomaly ${anomalyId}`,
+        lines: [
+          `Type: ${classificationConfiguration.variableTypeLabel ?? selectedType}`,
+          `Period: ${classificationConfiguration.periodNote}`,
+          comments.trim() ? `Notes: ${comments.trim()}` : "",
+        ],
+      });
+
       const response = await classificationsFetch("/api/gameplay/classifications", {
         method: "POST",
         headers: {
@@ -204,8 +216,9 @@ export const SuperWASPTutorial: React.FC<TelescopeProps> = ({ anomalyId }) => {
         body: JSON.stringify({
           anomaly: parseInt(anomalyId),
           classificationtype: "superwasp-variable",
-          classificationConfiguration,
+          classificationConfiguration: { ...classificationConfiguration, capture: capture.config },
           content: comments.trim() || null,
+          ...(capture.media.length ? { media: capture.media } : {}),
         }),
       });
       const data = await response.json().catch(() => ({}));
