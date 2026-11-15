@@ -3,21 +3,22 @@
 import { useEffect, useState } from "react";
 
 import styles from "../garden.module.css";
-import { SPACE_WEEK_LINKS, activeSkyCards, spaceWeekOpen, type SkyEventCard } from "../skyEvents";
+import { activeSkyCards, activeSkySeason, type SkyEventCard, type SkySeason } from "../skyEvents";
 
-/** Space Week banner and cards (SSC-41, SSC-44): each card is live from its date and all come down after 11 Oct. Link-out only. */
+/** Banner and cards for the current sky season (Space Week, Leonids, Geminids): each card is live from its date. Link-out only. */
 export function SkyEventCards() {
-  const [state, setState] = useState<{ open: boolean; cards: SkyEventCard[] }>({ open: false, cards: [] });
+  const [state, setState] = useState<{ season: SkySeason | null; cards: SkyEventCard[] }>({ season: null, cards: [] });
   useEffect(() => {
     const now = Date.now();
-    setState({ open: spaceWeekOpen(now), cards: activeSkyCards(now) });
+    setState({ season: activeSkySeason(now), cards: activeSkyCards(now) });
   }, []);
-  if (!state.open) return null;
+  const { season } = state;
+  if (!season) return null;
   return (
-    <aside className={styles.skyCards} aria-label="World Space Week sky events">
+    <aside className={styles.skyCards} aria-label={`${season.title} sky events`}>
       <section className={styles.skyCard}>
-        <h3>World Space Week · 4–10 Oct</h3>
-        {SPACE_WEEK_LINKS.map((link) => (
+        <h3>{season.title}</h3>
+        {season.links.map((link) => (
           <a key={link.href} href={link.href} target="_blank" rel="noopener noreferrer">
             {link.label} →
           </a>
