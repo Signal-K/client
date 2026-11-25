@@ -44,4 +44,7 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: apps/db-dashboard
+          # The action's default Wrangler (3.90) rejects an assets-only Worker with
+          # "Missing entry-point"; assets-only deploys need Wrangler 4.
+          wranglerVersion: "4.168.0"
           command: deploy
