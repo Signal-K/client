@@ -54,6 +54,8 @@ apps/mac-widget/StarSailorsPulse/Config/Secrets.xcconfig
 # debug
 npm-debug.log*
 package-lock.json
+# the db dashboard deploys with npm ci and its npm cache needs the lockfile
+!apps/db-dashboard/package-lock.json
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
