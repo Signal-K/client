@@ -1,0 +1,33 @@
+/* Dashboard additions on top of PocketBase's stylesheet. */
+html, body { height: 100%; }
+.app-view { flex: 1; min-height: 0; display: flex; }
+.app-view > .page { flex: 1; height: auto; }
+.ping { cursor: pointer; padding: 0 8px; white-space: nowrap; }
+.app-header .ping { color: var(--accentTxtColor); opacity: .8; }
+
+.login-wrap { min-height: 100%; display: flex; align-items: center; justify-content: center; background: var(--surfaceAlt1Color); padding: 16px; }
+.login-card { width: 100%; max-width: 380px; background: var(--surfaceColor); color: var(--surfaceTxtColor); padding: 32px; border-radius: var(--lgBorderRadius); border: 1px solid var(--surfaceAlt2Color); }
+.login-logo { display: block; margin: 0 auto 16px; max-height: 44px; }
+
+.game-switcher { display: flex; flex-wrap: wrap; gap: 4px; }
+
+.page-footer-bar { display: flex; align-items: center; gap: 8px; padding: 10px 0 0; flex-shrink: 0; }
+.breadcrumbs { display: inline-flex; gap: 8px; font-size: 1.1em; }
+.breadcrumb-item + .breadcrumb-item::before { content: "/"; margin-right: 8px; color: var(--surfaceTxtHintColor); }
+.row-link:hover td { background: var(--surfaceAlt1Color); }
+
+.metrics-body { padding-bottom: 32px; }
+.metric-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 12px; }
+.metric-card { background: var(--surfaceAlt1Color); border: 1px solid var(--surfaceAlt2Color); border-radius: var(--borderRadius); padding: 14px; }
+.metric-title { font-weight: 600; margin-bottom: 8px; }
+.stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 10px; }
+.stat-value { font-size: 1.4em; font-weight: 600; }
+.stat-label { font-size: .85em; color: var(--surfaceTxtHintColor); }
+.spark { width: 100%; height: 56px; display: block; margin-bottom: 4px; }
+.grid-2col { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+
+.record-view-overlay { position: fixed; inset: 0; z-index: 100; background: rgba(0, 0, 0, .45); display: flex; justify-content: flex-end; }
+.record-view-panel { width: min(560px, 100%); height: 100%; background: var(--surfaceColor); color: var(--surfaceTxtColor); display: flex; flex-direction: column; box-shadow: -8px 0 24px rgba(0, 0, 0, .25); }
+.record-view-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 14px 18px; border-bottom: 1px solid var(--surfaceAlt2Color); }
+.record-view-body { padding: 18px; overflow: auto; flex: 1; }
+.record-json { background: var(--surfaceAlt1Color); border: 1px solid var(--surfaceAlt2Color); border-radius: var(--borderRadius); padding: 12px; overflow: auto; max-height: 320px; font-family: var(--monospaceFontFamily); font-size: .85em; margin: 8px 0; }

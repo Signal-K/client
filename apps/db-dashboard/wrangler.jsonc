@@ -1,0 +1,15 @@
+{
+  "$schema": "https://unpkg.com/wrangler/config-schema.json",
+  // KES-550: the PocketBase metrics dashboard. A static site (Vite build in
+  // dist/) on Workers Static Assets with no Worker code, so it uses no CPU
+  // budget. It signs in with the PocketBase superuser account in the browser.
+  "name": "starsailors-db-dashboard",
+  "compatibility_date": "2026-07-24",
+  "assets": {
+    "directory": "dist",
+    "html_handling": "auto-trailing-slash",
+    "not_found_handling": "single-page-application"
+  },
+  "routes": [{ "pattern": "db.starsailors.space", "custom_domain": true }],
+  "workers_dev": false
+}
